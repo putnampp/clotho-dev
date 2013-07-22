@@ -1,0 +1,5 @@
+SET( DIRS )
+
+FOREACH( D ${DIRS} )
+    ADD_SUBDIRECTORY( ${D} )
+ENDFOREACH( D )

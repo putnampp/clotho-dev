@@ -50,7 +50,7 @@ ELSE (NOT POPSIM_EXTERNALLY_CONFIGURED )
 ENDIF (NOT POPSIM_EXTERNALLY_CONFIGURED )
 
 ################################################################################
-FIND_PACKAGE( Boost COMPONENTS program_options filesystem system thread REQUIRED )
+FIND_PACKAGE( Boost COMPONENTS program_options filesystem system thread unit_test_framework REQUIRED )
 IF( Boost_FOUND )
     INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
     MESSAGE (STATUS "Boost Include: " ${Boost_INCLUDE_DIR} )
@@ -87,3 +87,4 @@ set(CMAKE_CXX_FLAGS "-g -fPIC -Wall -O3" )
 LINK_DIRECTORIES( ${PROJECT_BINARY_DIR}/bin )
 
 add_subdirectory( src )
+add_subdirectory( unittest )
