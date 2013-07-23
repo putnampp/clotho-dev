@@ -1,0 +1,18 @@
+Project:    <pop_sim> (need to change as POPSIM is another project)
+
+DESCRIPTION
+    
+    <pop_sim> is a forward-time population genetics simulation engine.  The
+goal of the project is to provide a powerful and flexible simulation engine.
+The project should be able to take full advantage of the hardware resources
+available at the time of execution.
+
+    The engine is written in C/C++.
+
+OVERVIEW
+    - System Requirements
+
+
+SYSTEM REQUIREMENTS
+    - Boost 1.54.0 (or higher)
+    - OpenCL 1.1 (or higher) and supported hardware
