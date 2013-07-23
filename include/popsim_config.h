@@ -3,12 +3,12 @@
 
 #include "log_levels.h"
 
-#define MAJOR_VERSION  "${POPSIM_PACKAGE_VER_MAJOR}"
-#define MINOR_VERSION  "${POPSIM_PACKAGE_VER_MINOR}"
-#define VERSION        "${POPSIM_PACKAGE_STRING}"
+#define MAJOR_VERSION  "0.1"
+#define MINOR_VERSION  "0"
+#define VERSION        "POPSIM 0.1.0"
 
-#cmakedefine LOG
-#cmakedefine LOG_LEVEL @LOG_LEVEL@
+/* #undef LOG */
+/* #undef LOG_LEVEL */
 
 #ifdef LOG_LEVEL  // log_level defined
     #if LOG_LEVEL == LOG_OFF // but it is set to be off

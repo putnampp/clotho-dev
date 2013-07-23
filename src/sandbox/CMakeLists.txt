@@ -1,4 +1,4 @@
-SET( DIRS sandbox )
+SET( DIRS cl )
 
 FOREACH( D ${DIRS} )
     ADD_SUBDIRECTORY( ${D} )
