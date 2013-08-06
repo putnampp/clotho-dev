@@ -26,16 +26,14 @@
  * of the authors and should not be interpreted as representing official policies,
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
-#ifndef COMMON_H_
-#define COMMON_H_
 
-#include "popsim_config.h"
+#include <CL/cl.h>
 
-#include <string>
-#include <stdint.h>
+#include <iostream>
+#include <cstdlib>
 
-#include <boost/smart_ptr.hpp>
+int main(int argc, char ** argv ) {
 
-typedef std::string String;
 
-#endif  // COMMON_H_
+    return EXIT_SUCCESS;
+}

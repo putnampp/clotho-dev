@@ -26,16 +26,13 @@
  * of the authors and should not be interpreted as representing official policies,
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
-#ifndef COMMON_H_
-#define COMMON_H_
 
-#include "popsim_config.h"
+#ifndef MARKER_H_
+#define MARKER_H_
 
-#include <string>
-#include <stdint.h>
+/*******************************************************************************
+ * A Marker is a
+ ******************************************************************************/
+class Marker;
 
-#include <boost/smart_ptr.hpp>
-
-typedef std::string String;
-
-#endif  // COMMON_H_
+#endif  // MARKER_H_

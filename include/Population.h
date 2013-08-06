@@ -26,16 +26,28 @@
  * of the authors and should not be interpreted as representing official policies,
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
-#ifndef COMMON_H_
-#define COMMON_H_
 
-#include "popsim_config.h"
+#ifndef POPULATION_H_
+#define POPULATION_H_
 
-#include <string>
-#include <stdint.h>
+#include "common.h"
 
-#include <boost/smart_ptr.hpp>
+#include "Individual.h"
 
-typedef std::string String;
+#include <set>
 
-#endif  // COMMON_H_
+/*******************************************************************************
+ * A Population is a collection on Individuals.
+ ******************************************************************************/
+class Population {
+public:
+    Population();
+    virtual ~Population();
+private:
+    typedef boost::shared_ptr< Individiaul >            IndividualPtr;
+    typedef boost::scoped_ptr< std::set< IndividualPtr > > Individuals;
+
+    Individuals     m_individs;
+};
+
+#endif  // POPULATION_H_

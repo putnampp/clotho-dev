@@ -26,16 +26,28 @@
  * of the authors and should not be interpreted as representing official policies,
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
-#ifndef COMMON_H_
-#define COMMON_H_
 
-#include "popsim_config.h"
+#ifndef GENOTYPE_H_
+#define GENOTYPE_H_
 
-#include <string>
-#include <stdint.h>
+#include "common.h"
 
-#include <boost/smart_ptr.hpp>
+#include "Marker.h"
 
-typedef std::string String;
+#include <set>
 
-#endif  // COMMON_H_
+/*******************************************************************************
+ * A Genotype is a collection of markers
+ ******************************************************************************/
+class Genotype {
+public:
+    Genotype();
+    virtual ~Genotype();
+private:
+    typedef boost::shared_ptr< Marker > MarkerPtr;
+    typedef boost::scoped_ptr< std::set< MarkerPtr > >  Markers;
+
+    Markers     m_markers;
+};
+
+#endif  // GENOTYPE_H_

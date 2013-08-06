@@ -26,16 +26,12 @@
  * of the authors and should not be interpreted as representing official policies,
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
-#ifndef COMMON_H_
-#define COMMON_H_
 
-#include "popsim_config.h"
+#ifndef PHENOTYPE_H_
+#define PHENOTYPE_H_
 
-#include <string>
-#include <stdint.h>
+#include "common.h"
 
-#include <boost/smart_ptr.hpp>
+class Phenotype;
 
-typedef std::string String;
-
-#endif  // COMMON_H_
+#endif  // PHENOTYPE_H_

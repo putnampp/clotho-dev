@@ -26,16 +26,32 @@
  * of the authors and should not be interpreted as representing official policies,
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
-#ifndef COMMON_H_
-#define COMMON_H_
 
-#include "popsim_config.h"
+#ifndef INDIVIDUAL_H_
+#define INDIVIDUAL_H_
 
-#include <string>
-#include <stdint.h>
+#include "common.h"
 
-#include <boost/smart_ptr.hpp>
+#include "Genotype.h"
+#include "Phenotype.h"
 
-typedef std::string String;
 
-#endif  // COMMON_H_
+/*******************************************************************************
+ * An Individual is an encapsulation object consisting of a genotype and
+ * phenotype.
+ *
+ *
+ ******************************************************************************/
+class Individual {
+public:
+    Individual();
+    virtual ~Individual();
+private:
+    typedef boost::scoped_ptr< Genotype > GenotypePtr;
+    GenotypePtr     m_geno;
+
+    typedef boost::scoped_ptr< Phenotype > PhenotypePtr;
+    PhenotypePtr    m_pheno;
+};
+
+#endif  // INDIVIDUAL_H_
