@@ -27,35 +27,15 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef INDIVIDUAL_H_
-#define INDIVIDUAL_H_
-
-#include "common.h"
-
-#include "Genotype.h"
-#include "Phenotype.h"
-
-#include "Location.h"
+#ifndef LOCATION_H_
+#define LOCATION_H_
 
 
 /*******************************************************************************
- * An Individual is an encapsulation object consisting of a genotype and
- * phenotype.
- *
- *
+ * Location defines the relative position of an object.
  ******************************************************************************/
-class Individual {
-public:
-    Individual();
-
-    virtual bool mate( const Individual * b) = 0;
-    virtual ~Individual();
-private:
-    typedef boost::scoped_ptr< Genotype > GenotypePtr;
-    GenotypePtr     m_geno;
-
-    typedef boost::scoped_ptr< Phenotype > PhenotypePtr;
-    PhenotypePtr    m_pheno;
+struct Location {
+    uint32_t    m_x, m_y, m_z;
 };
 
-#endif  // INDIVIDUAL_H_
+#endif  // LOCATION_H_
