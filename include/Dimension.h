@@ -27,15 +27,67 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef LOCATION_H_
-#define LOCATION_H_
+#ifndef DIMENSION_H_
+#define DIMENSION_H_
+
+#include "common.h"
+#include <cassert>
 
 
 /*******************************************************************************
- * Location defines the relative position of an object.
+ * Dimensions is a generic fixed-length vector of coordinates of a specified
+ * type.
+ *
+ * D - specifies the desired type
+ * N - the number of dimensions (overflow occurs at 255)
  ******************************************************************************/
-struct Location {
-    uint32_t    m_x, m_y, m_z;
+template < class D, unsigned char N >
+class Dimensions {
+public:
+    enum { size = N };
+    typedef D   type;
+
+    Dimensions() {}
+
+    virtual type &   operator[]( uint32_t idx ) {
+        assert( idx < size );
+        return m_dimensions[ size ];
+    }
+
+    virtual ~Dimensions() {}
+protected:
+    type    m_dimensions[ size ];
+    struct  m_coordinates;
 };
 
-#endif  // LOCATION_H_
+/*******************************************************************************
+ * Dimensions< D > is 3D partial specialization of the Dimensions object.
+ * 
+ * Partial specialization provides an implementation of the coordinates 
+ * structure. Thus, inheriting objects can access the dimensions using
+ * either m_coordinates.(x, y, z) or m_dimensions[0,1,2].
+ ******************************************************************************/
+template < class D >
+class Dimensions < D, 3 > {
+public:
+    enum { size = 3 };
+    typedef D   type;
+
+    Dimensions() {}
+
+    virtual type & operator[]( uint32_t idx ) {
+        assert( idx < size );
+        return m_coordinates[ idx ];
+    }
+
+    virtual ~Dimensions() {}
+protected:
+    union {
+        type    m_dimensions[ size ];
+        struct  {
+            type    x, y, z;
+        } m_coordinates;
+    };
+};
+
+#endif  // DIMENSION_H_
