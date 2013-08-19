@@ -26,41 +26,13 @@
  * of the authors and should not be interpreted as representing official policies,
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
-#ifndef TRAIT_H_
-#define TRAIT_H_
 
-#include "common.h"
+#ifndef REPRODUCTION_H_
+#define REPRODUCTION_H_
 
-/*******************************************************************************
- * A Trait is some observed characteristic of an individual.
- *
- * A set of Traits is used to define a Phenotype.
- *
- * There are two types of traits: categorical or quantitative.
- *
- * Quantitative traits are represented by a measured value or quantity. For 
- * example, height is considered to be a quantitative value.
- *
- * Qualitative traits fall into a general set of values. For example, eye color
- * is a categorical trait, and is limited to a set of colors.
- *
- ******************************************************************************/
-template < class V >
-class Trait {
+class Reproduction {
 public:
-    typedef V   value_type;
-    String getName() const;
-    String getDescription() const;
-
-    template < class P >
-    P & getProperty( const String & key ) const;
-
-    const value_type & value();
-private:
-    class Property;
-    boost::scoped_ptr< Property > m_prop;
-
-    value_type  m_val;
+    virtual Individual *    reproduce( const Individual *, const Individual * ) = 0;
 };
 
-#endif  // TRAIT_H_
+#endif  // REPRODUCTION_H_

@@ -26,41 +26,32 @@
  * of the authors and should not be interpreted as representing official policies,
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
-#ifndef TRAIT_H_
-#define TRAIT_H_
+
+#ifndef STATISTICEVAL_H_
+#define STATISTICEVAL_H_
 
 #include "common.h"
+#include "Statistic.h"
+#include "Describable.h"
 
-/*******************************************************************************
- * A Trait is some observed characteristic of an individual.
- *
- * A set of Traits is used to define a Phenotype.
- *
- * There are two types of traits: categorical or quantitative.
- *
- * Quantitative traits are represented by a measured value or quantity. For 
- * example, height is considered to be a quantitative value.
- *
- * Qualitative traits fall into a general set of values. For example, eye color
- * is a categorical trait, and is limited to a set of colors.
- *
- ******************************************************************************/
-template < class V >
-class Trait {
+#include <vector>
+
+typedef std::vector< StatPtr >  StatGroup;
+
+class StatisticEval : public Describable {
 public:
-    typedef V   value_type;
-    String getName() const;
-    String getDescription() const;
+    StatisticEval() : m_stats( new StatGroup() ) {}
 
-    template < class P >
-    P & getProperty( const String & key ) const;
+    virtual void addStatistic( StatPtr stat );
 
-    const value_type & value();
-private:
-    class Property;
-    boost::scoped_ptr< Property > m_prop;
+    virtual bool operator()( const Population & p );
 
-    value_type  m_val;
+    virtual ~StatisticEval() {
+        m_stats.clear();
+    }
+protected:
+    typedef boost::scoped_ptr< StatGroup >  StatGroupPtr;
+    StatGroupPtr   m_stats;
 };
 
-#endif  // TRAIT_H_
+#endif  // STATISTICEVAL_H_

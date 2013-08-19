@@ -26,41 +26,44 @@
  * of the authors and should not be interpreted as representing official policies,
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
-#ifndef TRAIT_H_
-#define TRAIT_H_
+
+#ifndef STATISTIC_H_
+#define STATISTIC_H_
 
 #include "common.h"
+#include "Describable.h"
+#include "Population.h"
+#include "Configurable.h"
+
+#include <fstream>
 
 /*******************************************************************************
- * A Trait is some observed characteristic of an individual.
+ * Statistic is an abstract class from which statistic algorithms are
+ * derived.
  *
- * A set of Traits is used to define a Phenotype.
- *
- * There are two types of traits: categorical or quantitative.
- *
- * Quantitative traits are represented by a measured value or quantity. For 
- * example, height is considered to be a quantitative value.
- *
- * Qualitative traits fall into a general set of values. For example, eye color
- * is a categorical trait, and is limited to a set of colors.
- *
+ * Every Statistic is configurable. Meaning that it may or may not accept 
+ * external configuration settings.
  ******************************************************************************/
-template < class V >
-class Trait {
+class Statistic : public Describable, public Configurable {
 public:
-    typedef V   value_type;
-    String getName() const;
-    String getDescription() const;
+    Statistic( const String & desc ) : Describable( desc ) {}
 
-    template < class P >
-    P & getProperty( const String & key ) const;
+    virtual void configure( std::istream & in ) = 0;
+    virtual void operator()( const Population & p ) = 0;
 
-    const value_type & value();
-private:
-    class Property;
-    boost::scoped_ptr< Property > m_prop;
-
-    value_type  m_val;
+    friend std::ostream & operator<<( std::ostream & out, const Statistic & stat );
+    virtual ~Statistic() {}
+protected:
+    virtual void write_stat( std::ostream & out ) const {
+        out << m_desc;
+    }
 };
 
-#endif  // TRAIT_H_
+typedef boost::shared_ptr< Statistic > StatPtr;
+
+std::ostream & operator<<( std::ostream & out, const Statistic & stat ) {
+    stat.write_stat( out );
+    return out;
+}
+
+#endif  // STATISTIC_H_

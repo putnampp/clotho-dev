@@ -26,41 +26,53 @@
  * of the authors and should not be interpreted as representing official policies,
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
-#ifndef TRAIT_H_
-#define TRAIT_H_
+
+#ifndef STATCREATOR_H_
+#define STATCREATOR_H_
 
 #include "common.h"
+#include "iStatCreator.h"
 
-/*******************************************************************************
- * A Trait is some observed characteristic of an individual.
- *
- * A set of Traits is used to define a Phenotype.
- *
- * There are two types of traits: categorical or quantitative.
- *
- * Quantitative traits are represented by a measured value or quantity. For 
- * example, height is considered to be a quantitative value.
- *
- * Qualitative traits fall into a general set of values. For example, eye color
- * is a categorical trait, and is limited to a set of colors.
- *
- ******************************************************************************/
-template < class V >
-class Trait {
+#include "Statistic.h"
+
+#include "StatisticFactory.h"
+
+template < class STAT >
+class StatCreator : public iStatCreator {
 public:
-    typedef V   value_type;
-    String getName() const;
-    String getDescription() const;
+    StatCreator( const char * name, const char * desc ) : m_name( name ), m_desc  {
+        StatisticFactory::getInstance()->addStatistic( this );
+    }
 
-    template < class P >
-    P & getProperty( const String & key ) const;
+    String &    name() const {
+        return m_name;
+    }
 
-    const value_type & value();
-private:
-    class Property;
-    boost::scoped_ptr< Property > m_prop;
+    String &    description() const {
+        return m_desc;
+    }
 
-    value_type  m_val;
+    void    print( std::ostream & out ) const {
+        out << m_name << " - " << m_desc << std::endl;
+    }
+
+    boost::shared_ptr< Statistic > create() {
+        return boost::shared_ptr< Statistic >( new STAT() );
+    }
+
+    virtual ~StatCreator() {
+        StatisticFactory::getInstance()->removeStatistic( this );
+    }
+
+protected:
+    String m_name;
+    String m_desc;
 };
 
-#endif  // TRAIT_H_
+#define REGISTERED_STATISTIC(name, desc)                 \
+    class name;                                          \  // forward declare class
+    StatCreator< name >   stat_##name( #name, #desc);    \  // StatCreator adds self to StatisticFactory
+    class name : public Statistic
+
+#define REGISTERED_STATISTIC( name )    REGISTERED_STATISTIC(name, name )
+#endif  // STATCREATOR_H_

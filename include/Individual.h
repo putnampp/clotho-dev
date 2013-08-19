@@ -36,6 +36,8 @@
 #include "Phenotype.h"
 
 #include "Location.h"
+#include "Selection.h"
+#include "Reproduction.h"
 
 
 /*******************************************************************************
@@ -48,7 +50,9 @@ class Individual {
 public:
     Individual();
 
-    virtual bool mate( const Individual * b) = 0;
+    friend class Selection;
+    friend class Reproduction;
+
     virtual ~Individual();
 private:
     typedef boost::scoped_ptr< Genotype > GenotypePtr;

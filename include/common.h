@@ -31,6 +31,7 @@
 
 #include "popsim_config.h"
 
+#include <iostream>
 #include <string>
 #include <stdint.h>
 
