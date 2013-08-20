@@ -44,7 +44,7 @@ public:
     Population();
     virtual ~Population();
 private:
-    typedef boost::shared_ptr< Individiaul >            IndividualPtr;
+    typedef boost::shared_ptr< Individual >            IndividualPtr;
     typedef boost::scoped_ptr< std::set< IndividualPtr > > Individuals;
 
     Individuals     m_individs;

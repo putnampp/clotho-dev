@@ -35,8 +35,8 @@
  ******************************************************************************/
 class Marker {
 public:
-    Marker();
-    virtual Marker();
+    Marker(){}
+    virtual ~Marker(){}
 private:
     
 };

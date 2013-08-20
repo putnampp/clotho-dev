@@ -30,7 +30,9 @@
 #ifndef SELECTION_H_
 #define SELECTION_H_
 
-class Selection {
+#include "Individual.h"
+
+struct Selection {
     virtual bool select( const Individual *, const Individual * ) = 0;
 };
 

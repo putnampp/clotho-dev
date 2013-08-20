@@ -27,36 +27,13 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef INDIVIDUAL_H_
-#define INDIVIDUAL_H_
+#include <boost/test/unit_test.hpp>
+#include "StatisticFactory.h"
 
-#include "common.h"
+BOOST_AUTO_TEST_SUITE( test_statistic_factory )
 
-#include "Genotype.h"
-#include "Phenotype.h"
+BOOST_AUTO_TEST_CASE( sfSingleton ) {
+    BOOST_REQUIRE_MESSAGE( StatisticFactory::getInstance() != NULL, "Failed to get Statistic Factory" );
+}
 
-//#include "Dimension.h"
-//#include "Selection.h"
-//#include "MatingModel.h"
-
-
-/*******************************************************************************
- * An Individual is an encapsulation object consisting of a genotype and
- * phenotype.
- *
- *
- ******************************************************************************/
-class Individual {
-public:
-    Individual();
-
-    virtual ~Individual();
-private:
-    typedef boost::scoped_ptr< Genotype > GenotypePtr;
-    GenotypePtr     m_geno;
-
-    typedef boost::scoped_ptr< Phenotype > PhenotypePtr;
-    PhenotypePtr    m_pheno;
-};
-
-#endif  // INDIVIDUAL_H_
+BOOST_AUTO_TEST_SUITE_END()

@@ -27,36 +27,9 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef INDIVIDUAL_H_
-#define INDIVIDUAL_H_
+#define BOOST_TEST_MAIN
+#define BOOST_TEST_DYN_LINK
 
-#include "common.h"
+#define BOOST_TEST_MODULE PopSimTest
 
-#include "Genotype.h"
-#include "Phenotype.h"
-
-//#include "Dimension.h"
-//#include "Selection.h"
-//#include "MatingModel.h"
-
-
-/*******************************************************************************
- * An Individual is an encapsulation object consisting of a genotype and
- * phenotype.
- *
- *
- ******************************************************************************/
-class Individual {
-public:
-    Individual();
-
-    virtual ~Individual();
-private:
-    typedef boost::scoped_ptr< Genotype > GenotypePtr;
-    GenotypePtr     m_geno;
-
-    typedef boost::scoped_ptr< Phenotype > PhenotypePtr;
-    PhenotypePtr    m_pheno;
-};
-
-#endif  // INDIVIDUAL_H_
+#include <boost/test/unit_test.hpp>

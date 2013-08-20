@@ -26,8 +26,13 @@
 # of the authors and should not be interpreted as representing official policies,
 # either expressed or implied, of the FreeBSD Project.
 ################################################################################
-SET( DIRS )
+INCLUDE_DIRECTORIES(${POPSIM_INCLUDE_DIR})
+
+LIST(APPEND DIRS cchmc_test )
 
 FOREACH( D ${DIRS} )
     ADD_SUBDIRECTORY( ${D} )
 ENDFOREACH( D )
+
+ADD_EXECUTABLE(test_main test_main.cpp)
+TARGET_LINK_LIBRARIES( test_main ${Boost_LIBRARIES} cchmc cchmc_test)

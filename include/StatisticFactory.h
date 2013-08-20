@@ -48,8 +48,10 @@ public:
         return instance;
     }
 
-    void add( iStatCreator * stat );
+    bool add( iStatCreator * stat );
     void remove( iStatCreator * stat );
+
+    size_t  count() const;
     
     void buildEval( std::istream & configuration, StatisticEval * eval );
 

@@ -52,7 +52,7 @@ public:
 
     virtual void    print( std::ostream & out ) const;
 
-    boost::shared_ptr< MatingModel > create() {
+    virtual boost::shared_ptr< MatingModel > create() {
         return boost::shared_ptr< MatingModel >( new MODEL() );
     }
 

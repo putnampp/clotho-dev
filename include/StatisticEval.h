@@ -38,7 +38,7 @@
 
 typedef std::vector< StatPtr >  StatGroup;
 
-class StatisticEval : public Describable {
+class StatisticEval {
 public:
     StatisticEval() : m_stats( new StatGroup() ) {}
 
@@ -47,7 +47,7 @@ public:
     virtual bool operator()( const Population & p );
 
     virtual ~StatisticEval() {
-        m_stats.clear();
+        m_stats->clear();
     }
 protected:
     typedef boost::scoped_ptr< StatGroup >  StatGroupPtr;

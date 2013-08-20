@@ -33,7 +33,6 @@
 #include "iCreator.h"
 #include "MatingModel.h"
 
-struct iMatingModelCreator : public iCreator< MatingModel > {
-};
+struct iMatingModelCreator : public iCreator< MatingModel > { };
 
 #endif  // IMATINGMODELCREATOR_H_

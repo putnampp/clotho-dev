@@ -27,36 +27,34 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef INDIVIDUAL_H_
-#define INDIVIDUAL_H_
+#include "StatisticFactory.h"
 
-#include "common.h"
+size_t StatisticFactory::count() const {
+    return m_stats.size();
+}
 
-#include "Genotype.h"
-#include "Phenotype.h"
+bool StatisticFactory::add( iStatCreator * stat ) {
+    std::pair< RegisteredStats::iterator, bool> res = m_stats.insert( std::make_pair( stat->name(), stat) );
 
-//#include "Dimension.h"
-//#include "Selection.h"
-//#include "MatingModel.h"
+    if( !res.second ) {}
+        
+    return res.second;
+}
 
+void StatisticFactory::remove( iStatCreator * stat ) {
+    RegisteredStats::iterator it = m_stats.find( stat->name() );
 
-/*******************************************************************************
- * An Individual is an encapsulation object consisting of a genotype and
- * phenotype.
- *
- *
- ******************************************************************************/
-class Individual {
-public:
-    Individual();
+    if( it != m_stats.end() ) {
+        m_stats.erase( it );
+    }
+}
 
-    virtual ~Individual();
-private:
-    typedef boost::scoped_ptr< Genotype > GenotypePtr;
-    GenotypePtr     m_geno;
+void StatisticFactory::buildEval( std::istream & config, StatisticEval * eval ) {
 
-    typedef boost::scoped_ptr< Phenotype > PhenotypePtr;
-    PhenotypePtr    m_pheno;
-};
+}
 
-#endif  // INDIVIDUAL_H_
+StatisticFactory::~StatisticFactory() {
+    if(!m_stats.empty())
+        m_stats.clear();
+}
+
