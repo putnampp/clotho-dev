@@ -48,8 +48,8 @@ public:
         return instance;
     }
 
-    void addStatistic( iStatCreator * stat );
-    void removeStatistic( iStatCreator * stat );
+    void add( iStatCreator * stat );
+    void remove( iStatCreator * stat );
     
     void buildEval( std::istream & configuration, StatisticEval * eval );
 

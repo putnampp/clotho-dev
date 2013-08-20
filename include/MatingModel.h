@@ -27,53 +27,24 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef STATCREATOR_H_
-#define STATCREATOR_H_
+#ifndef MATINGMODEL_H_
+#define MATINGMODEL_H_
 
 #include "common.h"
-#include "iStatCreator.h"
+#include "Configurable.h"
+#include "Individual.h"
 
-#include "Statistic.h"
-
-#include "StatisticFactory.h"
-
-template < class STAT >
-class StatCreator : public iStatCreator {
+class MatingModel : public Configurable {
 public:
-    StatCreator( const char * name, const char * desc ) : m_name( name ), m_desc  {
-        StatisticFactory::getInstance()->add( this );
-    }
+    MatingModel( boost::shared_ptr< MatingModel > m ) : m_model( m ) {}
 
-    String &    name() const {
-        return m_name;
-    }
+    virtual void configure( std::istream & in ) = 0;
+    virtual boost::shared_ptr< Individual > mate( const Individual *, const Individual * ) = 0;
+    virtual boost::shared_ptr< MatingModel > clone() = 0;
 
-    String &    description() const {
-        return m_desc;
-    }
-
-    void    print( std::ostream & out ) const {
-        out << m_name << " - " << m_desc << std::endl;
-    }
-
-    boost::shared_ptr< Statistic > create() {
-        return boost::shared_ptr< Statistic >( new STAT() );
-    }
-
-    virtual ~StatCreator() {
-        StatisticFactory::getInstance()->remove( this );
-    }
-
+    virtual ~MatingModel() {}
 protected:
-    String m_name;
-    String m_desc;
+    boost::shared_ptr< MatingModel >   m_model;
 };
 
-#define REGISTERED_STATISTIC(name, desc)                 \
-    class name;                                          \  // forward declare class
-    StatCreator< name >   stat_##name( #name, #desc);    \  // StatCreator adds self to StatisticFactory
-    class name : public Statistic
-
-#define REGISTERED_STATISTIC( name )    REGISTERED_STATISTIC( name, name )
-
-#endif  // STATCREATOR_H_
+#endif  // MATINGMODEL_H_

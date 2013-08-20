@@ -27,53 +27,33 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef STATCREATOR_H_
-#define STATCREATOR_H_
+#ifndef EVOLUTION_H_
+#define EVOLUTION_H_
 
 #include "common.h"
-#include "iStatCreator.h"
+#include "Configurable.h"
+#include "Population.h"
+#include "SimulationSpace.h"
+#include "Environment.h"
+#include "StatisticEval.h"
 
-#include "Statistic.h"
-
-#include "StatisticFactory.h"
-
-template < class STAT >
-class StatCreator : public iStatCreator {
-public:
-    StatCreator( const char * name, const char * desc ) : m_name( name ), m_desc  {
-        StatisticFactory::getInstance()->add( this );
-    }
-
-    String &    name() const {
-        return m_name;
-    }
-
-    String &    description() const {
-        return m_desc;
-    }
-
-    void    print( std::ostream & out ) const {
-        out << m_name << " - " << m_desc << std::endl;
-    }
-
-    boost::shared_ptr< Statistic > create() {
-        return boost::shared_ptr< Statistic >( new STAT() );
-    }
-
-    virtual ~StatCreator() {
-        StatisticFactory::getInstance()->remove( this );
-    }
-
-protected:
-    String m_name;
-    String m_desc;
+struct Evolveable {
+    virtual void evolve() = 0;
 };
 
-#define REGISTERED_STATISTIC(name, desc)                 \
-    class name;                                          \  // forward declare class
-    StatCreator< name >   stat_##name( #name, #desc);    \  // StatCreator adds self to StatisticFactory
-    class name : public Statistic
+class Evolution: public Evolveable, public Configurable {
+public:
+    Evolution();
 
-#define REGISTERED_STATISTIC( name )    REGISTERED_STATISTIC( name, name )
+    virtual void configure( std::istream & config );
+    virtual void evolve();
 
-#endif  // STATCREATOR_H_
+    virtual ~Evolution();
+protected:
+    boost::scoped_ptr< Population >         m_pop;
+    boost::scoped_ptr< SimulationSpace >    m_space;
+    boost::scoped_ptr< Environment  >       m_environ;
+    boost::scoped_ptr< StatisticEval >      m_stats;
+};
+
+#endif  // EVOLUTION_H_

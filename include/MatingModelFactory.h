@@ -27,12 +27,35 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef REPRODUCTION_H_
-#define REPRODUCTION_H_
+#ifndef MATINGMODELFACTORY_H_
+#define MATINGMODELFACTORY_H_
 
-class Reproduction {
+#include "common.h"
+#include "iMatingModelCreator.h"
+
+class MatingModelFactory {
 public:
-    virtual Individual *    reproduce( const Individual *, const Individual * ) = 0;
+    static MatingModelFactory * getInstance() {
+        static MatingModelFactory * instance = new MatingModelFactory();
+        return instance;
+    }
+
+    void add( iMatingModelCreator * model );
+    void remove( iMatingModelCreator * model );
+
+/**
+ * Create a base MatingModel
+ */
+    boost::shared_ptr< MatingModel > create( const String & name );
+
+/**
+ * Create a decorated MatingModel 
+ */
+    boost::shared_ptr< MatingModel > create( const String & name, boost::shared_ptr< MatingModel > m);
+
+    virtual ~MatingModelFactory();
+private:
+    MatingModelFactory() {}
 };
 
-#endif  // REPRODUCTION_H_
+#endif  // MATINGMODELFACTORY_H_

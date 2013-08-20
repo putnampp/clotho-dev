@@ -31,12 +31,10 @@
 #define ISTATCREATOR_H_
 
 #include "common.h"
+#include "iCreator.h"
+#include "Statistic.h"
 
-struct iStatCreator {
-    virtual String & name() const = 0;
-    virtual String & description() const = 0;
-    virtual void     print( std::ostream & out ) const = 0;
-    virtual boost::shared_ptr< Statistic > create() = 0;
+struct iStatCreator : public iCreator< Statistic >  {
 };
 
 #endif  // ISTATCREATOR_H_

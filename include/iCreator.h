@@ -27,53 +27,17 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef STATCREATOR_H_
-#define STATCREATOR_H_
+#ifndef ICREATOR_H_
+#define ICREATOR_H_
 
-#include "common.h"
-#include "iStatCreator.h"
+template < class C >
+struct iCreator {
+    virtual String & name() const = 0;
+    virtual String & description() const = 0;
 
-#include "Statistic.h"
+    virtual void     print( std::ostream & out ) const = 0;
 
-#include "StatisticFactory.h"
-
-template < class STAT >
-class StatCreator : public iStatCreator {
-public:
-    StatCreator( const char * name, const char * desc ) : m_name( name ), m_desc  {
-        StatisticFactory::getInstance()->add( this );
-    }
-
-    String &    name() const {
-        return m_name;
-    }
-
-    String &    description() const {
-        return m_desc;
-    }
-
-    void    print( std::ostream & out ) const {
-        out << m_name << " - " << m_desc << std::endl;
-    }
-
-    boost::shared_ptr< Statistic > create() {
-        return boost::shared_ptr< Statistic >( new STAT() );
-    }
-
-    virtual ~StatCreator() {
-        StatisticFactory::getInstance()->remove( this );
-    }
-
-protected:
-    String m_name;
-    String m_desc;
+    virtual boost::shared_ptr< C > create() = 0;
 };
 
-#define REGISTERED_STATISTIC(name, desc)                 \
-    class name;                                          \  // forward declare class
-    StatCreator< name >   stat_##name( #name, #desc);    \  // StatCreator adds self to StatisticFactory
-    class name : public Statistic
-
-#define REGISTERED_STATISTIC( name )    REGISTERED_STATISTIC( name, name )
-
-#endif  // STATCREATOR_H_
+#endif  // ICREATOR_H_

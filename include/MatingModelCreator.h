@@ -27,53 +27,46 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef STATCREATOR_H_
-#define STATCREATOR_H_
+#ifndef MATINGMODELCREATOR_H_
+#define MATINGMODELCREATOR_H_
 
 #include "common.h"
-#include "iStatCreator.h"
+#include "iMatingModelCreator.h"
+#include "MatingModelFactory.h"
 
-#include "Statistic.h"
-
-#include "StatisticFactory.h"
-
-template < class STAT >
-class StatCreator : public iStatCreator {
+template < class MODEL >
+class MatingModelCreator : public iMatingModelCreator {
 public:
-    StatCreator( const char * name, const char * desc ) : m_name( name ), m_desc  {
-        StatisticFactory::getInstance()->add( this );
+    MatingModelCreator( const char * name, const char * desc ) :
+        m_name(name), m_desc( desc ) {
+        MatingModelFactory::getInstance()->add( this );
     }
 
-    String &    name() const {
+    virtual String & name() const {
         return m_name;
     }
 
-    String &    description() const {
+    virtual String & description() const {
         return m_desc;
     }
 
-    void    print( std::ostream & out ) const {
-        out << m_name << " - " << m_desc << std::endl;
+    virtual void    print( std::ostream & out ) const;
+
+    boost::shared_ptr< MatingModel > create() {
+        return boost::shared_ptr< MatingModel >( new MODEL() );
     }
 
-    boost::shared_ptr< Statistic > create() {
-        return boost::shared_ptr< Statistic >( new STAT() );
+    virtual ~MatingModelCreator() {
+        MatingModelFactory::getInstance()->remove( this );
     }
-
-    virtual ~StatCreator() {
-        StatisticFactory::getInstance()->remove( this );
-    }
-
-protected:
-    String m_name;
-    String m_desc;
+private:
+    String  m_name;
+    String  m_desc;
 };
 
-#define REGISTERED_STATISTIC(name, desc)                 \
-    class name;                                          \  // forward declare class
-    StatCreator< name >   stat_##name( #name, #desc);    \  // StatCreator adds self to StatisticFactory
-    class name : public Statistic
+#define REGISTERED_MATINGMODEL( name, desc )                \
+    class name;                                             \
+    MatingModelCreator< name >  mm_##name( #name, #desc );  \
+    class name : public MatingModel
 
-#define REGISTERED_STATISTIC( name )    REGISTERED_STATISTIC( name, name )
-
-#endif  // STATCREATOR_H_
+#endif  // MATINGMODELCREATOR_H_
