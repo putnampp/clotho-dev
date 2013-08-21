@@ -38,6 +38,7 @@ SET (POPSIM_VER_RELEASE 0 )
 SET (POPSIM_RESOURCES_DIR ${POPSIM_SOURCE_DIR}/cmake)
 SET (POPSIM_SRC_DIR       ${POPSIM_SOURCE_DIR}/src)
 SET( POPSIM_INCLUDE_DIR   ${POPSIM_SOURCE_DIR}/include )
+SET( POPSIM_UNITTEST_DIR   ${POPSIM_SOURCE_DIR}/unittest )
 
 SET (CMAKE_INSTALL_PREFIX "./popsim" CACHE PATH "Install path prefix, prepended onto install directories")
 
@@ -91,20 +92,6 @@ IF( CUDA_FOUND )
     MESSAGE(STATUS "CUDA Library: " ${CUDA_LIBRARIES} )
 ENDIF( CUDA_FOUND )
 
-#FIND_PACKAGE( HDF5 COMPONENTS C CXX REQUIRED )
-#FIND_PACKAGE( HDF5 REQUIRED )
-#IF( HDF5_FOUND )
-#    INCLUDE_DIRECTORIES( ${HDF5_INCLUDE_DIR} )
-#    MESSAGE (STATUS "HDF5 Include: " ${HDF5_INCLUDE_DIR} )
-#    MESSAGE (STATUS "HDF5 Library: " ${HDF5_LIBRARIES} )
-#ENDIF( HDF5_FOUND )
-
-#SET( MongoDB_INCLUDE_DIR /opt/mongo/include )
-#SET( MongoDB_LIBRARIES /opt/mongo/lib/libmongoclient.a )
-
-#MESSAGE( STATUS "MongoDB: " ${MongoDB_INCLUDE_DIR} )
-#MESSAGE( STATUS "MongoDB libs: " ${MongoDB_LIBRARIES} )
-
 ################################################################################
 
 OPTION( LOG       "Compile with debugging; sets LOG_LEVEL to the default logging level"        OFF )
@@ -115,6 +102,8 @@ IF( EXISTS "${POPSIM_INCLUDE_DIR}/popsim_config.h" )
 ENDIF()
 
 CONFIGURE_FILE( ${POPSIM_INCLUDE_DIR}/popsim_config.h.in ${POPSIM_INCLUDE_DIR}/popsim_config.h)
+
+CONFIGURE_FILE( ${POPSIM_UNITTEST_DIR}/test_main.cpp.in ${POPSIM_UNITTEST_DIR}/test_main.cpp )
 
 set(CMAKE_CXX_FLAGS "-g -fPIC -Wall -O3" )
 
