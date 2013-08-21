@@ -53,4 +53,17 @@ BOOST_AUTO_TEST_CASE( sfAutoRegistration ) {
     BOOST_REQUIRE_MESSAGE( StatisticFactory::getInstance()->count() == (c + 1), "Failed to auto register new statistic" );
 }
 
+BOOST_AUTO_TEST_CASE( sfCreation ) {
+    String  name("testA");
+    String  dne_name("dne_test");
+
+    boost::shared_ptr< Statistic > stat = StatisticFactory::getInstance()->create( name );
+
+    BOOST_REQUIRE_MESSAGE( stat, name << " does not exist when it should!!" );
+
+    boost::shared_ptr< Statistic > stat2 = StatisticFactory::getInstance()->create( dne_name );
+
+    BOOST_REQUIRE_MESSAGE( !stat2, dne_name << " exists when it shouldn't!!" );
+}
+
 BOOST_AUTO_TEST_SUITE_END()

@@ -48,12 +48,14 @@ public:
         return instance;
     }
 
-    bool add( iStatCreator * stat );
-    void remove( iStatCreator * stat );
+    virtual bool add( iStatCreator * stat );
+    virtual void remove( iStatCreator * stat );
 
     size_t  count() const;
     
     void buildEval( std::istream & configuration, StatisticEval * eval );
+
+    virtual boost::shared_ptr<Statistic> create( const String & name);
 
     friend std::ostream & operator<<( std::ostream & out, const StatisticFactory & sf );
     virtual ~StatisticFactory();
