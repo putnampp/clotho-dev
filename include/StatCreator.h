@@ -40,15 +40,15 @@
 template < class STAT >
 class StatCreator : public iStatCreator {
 public:
-    StatCreator( const char * name, const char * desc ) : m_name( name ), m_desc  {
+    StatCreator( const char * name, const char * desc ) : m_name( name ), m_desc(desc)  {
         StatisticFactory::getInstance()->add( this );
     }
 
-    String &    name() const {
+    String     name() const {
         return m_name;
     }
 
-    String &    description() const {
+    String     description() const {
         return m_desc;
     }
 
@@ -70,10 +70,10 @@ protected:
 };
 
 #define REGISTERED_STATISTIC(name, desc)                 \
-    class name;                                          \  // forward declare class
-    StatCreator< name >   stat_##name( #name, #desc);    \  // StatCreator adds self to StatisticFactory
+    class name;                                          \
+    StatCreator< name >   stat_##name( #name, desc);    \
     class name : public Statistic
 
-#define REGISTERED_STATISTIC( name )    REGISTERED_STATISTIC( name, name )
+#define REGISTER_STATISTIC( name )    REGISTERED_STATISTIC( name, #name )
 
 #endif  // STATCREATOR_H_

@@ -30,10 +30,27 @@
 #include <boost/test/unit_test.hpp>
 #include "StatisticFactory.h"
 
+#include "StatCreator.h"
+
 BOOST_AUTO_TEST_SUITE( test_statistic_factory )
 
 BOOST_AUTO_TEST_CASE( sfSingleton ) {
     BOOST_REQUIRE_MESSAGE( StatisticFactory::getInstance() != NULL, "Failed to get Statistic Factory" );
+}
+
+size_t c = StatisticFactory::getInstance()->count();
+
+REGISTERED_STATISTIC( testA, "this is just a test") {
+public:
+        testA() : Statistic("this is just a test") {}
+        void configure( std::istream & in ) {}
+
+        void operator()(const Population & p ) {}
+};
+
+BOOST_AUTO_TEST_CASE( sfAutoRegistration ) {
+
+    BOOST_REQUIRE_MESSAGE( StatisticFactory::getInstance()->count() == (c + 1), "Failed to auto register new statistic" );
 }
 
 BOOST_AUTO_TEST_SUITE_END()
