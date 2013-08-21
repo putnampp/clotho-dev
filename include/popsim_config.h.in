@@ -31,9 +31,9 @@
 
 #include "log_levels.h"
 
-#define MAJOR_VERSION  "${POPSIM_PACKAGE_VER_MAJOR}"
-#define MINOR_VERSION  "${POPSIM_PACKAGE_VER_MINOR}"
-#define VERSION        "${POPSIM_PACKAGE_STRING}"
+#define MAJOR_VERSION  "${${PROJECT_NAME}_PACKAGE_VER_MAJOR}"
+#define MINOR_VERSION  "${${PROJECT_NAME}_PACKAGE_VER_MINOR}"
+#define VERSION        "${${PROJECT_NAME}_PACKAGE_STRING}"
 
 #cmakedefine LOG
 #cmakedefine LOG_LEVEL @LOG_LEVEL@
