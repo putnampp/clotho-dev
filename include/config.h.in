@@ -26,8 +26,8 @@
  * of the authors and should not be interpreted as representing official policies,
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
-#ifndef POPSIM_CONFIG_H_
-#define POPSIM_CONFIG_H_
+#ifndef ${PROJECT_NAME}_CONFIG_H_
+#define ${PROJECT_NAME}_CONFIG_H_
 
 #include "log_levels.h"
 
@@ -64,4 +64,4 @@
     #define LOG_LEVEL LOG_DEFAULT
 #endif  // end verifications
 
-#endif  // POPSIM_CONFIG_H_
+#endif  // ${PROJECT_NAME}_CONFIG_H_

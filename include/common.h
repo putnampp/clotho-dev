@@ -29,7 +29,7 @@
 #ifndef COMMON_H_
 #define COMMON_H_
 
-#include "popsim_config.h"
+#include "config.h"
 
 #include <iostream>
 #include <string>

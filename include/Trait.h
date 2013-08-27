@@ -31,6 +31,10 @@
 
 #include "common.h"
 
+enum Ploidy { HAPLOID = 1, DIPLOID, TRIPLOID, TETRAPLOID };
+
+#define MAX_ALLELE_PER_LOCUS 255
+
 /*******************************************************************************
  * A Trait is some observed characteristic of an individual.
  *
@@ -45,7 +49,7 @@
  * is a categorical trait, and is limited to a set of colors.
  *
  ******************************************************************************/
-template < class V >
+template < class V, unsigned char P = DIPLOID, unsigned char A = MAX_ALLELE >
 class Trait {
 public:
     typedef V   value_type;
@@ -57,8 +61,12 @@ public:
 
     const value_type & value();
 private:
+
+    enum { PLOIDY = P };
     class Property;
     boost::scoped_ptr< Property > m_prop;
+
+    template < class 
 
     value_type  m_val;
 };
