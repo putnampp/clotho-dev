@@ -26,63 +26,32 @@
  * of the authors and should not be interpreted as representing official policies,
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
-#ifndef TRAIT_H_
-#define TRAIT_H_
 
-#include "common.h"
-#include "ploidy.h"
-#include "Configurable.h"
-#include "Mutate.h"
-#include "Inheritance.h"
+#ifndef ALLELE_H_
+#define ALLELE_H_
 
-#include <cassert>
+//#include "config.h"
 
-struct iTrait {
+#if MAX_ALLELES <= (1 << 8)
 
-/**
- *  return the ploidy of the trait
- */
-    virtual ploidy_t    ploidy()    const = 0;
+typedef unsigned char   allele_t;
 
-/**
- *  return the number of loci associated with the trait
- */
-    virtual uint32_t    loci()      const = 0;
+#elif MAX_ALLELES <= (1 << 16 )
 
-/**
- *  return the number of possible alleles
- */
-    virtual uint32_t    alleles()   const = 0;
-};
+typedef unsigned short   allele_t;
 
-/*******************************************************************************
- * A Trait is some observed characteristic of an individual.
- *
- * A set of Traits is used to define a Phenotype.
- *
- * There are two types of traits: categorical or quantitative.
- *
- * Quantitative traits are represented by a measured value or quantity. For 
- * example, height is considered to be a quantitative value.
- *
- * Qualitative traits fall into a general set of values. For example, eye color
- * is a categorical trait, and is limited to a set of colors.
- *
- ******************************************************************************/
-template < class V = Byte, unsigned char P = DIPLOID >
-class Trait : public iTrait, 
-    public Configurable, 
-    virtual MutatableSequence< V, P>, 
-    virtual InheritableSequence<V, P>,
-    virtual Sequence<V,P> {
-public:
-    String getName() const;
-    String getDescription() const;
+#elif MAX_ALLELES <= (1 << 32 )
 
-    virtual void configure( std::istream & config );
+typedef unsigned int    allele_t;
 
-    virtual ~Trait() {    }
-private:
-};
+#elif MAX_ALLELES <= 0xFFFFFFFFFFFFFFFF
 
-#endif  // TRAIT_H_
+typedef unsigned long   allele_t;
+
+#else
+
+#error Invalid Maximum Allele Forms
+
+#endif
+
+#endif  // ALLELE_H_

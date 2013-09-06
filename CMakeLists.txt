@@ -97,6 +97,12 @@ ENDIF( CUDA_FOUND )
 OPTION( LOG       "Compile with debugging; sets LOG_LEVEL to the default logging level"        OFF )
 OPTION( LOG_LEVEL "Set the default debug level; (-1 = OFF, 0 - Critical Message, 1 - Errors, 2 - Warnings, 3 - Status (default), 4 - Notes, 5 - Debug, 6 - All"   0 )  # OFF
 
+SET(MAX_ALLELES 256 CACHE INTEGER "Maximum alleles per locus")
+
+IF( MAX_ALLELES LESS 0 )
+    MESSAGE(FATAL_ERROR "Maximum alleles cannot be negative" )
+ENDIF()
+
 IF( EXISTS "${${PROJECT_NAME}_INCLUDE_DIR}/config.h" )
     UNSET( ${${PROJECT_NAME}_INCLUDE_DIR}/config.h CACHE )
 ENDIF()

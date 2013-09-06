@@ -64,4 +64,12 @@
     #define LOG_LEVEL LOG_DEFAULT
 #endif  // end verifications
 
+#ifndef MAX_ALLELES
+#define    MAX_ALLELES ${MAX_ALLELES}
+#endif  // MAX_ALLELES
+
+#if MAX_ALLELES < 0
+#error  Cannot have negative alleles
+#endif  // MAX_ALLELES
+
 #endif  // ${PROJECT_NAME}_CONFIG_H_

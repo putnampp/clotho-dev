@@ -37,6 +37,9 @@
 
 #include <boost/smart_ptr.hpp>
 
+#include "Allele.h"
+
 typedef std::string String;
+typedef unsigned char Byte;
 
 #endif  // COMMON_H_

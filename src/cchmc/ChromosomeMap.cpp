@@ -26,63 +26,36 @@
  * of the authors and should not be interpreted as representing official policies,
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
-#ifndef TRAIT_H_
-#define TRAIT_H_
 
-#include "common.h"
-#include "ploidy.h"
-#include "Configurable.h"
-#include "Mutate.h"
-#include "Inheritance.h"
+#include "ChromosomeMap.h"
 
-#include <cassert>
+void ChromosomeMap::configure( std::istream & config ) { }
 
-struct iTrait {
+size_t ChromosomeMap::size() const {
+    return m_chroms->size();
+}
 
-/**
- *  return the ploidy of the trait
- */
-    virtual ploidy_t    ploidy()    const = 0;
+chromid_t   ChromosomeMap::find( const String & name, bool bCreateMissing ) {
+    chromid_t id = UNKNOWN_CHROM;
+    
+    Chromosomes::iterator it = m_chroms->find(name);
 
-/**
- *  return the number of loci associated with the trait
- */
-    virtual uint32_t    loci()      const = 0;
+    if( it != m_chroms->end() ) {
+        id = it->second->id();
+    } else if( bCreateMissing ) {
+        ChromosomePtr c( new Chromosome( name, 0) );
 
-/**
- *  return the number of possible alleles
- */
-    virtual uint32_t    alleles()   const = 0;
-};
+        m_chroms->insert( std::make_pair(name, c) );
 
-/*******************************************************************************
- * A Trait is some observed characteristic of an individual.
- *
- * A set of Traits is used to define a Phenotype.
- *
- * There are two types of traits: categorical or quantitative.
- *
- * Quantitative traits are represented by a measured value or quantity. For 
- * example, height is considered to be a quantitative value.
- *
- * Qualitative traits fall into a general set of values. For example, eye color
- * is a categorical trait, and is limited to a set of colors.
- *
- ******************************************************************************/
-template < class V = Byte, unsigned char P = DIPLOID >
-class Trait : public iTrait, 
-    public Configurable, 
-    virtual MutatableSequence< V, P>, 
-    virtual InheritableSequence<V, P>,
-    virtual Sequence<V,P> {
-public:
-    String getName() const;
-    String getDescription() const;
+        id = c->id();
+    }
 
-    virtual void configure( std::istream & config );
+    return id;
+}
 
-    virtual ~Trait() {    }
-private:
-};
+ChromosomeMap::ChromosomeIter ChromosomeMap::begin() const { return m_chroms->begin(); }
+ChromosomeMap::ChromosomeIter ChromosomeMap::end() const { return m_chroms->end(); }
 
-#endif  // TRAIT_H_
+ChromosomeMap::~ChromosomeMap() {
+    m_chroms->clear();
+}

@@ -26,63 +26,87 @@
  * of the authors and should not be interpreted as representing official policies,
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
-#ifndef TRAIT_H_
-#define TRAIT_H_
+
+#ifndef CHROMOSOMEMAP_H_
+#define CHROMOSOMEMAP_H_
 
 #include "common.h"
-#include "ploidy.h"
-#include "Configurable.h"
-#include "Mutate.h"
-#include "Inheritance.h"
-
 #include <cassert>
+#include "Configurable.h"
+#include "Sequence.h"
 
-struct iTrait {
+#include <map>
 
-/**
- *  return the ploidy of the trait
- */
-    virtual ploidy_t    ploidy()    const = 0;
+typedef char chromid_t;
+#define UNKNOWN_CHROM -1
 
-/**
- *  return the number of loci associated with the trait
- */
-    virtual uint32_t    loci()      const = 0;
+class ChromosomeMap;
 
-/**
- *  return the number of possible alleles
- */
-    virtual uint32_t    alleles()   const = 0;
-};
-
-/*******************************************************************************
- * A Trait is some observed characteristic of an individual.
- *
- * A set of Traits is used to define a Phenotype.
- *
- * There are two types of traits: categorical or quantitative.
- *
- * Quantitative traits are represented by a measured value or quantity. For 
- * example, height is considered to be a quantitative value.
- *
- * Qualitative traits fall into a general set of values. For example, eye color
- * is a categorical trait, and is limited to a set of colors.
- *
- ******************************************************************************/
-template < class V = Byte, unsigned char P = DIPLOID >
-class Trait : public iTrait, 
-    public Configurable, 
-    virtual MutatableSequence< V, P>, 
-    virtual InheritableSequence<V, P>,
-    virtual Sequence<V,P> {
+class Chromosome {
 public:
-    String getName() const;
-    String getDescription() const;
+    friend class ChromosomeMap;
 
-    virtual void configure( std::istream & config );
+    Chromosome( const String & n, size_t s) : m_name(n), m_id(nextID()), m_size(s) { }
 
-    virtual ~Trait() {    }
+    chromid_t id() const { return m_id; }
+    String  name() const { return m_name; }
+    size_t  length() const { return m_size; }
+
+    virtual ~Chromosome() {}
+protected:
+    String      m_name;
+    chromid_t   m_id;
+    size_t      m_size;
+
 private:
+    static chromid_t nextID() {
+        static chromid_t next_id = 0;
+        assert( next_id > UNKNOWN_CHROM );
+        return next_id++;
+    }
 };
 
-#endif  // TRAIT_H_
+typedef boost::shared_ptr< Chromosome > ChromosomePtr;
+
+class ChromosomeMap : public Configurable {
+public:
+    typedef std::map< const String, ChromosomePtr > Chromosomes;
+    typedef Chromosomes::const_iterator ChromosomeIter;
+
+    static ChromosomeMap * getInstance() {
+        static ChromosomeMap * inst = new ChromosomeMap();
+        return inst;
+    }
+
+    virtual void    configure( std::istream & config );
+
+/**
+ *  The number of chromosomes currently being tracked
+ */
+    virtual size_t    size() const;
+
+/**
+ *  Find a chromosome id by the chromosomes name.
+ *
+ *  It is possible to create missing chromosomes
+ *
+ *  String matching is done case-sensitively, by default
+ */
+    virtual chromid_t find( const String & name, bool bCreateMissing = false );
+
+/**
+ * Iterators that traverse the chromosomes in name lexicographical order
+ * 
+ * NOTE: ID order may not reflected sorted index
+ */
+    virtual ChromosomeIter begin() const;
+    virtual ChromosomeIter end() const;
+
+    virtual ~ChromosomeMap();
+protected:
+    ChromosomeMap(): m_chroms( new Chromosomes() ) {}
+
+    boost::shared_ptr< Chromosomes >   m_chroms;
+};
+
+#endif  // CHROMOSOMEMAP_H_

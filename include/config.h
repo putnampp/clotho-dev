@@ -64,4 +64,12 @@
     #define LOG_LEVEL LOG_DEFAULT
 #endif  // end verifications
 
+#ifndef MAX_ALLELES
+#define    MAX_ALLELES 15
+#endif  // MAX_ALLELES
+
+#if MAX_ALLELES < 0
+#error  Cannot have negative alleles
+#endif  // MAX_ALLELES
+
 #endif  // POPSIM_CONFIG_H_

@@ -26,63 +26,38 @@
  * of the authors and should not be interpreted as representing official policies,
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
-#ifndef TRAIT_H_
-#define TRAIT_H_
+
+#ifndef MUTATE_H_
+#define MUTATE_H_
 
 #include "common.h"
-#include "ploidy.h"
-#include "Configurable.h"
-#include "Mutate.h"
-#include "Inheritance.h"
 
-#include <cassert>
-
-struct iTrait {
-
-/**
- *  return the ploidy of the trait
- */
-    virtual ploidy_t    ploidy()    const = 0;
-
-/**
- *  return the number of loci associated with the trait
- */
-    virtual uint32_t    loci()      const = 0;
-
-/**
- *  return the number of possible alleles
- */
-    virtual uint32_t    alleles()   const = 0;
+struct Mutatable {
+    virtual void mutate( ) = 0;
 };
 
-/*******************************************************************************
- * A Trait is some observed characteristic of an individual.
- *
- * A set of Traits is used to define a Phenotype.
- *
- * There are two types of traits: categorical or quantitative.
- *
- * Quantitative traits are represented by a measured value or quantity. For 
- * example, height is considered to be a quantitative value.
- *
- * Qualitative traits fall into a general set of values. For example, eye color
- * is a categorical trait, and is limited to a set of colors.
- *
- ******************************************************************************/
-template < class V = Byte, unsigned char P = DIPLOID >
-class Trait : public iTrait, 
-    public Configurable, 
-    virtual MutatableSequence< V, P>, 
-    virtual InheritableSequence<V, P>,
-    virtual Sequence<V,P> {
+template < class V, unsigned char P >
+struct MutatationModel {
+    virtual void operator()( Sequence<V, P> * loci ) { return; }
+};
+
+template < class V, unsigned char P >
+struct SSM : MutatationModel< V, P > {
+    virtual void operator()( Sequence<V, P> * loci ) {
+        
+    }
+};
+
+template < class V, unsigned char P >
+class MutatableSequence: virtual Sequence< V, P>, public Mutatable {
 public:
-    String getName() const;
-    String getDescription() const;
+    MutatableSequence( MutationModel<V,P> * model ) : m_mutate( model ) {}
 
-    virtual void configure( std::istream & config );
-
-    virtual ~Trait() {    }
-private:
+    virtual void mutate() {
+        (*m_mutate)( this );
+    }
+protected:
+    MutationModel< V, P >  * m_mutate;
 };
 
-#endif  // TRAIT_H_
+#endif  // MUTATE_H_
