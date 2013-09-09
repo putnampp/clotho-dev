@@ -27,30 +27,42 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef DOMINANCE_H_
-#define DOMINANCE_H_
+#ifndef CHROMOSOME_H_
+#define CHROMOSOME_H_
 
 #include "common.h"
+#include <cassert>
+#include "Configurable.h"
 
-#include "IndexSpace.h"
+typedef char chromid_t;
+#define UNKNOWN_CHROM -1
 
-template < class T, unsigned char P >
-class Dominance {
+class ChromosomeMap;
+
+class Chromosome {
 public:
-    typedef T value_t;
-    Dominance( uint32_t forms ) :
-        m_idxspace( new IndexSpace( forms ) ),
-        m_data( new value_t[ m_idxspace->limit() ] ) {
-    }
+    friend class ChromosomeMap;
 
-    value_t operator()( const enumerable  * o ) {
-        return m_data[ o->index() ];
-    }
+    Chromosome( const String & n, size_t s) : m_name(n), m_id(nextID()), m_size(s) { }
+
+    chromid_t id() const { return m_id; }
+    String  name() const { return m_name; }
+    size_t  length() const { return m_size; }
+
+    virtual ~Chromosome() {}
 protected:
-    static const unsigned char PLOIDY = P;
-    shared_ptr< value_t [] >  m_data;
+    String      m_name;
+    chromid_t   m_id;
+    size_t      m_size;
 
-    shared_ptr< IndexSpace< PLOIDY > > m_idxspace;
+private:
+    static chromid_t nextID() {
+        static chromid_t next_id = 0;
+        assert( next_id > UNKNOWN_CHROM );
+        return next_id++;
+    }
 };
 
-#endif  // DOMINANCE_H_
+typedef shared_ptr< Chromosome > ChromosomePtr;
+
+#endif  // CHROMOSOME_H_

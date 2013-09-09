@@ -31,13 +31,9 @@
 #define GENETICMAP_H_
 
 #include "common.h"
-
+#include "Configurable.h"
 #include "ChromosomeMap.h"
-
-struct locus {
-    
-    size_t start, end;
-};
+#include "Locus.h"
 
 /**
  *
@@ -49,8 +45,20 @@ struct locus {
  *
  */
 
-class GeneticMap {
+class GeneticMap : public Configurable {
 public:
+    static GeneticMap * getInstance() {
+        static GeneticMap * instance = new GeneticMap();
+        return instance;
+    }
+
+    virtual void configure( std::istream & config );
+
+    virtual void add( const shared_ptr< Locus > l );
+    virtual void add( const shared_ptr< Trait > p );
+
+    virtual ~GeneticMap() {}
+protected:
     GeneticMap();
 };
 

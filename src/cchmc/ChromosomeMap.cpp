@@ -53,8 +53,32 @@ chromid_t   ChromosomeMap::find( const String & name, bool bCreateMissing ) {
     return id;
 }
 
-ChromosomeMap::ChromosomeIter ChromosomeMap::begin() const { return m_chroms->begin(); }
-ChromosomeMap::ChromosomeIter ChromosomeMap::end() const { return m_chroms->end(); }
+/**
+ *  Linearly search for chromosome object by id
+ *
+ *  TODO: would be more efficient to maintain a map
+ *  of chromosomes by ID.  Is it worth maintaining multiple
+ *  maps for sorted access? Cost/benefit of find method usage?
+ */
+ChromosomePtr ChromosomeMap::find( chromid_t id ) {
+    assert( 0 <= id && id < (chromid_t) m_chroms->size() );
+
+    ChromosomesIter it = m_chroms->begin();
+
+    ChromosomePtr p;
+
+    while( it != m_chroms->end() ) {
+        if( it->second->id() == id ) {
+            p = it->second;
+            break;
+        }
+        it++;
+    }
+    return p;
+}
+
+ChromosomeMap::ChromosomesIter ChromosomeMap::begin() const { return m_chroms->begin(); }
+ChromosomeMap::ChromosomesIter ChromosomeMap::end() const { return m_chroms->end(); }
 
 ChromosomeMap::~ChromosomeMap() {
     m_chroms->clear();

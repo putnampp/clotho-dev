@@ -31,33 +31,37 @@
 #define MUTATE_H_
 
 #include "common.h"
+#include "ploidy.h"
+#include "Sequence.h"
+
+typedef double mutrate_t;
 
 struct Mutatable {
     virtual void mutate( ) = 0;
 };
 
-template < class V, unsigned char P >
-struct MutatationModel {
-    virtual void operator()( Sequence<V, P> * loci ) { return; }
+template < ploidy_t P >
+struct MutationModel {
+    virtual void operator()( Sequence< P > * loci ) { return; }
 };
 
-template < class V, unsigned char P >
-struct SSM : MutatationModel< V, P > {
-    virtual void operator()( Sequence<V, P> * loci ) {
+template < ploidy_t P >
+struct SSM : MutationModel< P > {
+    virtual void operator()( Sequence< P > * loci ) {
         
     }
 };
 
-template < class V, unsigned char P >
-class MutatableSequence: virtual Sequence< V, P>, public Mutatable {
+template < ploidy_t P >
+class MutatableSequence: virtual Sequence< P >, public Mutatable {
 public:
-    MutatableSequence( MutationModel<V,P> * model ) : m_mutate( model ) {}
+    MutatableSequence( MutationModel< P > * model ) : m_mutate( model ) {}
 
     virtual void mutate() {
         (*m_mutate)( this );
     }
 protected:
-    MutationModel< V, P >  * m_mutate;
+    MutationModel< P >  * m_mutate;
 };
 
 #endif  // MUTATE_H_

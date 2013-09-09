@@ -34,6 +34,7 @@
 #include "Configurable.h"
 #include "Mutate.h"
 #include "Inheritance.h"
+#include "Locus.h"
 
 #include <cassert>
 
@@ -47,12 +48,7 @@ struct iTrait {
 /**
  *  return the number of loci associated with the trait
  */
-    virtual uint32_t    loci()      const = 0;
-
-/**
- *  return the number of possible alleles
- */
-    virtual uint32_t    alleles()   const = 0;
+    virtual size_t    loci()      const = 0;
 };
 
 /*******************************************************************************
@@ -69,20 +65,29 @@ struct iTrait {
  * is a categorical trait, and is limited to a set of colors.
  *
  ******************************************************************************/
-template < class V = Byte, unsigned char P = DIPLOID >
+template < ploidy_t P = DIPLOID >
 class Trait : public iTrait, 
     public Configurable, 
-    virtual MutatableSequence< V, P>, 
-    virtual InheritableSequence<V, P>,
-    virtual Sequence<V,P> {
+    virtual MutatableSequence< P >, 
+    virtual InheritableSequence< P >,
+    virtual Sequence< P > {
 public:
     String getName() const;
     String getDescription() const;
 
     virtual void configure( std::istream & config );
 
+    virtual void add( const String & locus_name );
+    virtual void add( const shared_ptr< Locus > l );
+
+    virtual ploidy_t    ploidy() const;
+    virtual size_t      loci() const;
+
     virtual ~Trait() {    }
 private:
+    static const ploidy_t PLOIDY = P;
+
+    Loci    m_loci;
 };
 
 #endif  // TRAIT_H_

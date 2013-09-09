@@ -30,8 +30,6 @@
 #ifndef ALLELE_H_
 #define ALLELE_H_
 
-//#include "config.h"
-
 #if MAX_ALLELES <= (1 << 8)
 
 typedef unsigned char   allele_t;

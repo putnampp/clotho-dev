@@ -37,12 +37,16 @@
 
 #include <map>
 
-typedef std::map< String, iStatCreator * >   RegisteredStats;
+using std::map;
+using std::istream;
+using std::ostream;
+
+typedef map< String, iStatCreator * >   RegisteredStats;
 
 class StatisticFactory {
 public:
 
-    typedef boost::shared_ptr< StatisticFactory >   StatisticFactoryPtr;
+    typedef shared_ptr< StatisticFactory >   StatisticFactoryPtr;
     static StatisticFactoryPtr getInstance() {
         static StatisticFactoryPtr instance( new StatisticFactory() );
         return instance;
@@ -53,11 +57,11 @@ public:
 
     size_t  count() const;
     
-    void buildEval( std::istream & configuration, StatisticEval * eval );
+    void buildEval( istream & configuration, StatisticEval * eval );
 
-    virtual boost::shared_ptr<Statistic> create( const String & name);
+    virtual shared_ptr<Statistic> create( const String & name);
 
-    friend std::ostream & operator<<( std::ostream & out, const StatisticFactory & sf );
+    friend ostream & operator<<( ostream & out, const StatisticFactory & sf );
     virtual ~StatisticFactory();
 protected:
     RegisteredStats     m_stats;

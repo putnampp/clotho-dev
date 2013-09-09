@@ -37,6 +37,8 @@
 
 #include <set>
 
+using std::set;
+
 /*******************************************************************************
  * A Population is a collection on Individuals.
  ******************************************************************************/
@@ -48,8 +50,8 @@ public:
 
     virtual ~Population();
 private:
-    typedef boost::shared_ptr< Individual >            IndividualPtr;
-    typedef boost::scoped_ptr< std::set< IndividualPtr > > Individuals;
+    typedef shared_ptr< Individual >            IndividualPtr;
+    typedef scoped_ptr< set< IndividualPtr > > Individuals;
 
     Individuals     m_individs;
 };

@@ -56,8 +56,8 @@ public:
         out << m_name << " - " << m_desc << std::endl;
     }
 
-    boost::shared_ptr< Statistic > create() {
-        return boost::shared_ptr< Statistic >( new STAT() );
+    shared_ptr< Statistic > create() {
+        return shared_ptr< Statistic >( new STAT() );
     }
 
     virtual ~StatCreator() {

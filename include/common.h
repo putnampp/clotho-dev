@@ -36,10 +36,14 @@
 #include <stdint.h>
 
 #include <boost/smart_ptr.hpp>
+#include <boost/scoped_ptr.hpp>
 
 #include "Allele.h"
 
 typedef std::string String;
 typedef unsigned char Byte;
+
+using boost::shared_ptr;
+using boost::scoped_ptr;
 
 #endif  // COMMON_H_

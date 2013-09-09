@@ -36,6 +36,8 @@
 
 #include <set>
 
+using std::set;
+
 /*******************************************************************************
  * A Genotype is a collection of markers
  ******************************************************************************/
@@ -44,8 +46,8 @@ public:
     Genotype();
     virtual ~Genotype();
 private:
-    typedef boost::shared_ptr< Marker > MarkerPtr;
-    typedef boost::scoped_ptr< std::set< MarkerPtr > >  Markers;
+    typedef shared_ptr< Marker > MarkerPtr;
+    typedef scoped_ptr< set< MarkerPtr > >  Markers;
 
     Markers     m_markers;
 };

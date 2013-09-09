@@ -27,30 +27,39 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef DOMINANCE_H_
-#define DOMINANCE_H_
+#ifndef LOCUS_H_
+#define LOCUS_H_
 
 #include "common.h"
+#include "Chromosome.h"
+#include "Mutate.h"
 
-#include "IndexSpace.h"
+#include <vector>
 
-template < class T, unsigned char P >
-class Dominance {
-public:
-    typedef T value_t;
-    Dominance( uint32_t forms ) :
-        m_idxspace( new IndexSpace( forms ) ),
-        m_data( new value_t[ m_idxspace->limit() ] ) {
-    }
+using std::vector;
 
-    value_t operator()( const enumerable  * o ) {
-        return m_data[ o->index() ];
-    }
-protected:
-    static const unsigned char PLOIDY = P;
-    shared_ptr< value_t [] >  m_data;
-
-    shared_ptr< IndexSpace< PLOIDY > > m_idxspace;
+/**
+ * Implementation specific definition of a locus structure
+ *
+ * From a simulation perspective only the the pair <chromosome, position> are important. For extensibility reasons, position is
+ * considered to be an open ended region [start, end)
+ * All other fields are generally optional, depending upon simulation models.
+ *
+ * Other optional properties are:
+ *  - properties (name, alleles, ... )
+ *
+ */
+struct Locus {
+    String      name;
+    size_t      start, end;
+    size_t      alt_count;
+    shared_ptr< allele_t [] > alleles;
+    mutrate_t   mutation_rate;
+    chromid_t   chromid;
 };
 
-#endif  // DOMINANCE_H_
+typedef shared_ptr< Locus > LocusPtr;
+typedef vector< LocusPtr > Loci;
+typedef Loci::iterator  LociIterator;
+
+#endif  // LOCUS_H_

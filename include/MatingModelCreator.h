@@ -52,8 +52,8 @@ public:
 
     virtual void    print( std::ostream & out ) const;
 
-    virtual boost::shared_ptr< MatingModel > create() {
-        return boost::shared_ptr< MatingModel >( new MODEL() );
+    virtual shared_ptr< MatingModel > create() {
+        return shared_ptr< MatingModel >( new MODEL() );
     }
 
     virtual ~MatingModelCreator() {
