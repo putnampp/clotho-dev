@@ -36,7 +36,9 @@
 
 #include <vector>
 
-typedef std::vector< StatPtr >  StatGroup;
+using std::vector;
+
+typedef vector< StatPtr >  StatGroup;
 
 class StatisticEval {
 public:
@@ -50,7 +52,7 @@ public:
         m_stats->clear();
     }
 protected:
-    typedef boost::scoped_ptr< StatGroup >  StatGroupPtr;
+    typedef scoped_ptr< StatGroup >  StatGroupPtr;
     StatGroupPtr   m_stats;
 };
 

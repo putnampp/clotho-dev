@@ -39,12 +39,12 @@ public:
     MatingModel( boost::shared_ptr< MatingModel > m ) : m_model( m ) {}
 
     virtual void configure( std::istream & in ) = 0;
-    virtual boost::shared_ptr< Individual > mate( const Individual *, const Individual * ) = 0;
-    virtual boost::shared_ptr< MatingModel > clone() = 0;
+    virtual shared_ptr< Individual > mate( const Individual *, const Individual * ) = 0;
+    virtual shared_ptr< MatingModel > clone() = 0;
 
     virtual ~MatingModel() {}
 protected:
-    boost::shared_ptr< MatingModel >   m_model;
+    shared_ptr< MatingModel >   m_model;
 };
 
 #endif  // MATINGMODEL_H_

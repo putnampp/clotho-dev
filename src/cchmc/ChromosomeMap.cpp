@@ -27,9 +27,59 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#define BOOST_TEST_MAIN
-#define BOOST_TEST_DYN_LINK
+#include "ChromosomeMap.h"
 
-#define BOOST_TEST_MODULE CLOTHOTest
+void ChromosomeMap::configure( std::istream & config ) { }
 
-#include <boost/test/unit_test.hpp>
+size_t ChromosomeMap::size() const {
+    return m_chroms->size();
+}
+
+chromid_t   ChromosomeMap::find( const String & name, bool bCreateMissing ) {
+    chromid_t id = UNKNOWN_CHROM;
+    
+    Chromosomes::iterator it = m_chroms->find(name);
+
+    if( it != m_chroms->end() ) {
+        id = it->second->id();
+    } else if( bCreateMissing ) {
+        ChromosomePtr c( new Chromosome( name, 0) );
+
+        m_chroms->insert( std::make_pair(name, c) );
+
+        id = c->id();
+    }
+
+    return id;
+}
+
+/**
+ *  Linearly search for chromosome object by id
+ *
+ *  TODO: would be more efficient to maintain a map
+ *  of chromosomes by ID.  Is it worth maintaining multiple
+ *  maps for sorted access? Cost/benefit of find method usage?
+ */
+ChromosomePtr ChromosomeMap::find( chromid_t id ) {
+    assert( 0 <= id && id < (chromid_t) m_chroms->size() );
+
+    ChromosomesIter it = m_chroms->begin();
+
+    ChromosomePtr p;
+
+    while( it != m_chroms->end() ) {
+        if( it->second->id() == id ) {
+            p = it->second;
+            break;
+        }
+        it++;
+    }
+    return p;
+}
+
+ChromosomeMap::ChromosomesIter ChromosomeMap::begin() const { return m_chroms->begin(); }
+ChromosomeMap::ChromosomesIter ChromosomeMap::end() const { return m_chroms->end(); }
+
+ChromosomeMap::~ChromosomeMap() {
+    m_chroms->clear();
+}

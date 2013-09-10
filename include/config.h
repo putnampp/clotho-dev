@@ -26,14 +26,14 @@
  * of the authors and should not be interpreted as representing official policies,
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
-#ifndef POPSIM_CONFIG_H_
-#define POPSIM_CONFIG_H_
+#ifndef CLOTHO_CONFIG_H_
+#define CLOTHO_CONFIG_H_
 
 #include "log_levels.h"
 
 #define MAJOR_VERSION  "0.1"
 #define MINOR_VERSION  "0"
-#define VERSION        "POPSIM 0.1.0"
+#define VERSION        "CLOTHO 0.1.0"
 
 /* #undef LOG */
 /* #undef LOG_LEVEL */
@@ -64,4 +64,12 @@
     #define LOG_LEVEL LOG_DEFAULT
 #endif  // end verifications
 
-#endif  // POPSIM_CONFIG_H_
+#ifndef MAX_ALLELES
+#define    MAX_ALLELES 256
+#endif  // MAX_ALLELES
+
+#if MAX_ALLELES < 0
+#error  Cannot have negative alleles
+#endif  // MAX_ALLELES
+
+#endif  // CLOTHO_CONFIG_H_

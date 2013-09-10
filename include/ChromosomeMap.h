@@ -27,9 +27,57 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#define BOOST_TEST_MAIN
-#define BOOST_TEST_DYN_LINK
+#ifndef CHROMOSOMEMAP_H_
+#define CHROMOSOMEMAP_H_
 
-#define BOOST_TEST_MODULE CLOTHOTest
+#include "common.h"
+#include "Chromosome.h"
+#include "Configurable.h"
+#include "Sequence.h"
 
-#include <boost/test/unit_test.hpp>
+#include <map>
+
+class ChromosomeMap : public Configurable {
+public:
+    typedef std::map< const String, ChromosomePtr > Chromosomes;
+    typedef Chromosomes::const_iterator ChromosomesIter;
+
+    static ChromosomeMap * getInstance() {
+        static ChromosomeMap * inst = new ChromosomeMap();
+        return inst;
+    }
+
+    virtual void    configure( std::istream & config );
+
+/**
+ *  The number of chromosomes currently being tracked
+ */
+    virtual size_t    size() const;
+
+/**
+ *  Find a chromosome id by the chromosomes name.
+ *
+ *  It is possible to create missing chromosomes
+ *
+ *  String matching is done case-sensitively, by default
+ */
+    virtual chromid_t find( const String & name, bool bCreateMissing = false );
+
+    virtual ChromosomePtr find( chromid_t id );
+
+/**
+ * Iterators that traverse the chromosomes in name lexicographical order
+ * 
+ * NOTE: ID order may not reflected sorted index
+ */
+    virtual ChromosomesIter begin() const;
+    virtual ChromosomesIter end() const;
+
+    virtual ~ChromosomeMap();
+protected:
+    ChromosomeMap(): m_chroms( new Chromosomes() ) {}
+
+    shared_ptr< Chromosomes >   m_chroms;
+};
+
+#endif  // CHROMOSOMEMAP_H_

@@ -32,20 +32,26 @@
 
 #include "common.h"
 
+#include "Configurable.h"
 #include "Individual.h"
 
 #include <set>
 
+using std::set;
+
 /*******************************************************************************
  * A Population is a collection on Individuals.
  ******************************************************************************/
-class Population {
+class Population : public Configurable {
 public:
     Population();
+
+    virtual void    configure( std::istream & config );
+
     virtual ~Population();
 private:
-    typedef boost::shared_ptr< Individual >            IndividualPtr;
-    typedef boost::scoped_ptr< std::set< IndividualPtr > > Individuals;
+    typedef shared_ptr< Individual >            IndividualPtr;
+    typedef scoped_ptr< set< IndividualPtr > > Individuals;
 
     Individuals     m_individs;
 };

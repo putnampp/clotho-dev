@@ -27,9 +27,41 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#define BOOST_TEST_MAIN
-#define BOOST_TEST_DYN_LINK
+#ifndef MUTATE_H_
+#define MUTATE_H_
 
-#define BOOST_TEST_MODULE CLOTHOTest
+#include "common.h"
+#include "ploidy.h"
+#include "Sequence.h"
 
-#include <boost/test/unit_test.hpp>
+typedef double mutrate_t;
+
+struct Mutatable {
+    virtual void mutate( ) = 0;
+};
+
+template < ploidy_t P >
+struct MutationModel {
+    virtual void operator()( Sequence< P > * loci ) { return; }
+};
+
+template < ploidy_t P >
+struct SSM : MutationModel< P > {
+    virtual void operator()( Sequence< P > * loci ) {
+        
+    }
+};
+
+template < ploidy_t P >
+class MutatableSequence: virtual Sequence< P >, public Mutatable {
+public:
+    MutatableSequence( MutationModel< P > * model ) : m_mutate( model ) {}
+
+    virtual void mutate() {
+        (*m_mutate)( this );
+    }
+protected:
+    MutationModel< P >  * m_mutate;
+};
+
+#endif  // MUTATE_H_

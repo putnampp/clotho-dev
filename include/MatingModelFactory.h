@@ -46,12 +46,12 @@ public:
 /**
  * Create a base MatingModel
  */
-    boost::shared_ptr< MatingModel > create( const String & name );
+    shared_ptr< MatingModel > create( const String & name );
 
 /**
  * Create a decorated MatingModel 
  */
-    boost::shared_ptr< MatingModel > create( const String & name, boost::shared_ptr< MatingModel > m);
+    shared_ptr< MatingModel > create( const String & name, shared_ptr< MatingModel > m);
 
     virtual ~MatingModelFactory();
 private:

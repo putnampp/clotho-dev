@@ -27,9 +27,10 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#define BOOST_TEST_MAIN
-#define BOOST_TEST_DYN_LINK
+#ifndef PLOIDY_H_
+#define PLOIDY_H_
 
-#define BOOST_TEST_MODULE CLOTHOTest
+typedef unsigned char ploidy_t;
+enum Ploidy { HAPLOID = 1, DIPLOID, TRIPLOID, TETRAPLOID };
 
-#include <boost/test/unit_test.hpp>
+#endif  // PLOIDY_H_

@@ -37,6 +37,8 @@
 
 #include <fstream>
 
+using std::ostream;
+
 /*******************************************************************************
  * Statistic is an abstract class from which statistic algorithms are
  * derived.
@@ -51,17 +53,17 @@ public:
     virtual void configure( std::istream & in ) = 0;
     virtual void operator()( const Population & p ) = 0;
 
-    friend std::ostream & operator<<( std::ostream & out, const Statistic & stat );
+    friend ostream & operator<<( ostream & out, const Statistic & stat );
     virtual ~Statistic() {}
 protected:
-    virtual void write_stat( std::ostream & out ) const {
+    virtual void write_stat( ostream & out ) const {
         out << m_desc;
     }
 };
 
 typedef boost::shared_ptr< Statistic > StatPtr;
 
-std::ostream & operator<<( std::ostream & out, const Statistic & stat ) {
+std::ostream & operator<<( ostream & out, const Statistic & stat ) {
     stat.write_stat( out );
     return out;
 }

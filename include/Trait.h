@@ -30,6 +30,26 @@
 #define TRAIT_H_
 
 #include "common.h"
+#include "ploidy.h"
+#include "Configurable.h"
+#include "Mutate.h"
+#include "Inheritance.h"
+#include "Locus.h"
+
+#include <cassert>
+
+struct iTrait {
+
+/**
+ *  return the ploidy of the trait
+ */
+    virtual ploidy_t    ploidy()    const = 0;
+
+/**
+ *  return the number of loci associated with the trait
+ */
+    virtual size_t    loci()      const = 0;
+};
 
 /*******************************************************************************
  * A Trait is some observed characteristic of an individual.
@@ -45,22 +65,29 @@
  * is a categorical trait, and is limited to a set of colors.
  *
  ******************************************************************************/
-template < class V >
-class Trait {
+template < ploidy_t P = DIPLOID >
+class Trait : public iTrait, 
+    public Configurable, 
+    virtual MutatableSequence< P >, 
+    virtual InheritableSequence< P >,
+    virtual Sequence< P > {
 public:
-    typedef V   value_type;
     String getName() const;
     String getDescription() const;
 
-    template < class P >
-    P & getProperty( const String & key ) const;
+    virtual void configure( std::istream & config );
 
-    const value_type & value();
+    virtual void add( const String & locus_name );
+    virtual void add( const shared_ptr< Locus > l );
+
+    virtual ploidy_t    ploidy() const;
+    virtual size_t      loci() const;
+
+    virtual ~Trait() {    }
 private:
-    class Property;
-    boost::scoped_ptr< Property > m_prop;
+    static const ploidy_t PLOIDY = P;
 
-    value_type  m_val;
+    Loci    m_loci;
 };
 
 #endif  // TRAIT_H_

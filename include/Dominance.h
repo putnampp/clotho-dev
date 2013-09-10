@@ -26,42 +26,31 @@
  * of the authors and should not be interpreted as representing official policies,
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
-#ifndef POPSIM_CONFIG_H_
-#define POPSIM_CONFIG_H_
 
-#include "log_levels.h"
+#ifndef DOMINANCE_H_
+#define DOMINANCE_H_
 
-#define MAJOR_VERSION  "${POPSIM_PACKAGE_VER_MAJOR}"
-#define MINOR_VERSION  "${POPSIM_PACKAGE_VER_MINOR}"
-#define VERSION        "${POPSIM_PACKAGE_STRING}"
+#include "common.h"
 
-#cmakedefine LOG
-#cmakedefine LOG_LEVEL @LOG_LEVEL@
+#include "IndexSpace.h"
 
-#ifdef LOG_LEVEL  // log_level defined
-    #if LOG_LEVEL == LOG_OFF // but it is set to be off
-        #ifdef LOG
-            #warning "Turning Logging OFF"
-            #undef LOG      // make sure logging is off
-        #endif 
-    #else   // LOG_LEVEL
-        #ifndef LOG   // debug not turned
-            #define LOG   // turn it on
-        #endif
+template < class T, unsigned char P >
+class Dominance {
+public:
+    typedef T value_t;
+    Dominance( uint32_t forms ) :
+        m_idxspace( new IndexSpace( forms ) ),
+        m_data( new value_t[ m_idxspace->limit() ] ) {
+    }
 
-        #if LOG_LEVEL == LOG_CRIT
-        #elif LOG_LEVEL == LOG_ERROR
-        #elif LOG_LEVEL == LOG_WARN
-        #elif LOG_LEVEL == LOG_STATUS
-        #elif LOG_LEVEL == LOG_NOTE
-        #elif LOG_LEVEL == LOG_DEBUG
-        #elif LOG_LEVEL == LOG_ALL
-        #else
-            #error "UNKNOWN LOG LEVEL DEFINED."
-        #endif // LOG_LEVEL
-    #endif  // LOG_LEVEL
-#elif defined LOG     // debugging turned on, but debug_level not defined
-    #define LOG_LEVEL LOG_DEFAULT
-#endif  // end verifications
+    value_t operator()( const enumerable  * o ) {
+        return m_data[ o->index() ];
+    }
+protected:
+    static const unsigned char PLOIDY = P;
+    shared_ptr< value_t [] >  m_data;
 
-#endif  // POPSIM_CONFIG_H_
+    shared_ptr< IndexSpace< PLOIDY > > m_idxspace;
+};
+
+#endif  // DOMINANCE_H_

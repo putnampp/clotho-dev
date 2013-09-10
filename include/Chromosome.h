@@ -27,9 +27,42 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#define BOOST_TEST_MAIN
-#define BOOST_TEST_DYN_LINK
+#ifndef CHROMOSOME_H_
+#define CHROMOSOME_H_
 
-#define BOOST_TEST_MODULE CLOTHOTest
+#include "common.h"
+#include <cassert>
+#include "Configurable.h"
 
-#include <boost/test/unit_test.hpp>
+typedef char chromid_t;
+#define UNKNOWN_CHROM -1
+
+class ChromosomeMap;
+
+class Chromosome {
+public:
+    friend class ChromosomeMap;
+
+    Chromosome( const String & n, size_t s) : m_name(n), m_id(nextID()), m_size(s) { }
+
+    chromid_t id() const { return m_id; }
+    String  name() const { return m_name; }
+    size_t  length() const { return m_size; }
+
+    virtual ~Chromosome() {}
+protected:
+    String      m_name;
+    chromid_t   m_id;
+    size_t      m_size;
+
+private:
+    static chromid_t nextID() {
+        static chromid_t next_id = 0;
+        assert( next_id > UNKNOWN_CHROM );
+        return next_id++;
+    }
+};
+
+typedef shared_ptr< Chromosome > ChromosomePtr;
+
+#endif  // CHROMOSOME_H_

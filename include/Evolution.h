@@ -50,10 +50,10 @@ public:
 
     virtual ~Evolution();
 protected:
-    boost::scoped_ptr< Population >         m_pop;
-    boost::scoped_ptr< SimulationSpace >    m_space;
-    boost::scoped_ptr< Environment  >       m_environ;
-    boost::scoped_ptr< StatisticEval >      m_stats;
+    scoped_ptr< Population >         m_pop;
+    scoped_ptr< SimulationSpace >    m_space;
+    scoped_ptr< Environment  >       m_environ;
+    scoped_ptr< StatisticEval >      m_stats;
 };
 
 #endif  // EVOLUTION_H_

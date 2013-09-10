@@ -27,9 +27,39 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#define BOOST_TEST_MAIN
-#define BOOST_TEST_DYN_LINK
+#ifndef GENETICMAP_H_
+#define GENETICMAP_H_
 
-#define BOOST_TEST_MODULE CLOTHOTest
+#include "common.h"
+#include "Configurable.h"
+#include "ChromosomeMap.h"
+#include "Locus.h"
 
-#include <boost/test/unit_test.hpp>
+/**
+ *
+ * A GeneticMap is intended to retain the Loci information for the current
+ * simulation.
+ *
+ * One locus can affect multiple Phenotypic traits (pleitropy). However, multiple
+ * traits need not necessarily contain the same set of Loci.
+ *
+ */
+
+class GeneticMap : public Configurable {
+public:
+    static GeneticMap * getInstance() {
+        static GeneticMap * instance = new GeneticMap();
+        return instance;
+    }
+
+    virtual void configure( std::istream & config );
+
+    virtual void add( const shared_ptr< Locus > l );
+    virtual void add( const shared_ptr< Trait > p );
+
+    virtual ~GeneticMap() {}
+protected:
+    GeneticMap();
+};
+
+#endif  // GENETICMAP_H_

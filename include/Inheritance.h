@@ -27,9 +27,27 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#define BOOST_TEST_MAIN
-#define BOOST_TEST_DYN_LINK
+#ifndef INHERITANCE_H_
+#define INHERITANCE_H_
 
-#define BOOST_TEST_MODULE CLOTHOTest
+#include "common.h"
+#include "Sequence.h"
 
-#include <boost/test/unit_test.hpp>
+template < class V, unsigned char P >
+struct InheritanceModel {
+    virtual void operator()( const Sequence * p1, const Sequence * parent2, Sequence * offspring ) = 0;
+};
+
+template < class V, unsigned char P >
+class InheritableSequence : virtual Sequence< V, P >, public Inheritable {
+public:
+    InheritableSequence( InheritanceModel<V, P> * model) : m_inherit(model) {}
+
+    virtual void inherit( const Sequence<V, P> * p1, const Sequence<V,P> * p2 ) {
+        (*m_inherit)( p1, p2, this);
+    }
+protected:
+    InheritanceModel    *m_inherit;
+};
+
+#endif  // INHERITANCE_H_

@@ -52,10 +52,10 @@ public:
 
     virtual ~Individual();
 private:
-    typedef boost::scoped_ptr< Genotype > GenotypePtr;
+    typedef scoped_ptr< Genotype > GenotypePtr;
     GenotypePtr     m_geno;
 
-    typedef boost::scoped_ptr< Phenotype > PhenotypePtr;
+    typedef scoped_ptr< Phenotype > PhenotypePtr;
     PhenotypePtr    m_pheno;
 };
 

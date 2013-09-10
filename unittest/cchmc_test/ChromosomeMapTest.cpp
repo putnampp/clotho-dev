@@ -27,9 +27,13 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#define BOOST_TEST_MAIN
-#define BOOST_TEST_DYN_LINK
-
-#define BOOST_TEST_MODULE CLOTHOTest
-
 #include <boost/test/unit_test.hpp>
+#include "ChromosomeMap.h"
+
+BOOST_AUTO_TEST_SUITE( test_chromosome_map )
+
+BOOST_AUTO_TEST_CASE( cmSingleton ) {
+    BOOST_REQUIRE_MESSAGE( ChromosomeMap::getInstance() != NULL, "Failed to get ChromosomeMap" );
+}
+
+BOOST_AUTO_TEST_SUITE_END()

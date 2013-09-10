@@ -27,9 +27,39 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#define BOOST_TEST_MAIN
-#define BOOST_TEST_DYN_LINK
+#ifndef LOCUS_H_
+#define LOCUS_H_
 
-#define BOOST_TEST_MODULE CLOTHOTest
+#include "common.h"
+#include "Chromosome.h"
+#include "Mutate.h"
 
-#include <boost/test/unit_test.hpp>
+#include <vector>
+
+using std::vector;
+
+/**
+ * Implementation specific definition of a locus structure
+ *
+ * From a simulation perspective only the the pair <chromosome, position> are important. For extensibility reasons, position is
+ * considered to be an open ended region [start, end)
+ * All other fields are generally optional, depending upon simulation models.
+ *
+ * Other optional properties are:
+ *  - properties (name, alleles, ... )
+ *
+ */
+struct Locus {
+    String      name;
+    size_t      start, end;
+    size_t      alt_count;
+    shared_ptr< allele_t [] > alleles;
+    mutrate_t   mutation_rate;
+    chromid_t   chromid;
+};
+
+typedef shared_ptr< Locus > LocusPtr;
+typedef vector< LocusPtr > Loci;
+typedef Loci::iterator  LociIterator;
+
+#endif  // LOCUS_H_

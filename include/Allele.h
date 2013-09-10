@@ -27,9 +27,29 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#define BOOST_TEST_MAIN
-#define BOOST_TEST_DYN_LINK
+#ifndef ALLELE_H_
+#define ALLELE_H_
 
-#define BOOST_TEST_MODULE CLOTHOTest
+#if MAX_ALLELES <= (1 << 8)
 
-#include <boost/test/unit_test.hpp>
+typedef unsigned char   allele_t;
+
+#elif MAX_ALLELES <= (1 << 16 )
+
+typedef unsigned short   allele_t;
+
+#elif MAX_ALLELES <= (1 << 32 )
+
+typedef unsigned int    allele_t;
+
+#elif MAX_ALLELES <= 0xFFFFFFFFFFFFFFFF
+
+typedef unsigned long   allele_t;
+
+#else
+
+#error Invalid Maximum Allele Forms
+
+#endif
+
+#endif  // ALLELE_H_
