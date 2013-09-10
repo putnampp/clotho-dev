@@ -26,7 +26,7 @@
 # of the authors and should not be interpreted as representing official policies,
 # either expressed or implied, of the FreeBSD Project.
 ################################################################################
-INCLUDE_DIRECTORIES( ${POPSIM_INCLUDE_DIR} )
+INCLUDE_DIRECTORIES( ${${PROJECT_NAME}_INCLUDE_DIR} )
 INCLUDE_DIRECTORIES( ${CUDA_INCLUDE_DIRS} )
 cuda_add_executable( platform_test platform_test.cpp )
 

@@ -27,9 +27,9 @@
 # either expressed or implied, of the FreeBSD Project.
 ################################################################################
 cmake_minimum_required (VERSION 2.8)
-PROJECT( POPSIM CXX )
+PROJECT( CLOTHO CXX )
 
-SET (${PROJECT_NAME}_LIB_CORENAME "popsim")
+SET (${PROJECT_NAME}_LIB_CORENAME "clotho")
 
 SET (${PROJECT_NAME}_VER_MAJ 0)
 SET (${PROJECT_NAME}_VER_MIN 1)
