@@ -32,13 +32,11 @@
 
 #include "common.h"
 
+#include "Genome.h"
+#include "Sequence.h"
+
 #include "Genotype.h"
 #include "Phenotype.h"
-
-//#include "Dimension.h"
-//#include "Selection.h"
-//#include "MatingModel.h"
-
 
 /*******************************************************************************
  * An Individual is an encapsulation object consisting of a genotype and
@@ -46,17 +44,24 @@
  *
  *
  ******************************************************************************/
-class Individual {
+template < chrom_num_t C, ploidy_t P >
+class Individual : public Genotypeable< P >, public Phenotypeable {
 public:
     Individual();
 
+    virtual SEX sex();
+
+    virtual bool isHomozygous( const LocusPtr l );
+    virtual bool isDominant( const LocusPtr l );
+    virtual void genotype( const LocusPtr l, Genotype< P > & g );
+
+    virtual void phenotype( iTrait *, Phenotype * );
+
     virtual ~Individual();
 private:
-    typedef scoped_ptr< Genotype > GenotypePtr;
-    GenotypePtr     m_geno;
-
-    typedef scoped_ptr< Phenotype > PhenotypePtr;
-    PhenotypePtr    m_pheno;
+    static const chrom_num_t CHROMOSOMES = c;
+    static const ploidy_t PLOIDY = p;
+    Sequence *  m_seqs[ PLOIDY ][ CHROMOSOMES ];
 };
 
 #endif  // INDIVIDUAL_H_

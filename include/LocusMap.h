@@ -27,28 +27,18 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef GENOTYPE_H_
-#define GENOTYPE_H_
+#ifndef LOCUSMAP_H_
+#define LOCUSMAP_H_
 
 #include "common.h"
-#include "ploidy.h"
-#include "Allele.h"
+
 #include "Locus.h"
+#include "Sequence.h"
 
-template < ploidy_t P >
-struct Genotype {
-    static const ploidy_t PLOIDY = P;
-    allele_t    geno[ PLOIDY ];
+class LocusMap : public Sequence {
+public:
+
+    virtual bool add( const LocusPtr l );
 };
 
-enum GENOTYPES { HOMOZYGOUS, HETEROZYGOUS };
-
-template < ploidy_t P >
-struct Genotypeable {
-    virtual bool isHomozygous( const LocusPtr l ) = 0;
-    virtual bool isDominant( const LocusPtr l ) = 0;
-    virtual void genotype( const LocusPtr l, Genotype< P > & g ) = 0;
-};
-
-
-#endif  // GENOTYPE_H_
+#endif  // LOCUSMAP_H_

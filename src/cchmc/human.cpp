@@ -27,18 +27,4 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef MARKER_H_
-#define MARKER_H_
-
-/*******************************************************************************
- * A Marker is a genomic element of interest.
- ******************************************************************************/
-class Marker {
-public:
-    Marker(){}
-    virtual ~Marker(){}
-private:
-    
-};
-
-#endif  // MARKER_H_
+#include "human.h"

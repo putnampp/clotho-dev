@@ -31,19 +31,19 @@
 #define SEQUENCE_H_
 
 #include "common.h"
-#include "ploidy.h"
+#include "Locus.h"
 
 struct sequence {
-    virtual size_t length() const = 0;
-    virtual allele_t &   allele( size_t strand, size_t locus ) = 0;
+    virtual size_t      length() const = 0;
+    virtual allele_t &  allele( size_t l ) = 0;
 };
 
 /**
- * A sequence is an in-silico representation of a set of 
- * allelic values for a given set of loci.
+ * A sequence is an in-silico representation of a contiguous vector of 
+ * allelic values. Each value corresponds to a specific locus.
  *
- * Each loci is associated with an enumerated set of forms.
- * The values of the sequence are indices into the enumerated set
+ * Each locus is associated with an enumerated set of forms.
+ * The allelic values of the sequence are indices into the enumerated set
  * of forms.
  *
  * The allele_t of the a sequence is intended to be an integral
@@ -53,32 +53,7 @@ struct sequence {
  * byte (unsigned char) is sufficient to represent all possible
  * form indices.
  *
- * It is desirable to use one sequence to represent multiple parallel
- * forms of the sequence (ie. use 1 sequence to represent both
- * strands of a chromosome.) Thus, a sequence is best thought of 
- * as a Matrix of values, where the rows correspond to alleles, 
- * and columns are the loci.
- * 
- * A -> ______LOCUS______
- * 0 ->| L0|  L1|  L2|...|
- * 1 ->| L0|  L1|  L2|...|
- * ...
- *
- * An alternative implementation decision would tie the value type
- * V to the ploidy of the sequence. For instance, a Haploid sequence
- * would use a single byte per locus. A Diploid sequence would
- * use a short to represent both strand alleles. This would be essentially
- * the transpose of the current implementation.
- *
- * L ->  _____Allele__
- * 0 -> |  0    |    1| 
- * 1 -> |  0    |    1| 
- * 2 -> |  0    |    1|
- * ...
- *
- *
  **/
-template < ploidy_t P >
 class Sequence : public sequence {
 public:
     Sequence( ) : m_nLoci(0), m_maxForms(MAX_ALLELES), m_allocatedLoci(0) {}
@@ -87,53 +62,40 @@ public:
         resizeSeq( loci );
     }
 
-    virtual ploidy_t ploidy() const {
-        return PLOIDY;
-    }
-
     virtual size_t length() const {
         return m_nLoci;
     }
 
-    virtual allele_t & allele(size_t strand, size_t locus) {
-        assert( strand < PLOIDY && locus < m_nLoci );
-        return m_alleles[strand][locus];
+    virtual allele_t & allele(size_t locus) {
+        assert( locus < m_nLoci );
+        return m_alleles[locus];
     }
 
     virtual ~Sequence() {
-        if( m_nLoci > 0 ) delete [] m_alleles[0];
+        if( m_nLoci > 0 ) delete [] m_alleles;
     }
 
 protected:
-    static const unsigned char PLOIDY = P;
-    allele_t *   m_alleles[ PLOIDY ];
+    allele_t *   m_alleles;
 
-    size_t    m_nLoci;
-    size_t    m_maxForms;
-private:
+    size_t       m_nLoci;
+    size_t       m_maxForms;
     size_t    m_allocatedLoci;
 
     void    resizeSeq( size_t nLoci ) {
-        allele_t * tmp = new allele_t[ ((size_t) PLOIDY) * nLoci ];
+        allele_t * tmp = new allele_t[ nLoci ];
         if( m_allocatedLoci != 0 ) {
             // copy current loci values over
-            for( unsigned char i = 0; i < PLOIDY; ++i ) {
-                memcpy( &tmp[ i * nLoci ], m_alleles[i], m_allocatedLoci * sizeof( allele_t ) );
-            }
+            memcpy( tmp, m_alleles, m_allocatedLoci * sizeof( allele_t ) );
 
             // delete currently allocated memory
-            delete [] m_alleles[0];
+            delete [] m_alleles;
         }
 
         // establish new memory space
-        for( int i = 0; i < PLOIDY; ++i ) {
-            m_alleles[i] = &tmp[i * nLoci];
-        }
-
+        m_alleles = tmp;
         m_allocatedLoci = nLoci;
     }
 };
-
-typedef Sequence< DIPLOID > DiploidSequence;
 
 #endif  // SEQUENCE_H_

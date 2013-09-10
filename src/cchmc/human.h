@@ -27,28 +27,16 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef GENOTYPE_H_
-#define GENOTYPE_H_
+#ifndef HUMAN_H_
+#define HUMAN_H_
 
-#include "common.h"
-#include "ploidy.h"
-#include "Allele.h"
-#include "Locus.h"
+#include "Genome.h"
+#include "Individual.h"
 
-template < ploidy_t P >
-struct Genotype {
-    static const ploidy_t PLOIDY = P;
-    allele_t    geno[ PLOIDY ];
-};
+#define HUMAN_GERM_LINE 23
+#define HUMAN_PLOIDY    DIPLOID
 
-enum GENOTYPES { HOMOZYGOUS, HETEROZYGOUS };
+typedef GenomeFactory< HUMAN_GERM_LINE, HUMAN_PLOIDY > HumanFactory;
+typedef Individual< HumanFactory::CHROMOSOMES, HumanFactory::PLOIDY > HumanIndividual;
 
-template < ploidy_t P >
-struct Genotypeable {
-    virtual bool isHomozygous( const LocusPtr l ) = 0;
-    virtual bool isDominant( const LocusPtr l ) = 0;
-    virtual void genotype( const LocusPtr l, Genotype< P > & g ) = 0;
-};
-
-
-#endif  // GENOTYPE_H_
+#endif  // HUMAN_H_

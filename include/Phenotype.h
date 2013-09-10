@@ -31,7 +31,14 @@
 #define PHENOTYPE_H_
 
 #include "common.h"
+#include "Trait.h"
 
-class Phenotype;
+struct Phenotype {
+    double  value;
+};
+
+struct Phenotypeable {
+    virtual void phenotype( iTrait *, Phenotype * ) = 0;
+};
 
 #endif  // PHENOTYPE_H_

@@ -49,6 +49,9 @@ struct iTrait {
  *  return the number of loci associated with the trait
  */
     virtual size_t    loci()      const = 0;
+
+    virtual LocusIterator   begin() const = 0;
+    virtual LocusIterator   end()   const = 0;
 };
 
 /*******************************************************************************
@@ -67,10 +70,8 @@ struct iTrait {
  ******************************************************************************/
 template < ploidy_t P = DIPLOID >
 class Trait : public iTrait, 
-    public Configurable, 
-    virtual MutatableSequence< P >, 
-    virtual InheritableSequence< P >,
-    virtual Sequence< P > {
+    public Configurable 
+{
 public:
     String getName() const;
     String getDescription() const;
@@ -82,6 +83,9 @@ public:
 
     virtual ploidy_t    ploidy() const;
     virtual size_t      loci() const;
+
+    virtual LocusIterator   begin() const;
+    virtual LocusIterator   end()   const;
 
     virtual ~Trait() {    }
 private:
