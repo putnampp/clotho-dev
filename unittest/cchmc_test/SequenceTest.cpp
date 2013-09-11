@@ -27,49 +27,35 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef CHROMOSOME_H_
-#define CHROMOSOME_H_
+#include <boost/test/unit_test.hpp>
+#include "Sequence.h"
 
-#include "common.h"
-#include <cassert>
-#include "Configurable.h"
+BOOST_AUTO_TEST_SUITE( test_sequence )
 
-#include <set>
 
-using std::set;
+BOOST_AUTO_TEST_CASE( seq_create ) {
+    Sequence s;
+}
 
-typedef unsigned char chromid_t;
-#define UNKNOWN_CHROM -1
+BOOST_AUTO_TEST_CASE( seq_create2 ) {
+    const size_t size = 35;
+    Sequence s(size);
 
-class ChromosomeMap;
+    BOOST_REQUIRE_MESSAGE( s.length() == size, "Failed to create a sequence with " << size << " loci" );
+}
 
-class Chromosome {
-public:
-    friend class ChromosomeMap;
+BOOST_AUTO_TEST_CASE( seq_set_locus ) {
+    const size_t size = 35;
 
-    Chromosome( const String & n, size_t s);
+    Sequence s( size );
 
-    void    add_site( size_t pos );
+    for( size_t i = 0; i < size; ++i ) {
+        s.allele( i ) = (allele_t) i;
+    }
 
-    chromid_t id() const;
-    String  name() const;
-    size_t  length() const;
+    for( size_t i = 0; i < size; ++i ) {
+        BOOST_REQUIRE_MESSAGE( s.allele(i) == (allele_t)i, "Allele " << i << ": Expected = " << (allele_t)i << "; Actual = " << s.allele(i) );
+    }
+}
 
-    size_t  loci() const;
-    bool    is_locus( size_t pos ) const;
-
-    virtual ~Chromosome();
-protected:
-    String      m_name;
-    chromid_t   m_id;
-    size_t      m_size;
-
-    set< size_t > m_sites;
-
-private:
-    static chromid_t nextID();
-};
-
-typedef shared_ptr< Chromosome > ChromosomePtr;
-
-#endif  // CHROMOSOME_H_
+BOOST_AUTO_TEST_SUITE_END()

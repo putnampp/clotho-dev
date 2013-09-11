@@ -30,6 +30,7 @@ INCLUDE_DIRECTORIES( ${${PROJECT_NAME}_INCLUDE_DIR} )
 
 LIST( APPEND SRCS StatisticFactory.cpp)
 LIST( APPEND SRCS ChromosomeMap.cpp)
+LIST( APPEND SRCS Chromosome.cpp)
 LIST( APPEND SRCS human.cpp)
 LIST( APPEND SRCS Sequence.cpp)
 

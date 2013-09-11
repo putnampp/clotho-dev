@@ -34,25 +34,46 @@
 #include "ploidy.h"
 #include "Chromosome.h"
 //#include "Individual.h"
+#include "Sequence.h"
 
-template< chromid_t C = 23, ploidy_t P = DIPLOID >
+template< chromid_t C, ploidy_t P >
 class GenomeFactory {
 public:
     static const chromid_t CHROMOSOMES = C;
     static const ploidy_t PLOIDY = P;
     static GenomeFactory<C, P> * getInstance() {
-        static GenomeFactory<C, P > instance( new GenomeFactory< C, P >() );
+        static GenomeFactory<C, P > * instance =  new GenomeFactory< C, P >();
         return instance;
     }
 
     virtual bool addChromosome( const ChromosomePtr c) { assert( false ); return false; }
 
-//    virtual shared_ptr< Individual< C, P > > build(){ assert( false ); return shared_ptr< Individual< C, P > >( new Individual<C, P>()); }
+    virtual shared_ptr< Sequence > build_sequence( chromid_t c ) {
+        assert( c < CHROMOSOMES );
+        return shared_ptr< Sequence >( new Sequence( m_chroms[ c ]->loci() ));
+    }
 
-    virtual ~GenomeFactory();
+    virtual size_t total_size() const {
+        return m_base_count;
+    }
+
+    virtual size_t loci() const {
+        return m_nLoci;
+    }
+
+    virtual ~GenomeFactory() {}
 protected:
-    GenomeFactory( ) {}
+    GenomeFactory( ) : m_base_count(0), m_nLoci(0) {
+        for( chromid_t c = 0; c < CHROMOSOMES; ++c ) {
+            m_chroms[ c ] = ChromosomePtr( new Chromosome( "name", 100 ) );
 
+            m_base_count += m_chroms[ c ]->length();
+            m_nLoci += m_chroms[ c ]->loci();
+        }
+    }
+
+    size_t          m_base_count;
+    size_t          m_nLoci;
     ChromosomePtr   m_chroms[ CHROMOSOMES ];
 };
 

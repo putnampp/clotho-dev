@@ -27,49 +27,45 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef CHROMOSOME_H_
-#define CHROMOSOME_H_
+#include "Chromosome.h"
 
-#include "common.h"
-#include <cassert>
-#include "Configurable.h"
+Chromosome::Chromosome( const String & n, size_t len ) :
+        m_name(n), 
+        m_id( nextID() ),
+        m_size(len) { }
 
-#include <set>
+void Chromosome::add_site( size_t pos ) {
+    assert( pos < m_size );
+    m_sites.insert( pos );
+}
 
-using std::set;
+chromid_t Chromosome::id() const {
+    return m_id;
+}
 
-typedef unsigned char chromid_t;
-#define UNKNOWN_CHROM -1
+String Chromosome::name() const {
+    return m_name;
+}
 
-class ChromosomeMap;
+size_t Chromosome::length() const {
+    return m_size;
+}
 
-class Chromosome {
-public:
-    friend class ChromosomeMap;
+size_t Chromosome::loci() const {
+    return m_sites.size();
+}
 
-    Chromosome( const String & n, size_t s);
+bool    Chromosome::is_locus( size_t pos ) const {
+    set< size_t >::iterator it = m_sites.find( pos );
+    return it == m_sites.end();
+}
 
-    void    add_site( size_t pos );
+chromid_t Chromosome::nextID() {
+    static chromid_t next_id = 0;
+    assert( next_id != UNKNOWN_CHROM );
+    return next_id++;
+}
 
-    chromid_t id() const;
-    String  name() const;
-    size_t  length() const;
-
-    size_t  loci() const;
-    bool    is_locus( size_t pos ) const;
-
-    virtual ~Chromosome();
-protected:
-    String      m_name;
-    chromid_t   m_id;
-    size_t      m_size;
-
-    set< size_t > m_sites;
-
-private:
-    static chromid_t nextID();
-};
-
-typedef shared_ptr< Chromosome > ChromosomePtr;
-
-#endif  // CHROMOSOME_H_
+Chromosome::~Chromosome() {
+    m_sites.clear();
+}

@@ -27,49 +27,14 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef CHROMOSOME_H_
-#define CHROMOSOME_H_
+#include <boost/test/unit_test.hpp>
+#include "Genome.h"
 
-#include "common.h"
-#include <cassert>
-#include "Configurable.h"
+BOOST_AUTO_TEST_SUITE( test_genome_factory )
 
-#include <set>
+BOOST_AUTO_TEST_CASE( genome_factory_create ) {
+    BOOST_REQUIRE_MESSAGE( (GenomeFactory<23, 2>::getInstance() != NULL), "Unable to create GenomeFactory<23,2>" );
+    BOOST_REQUIRE_MESSAGE( (GenomeFactory<22, 1>::getInstance() != NULL), "Unable to create GenomeFactory<22,1>" );
+}
 
-using std::set;
-
-typedef unsigned char chromid_t;
-#define UNKNOWN_CHROM -1
-
-class ChromosomeMap;
-
-class Chromosome {
-public:
-    friend class ChromosomeMap;
-
-    Chromosome( const String & n, size_t s);
-
-    void    add_site( size_t pos );
-
-    chromid_t id() const;
-    String  name() const;
-    size_t  length() const;
-
-    size_t  loci() const;
-    bool    is_locus( size_t pos ) const;
-
-    virtual ~Chromosome();
-protected:
-    String      m_name;
-    chromid_t   m_id;
-    size_t      m_size;
-
-    set< size_t > m_sites;
-
-private:
-    static chromid_t nextID();
-};
-
-typedef shared_ptr< Chromosome > ChromosomePtr;
-
-#endif  // CHROMOSOME_H_
+BOOST_AUTO_TEST_SUITE_END()

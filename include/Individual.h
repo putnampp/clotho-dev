@@ -48,7 +48,7 @@
 template < chromid_t C, ploidy_t P >
 class Individual : public Genotypeable< P >, public Phenotypeable {
 public:
-    Individual() {}
+    Individual() { initialize(); }
 
     virtual bool sex();
 
@@ -62,13 +62,14 @@ public:
 
     virtual ~Individual() {}
 protected:
+    virtual void initialize();
     virtual void inspectLocus( const LocusPtr l, Genotype< P > & g );
 
 private:
     static const chromid_t CHROMOSOMES = C;
     static const ploidy_t PLOIDY = P;
 
-    Sequence *  m_seqs[ PLOIDY ][ CHROMOSOMES ];
+    shared_ptr< Sequence >  m_seqs[ PLOIDY ][ CHROMOSOMES ];
     Genotype< P >   m_geno;
 };
 
@@ -97,6 +98,14 @@ IND_MEMBER_DECL( bool, isHomozygous)( const LocusPtr locus ) {
 IND_MEMBER_DECL( bool, isDominant )( const LocusPtr locus ) {
     inspectLocus( locus, m_geno );
     return m_geno.bDominant;
+}
+
+IND_MEMBER_DECL( void, initialize )( ) {
+    for( ploidy_t p = 0; p < PLOIDY; ++p ) {
+        for( chromid_t c = 0; c < CHROMOSOMES; ++c ) {
+            m_seqs[p][c] = GenomeFactory< CHROMOSOMES, PLOIDY >::getInstance()->build_sequence( c );
+        }
+    }
 }
 
 IND_MEMBER_DECL( void, inspectLocus)( const LocusPtr l, Genotype< P > & g ) {
