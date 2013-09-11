@@ -33,17 +33,15 @@
 #include "common.h"
 #include "Sequence.h"
 
-template < class V, unsigned char P >
 struct InheritanceModel {
-    virtual void operator()( const Sequence * p1, const Sequence * parent2, Sequence * offspring ) = 0;
+    virtual void operator()( const Sequence * p1, const Sequence * p2, Sequence * offspring ) = 0;
 };
 
-template < class V, unsigned char P >
-class InheritableSequence : virtual Sequence< V, P >, public Inheritable {
+class InheritableSequence : virtual Sequence {
 public:
-    InheritableSequence( InheritanceModel<V, P> * model) : m_inherit(model) {}
+    InheritableSequence( InheritanceModel * model) : m_inherit(model) {}
 
-    virtual void inherit( const Sequence<V, P> * p1, const Sequence<V,P> * p2 ) {
+    virtual void inherit( const Sequence * p1, const Sequence * p2 ) {
         (*m_inherit)( p1, p2, this);
     }
 protected:

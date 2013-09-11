@@ -31,7 +31,6 @@
 #define SEQUENCE_H_
 
 #include "common.h"
-#include "Locus.h"
 
 struct sequence {
     virtual size_t      length() const = 0;
@@ -56,24 +55,14 @@ struct sequence {
  **/
 class Sequence : public sequence {
 public:
-    Sequence( ) : m_nLoci(0), m_maxForms(MAX_ALLELES), m_allocatedLoci(0) {}
+    Sequence( );
+    Sequence( size_t loci );
 
-    Sequence( size_t loci ) : m_nLoci(loci), m_maxForms( MAX_ALLELES ), m_allocatedLoci(0) {
-        resizeSeq( loci );
-    }
+    virtual size_t length() const;
 
-    virtual size_t length() const {
-        return m_nLoci;
-    }
+    virtual allele_t & allele(size_t locus);
 
-    virtual allele_t & allele(size_t locus) {
-        assert( locus < m_nLoci );
-        return m_alleles[locus];
-    }
-
-    virtual ~Sequence() {
-        if( m_nLoci > 0 ) delete [] m_alleles;
-    }
+    virtual ~Sequence();
 
 protected:
     allele_t *   m_alleles;
@@ -82,20 +71,7 @@ protected:
     size_t       m_maxForms;
     size_t    m_allocatedLoci;
 
-    void    resizeSeq( size_t nLoci ) {
-        allele_t * tmp = new allele_t[ nLoci ];
-        if( m_allocatedLoci != 0 ) {
-            // copy current loci values over
-            memcpy( tmp, m_alleles, m_allocatedLoci * sizeof( allele_t ) );
-
-            // delete currently allocated memory
-            delete [] m_alleles;
-        }
-
-        // establish new memory space
-        m_alleles = tmp;
-        m_allocatedLoci = nLoci;
-    }
+    void    resizeSeq( size_t nLoci );
 };
 
 #endif  // SEQUENCE_H_

@@ -31,5 +31,6 @@ INCLUDE_DIRECTORIES( ${POPSIM_INCLUDE_DIR} )
 
 LIST(APPEND SRCS StatisticFactoryTest.cpp )
 LIST(APPEND SRCS ChromosomeMapTest.cpp )
+LIST(APPEND SRCS IndividualTest.cpp )
 
 ADD_LIBRARY(cchmc_test SHARED ${SRCS} )

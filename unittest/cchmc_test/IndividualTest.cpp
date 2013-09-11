@@ -27,34 +27,14 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef GENOME_H_
-#define GENOME_H_
+#include <boost/test/unit_test.hpp>
+#include "Individual.h"
 
-#include "common.h"
-#include "ploidy.h"
-#include "Chromosome.h"
-//#include "Individual.h"
-
-template< chromid_t C = 23, ploidy_t P = DIPLOID >
-class GenomeFactory {
-public:
-    static const chromid_t CHROMOSOMES = C;
-    static const ploidy_t PLOIDY = P;
-    static GenomeFactory<C, P> * getInstance() {
-        static GenomeFactory<C, P > instance( new GenomeFactory< C, P >() );
-        return instance;
-    }
-
-    virtual bool addChromosome( const ChromosomePtr c) { assert( false ); return false; }
-
-//    virtual shared_ptr< Individual< C, P > > build(){ assert( false ); return shared_ptr< Individual< C, P > >( new Individual<C, P>()); }
-
-    virtual ~GenomeFactory();
-protected:
-    GenomeFactory( ) {}
-
-    ChromosomePtr   m_chroms[ CHROMOSOMES ];
-};
+BOOST_AUTO_TEST_SUITE( test_individual )
 
 
-#endif  // GENOME_H_
+BOOST_AUTO_TEST_CASE( ind_create ) {
+    Individual<23, 2> human;
+}
+
+BOOST_AUTO_TEST_SUITE_END()

@@ -34,7 +34,7 @@
 #include <cassert>
 #include "Configurable.h"
 
-typedef char chromid_t;
+typedef unsigned char chromid_t;
 #define UNKNOWN_CHROM -1
 
 class ChromosomeMap;

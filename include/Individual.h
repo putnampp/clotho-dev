@@ -31,6 +31,7 @@
 #define INDIVIDUAL_H_
 
 #include "common.h"
+#include "Allele.h"
 
 #include "Genome.h"
 #include "Sequence.h"
@@ -44,12 +45,14 @@
  *
  *
  ******************************************************************************/
-template < chrom_num_t C, ploidy_t P >
+template < chromid_t C, ploidy_t P >
 class Individual : public Genotypeable< P >, public Phenotypeable {
 public:
-    Individual();
+    Individual() {}
 
-    virtual SEX sex();
+    virtual bool sex();
+
+    virtual allele_t allele( const LocusPtr locus );
 
     virtual bool isHomozygous( const LocusPtr l );
     virtual bool isDominant( const LocusPtr l );
@@ -57,11 +60,66 @@ public:
 
     virtual void phenotype( iTrait *, Phenotype * );
 
-    virtual ~Individual();
+    virtual ~Individual() {}
+protected:
+    virtual void inspectLocus( const LocusPtr l, Genotype< P > & g );
+
 private:
-    static const chrom_num_t CHROMOSOMES = c;
-    static const ploidy_t PLOIDY = p;
+    static const chromid_t CHROMOSOMES = C;
+    static const ploidy_t PLOIDY = P;
+
     Sequence *  m_seqs[ PLOIDY ][ CHROMOSOMES ];
+    Genotype< P >   m_geno;
 };
+
+/**
+ *
+ * IMPLEMENTATION
+ *
+ */
+
+#define IND_MEMBER_DECL(t, f) template < chromid_t C, ploidy_t P > t Individual<C,P>::f
+
+IND_MEMBER_DECL(bool, sex)() {
+    return false;
+}
+
+IND_MEMBER_DECL( allele_t, allele)( const LocusPtr locus ) {
+    assert( locus->chrom < CHROMOSOMES && locus->ploid < PLOIDY );
+    return m_seqs[locus->ploid][locus->chrom]->allele(locus->start);
+}
+
+IND_MEMBER_DECL( bool, isHomozygous)( const LocusPtr locus ) {
+    inspectLocus( locus, m_geno );
+    return m_geno.bHomo;
+}
+
+IND_MEMBER_DECL( bool, isDominant )( const LocusPtr locus ) {
+    inspectLocus( locus, m_geno );
+    return m_geno.bDominant;
+}
+
+IND_MEMBER_DECL( void, inspectLocus)( const LocusPtr l, Genotype< P > & g ) {
+    assert( l->chrom < CHROMOSOMES );
+    g.bHomo = true;
+    chromid_t c = l->chrom;
+    size_t    pos = l->start;
+    allele_t all = m_seqs[0][c]->allele(pos);
+    for( ploidy_t p = 1; p < PLOIDY; ++p ) {
+        g.geno[p] = m_seqs[p][c]->allele(pos);
+        g.bHomo = (g.bHomo && all == g.geno[p]);
+    }
+    g.bDominant = (g.bHomo && all == l->dominant_allele);
+}
+
+
+
+IND_MEMBER_DECL( void, genotype)( const LocusPtr locus, Genotype< P > & g ) {
+    inspectLocus( locus, g );
+}
+
+IND_MEMBER_DECL( void, phenotype)( iTrait * trait, Phenotype * p ) {
+    
+} 
 
 #endif  // INDIVIDUAL_H_

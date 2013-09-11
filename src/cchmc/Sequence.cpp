@@ -27,34 +27,39 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef GENOME_H_
-#define GENOME_H_
+#include "Sequence.h"
+#include <cstring>
 
-#include "common.h"
-#include "ploidy.h"
-#include "Chromosome.h"
-//#include "Individual.h"
+Sequence::Sequence() : m_nLoci(0), m_maxForms(MAX_ALLELES), m_allocatedLoci(0) {}
 
-template< chromid_t C = 23, ploidy_t P = DIPLOID >
-class GenomeFactory {
-public:
-    static const chromid_t CHROMOSOMES = C;
-    static const ploidy_t PLOIDY = P;
-    static GenomeFactory<C, P> * getInstance() {
-        static GenomeFactory<C, P > instance( new GenomeFactory< C, P >() );
-        return instance;
+Sequence::Sequence( size_t loci ) : m_nLoci(loci), m_maxForms( MAX_ALLELES ), m_allocatedLoci(0) {
+    resizeSeq( m_nLoci );
+}
+
+size_t Sequence::length() const {
+    return m_nLoci;
+}
+
+allele_t & Sequence::allele( size_t locus ) {
+    assert( locus < m_nLoci );
+    return m_alleles[ locus ];
+}
+
+void    Sequence::resizeSeq( size_t nLoci ) {
+    allele_t * tmp = new allele_t[ nLoci ];
+    if( m_allocatedLoci != 0 ) {
+        // copy current loci values over
+        memcpy( tmp, m_alleles, m_allocatedLoci * sizeof( allele_t ) );
+
+        // delete currently allocated memory
+        delete [] m_alleles;
     }
 
-    virtual bool addChromosome( const ChromosomePtr c) { assert( false ); return false; }
+    // establish new memory space
+    m_alleles = tmp;
+    m_allocatedLoci = nLoci;
+}
 
-//    virtual shared_ptr< Individual< C, P > > build(){ assert( false ); return shared_ptr< Individual< C, P > >( new Individual<C, P>()); }
-
-    virtual ~GenomeFactory();
-protected:
-    GenomeFactory( ) {}
-
-    ChromosomePtr   m_chroms[ CHROMOSOMES ];
-};
-
-
-#endif  // GENOME_H_
+Sequence::~Sequence() {
+    if( m_nLoci > 0 )   delete [] m_alleles;
+}

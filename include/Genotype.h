@@ -39,9 +39,9 @@ template < ploidy_t P >
 struct Genotype {
     static const ploidy_t PLOIDY = P;
     allele_t    geno[ PLOIDY ];
+    bool        bHomo;
+    bool        bDominant;
 };
-
-enum GENOTYPES { HOMOZYGOUS, HETEROZYGOUS };
 
 template < ploidy_t P >
 struct Genotypeable {

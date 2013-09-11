@@ -53,13 +53,15 @@ struct Locus {
     String      name;
     size_t      start, end;
     size_t      alt_count;
-    shared_ptr< allele_t [] > alleles;
     mutrate_t   mutation_rate;
-    chromid_t   chromid;
+    shared_ptr< allele_t [] > alleles;
+    allele_t    dominant_allele;
+    chromid_t   chrom;
+    ploidy_t    ploid;
 };
 
 typedef shared_ptr< Locus > LocusPtr;
 typedef vector< LocusPtr > Loci;
-typedef Loci::iterator  LociIterator;
+typedef Loci::iterator  LocusIterator;
 
 #endif  // LOCUS_H_
