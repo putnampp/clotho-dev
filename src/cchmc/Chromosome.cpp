@@ -34,9 +34,33 @@ Chromosome::Chromosome( const String & n, size_t len ) :
         m_id( nextID() ),
         m_size(len) { }
 
+/**
+ *
+ * Change the chromosome length. New size cannot be smaller
+ * than the largest site. In the event that size is less
+ * than the largest site, then length will not be modified
+ */
+void Chromosome::setLength( size_t size ) {
+    // chromosome size must be greater than the largest site
+    // site set is ordered, just need to compare size to 
+    // last element
+    if( m_sites.empty() || size >= (*m_sites.rbegin()))
+        m_size = size;
+}
+
+/**
+ *
+ * Add positions of interest (sites).
+ *
+ * The length of the chromosome will be extended to 
+ * include this site should it not be long enough
+ *
+ */
 void Chromosome::add_site( size_t pos ) {
-    assert( pos < m_size );
     m_sites.insert( pos );
+
+    if( (*m_sites.rbegin()) >= m_size )
+        m_size = (*m_sites.rbegin()) + 1;
 }
 
 chromid_t Chromosome::id() const {

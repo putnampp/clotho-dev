@@ -45,13 +45,22 @@ typedef unsigned char chromid_t;
 
 class ChromosomeMap;
 
+/**
+ *
+ * A Chromosome is a named sequence of positions.
+ *
+ * The chromosome length is at least the largest position.
+ *
+ */
 class Chromosome {
 public:
     friend class ChromosomeMap;
 
     Chromosome( const String & n, size_t s = DEFAULT_CHROMOSOME_LEN);
 
-    void    add_site( size_t pos );
+    virtual void setLength( size_t len );
+
+    virtual void    add_site( size_t pos );
 
     chromid_t id() const;
     String  name() const;

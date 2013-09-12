@@ -35,7 +35,7 @@
 #define HUMAN_GERM_LINE 23
 #define HUMAN_PLOIDY    DIPLOID
 
-typedef GenomeFactory< HUMAN_GERM_LINE, HUMAN_PLOIDY > HumanFactory;
-typedef Individual< HumanFactory::CHROMOSOMES, HumanFactory::PLOIDY > HumanIndividual;
+typedef GenomeFactory< HUMAN_GERM_LINE > HumanFactory;
+typedef Individual< HumanFactory::CHROMOSOMES, HUMAN_PLOIDY > HumanIndividual;
 
 #endif  // HUMAN_H_

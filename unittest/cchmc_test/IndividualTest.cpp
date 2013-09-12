@@ -32,9 +32,49 @@
 
 BOOST_AUTO_TEST_SUITE( test_individual )
 
+const chromid_t chroms = 23;
+const ploidy_t  ploid = 2;
+
+typedef Individual< chroms, ploid > Ind;
+typedef GenomeFactory< chroms > GF;
 
 BOOST_AUTO_TEST_CASE( ind_create ) {
-    Individual<23, 2> human;
+    Ind ind;
+}
+
+BOOST_AUTO_TEST_CASE( ind_chrom_size ) {
+    GF::getInstance()->reset();
+    Ind human;
+
+    for( chromid_t c = 0; c < chroms; ++c ) {
+        for( ploidy_t p = 0; p < ploid; ++p ) {
+            // A default genome has no loci set, therefore all sequences should have 0 length
+            BOOST_REQUIRE_MESSAGE( (human.getSequence( c, p )->length() == 0), "Unexpected length of sequence for chromosome " << c << " copy " << p);
+        }
+    }
+}
+
+BOOST_AUTO_TEST_CASE( ind_chrom_size2 ) {
+    GF::getInstance()->reset();
+
+    // add site to all chromosomes
+    //
+    for( chromid_t c = 0; c < chroms; ++c ) {
+        for( ploidy_t p = 0; p < ploid; ++p ) {
+            GF::getInstance()->getChromosome(c)->add_site( (size_t) 42 );
+        }
+    }
+
+    // Individual object assumes underlying genome has already been constructed
+    Ind h;
+
+    for( chromid_t c = 0; c < chroms; ++c ) {
+        for( ploidy_t p = 0; p < ploid; ++p ) {
+            BOOST_REQUIRE_MESSAGE( (h.getSequence(c, p)->length() == 1), "Unexpected sequence length");
+        }
+    }
+
+    GF::getInstance()->reset();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -40,37 +40,45 @@
 /***
  *
  * GenomeFactory maintains the set of chromosomes in an indexed
- * array. The array is 2D with the rows corresponding
- * to the individuals and columns being the copies of each
- * chromosome. Indexes are 0 based
- *       __0__  __1__  _..._  __P__
- * chr1 |  0   |  1   | ...  | P-1 |
- * chr2 |  P   |      ...    | 2P-1|
- * ...  |      |      ...    |     |
- *  C   |(C-1)P|      ...    | CP-1|
- *
+ * array.
  *
  */
-template< chromid_t C, ploidy_t P >
+template< chromid_t C >
 class GenomeFactory {
 public:
     static const chromid_t CHROMOSOMES = C;
-    static const ploidy_t PLOIDY = P;
-    static GenomeFactory<C, P> * getInstance() {
-        static GenomeFactory<C, P > * instance =  new GenomeFactory< C, P >();
+    static GenomeFactory<C> * getInstance() {
+        static GenomeFactory<C > * instance =  new GenomeFactory< C >();
         return instance;
     }
 
-    virtual bool addChromosome( const ChromosomePtr c) { assert( false ); return false; }
+/**
+ * Set all copies of a chromosome to be the same length
+ */
+    virtual void setChromosomeSize( chromid_t c, size_t size ) {
+        assert( c < CHROMOSOMES );
 
-    virtual SequencePtr build_sequence( chromid_t c, ploidy_t p ) {
-        assert( c < CHROMOSOMES && p < PLOIDY );
-        return SequencePtr( new Sequence( m_chroms[ c * PLOIDY + p ]->loci() ));
+        m_base_count -= m_chroms[ c ]->length();
+        m_chroms[ c ]->setLength( size );
+        m_base_count += m_chroms[ c ]->length();
     }
 
-    virtual ChromosomePtr getChromosome( chromid_t c, ploidy_t p ) {
-        assert( c < CHROMOSOMES && p < PLOIDY );
-        return m_chroms[c * PLOIDY + p ];
+    virtual void addChromosomeSite( chromid_t c, size_t pos ) {
+        assert( c < CHROMOSOMES );
+
+        m_nLoci -= m_chroms[ c ]->loci();
+        m_chroms[ c ]->add_site( pos );
+        m_nLoci += m_chroms[ c ]->loci();
+    }
+
+    virtual SequencePtr build_sequence( chromid_t c ) {
+        assert( c < CHROMOSOMES );
+        return SequencePtr( new Sequence( m_chroms[ c ]->loci() ));
+    }
+
+    virtual ChromosomePtr getChromosome( chromid_t c ) {
+        assert( c < CHROMOSOMES );
+        return m_chroms[ c ];
     }
 
     virtual size_t total_size() const {
@@ -79,6 +87,17 @@ public:
 
     virtual size_t loci() const {
         return m_nLoci;
+    }
+
+    virtual void reset() {
+        for( chromid_t c = 0; c < CHROMOSOMES; ++c ) {
+            m_chroms[c].reset();
+        }
+
+        m_base_count = 0;
+        m_nLoci = 0;
+
+        initialize();
     }
 
     virtual ~GenomeFactory() {}
@@ -90,7 +109,7 @@ protected:
     virtual void initialize() {
         /// prepopulate the chromosome array with
         /// default chromosomes
-        for( chromid_t c = 0; c < CHROMOSOMES * PLOIDY; ++c ) {
+        for( chromid_t c = 0; c < CHROMOSOMES; ++c ) {
             m_chroms[ c ] = ChromosomePtr( new Chromosome( "name" ) );
 
             m_base_count += m_chroms[ c ]->length();
@@ -100,7 +119,7 @@ protected:
 
     size_t          m_base_count;
     size_t          m_nLoci;
-    ChromosomePtr   m_chroms[ CHROMOSOMES * PLOIDY ];
+    ChromosomePtr   m_chroms[ CHROMOSOMES ];
 };
 
 

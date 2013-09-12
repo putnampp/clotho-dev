@@ -48,10 +48,12 @@
 template < chromid_t C, ploidy_t P >
 class Individual : public Genotypeable< P >, public Phenotypeable {
 public:
-    typedef GenomeFactory< C, P > GF;
+    typedef GenomeFactory< C > GF;
     Individual() { initialize(); }
 
     virtual bool sex();
+
+    virtual SequencePtr getSequence( chromid_t c, ploidy_t p );
 
     virtual allele_t allele( const LocusPtr locus );
 
@@ -70,7 +72,7 @@ private:
     static const chromid_t CHROMOSOMES = C;
     static const ploidy_t PLOIDY = P;
 
-    shared_ptr< Sequence >  m_seqs[ PLOIDY * CHROMOSOMES ];
+    SequencePtr  m_seqs[ PLOIDY * CHROMOSOMES ];
     Genotype< P >   m_geno;
 };
 
@@ -84,6 +86,11 @@ private:
 
 IND_MEMBER_DECL(bool, sex)() {
     return false;
+}
+
+IND_MEMBER_DECL( SequencePtr, getSequence)( chromid_t c, ploidy_t p ) {
+    assert( c < CHROMOSOMES && p < PLOIDY );
+    return m_seqs[ c * PLOIDY + p ];
 }
 
 IND_MEMBER_DECL( allele_t, allele)( const LocusPtr locus ) {
@@ -104,7 +111,7 @@ IND_MEMBER_DECL( bool, isDominant )( const LocusPtr locus ) {
 IND_MEMBER_DECL( void, initialize )( ) {
     for( chromid_t c = 0; c < CHROMOSOMES; ++c ) {
         for( ploidy_t p = 0; p < PLOIDY; ++p ) {
-            m_seqs[c * PLOIDY + p] = GF::getInstance()->build_sequence( c, p );
+            m_seqs[c * PLOIDY + p] = GF::getInstance()->build_sequence( c );
         }
     }
 }
