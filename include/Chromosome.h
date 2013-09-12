@@ -57,6 +57,7 @@ public:
     friend class ChromosomeMap;
 
     Chromosome( const String & n, size_t s = DEFAULT_CHROMOSOME_LEN);
+    Chromosome( const Chromosome & c );
 
     virtual void setLength( size_t len );
 

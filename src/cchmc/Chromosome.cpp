@@ -34,6 +34,14 @@ Chromosome::Chromosome( const String & n, size_t len ) :
         m_id( nextID() ),
         m_size(len) { }
 
+Chromosome::Chromosome( const Chromosome & c ) {
+    m_name = c.m_name;
+    m_id = c.m_id;
+    m_size = c.m_size;
+
+    m_sites.insert( c.m_sites.begin(), c.m_sites.end() );
+}
+
 /**
  *
  * Change the chromosome length. New size cannot be smaller
