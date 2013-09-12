@@ -38,6 +38,8 @@
 
 using std::set;
 
+#define DEFAULT_CHROMOSOME_LEN 100
+
 typedef unsigned char chromid_t;
 #define UNKNOWN_CHROM -1
 
@@ -47,7 +49,7 @@ class Chromosome {
 public:
     friend class ChromosomeMap;
 
-    Chromosome( const String & n, size_t s);
+    Chromosome( const String & n, size_t s = DEFAULT_CHROMOSOME_LEN);
 
     void    add_site( size_t pos );
 

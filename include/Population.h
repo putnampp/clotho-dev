@@ -33,7 +33,7 @@
 #include "common.h"
 
 #include "Configurable.h"
-#include "Individual.h"
+#include "Individual.hpp"
 
 #include <set>
 

@@ -33,7 +33,7 @@
 #include "common.h"
 #include "Allele.h"
 
-#include "Genome.h"
+#include "GenomeFactory.hpp"
 #include "Sequence.h"
 
 #include "Genotype.h"

@@ -36,6 +36,8 @@
 //#include "Individual.h"
 #include "Sequence.h"
 
+
+
 template< chromid_t C, ploidy_t P >
 class GenomeFactory {
 public:
@@ -64,8 +66,8 @@ public:
     virtual ~GenomeFactory() {}
 protected:
     GenomeFactory( ) : m_base_count(0), m_nLoci(0) {
-        for( chromid_t c = 0; c < CHROMOSOMES; ++c ) {
-            m_chroms[ c ] = ChromosomePtr( new Chromosome( "name", 100 ) );
+        for( chromid_t c = 0; c < CHROMOSOMES * PLOIDY; ++c ) {
+            m_chroms[ c ] = ChromosomePtr( new Chromosome( "name" ) );
 
             m_base_count += m_chroms[ c ]->length();
             m_nLoci += m_chroms[ c ]->loci();
@@ -74,7 +76,7 @@ protected:
 
     size_t          m_base_count;
     size_t          m_nLoci;
-    ChromosomePtr   m_chroms[ CHROMOSOMES ];
+    ChromosomePtr   m_chroms[ CHROMOSOMES * PLOIDY ];
 };
 
 

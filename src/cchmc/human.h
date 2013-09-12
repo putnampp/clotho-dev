@@ -30,8 +30,7 @@
 #ifndef HUMAN_H_
 #define HUMAN_H_
 
-#include "Genome.h"
-#include "Individual.h"
+#include "Individual.hpp"
 
 #define HUMAN_GERM_LINE 23
 #define HUMAN_PLOIDY    DIPLOID

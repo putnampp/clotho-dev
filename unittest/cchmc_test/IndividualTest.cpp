@@ -28,7 +28,7 @@
  ******************************************************************************/
 
 #include <boost/test/unit_test.hpp>
-#include "Individual.h"
+#include "Individual.hpp"
 
 BOOST_AUTO_TEST_SUITE( test_individual )
 

@@ -28,13 +28,18 @@
  ******************************************************************************/
 
 #include <boost/test/unit_test.hpp>
-#include "Genome.h"
+#include "GenomeFactory.hpp"
 
 BOOST_AUTO_TEST_SUITE( test_genome_factory )
 
 BOOST_AUTO_TEST_CASE( genome_factory_create ) {
     BOOST_REQUIRE_MESSAGE( (GenomeFactory<23, 2>::getInstance() != NULL), "Unable to create GenomeFactory<23,2>" );
     BOOST_REQUIRE_MESSAGE( (GenomeFactory<22, 1>::getInstance() != NULL), "Unable to create GenomeFactory<22,1>" );
+}
+
+BOOST_AUTO_TEST_CASE( genome_factory_default_size ) {
+    BOOST_REQUIRE_MESSAGE( (GenomeFactory<23, 2>::getInstance()->total_size() == (23 * 2 * DEFAULT_CHROMOSOME_LEN)), "Unexpected length of the default genome: " << (GenomeFactory<23, 2>::getInstance()->total_size()));
+    BOOST_REQUIRE_MESSAGE( (GenomeFactory<23, 2>::getInstance()->loci() == 0), "Unexpected number of loci in default genome");
 }
 
 BOOST_AUTO_TEST_SUITE_END()
