@@ -66,9 +66,13 @@ public:
     virtual void addChromosomeSite( chromid_t c, size_t pos ) {
         assert( c < CHROMOSOMES );
 
+        m_base_count -= m_chroms[ c ]->length();
         m_nLoci -= m_chroms[ c ]->loci();
+
         m_chroms[ c ]->add_site( pos );
+
         m_nLoci += m_chroms[ c ]->loci();
+        m_base_count += m_chroms[ c ]->length();
     }
 
     virtual SequencePtr build_sequence( chromid_t c ) {

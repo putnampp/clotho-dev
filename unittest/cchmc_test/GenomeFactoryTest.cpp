@@ -71,4 +71,31 @@ BOOST_AUTO_TEST_CASE( genome_factory_reset ) {
     }
 }
 
+BOOST_AUTO_TEST_CASE( genome_factory_chrom_sizes ) {
+    GF::getInstance()->reset();
+
+    const size_t new_size = 3000;
+    for( chromid_t c = 0; c < chrom; ++c ) {
+        GF::getInstance()->setChromosomeSize( c, new_size );
+    }
+
+    BOOST_REQUIRE_MESSAGE( GF::getInstance()->total_size() == new_size * chrom, "Unexpected genome size after resizing");
+}
+
+BOOST_AUTO_TEST_CASE( genome_factory_chrom_site ) {
+    GF::getInstance()->reset();
+
+    size_t genome_size = GF::getInstance()->total_size();
+    const size_t locus_pos = 25;
+
+    GF::getInstance()->addChromosomeSite( 1, locus_pos );
+
+    if( locus_pos >= DEFAULT_CHROMOSOME_LEN ) {
+        BOOST_REQUIRE_MESSAGE( (GF::getInstance()->total_size() - 1 - locus_pos + DEFAULT_CHROMOSOME_LEN == genome_size),
+        "Unexpected genome size: " << GF::getInstance()->total_size() << " was " << genome_size );
+    } else {
+        BOOST_REQUIRE_MESSAGE( (GF::getInstance()->total_size() == genome_size), "Genome Size should not have changed when site " << locus_pos << " was added");
+    }
+}
+
 BOOST_AUTO_TEST_SUITE_END()
