@@ -74,4 +74,6 @@ protected:
     void    resizeSeq( size_t nLoci );
 };
 
+typedef shared_ptr< Sequence > SequencePtr;
+
 #endif  // SEQUENCE_H_

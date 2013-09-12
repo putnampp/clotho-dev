@@ -37,7 +37,20 @@
 #include "Sequence.h"
 
 
-
+/***
+ *
+ * GenomeFactory maintains the set of chromosomes in an indexed
+ * array. The array is 2D with the rows corresponding
+ * to the individuals and columns being the copies of each
+ * chromosome. Indexes are 0 based
+ *       __0__  __1__  _..._  __P__
+ * chr1 |  0   |  1   | ...  | P-1 |
+ * chr2 |  P   |      ...    | 2P-1|
+ * ...  |      |      ...    |     |
+ *  C   |(C-1)P|      ...    | CP-1|
+ *
+ *
+ */
 template< chromid_t C, ploidy_t P >
 class GenomeFactory {
 public:
@@ -50,9 +63,14 @@ public:
 
     virtual bool addChromosome( const ChromosomePtr c) { assert( false ); return false; }
 
-    virtual shared_ptr< Sequence > build_sequence( chromid_t c ) {
-        assert( c < CHROMOSOMES );
-        return shared_ptr< Sequence >( new Sequence( m_chroms[ c ]->loci() ));
+    virtual SequencePtr build_sequence( chromid_t c, ploidy_t p ) {
+        assert( c < CHROMOSOMES && p < PLOIDY );
+        return SequencePtr( new Sequence( m_chroms[ c * PLOIDY + p ]->loci() ));
+    }
+
+    virtual ChromosomePtr getChromosome( chromid_t c, ploidy_t p ) {
+        assert( c < CHROMOSOMES && p < PLOIDY );
+        return m_chroms[c * PLOIDY + p ];
     }
 
     virtual size_t total_size() const {
@@ -66,6 +84,12 @@ public:
     virtual ~GenomeFactory() {}
 protected:
     GenomeFactory( ) : m_base_count(0), m_nLoci(0) {
+        initialize();
+    }
+
+    virtual void initialize() {
+        /// prepopulate the chromosome array with
+        /// default chromosomes
         for( chromid_t c = 0; c < CHROMOSOMES * PLOIDY; ++c ) {
             m_chroms[ c ] = ChromosomePtr( new Chromosome( "name" ) );
 
