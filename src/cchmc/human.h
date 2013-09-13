@@ -27,18 +27,15 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef MARKER_H_
-#define MARKER_H_
+#ifndef HUMAN_H_
+#define HUMAN_H_
 
-/*******************************************************************************
- * A Marker is a genomic element of interest.
- ******************************************************************************/
-class Marker {
-public:
-    Marker(){}
-    virtual ~Marker(){}
-private:
-    
-};
+#include "Individual.hpp"
 
-#endif  // MARKER_H_
+#define HUMAN_GERM_LINE 23
+#define HUMAN_PLOIDY    DIPLOID
+
+typedef GenomeFactory< HUMAN_GERM_LINE > HumanFactory;
+typedef Individual< HumanFactory::CHROMOSOMES, HUMAN_PLOIDY > HumanIndividual;
+
+#endif  // HUMAN_H_

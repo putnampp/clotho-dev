@@ -34,33 +34,54 @@
 #include <cassert>
 #include "Configurable.h"
 
-typedef char chromid_t;
+#include <map>
+
+using std::map;
+using std::make_pair;
+
+#define DEFAULT_CHROMOSOME_LEN 100
+
+typedef unsigned char chromid_t;
 #define UNKNOWN_CHROM -1
 
 class ChromosomeMap;
 
+/**
+ *
+ * A Chromosome is a named sequence of positions.
+ *
+ * The chromosome length is at least the largest position.
+ *
+ */
 class Chromosome {
 public:
     friend class ChromosomeMap;
 
-    Chromosome( const String & n, size_t s) : m_name(n), m_id(nextID()), m_size(s) { }
+    Chromosome( const String & n, size_t s = DEFAULT_CHROMOSOME_LEN);
+    Chromosome( const Chromosome & c );
 
-    chromid_t id() const { return m_id; }
-    String  name() const { return m_name; }
-    size_t  length() const { return m_size; }
+    virtual void setLength( size_t len );
 
-    virtual ~Chromosome() {}
+    virtual void    add_site( size_t pos );
+
+    chromid_t id() const;
+    String  name() const;
+    size_t  length() const;
+
+    size_t  loci() const;
+    bool    is_locus( size_t pos, size_t & offset ) const;
+
+    virtual ~Chromosome();
 protected:
     String      m_name;
     chromid_t   m_id;
     size_t      m_size;
 
+    typedef map<size_t, size_t> Sites;
+    Sites m_sites;
+
 private:
-    static chromid_t nextID() {
-        static chromid_t next_id = 0;
-        assert( next_id > UNKNOWN_CHROM );
-        return next_id++;
-    }
+    static chromid_t nextID();
 };
 
 typedef shared_ptr< Chromosome > ChromosomePtr;

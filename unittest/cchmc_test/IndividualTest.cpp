@@ -27,52 +27,54 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef SEQUENCE_H_
-#define SEQUENCE_H_
+#include <boost/test/unit_test.hpp>
+#include "Individual.hpp"
 
-#include "common.h"
+BOOST_AUTO_TEST_SUITE( test_individual )
 
-struct sequence {
-    virtual size_t      length() const = 0;
-    virtual allele_t &  allele( size_t l ) = 0;
-};
+const chromid_t chroms = 23;
+const ploidy_t  ploid = 2;
 
-/**
- * A sequence is an in-silico representation of a contiguous vector of 
- * allelic values. Each value corresponds to a specific locus.
- *
- * Each locus is associated with an enumerated set of forms.
- * The allelic values of the sequence are indices into the enumerated set
- * of forms.
- *
- * The allele_t of the a sequence is intended to be an integral
- * type with sufficient bits to represent the index.
- *
- * A default sequence allows for 256 forms per loci, thus a
- * byte (unsigned char) is sufficient to represent all possible
- * form indices.
- *
- **/
-class Sequence : public sequence {
-public:
-    Sequence( );
-    Sequence( size_t loci );
+typedef Individual< chroms, ploid > Ind;
+typedef GenomeFactory< chroms > GF;
 
-    virtual size_t length() const;
-    virtual allele_t & allele(size_t locus);
+BOOST_AUTO_TEST_CASE( ind_create ) {
+    Ind ind;
+}
 
-    virtual ~Sequence();
+BOOST_AUTO_TEST_CASE( ind_chrom_size ) {
+    GF::getInstance()->reset();
+    Ind human;
 
-protected:
-    allele_t *   m_alleles;
+    for( chromid_t c = 0; c < chroms; ++c ) {
+        for( ploidy_t p = 0; p < ploid; ++p ) {
+            // A default genome has no loci set, therefore all sequences should have 0 length
+            BOOST_REQUIRE_MESSAGE( (human.getSequence( c, p )->length() == 0), "Unexpected length of sequence for chromosome " << c << " copy " << p);
+        }
+    }
+}
 
-    size_t       m_nLoci;
-    size_t       m_maxForms;
-    size_t    m_allocatedLoci;
+BOOST_AUTO_TEST_CASE( ind_chrom_size2 ) {
+    GF::getInstance()->reset();
 
-    void    resizeSeq( size_t nLoci );
-};
+    // add site to all chromosomes
+    //
+    for( chromid_t c = 0; c < chroms; ++c ) {
+        for( ploidy_t p = 0; p < ploid; ++p ) {
+            GF::getInstance()->getChromosome(c)->add_site( (size_t) 42 );
+        }
+    }
 
-typedef shared_ptr< Sequence > SequencePtr;
+    // Individual object assumes underlying genome has already been constructed
+    Ind h;
 
-#endif  // SEQUENCE_H_
+    for( chromid_t c = 0; c < chroms; ++c ) {
+        for( ploidy_t p = 0; p < ploid; ++p ) {
+            BOOST_REQUIRE_MESSAGE( (h.getSequence(c, p)->length() == 1), "Unexpected sequence length");
+        }
+    }
+
+    GF::getInstance()->reset();
+}
+
+BOOST_AUTO_TEST_SUITE_END()

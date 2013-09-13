@@ -27,36 +27,4 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef INDIVIDUAL_H_
-#define INDIVIDUAL_H_
-
-#include "common.h"
-
-#include "Genotype.h"
-#include "Phenotype.h"
-
-//#include "Dimension.h"
-//#include "Selection.h"
-//#include "MatingModel.h"
-
-
-/*******************************************************************************
- * An Individual is an encapsulation object consisting of a genotype and
- * phenotype.
- *
- *
- ******************************************************************************/
-class Individual {
-public:
-    Individual();
-
-    virtual ~Individual();
-private:
-    typedef scoped_ptr< Genotype > GenotypePtr;
-    GenotypePtr     m_geno;
-
-    typedef scoped_ptr< Phenotype > PhenotypePtr;
-    PhenotypePtr    m_pheno;
-};
-
-#endif  // INDIVIDUAL_H_
+#include "human.h"

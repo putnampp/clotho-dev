@@ -27,52 +27,39 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef SEQUENCE_H_
-#define SEQUENCE_H_
+#include "Sequence.h"
+#include <cstring>
 
-#include "common.h"
+Sequence::Sequence() : m_nLoci(0), m_maxForms(MAX_ALLELES), m_allocatedLoci(0) {}
 
-struct sequence {
-    virtual size_t      length() const = 0;
-    virtual allele_t &  allele( size_t l ) = 0;
-};
+Sequence::Sequence( size_t loci ) : m_nLoci(loci), m_maxForms( MAX_ALLELES ), m_allocatedLoci(0) {
+    resizeSeq( m_nLoci );
+}
 
-/**
- * A sequence is an in-silico representation of a contiguous vector of 
- * allelic values. Each value corresponds to a specific locus.
- *
- * Each locus is associated with an enumerated set of forms.
- * The allelic values of the sequence are indices into the enumerated set
- * of forms.
- *
- * The allele_t of the a sequence is intended to be an integral
- * type with sufficient bits to represent the index.
- *
- * A default sequence allows for 256 forms per loci, thus a
- * byte (unsigned char) is sufficient to represent all possible
- * form indices.
- *
- **/
-class Sequence : public sequence {
-public:
-    Sequence( );
-    Sequence( size_t loci );
+size_t Sequence::length() const {
+    return m_nLoci;
+}
 
-    virtual size_t length() const;
-    virtual allele_t & allele(size_t locus);
+allele_t & Sequence::allele( size_t locus ) {
+    assert( locus < m_nLoci );
+    return m_alleles[ locus ];
+}
 
-    virtual ~Sequence();
+void    Sequence::resizeSeq( size_t nLoci ) {
+    allele_t * tmp = new allele_t[ nLoci ];
+    if( m_allocatedLoci != 0 ) {
+        // copy current loci values over
+        memcpy( tmp, m_alleles, m_allocatedLoci * sizeof( allele_t ) );
 
-protected:
-    allele_t *   m_alleles;
+        // delete currently allocated memory
+        delete [] m_alleles;
+    }
 
-    size_t       m_nLoci;
-    size_t       m_maxForms;
-    size_t    m_allocatedLoci;
+    // establish new memory space
+    m_alleles = tmp;
+    m_allocatedLoci = nLoci;
+}
 
-    void    resizeSeq( size_t nLoci );
-};
-
-typedef shared_ptr< Sequence > SequencePtr;
-
-#endif  // SEQUENCE_H_
+Sequence::~Sequence() {
+    if( m_nLoci > 0 )   delete [] m_alleles;
+}

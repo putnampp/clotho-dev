@@ -34,11 +34,13 @@
 #include "Configurable.h"
 #include "Individual.h"
 
+using std::istream;
+
 class MatingModel : public Configurable {
 public:
-    MatingModel( boost::shared_ptr< MatingModel > m ) : m_model( m ) {}
+    MatingModel( shared_ptr< MatingModel > m ) : m_model( m ) {}
 
-    virtual void configure( std::istream & in ) = 0;
+    virtual void configure( istream & in ) = 0;
     virtual shared_ptr< Individual > mate( const Individual *, const Individual * ) = 0;
     virtual shared_ptr< MatingModel > clone() = 0;
 

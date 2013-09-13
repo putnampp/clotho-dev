@@ -32,8 +32,8 @@
 
 #include "common.h"
 #include "Describable.h"
-#include "Population.h"
 #include "Configurable.h"
+#include "Population.h"
 
 #include <fstream>
 

@@ -27,52 +27,35 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef SEQUENCE_H_
-#define SEQUENCE_H_
+#include <boost/test/unit_test.hpp>
+#include "Sequence.h"
 
-#include "common.h"
+BOOST_AUTO_TEST_SUITE( test_sequence )
 
-struct sequence {
-    virtual size_t      length() const = 0;
-    virtual allele_t &  allele( size_t l ) = 0;
-};
 
-/**
- * A sequence is an in-silico representation of a contiguous vector of 
- * allelic values. Each value corresponds to a specific locus.
- *
- * Each locus is associated with an enumerated set of forms.
- * The allelic values of the sequence are indices into the enumerated set
- * of forms.
- *
- * The allele_t of the a sequence is intended to be an integral
- * type with sufficient bits to represent the index.
- *
- * A default sequence allows for 256 forms per loci, thus a
- * byte (unsigned char) is sufficient to represent all possible
- * form indices.
- *
- **/
-class Sequence : public sequence {
-public:
-    Sequence( );
-    Sequence( size_t loci );
+BOOST_AUTO_TEST_CASE( seq_create ) {
+    Sequence s;
+}
 
-    virtual size_t length() const;
-    virtual allele_t & allele(size_t locus);
+BOOST_AUTO_TEST_CASE( seq_create2 ) {
+    const size_t size = 35;
+    Sequence s(size);
 
-    virtual ~Sequence();
+    BOOST_REQUIRE_MESSAGE( s.length() == size, "Failed to create a sequence with " << size << " loci" );
+}
 
-protected:
-    allele_t *   m_alleles;
+BOOST_AUTO_TEST_CASE( seq_set_locus ) {
+    const size_t size = 35;
 
-    size_t       m_nLoci;
-    size_t       m_maxForms;
-    size_t    m_allocatedLoci;
+    Sequence s( size );
 
-    void    resizeSeq( size_t nLoci );
-};
+    for( size_t i = 0; i < size; ++i ) {
+        s.allele( i ) = (allele_t) i;
+    }
 
-typedef shared_ptr< Sequence > SequencePtr;
+    for( size_t i = 0; i < size; ++i ) {
+        BOOST_REQUIRE_MESSAGE( s.allele(i) == (allele_t)i, "Allele " << i << ": Expected = " << (allele_t)i << "; Actual = " << s.allele(i) );
+    }
+}
 
-#endif  // SEQUENCE_H_
+BOOST_AUTO_TEST_SUITE_END()

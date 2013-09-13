@@ -38,6 +38,8 @@
 
 #include <cassert>
 
+using std::istream;
+
 struct iTrait {
 
 /**
@@ -49,6 +51,9 @@ struct iTrait {
  *  return the number of loci associated with the trait
  */
     virtual size_t    loci()      const = 0;
+
+    virtual LocusIterator   begin() const = 0;
+    virtual LocusIterator   end()   const = 0;
 };
 
 /*******************************************************************************
@@ -67,27 +72,71 @@ struct iTrait {
  ******************************************************************************/
 template < ploidy_t P = DIPLOID >
 class Trait : public iTrait, 
-    public Configurable, 
-    virtual MutatableSequence< P >, 
-    virtual InheritableSequence< P >,
-    virtual Sequence< P > {
+    public Configurable 
+{
 public:
+    Trait( const String & name, const String & desc );
+
     String getName() const;
     String getDescription() const;
 
-    virtual void configure( std::istream & config );
+    virtual void configure( istream & config );
 
-    virtual void add( const String & locus_name );
-    virtual void add( const shared_ptr< Locus > l );
+    virtual void add( const LocusPtr l );
 
     virtual ploidy_t    ploidy() const;
     virtual size_t      loci() const;
+
+    virtual LocusIterator   begin() const;
+    virtual LocusIterator   end()   const;
 
     virtual ~Trait() {    }
 private:
     static const ploidy_t PLOIDY = P;
 
     Loci    m_loci;
+    String  m_name;
+    String  m_desc;
 };
+
+/**
+ *
+ * Implementation
+ *
+ */
+
+#define TRAIT_DECL( t, f ) template < ploidy_t P > t Trait<P>::f
+
+TRAIT_DECL( String, getName )() const {
+    return m_name;
+}
+
+TRAIT_DECL( String, getDescription )() const {
+    return m_desc;
+}
+
+TRAIT_DECL( void, configure)( istream & config ) {
+
+}
+
+TRAIT_DECL( void, add )( const LocusPtr locus ) {
+
+}
+
+TRAIT_DECL( ploidy_t, ploidy)() const {
+    return PLOIDY;
+}
+
+TRAIT_DECL( size_t, loci)() const {
+    return m_loci.size();
+}
+
+TRAIT_DECL( LocusIterator, begin )() const {
+    return m_loci.begin();
+}
+
+TRAIT_DECL( LocusIterator, end )() const {
+    return m_loci.end();
+}
 
 #endif  // TRAIT_H_

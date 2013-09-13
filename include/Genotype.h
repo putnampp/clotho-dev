@@ -31,25 +31,24 @@
 #define GENOTYPE_H_
 
 #include "common.h"
+#include "ploidy.h"
+#include "Allele.h"
+#include "Locus.h"
 
-#include "Marker.h"
-
-#include <set>
-
-using std::set;
-
-/*******************************************************************************
- * A Genotype is a collection of markers
- ******************************************************************************/
-class Genotype {
-public:
-    Genotype();
-    virtual ~Genotype();
-private:
-    typedef shared_ptr< Marker > MarkerPtr;
-    typedef scoped_ptr< set< MarkerPtr > >  Markers;
-
-    Markers     m_markers;
+template < ploidy_t P >
+struct Genotype {
+    static const ploidy_t PLOIDY = P;
+    allele_t    geno[ PLOIDY ];
+    bool        bHomo;
+    bool        bDominant;
 };
+
+template < ploidy_t P >
+struct Genotypeable {
+    virtual bool isHomozygous( const LocusPtr l ) = 0;
+    virtual bool isDominant( const LocusPtr l ) = 0;
+    virtual void genotype( const LocusPtr l, Genotype< P > & g ) = 0;
+};
+
 
 #endif  // GENOTYPE_H_

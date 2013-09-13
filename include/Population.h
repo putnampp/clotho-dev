@@ -33,7 +33,7 @@
 #include "common.h"
 
 #include "Configurable.h"
-#include "Individual.h"
+#include "Individual.hpp"
 
 #include <set>
 
@@ -44,16 +44,16 @@ using std::set;
  ******************************************************************************/
 class Population : public Configurable {
 public:
-    Population();
+    Population() {}
 
-    virtual void    configure( std::istream & config );
+    virtual void    configure( std::istream & config ) {}
 
-    virtual ~Population();
+    virtual ~Population() {}
 private:
-    typedef shared_ptr< Individual >            IndividualPtr;
-    typedef scoped_ptr< set< IndividualPtr > > Individuals;
+//    typedef shared_ptr< Individual >            IndividualPtr;
+//    typedef scoped_ptr< set< IndividualPtr > > Individuals;
 
-    Individuals     m_individs;
+//    Individuals     m_individs;
 };
 
 #endif  // POPULATION_H_

@@ -27,31 +27,18 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef GENOME_H_
-#define GENOME_H_
+#ifndef LOCUSMAP_H_
+#define LOCUSMAP_H_
 
 #include "common.h"
 
-template< size_t C = 23, unsigned char P = DIPLOID >
-class Genome {
+#include "Locus.h"
+#include "Sequence.h"
+
+class LocusMap : public Sequence {
 public:
-    Genome( Genome<C, P> * p1, Genome<C, P> * p2 );
 
-    virtual Byte genotype( size_t chrom, size_t loci );
-    virtual double phenotype( size_t trait );
-
-    virtual ~Genome();
-protected:
-    static const size_t CHROMOSOMES = C;
-    static const unsigned char PLOIDY = P;
-
-    virtual void mate( Genome<C, P> * p1, Genome<C, P> * p2 ) {
-        for( size_t i = 0; i < CHROMOSOMES; ++i) {
-            chromosomes[i] = SequenceBuilder<PLOIDY>::mate( p1->chromosomes[i], p2->chromosomes[i] );
-        }
-    }
-
-    Sequence< PLOIDY > * chromosomes[ CHROMOSOMES ];
+    virtual bool add( const LocusPtr l );
 };
 
-#endif  // GENOME_H_
+#endif  // LOCUSMAP_H_

@@ -27,52 +27,69 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef SEQUENCE_H_
-#define SEQUENCE_H_
+#ifndef CHROMOSOMETUPLE_H_
+#define CHROMOSOMETUPLE_H_
 
 #include "common.h"
+#include "ploidy.h"
+#include "Allele.h"
+#include "Sequence.h"
+#include "Chromosome.h"
+#include "Locus.h"
 
-struct sequence {
-    virtual size_t      length() const = 0;
-    virtual allele_t &  allele( size_t l ) = 0;
+struct chromosome_set {
+    virtual size_t   length() const = 0;
+    virtual ploidy_t ploidy() const = 0;
+    virtual bool allele( ploidy_t copy, size_t locus, allele_t & all ) = 0;
 };
 
-/**
- * A sequence is an in-silico representation of a contiguous vector of 
- * allelic values. Each value corresponds to a specific locus.
- *
- * Each locus is associated with an enumerated set of forms.
- * The allelic values of the sequence are indices into the enumerated set
- * of forms.
- *
- * The allele_t of the a sequence is intended to be an integral
- * type with sufficient bits to represent the index.
- *
- * A default sequence allows for 256 forms per loci, thus a
- * byte (unsigned char) is sufficient to represent all possible
- * form indices.
- *
- **/
-class Sequence : public sequence {
+template < ploidy_t P >
+class ChromosomeTuple : public chromosome_set {
 public:
-    Sequence( );
-    Sequence( size_t loci );
+    ChromosomeTuple( const ChromosomePtr c ) : m_chrom(c) {
+        for( ploidy_t p = 0; p < PLOIDY; ++p ) {
+            m_seqs[p].reset(new Sequence( m_chrom->loci() ));
+        }
+    }
 
-    virtual size_t length() const;
-    virtual allele_t & allele(size_t locus);
+    virtual chromid_t   id()     const { return m_chrom->id(); }
+    virtual size_t      length() const { return m_chrom->length(); }
+    virtual ploidy_t    ploidy() const { return PLOIDY; }
 
-    virtual ~Sequence();
+    virtual bool  allele( ploidy_t copy, size_t locus, allele_t & all ) {
+        assert( copy < PLOIDY );
 
+        size_t offset = 0;
+        bool bIsLocus = m_chrom->is_locus( locus, offset );
+        if( bIsLocus ) {
+            all = m_seqs[ copy ]->allele( locus );
+        }
+        return bIsLocus;
+    }
+
+    virtual SequencePtr sequence( ploidy_t copy ) {
+        assert( copy < PLOIDY );
+        return m_seqs[ copy ];
+    }
+
+    virtual void genotype( const LocusPtr l, Genotype< P > & g ) {  
+        size_t   pos = l->start;
+        ploidy_t p = 0;
+        g.bHomo = true;
+        g.geno[p] = m_seqs[p]->allele(pos);
+        while( ++p < PLOIDY ) {
+            g.geno[p] = m_seqs[p]->allele(pos);
+            g.bHomo = (g.bHomo && (g.geno[0] == g.geno[p]));
+        }
+
+        g.bDominant = (g.bHomo && (g.geno[0] == l->dominant_allele ));
+    }
+
+    virtual ~ChromosomeTuple() {}
 protected:
-    allele_t *   m_alleles;
-
-    size_t       m_nLoci;
-    size_t       m_maxForms;
-    size_t    m_allocatedLoci;
-
-    void    resizeSeq( size_t nLoci );
+    static const ploidy_t PLOIDY = P;
+    ChromosomePtr   m_chrom;
+    SequencePtr     m_seqs[ P ];
 };
 
-typedef shared_ptr< Sequence > SequencePtr;
-
-#endif  // SEQUENCE_H_
+#endif  // CHROMOSOMETUPLE_H_
