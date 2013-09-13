@@ -33,7 +33,7 @@
 BOOST_AUTO_TEST_SUITE( test_chromosome_map )
 
 BOOST_AUTO_TEST_CASE( cmSingleton ) {
-    BOOST_REQUIRE_MESSAGE( ChromosomeMap::getInstance() != NULL, "Failed to get ChromosomeMap" );
+    BOOST_REQUIRE_MESSAGE( (ChromosomeMap::getInstance() != NULL), "Failed to get ChromosomeMap" );
 }
 
 BOOST_AUTO_TEST_SUITE_END()

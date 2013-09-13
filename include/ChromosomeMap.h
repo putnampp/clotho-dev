@@ -37,9 +37,11 @@
 
 #include <map>
 
+using std::map;
+
 class ChromosomeMap : public Configurable {
 public:
-    typedef std::map< const String, ChromosomePtr > Chromosomes;
+    typedef map< const String, ChromosomePtr > Chromosomes;
     typedef Chromosomes::const_iterator ChromosomesIter;
 
     static ChromosomeMap * getInstance() {
@@ -75,9 +77,9 @@ public:
 
     virtual ~ChromosomeMap();
 protected:
-    ChromosomeMap(): m_chroms( new Chromosomes() ) {}
+    ChromosomeMap(): m_chroms( ) {}
 
-    shared_ptr< Chromosomes >   m_chroms;
+    Chromosomes     m_chroms;
 };
 
 #endif  // CHROMOSOMEMAP_H_

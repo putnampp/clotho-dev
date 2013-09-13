@@ -34,9 +34,10 @@
 #include <cassert>
 #include "Configurable.h"
 
-#include <set>
+#include <map>
 
-using std::set;
+using std::map;
+using std::make_pair;
 
 #define DEFAULT_CHROMOSOME_LEN 100
 
@@ -68,7 +69,7 @@ public:
     size_t  length() const;
 
     size_t  loci() const;
-    bool    is_locus( size_t pos ) const;
+    bool    is_locus( size_t pos, size_t & offset ) const;
 
     virtual ~Chromosome();
 protected:
@@ -76,7 +77,8 @@ protected:
     chromid_t   m_id;
     size_t      m_size;
 
-    set< size_t > m_sites;
+    typedef map<size_t, size_t> Sites;
+    Sites m_sites;
 
 private:
     static chromid_t nextID();

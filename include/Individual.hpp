@@ -39,16 +39,20 @@
 #include "Genotype.h"
 #include "Phenotype.h"
 
+#include "ChromosomeTuple.h"
+
 /*******************************************************************************
  * An Individual is an encapsulation object consisting of a genotype and
  * phenotype.
- *
  *
  ******************************************************************************/
 template < chromid_t C, ploidy_t P >
 class Individual : public Genotypeable< P >, public Phenotypeable {
 public:
-    typedef GenomeFactory< C > GF;
+    static const chromid_t CHROMOSOMES = C;
+    static const ploidy_t PLOIDY = P;
+    typedef GenomeFactory< CHROMOSOMES > GF;
+    typedef shared_ptr< ChromosomeTuple< PLOIDY > > ChromosomeTuplePtr;
     Individual() { initialize(); }
 
     virtual bool sex();
@@ -69,10 +73,8 @@ protected:
     virtual void inspectLocus( const LocusPtr l, Genotype< P > & g );
 
 private:
-    static const chromid_t CHROMOSOMES = C;
-    static const ploidy_t PLOIDY = P;
-
-    SequencePtr  m_seqs[ PLOIDY * CHROMOSOMES ];
+    //SequencePtr  m_seqs[ CHROMOSOMES ];
+    ChromosomeTuplePtr  m_seqs[ CHROMOSOMES ];
     Genotype< P >   m_geno;
 };
 
@@ -90,12 +92,14 @@ IND_MEMBER_DECL(bool, sex)() {
 
 IND_MEMBER_DECL( SequencePtr, getSequence)( chromid_t c, ploidy_t p ) {
     assert( c < CHROMOSOMES && p < PLOIDY );
-    return m_seqs[ c * PLOIDY + p ];
+    return m_seqs[ c ]->sequence( p );
 }
 
 IND_MEMBER_DECL( allele_t, allele)( const LocusPtr locus ) {
     assert( locus->chrom < CHROMOSOMES && locus->ploid < PLOIDY );
-    return m_seqs[locus->chrom * PLOIDY + locus->ploid ]->allele(locus->start);
+    allele_t a;
+    m_seqs[locus->chrom ]->allele(locus->ploid, locus->start, a);
+    return a;
 }
 
 IND_MEMBER_DECL( bool, isHomozygous)( const LocusPtr locus ) {
@@ -110,23 +114,13 @@ IND_MEMBER_DECL( bool, isDominant )( const LocusPtr locus ) {
 
 IND_MEMBER_DECL( void, initialize )( ) {
     for( chromid_t c = 0; c < CHROMOSOMES; ++c ) {
-        for( ploidy_t p = 0; p < PLOIDY; ++p ) {
-            m_seqs[c * PLOIDY + p] = GF::getInstance()->build_sequence( c );
-        }
+        m_seqs[c].reset(new ChromosomeTuple<PLOIDY>( GF::getInstance()->getChromosome( c )));
     }
 }
 
 IND_MEMBER_DECL( void, inspectLocus)( const LocusPtr l, Genotype< P > & g ) {
     assert( l->chrom < CHROMOSOMES );
-    g.bHomo = true;
-    chromid_t c = l->chrom * PLOIDY;
-    size_t    pos = l->start;
-    allele_t all = m_seqs[c]->allele(pos);
-    for( ploidy_t p = 1; p < PLOIDY; ++p ) {
-        g.geno[p] = m_seqs[ c + p ]->allele(pos);
-        g.bHomo = (g.bHomo && all == g.geno[p]);
-    }
-    g.bDominant = (g.bHomo && all == l->dominant_allele);
+    m_seqs[ l->chrom ]->genotype( l, g );
 }
 
 

@@ -52,7 +52,7 @@ void Chromosome::setLength( size_t size ) {
     // chromosome size must be greater than the largest site
     // site set is ordered, just need to compare size to 
     // last element
-    if( m_sites.empty() || size >= (*m_sites.rbegin()))
+    if( m_sites.empty() || size >= (m_sites.rbegin()->first))
         m_size = size;
 }
 
@@ -65,10 +65,14 @@ void Chromosome::setLength( size_t size ) {
  *
  */
 void Chromosome::add_site( size_t pos ) {
-    m_sites.insert( pos );
+    Sites::const_iterator it = m_sites.find(pos);
 
-    if( (*m_sites.rbegin()) >= m_size )
-        m_size = (*m_sites.rbegin()) + 1;
+    if( it == m_sites.end() ) {
+        // new position to be added
+        m_sites.insert( make_pair(pos, m_sites.size()) );
+        if( pos >= m_size )
+            m_size = pos + 1;
+    }
 }
 
 chromid_t Chromosome::id() const {
@@ -87,9 +91,13 @@ size_t Chromosome::loci() const {
     return m_sites.size();
 }
 
-bool    Chromosome::is_locus( size_t pos ) const {
-    set< size_t >::iterator it = m_sites.find( pos );
-    return it == m_sites.end();
+bool    Chromosome::is_locus( size_t pos, size_t & offset ) const {
+    Sites::const_iterator it = m_sites.find( pos );
+    bool bFound = (it != m_sites.end() );
+    if( bFound ) {
+        offset = it->second;
+    }
+    return bFound;
 }
 
 chromid_t Chromosome::nextID() {

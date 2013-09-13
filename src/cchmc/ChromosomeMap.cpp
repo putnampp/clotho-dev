@@ -32,20 +32,20 @@
 void ChromosomeMap::configure( std::istream & config ) { }
 
 size_t ChromosomeMap::size() const {
-    return m_chroms->size();
+    return m_chroms.size();
 }
 
 chromid_t   ChromosomeMap::find( const String & name, bool bCreateMissing ) {
     chromid_t id = UNKNOWN_CHROM;
     
-    Chromosomes::iterator it = m_chroms->find(name);
+    Chromosomes::iterator it = m_chroms.find(name);
 
-    if( it != m_chroms->end() ) {
+    if( it != m_chroms.end() ) {
         id = it->second->id();
     } else if( bCreateMissing ) {
         ChromosomePtr c( new Chromosome( name, 0) );
 
-        m_chroms->insert( std::make_pair(name, c) );
+        m_chroms.insert( std::make_pair(name, c) );
 
         id = c->id();
     }
@@ -61,13 +61,13 @@ chromid_t   ChromosomeMap::find( const String & name, bool bCreateMissing ) {
  *  maps for sorted access? Cost/benefit of find method usage?
  */
 ChromosomePtr ChromosomeMap::find( chromid_t id ) {
-    assert( 0 <= id && id < (chromid_t) m_chroms->size() );
+    assert( 0 <= id && id < (chromid_t) m_chroms.size() );
 
-    ChromosomesIter it = m_chroms->begin();
+    ChromosomesIter it = m_chroms.begin();
 
     ChromosomePtr p;
 
-    while( it != m_chroms->end() ) {
+    while( it != m_chroms.end() ) {
         if( it->second->id() == id ) {
             p = it->second;
             break;
@@ -77,9 +77,9 @@ ChromosomePtr ChromosomeMap::find( chromid_t id ) {
     return p;
 }
 
-ChromosomeMap::ChromosomesIter ChromosomeMap::begin() const { return m_chroms->begin(); }
-ChromosomeMap::ChromosomesIter ChromosomeMap::end() const { return m_chroms->end(); }
+ChromosomeMap::ChromosomesIter ChromosomeMap::begin() const { return m_chroms.begin(); }
+ChromosomeMap::ChromosomesIter ChromosomeMap::end() const { return m_chroms.end(); }
 
 ChromosomeMap::~ChromosomeMap() {
-    m_chroms->clear();
+    m_chroms.clear();
 }
