@@ -41,6 +41,9 @@
 
 #include "ChromosomeTuple.h"
 
+typedef size_t  dob_t;
+typedef bool    sex_t;
+
 /*******************************************************************************
  * An Individual is an encapsulation object consisting of a genotype and
  * phenotype.
@@ -53,9 +56,10 @@ public:
     static const ploidy_t PLOIDY = P;
     typedef GenomeFactory< CHROMOSOMES > GF;
     typedef shared_ptr< ChromosomeTuple< PLOIDY > > ChromosomeTuplePtr;
-    Individual() { initialize(); }
+    Individual(dob_t dob = 0) : m_dob(dob) { initialize(); }
 
-    virtual bool sex();
+    virtual sex_t sex() const;
+    virtual dob_t dob() const;
 
     virtual SequencePtr getSequence( chromid_t c, ploidy_t p );
 
@@ -72,7 +76,8 @@ protected:
     virtual void initialize();
     virtual void inspectLocus( const LocusPtr l, Genotype< P > & g );
 
-private:
+    dob_t   m_dob;
+    
     //SequencePtr  m_seqs[ CHROMOSOMES ];
     ChromosomeTuplePtr  m_seqs[ CHROMOSOMES ];
     Genotype< P >   m_geno;
@@ -86,8 +91,12 @@ private:
 
 #define IND_MEMBER_DECL(t, f) template < chromid_t C, ploidy_t P > t Individual<C,P>::f
 
-IND_MEMBER_DECL(bool, sex)() {
+IND_MEMBER_DECL(sex_t, sex)() const {
     return false;
+}
+
+IND_MEMBER_DECL( dob_t, dob)() const {
+    return m_dob;
 }
 
 IND_MEMBER_DECL( SequencePtr, getSequence)( chromid_t c, ploidy_t p ) {

@@ -48,15 +48,16 @@ struct sequence {
  * The allele_t of the a sequence is intended to be an integral
  * type with sufficient bits to represent the index.
  *
- * A default sequence allows for 256 forms per loci, thus a
+ * A default sequence allows for MAX_ALLELES forms per loci, thus a
  * byte (unsigned char) is sufficient to represent all possible
  * form indices.
  *
  **/
 class Sequence : public sequence {
 public:
-    Sequence( );
+//    Sequence( );
     Sequence( size_t loci );
+    Sequence( shared_ptr< allele_t [] > alleles, size_t size );
 
     virtual size_t length() const;
     virtual allele_t & allele(size_t locus);
@@ -64,7 +65,7 @@ public:
     virtual ~Sequence();
 
 protected:
-    allele_t *   m_alleles;
+    shared_ptr< allele_t [] >   m_alleles;
 
     size_t       m_nLoci;
     size_t       m_maxForms;

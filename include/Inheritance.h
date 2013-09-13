@@ -33,7 +33,7 @@
 #include "common.h"
 #include "Sequence.h"
 
-struct InheritanceModel {
+/*struct InheritanceModel {
     virtual void operator()( const Sequence * p1, const Sequence * p2, Sequence * offspring ) = 0;
 };
 
@@ -46,6 +46,6 @@ public:
     }
 protected:
     InheritanceModel    *m_inherit;
-};
+};*/
 
 #endif  // INHERITANCE_H_
