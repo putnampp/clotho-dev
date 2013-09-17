@@ -26,11 +26,7 @@
 # of the authors and should not be interpreted as representing official policies,
 # either expressed or implied, of the FreeBSD Project.
 ################################################################################
-SET( DIRS sandbox )
-
-LIST(APPEND DIRS cchmc)
-LIST(APPEND DIRS engine)
-LIST(APPEND DIRS simulations)
+SET( DIRS simple )
 
 FOREACH( D ${DIRS} )
     ADD_SUBDIRECTORY( ${D} )

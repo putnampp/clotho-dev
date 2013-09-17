@@ -92,6 +92,10 @@ IF( CUDA_FOUND )
     MESSAGE(STATUS "CUDA Library: " ${CUDA_LIBRARIES} )
 ENDIF( CUDA_FOUND )
 
+SET( Warped_DIR "/opt/warped" CACHE PATH "Path to warped libraries")
+#SET( Warped_LIBRARIES "/opt/warped/utils/lib/libutils.so/opt/warped/warped/lib/libwarped.so")
+MESSAGE( STATUS "Warped DIR: " ${Warped_DIR})
+
 ################################################################################
 
 OPTION( LOG       "Compile with debugging; sets LOG_LEVEL to the default logging level"        OFF )
