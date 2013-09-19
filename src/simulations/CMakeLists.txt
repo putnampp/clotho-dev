@@ -28,6 +28,8 @@
 ################################################################################
 SET( DIRS examples )
 
+LIST( APPEND DIRS genetics )
+
 FOREACH( D ${DIRS} )
     ADD_SUBDIRECTORY( ${D} )
 ENDFOREACH( D )

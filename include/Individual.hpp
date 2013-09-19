@@ -41,46 +41,54 @@
 
 #include "ChromosomeTuple.h"
 
-typedef size_t  dob_t;
-typedef bool    sex_t;
+enum SEX { MALE = 0, FEMALE, UNKNOWN_SEX };
+
+typedef SEX    sex_t;
+
+struct individual {
+    virtual sex_t sex() const = 0;
+
+    virtual chromid_t   chromosomes() const = 0;
+    virtual ploidy_t    ploidy()    const = 0;
+
+    virtual allele_t    allele( const LocusPtr l ) = 0;
+};
 
 /*******************************************************************************
  * An Individual is an encapsulation object consisting of a genotype and
  * phenotype.
  *
  ******************************************************************************/
-template < chromid_t C, ploidy_t P >
-class Individual : public Genotypeable< P >, public Phenotypeable {
+class Individual : public Genotypeable, public Phenotypeable {
 public:
-    static const chromid_t CHROMOSOMES = C;
-    static const ploidy_t PLOIDY = P;
-    typedef GenomeFactory< CHROMOSOMES > GF;
-    typedef shared_ptr< ChromosomeTuple< PLOIDY > > ChromosomeTuplePtr;
-    Individual(dob_t dob = 0) : m_dob(dob) { initialize(); }
+    friend class GenomeFactory;
 
+    Individual( const GenomeFactory * gf, ploidy_t copies = 1 );
+
+    virtual chromid_t   chromosomes() const;
     virtual sex_t sex() const;
-    virtual dob_t dob() const;
 
-    virtual SequencePtr getSequence( chromid_t c, ploidy_t p );
+    virtual SequencePtr getSequenceByID( chromid_t c, ploidy_t p );
+    virtual SequencePtr getSequenceByIndex( size_t idx, ploidy_t p );
 
     virtual allele_t allele( const LocusPtr locus );
 
     virtual bool isHomozygous( const LocusPtr l );
     virtual bool isDominant( const LocusPtr l );
-    virtual void genotype( const LocusPtr l, Genotype< P > & g );
+    virtual const genotype & operator[]( const LocusPtr l );
 
     virtual void phenotype( iTrait *, Phenotype * );
 
     virtual ~Individual() {}
 protected:
-    virtual void initialize();
-    virtual void inspectLocus( const LocusPtr l, Genotype< P > & g );
+    virtual void initialize( const GenomeFactory * );
 
-    dob_t   m_dob;
+    chromid_t m_nChroms;
+    ploidy_t  m_nPloid;
+    sex_t   m_sex;
     
-    //SequencePtr  m_seqs[ CHROMOSOMES ];
-    ChromosomeTuplePtr  m_seqs[ CHROMOSOMES ];
-    Genotype< P >   m_geno;
+    ChromosomeTuplePtr  * m_seqs;
+    genotype            * m_geno;
 };
 
 /**
@@ -88,15 +96,11 @@ protected:
  * IMPLEMENTATION
  *
  */
-
+/*
 #define IND_MEMBER_DECL(t, f) template < chromid_t C, ploidy_t P > t Individual<C,P>::f
 
 IND_MEMBER_DECL(sex_t, sex)() const {
-    return false;
-}
-
-IND_MEMBER_DECL( dob_t, dob)() const {
-    return m_dob;
+    return m_sex;
 }
 
 IND_MEMBER_DECL( SequencePtr, getSequence)( chromid_t c, ploidy_t p ) {
@@ -112,13 +116,13 @@ IND_MEMBER_DECL( allele_t, allele)( const LocusPtr locus ) {
 }
 
 IND_MEMBER_DECL( bool, isHomozygous)( const LocusPtr locus ) {
-    inspectLocus( locus, m_geno );
-    return m_geno.bHomo;
+    inspectLocus( locus, *m_geno );
+    return m_geno->isFlag( HOMOZYGOUS );
 }
 
 IND_MEMBER_DECL( bool, isDominant )( const LocusPtr locus ) {
-    inspectLocus( locus, m_geno );
-    return m_geno.bDominant;
+    inspectLocus( locus, *m_geno );
+    return m_geno->isFlag( DOMINANT );
 }
 
 IND_MEMBER_DECL( void, initialize )( ) {
@@ -127,19 +131,19 @@ IND_MEMBER_DECL( void, initialize )( ) {
     }
 }
 
-IND_MEMBER_DECL( void, inspectLocus)( const LocusPtr l, Genotype< P > & g ) {
+IND_MEMBER_DECL( void, inspectLocus)( const LocusPtr l, genotype & g ) {
     assert( l->chrom < CHROMOSOMES );
     m_seqs[ l->chrom ]->genotype( l, g );
 }
 
 
 
-IND_MEMBER_DECL( void, genotype)( const LocusPtr locus, Genotype< P > & g ) {
+IND_MEMBER_DECL( void, genotype)( const LocusPtr locus, genotype & g ) {
     inspectLocus( locus, g );
 }
 
 IND_MEMBER_DECL( void, phenotype)( iTrait * trait, Phenotype * p ) {
     
 } 
-
+*/
 #endif  // INDIVIDUAL_H_

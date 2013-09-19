@@ -28,6 +28,8 @@
 ################################################################################
 SET( DIRS simple )
 
+LIST( APPEND DIRS basic_individual )
+
 FOREACH( D ${DIRS} )
     ADD_SUBDIRECTORY( ${D} )
 ENDFOREACH( D )

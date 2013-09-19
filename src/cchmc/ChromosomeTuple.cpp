@@ -27,41 +27,56 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#include "StatisticFactory.h"
+#include "ChromosomeTuple.h"
 
-size_t StatisticFactory::count() const {
-    return m_stats.size();
-}
-
-bool StatisticFactory::add( iStatCreator * stat ) {
-    std::pair< RegisteredStats::iterator, bool> res = m_stats.insert( std::make_pair( stat->name(), stat) );
-    return res.second;
-}
-
-void StatisticFactory::remove( iStatCreator * stat ) {
-    RegisteredStats::iterator it = m_stats.find( stat->name() );
-
-    if( it != m_stats.end() ) {
-        m_stats.erase( it );
+ChromosomeTuple::ChromosomeTuple( const ChromosomePtr c, ploidy_t copies ) : m_nPloid( copies ), m_chrom(c) {
+    m_seqs = new SequencePtr[ m_nPloid ];
+    for( ploidy_t p = 0; p < m_nPloid; ++p ) {
+        m_seqs[p].reset(new Sequence( m_chrom->loci() ));
     }
 }
 
-void StatisticFactory::buildEval( std::istream & config, StatisticEval * eval ) {
-
+ChromosomeTuple::~ChromosomeTuple() {
+    delete [] m_seqs;
 }
 
-boost::shared_ptr< Statistic > StatisticFactory::create( const String & name ) {
-    RegisteredStats::iterator it = m_stats.find( name );
+chromid_t ChromosomeTuple::id() const {
+    return m_chrom->id();
+}
 
-    if( it == m_stats.end() ) {
-        return shared_ptr<Statistic>();
+size_t  ChromosomeTuple::length() const {
+    return m_chrom->length();
+}
+
+ploidy_t ChromosomeTuple::ploidy() const {
+    return m_nPloid;
+}
+
+bool    ChromosomeTuple::allele( ploidy_t copy, size_t pos, allele_t & all ) {
+    assert( copy < m_nPloid );
+
+    size_t offset = 0;
+    bool bIsLocus = m_chrom->is_locus( pos, offset );
+    if( bIsLocus ) {
+        all = m_seqs[ copy ]->allele( pos );
     }
-
-    return it->second->create();
+    return bIsLocus;
 }
 
-StatisticFactory::~StatisticFactory() {
-    if(!m_stats.empty())
-        m_stats.clear();
+SequencePtr ChromosomeTuple::sequence( ploidy_t copy ) {
+    assert( copy < m_nPloid );
+    return m_seqs[ copy ];
 }
 
+void ChromosomeTuple::getGenotype( const LocusPtr l, genotype & g ) {
+    size_t   pos = l->start;
+    ploidy_t p = 0;
+    bool bHomo = true;
+    g[p] = m_seqs[p]->allele(pos);
+    while( ++p < m_nPloid ) {
+        g[p] = m_seqs[p]->allele(pos);
+        bHomo = (bHomo && (g[0] == g[p]));
+    }
+    g.setFlag(HOMOZYGOUS, bHomo );
+    g.setFlag( DOMINANT, (bHomo && (g[0] == l->dominant_allele )));
+}

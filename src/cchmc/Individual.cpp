@@ -27,41 +27,60 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#include "StatisticFactory.h"
+#include "Individual.hpp"
 
-size_t StatisticFactory::count() const {
-    return m_stats.size();
+#include <iostream>
+using std::cout;
+using std::endl;
+
+Individual::Individual( const GenomeFactory * gf, ploidy_t ploid ) 
+    : m_nChroms( gf->chromosomes() ), m_nPloid( ploid ) {
+    initialize(gf);
 }
 
-bool StatisticFactory::add( iStatCreator * stat ) {
-    std::pair< RegisteredStats::iterator, bool> res = m_stats.insert( std::make_pair( stat->name(), stat) );
-    return res.second;
-}
-
-void StatisticFactory::remove( iStatCreator * stat ) {
-    RegisteredStats::iterator it = m_stats.find( stat->name() );
-
-    if( it != m_stats.end() ) {
-        m_stats.erase( it );
+void Individual::initialize( const GenomeFactory * gf) {
+    m_seqs = new ChromosomeTuplePtr[ m_nChroms ];
+    size_t i = 0;
+    for( GenomeFactory::ChromosomeIter it = gf->begin(); it != gf->end(); it++ ) {
+        m_seqs[ i++ ].reset( new ChromosomeTuple( it->second , m_nPloid ) );
     }
 }
 
-void StatisticFactory::buildEval( std::istream & config, StatisticEval * eval ) {
-
+chromid_t   Individual::chromosomes() const {
+    return m_nChroms;
 }
 
-boost::shared_ptr< Statistic > StatisticFactory::create( const String & name ) {
-    RegisteredStats::iterator it = m_stats.find( name );
-
-    if( it == m_stats.end() ) {
-        return shared_ptr<Statistic>();
-    }
-
-    return it->second->create();
+sex_t   Individual::sex() const {
+    return m_sex;
 }
 
-StatisticFactory::~StatisticFactory() {
-    if(!m_stats.empty())
-        m_stats.clear();
+SequencePtr Individual::getSequenceByID( chromid_t c, ploidy_t p ) {
+    return m_seqs[ c ]->sequence( p );
 }
 
+SequencePtr Individual::getSequenceByIndex( size_t idx, ploidy_t p ) {
+    return ((idx < m_nChroms) ? m_seqs[idx]->sequence(p) : NULL_SEQUENCE);
+}
+
+allele_t    Individual::allele( const LocusPtr l ) {
+    allele_t all = 0;
+    return m_seqs[ l->chrom ]->allele( l->ploid, l->start, all );
+}
+
+const genotype & Individual::operator[]( const LocusPtr l ) {
+    m_seqs[ l->chrom ]->getGenotype( l, *m_geno );
+    return *m_geno;
+}
+
+bool Individual::isHomozygous( const LocusPtr l ) {
+    m_seqs[ l->chrom ]->getGenotype( l, *m_geno );
+    return m_geno->isFlag( HOMOZYGOUS );
+}
+
+bool Individual::isDominant( const LocusPtr l ) {
+    m_seqs[ l->chrom ]->getGenotype( l, *m_geno );
+    return m_geno->isFlag( DOMINANT );
+}
+
+void Individual::phenotype( iTrait *, Phenotype * ) {
+}

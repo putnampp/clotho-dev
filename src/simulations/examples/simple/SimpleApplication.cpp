@@ -44,11 +44,6 @@ SimpleApplication::SimpleApplication() : m_nObjects( 0 ), m_strInFile("") {}
 
 int SimpleApplication::initialize( vector< string > & args ) {
     getArgumentParser().checkArgs( args );
-
-/*    if( m_strInFile.empty() ) {
-        abort();
-    }
-*/
     return 0;
 }
 

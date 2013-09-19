@@ -55,9 +55,8 @@ struct sequence {
  **/
 class Sequence : public sequence {
 public:
-//    Sequence( );
     Sequence( size_t loci );
-    Sequence( shared_ptr< allele_t [] > alleles, size_t size );
+    Sequence( shared_ptr< allele_t [] > alleles, size_t loci );
 
     virtual size_t length() const;
     virtual allele_t & allele(size_t locus);
@@ -65,6 +64,7 @@ public:
     virtual ~Sequence();
 
 protected:
+    Sequence() {}
     shared_ptr< allele_t [] >   m_alleles;
 
     size_t       m_nLoci;
@@ -75,5 +75,7 @@ protected:
 };
 
 typedef shared_ptr< Sequence > SequencePtr;
+
+static const SequencePtr NULL_SEQUENCE = SequencePtr();
 
 #endif  // SEQUENCE_H_
