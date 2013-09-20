@@ -27,41 +27,11 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#include "StatisticFactory.h"
+#ifndef CLONEABLE_H_
+#define CLONEABLE_H_
 
-size_t StatisticFactory::count() const {
-    return m_stats.size();
-}
+struct Cloneable {
+    virtual Cloneable * clone() = 0;
+};
 
-bool StatisticFactory::add( iStatCreator * stat ) {
-    std::pair< RegisteredStats::iterator, bool> res = m_stats.insert( std::make_pair( stat->name(), stat) );
-    return res.second;
-}
-
-void StatisticFactory::remove( iStatCreator * stat ) {
-    RegisteredStats::iterator it = m_stats.find( stat->name() );
-
-    if( it != m_stats.end() ) {
-        m_stats.erase( it );
-    }
-}
-
-void StatisticFactory::buildEval( std::istream & config, StatisticEval * eval ) {
-
-}
-
-boost::shared_ptr< Statistic > StatisticFactory::create( const String & name ) {
-    RegisteredStats::iterator it = m_stats.find( name );
-
-    if( it == m_stats.end() ) {
-        return shared_ptr<Statistic>();
-    }
-
-    return it->second->create();
-}
-
-StatisticFactory::~StatisticFactory() {
-    if(!m_stats.empty())
-        m_stats.clear();
-}
-
+#endif  // CLONEABLE_H_

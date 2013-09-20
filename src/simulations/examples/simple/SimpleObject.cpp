@@ -27,41 +27,53 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#include "StatisticFactory.h"
+#include "SimpleObject.h"
+#include "SimpleState.h"
 
-size_t StatisticFactory::count() const {
-    return m_stats.size();
+#include <boost/lexical_cast.hpp>
+
+SimpleObject::SimpleObject(  ) : m_id(nextID()), m_name( "name" + boost::lexical_cast<string>(m_id) ) {}
+
+SimpleObject::~SimpleObject() {}
+
+void SimpleObject::initialize() { }
+
+void SimpleObject::finalize() { 
+    SEVERITY sev = NOTE;
+
+    SimpleState * s = static_cast< SimpleState * >( getState() );
+    ASSERT( s != NULL );
+
+    string msg = "Getting here\n";
+    reportError( msg, sev );
 }
 
-bool StatisticFactory::add( iStatCreator * stat ) {
-    std::pair< RegisteredStats::iterator, bool> res = m_stats.insert( std::make_pair( stat->name(), stat) );
-    return res.second;
+void SimpleObject::executeProcess() {
+    SimpleState * myState = static_cast< SimpleState * >( getState() );
+    ASSERT( myState != NULL );
 }
 
-void StatisticFactory::remove( iStatCreator * stat ) {
-    RegisteredStats::iterator it = m_stats.find( stat->name() );
-
-    if( it != m_stats.end() ) {
-        m_stats.erase( it );
-    }
+State * SimpleObject::allocateState() {
+    return new SimpleState();
 }
 
-void StatisticFactory::buildEval( std::istream & config, StatisticEval * eval ) {
-
+void SimpleObject::deallocateState( const State * state ) {
+    delete state;
 }
 
-boost::shared_ptr< Statistic > StatisticFactory::create( const String & name ) {
-    RegisteredStats::iterator it = m_stats.find( name );
-
-    if( it == m_stats.end() ) {
-        return shared_ptr<Statistic>();
-    }
-
-    return it->second->create();
+void SimpleObject::reclaimEvent( const Event * e ) {
+    delete e;
 }
 
-StatisticFactory::~StatisticFactory() {
-    if(!m_stats.empty())
-        m_stats.clear();
+int SimpleObject::nextID() {
+    static int id = 0;
+    return id++;
+}
+
+const string &SimpleObject::getName() const {
+    return m_name;
+}
+
+void SimpleObject::sendEvent( const string & owner ) {
 }
 

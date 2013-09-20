@@ -27,41 +27,37 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#include "StatisticFactory.h"
+#ifndef SIMPLE_APPLICATION_H_
+#define SIMPLE_APPLICATION_H_
 
-size_t StatisticFactory::count() const {
-    return m_stats.size();
-}
+#include "warped/Application.h"
+#include "warped/IntVTime.h"
 
-bool StatisticFactory::add( iStatCreator * stat ) {
-    std::pair< RegisteredStats::iterator, bool> res = m_stats.insert( std::make_pair( stat->name(), stat) );
-    return res.second;
-}
+class SimpleApplication : public Application {
+public:
+    SimpleApplication();
 
-void StatisticFactory::remove( iStatCreator * stat ) {
-    RegisteredStats::iterator it = m_stats.find( stat->name() );
+    int initialize( vector< string > & args );
 
-    if( it != m_stats.end() ) {
-        m_stats.erase( it );
-    }
-}
+    int getNumberOfSimulationObjects( int mgrId ) const;
 
-void StatisticFactory::buildEval( std::istream & config, StatisticEval * eval ) {
+    const PartitionInfo * getPartitionInfo( unsigned int nPE );
 
-}
+    int     finalize();
+    void    registerDeserializers();
 
-boost::shared_ptr< Statistic > StatisticFactory::create( const String & name ) {
-    RegisteredStats::iterator it = m_stats.find( name );
+    string  getCommandLineParameters() const;
 
-    if( it == m_stats.end() ) {
-        return shared_ptr<Statistic>();
-    }
+    const   VTime   & getPositiveInfinity();
+    const   VTime   & getZero();
 
-    return it->second->create();
-}
+    const   VTime   & getTime( string & time );
 
-StatisticFactory::~StatisticFactory() {
-    if(!m_stats.empty())
-        m_stats.clear();
-}
+private:
+    ArgumentParser & getArgumentParser();
+    vector< SimulationObject * > * getSimulationObjects();
+    unsigned int     m_nObjects;
+    string  m_strInFile;
+};
 
+#endif  // SIMPLE_APPLICATION_H_

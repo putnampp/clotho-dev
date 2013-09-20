@@ -30,11 +30,14 @@
 #include "Sequence.h"
 #include <cstring>
 
-Sequence::Sequence() : m_nLoci(0), m_maxForms(MAX_ALLELES), m_allocatedLoci(0) {}
+//Sequence::Sequence() : m_alleles(NULL), m_nLoci(0), m_maxForms(MAX_ALLELES), m_allocatedLoci(0) {}
 
-Sequence::Sequence( size_t loci ) : m_nLoci(loci), m_maxForms( MAX_ALLELES ), m_allocatedLoci(0) {
+Sequence::Sequence( size_t loci ) : m_alleles(), m_nLoci(loci), m_maxForms( MAX_ALLELES ), m_allocatedLoci(0) {
     resizeSeq( m_nLoci );
 }
+
+Sequence::Sequence( shared_ptr< allele_t [] > alleles, size_t size ) : m_alleles(alleles), m_nLoci( size ), 
+    m_maxForms( MAX_ALLELES ), m_allocatedLoci(size) { }
 
 size_t Sequence::length() const {
     return m_nLoci;
@@ -46,20 +49,23 @@ allele_t & Sequence::allele( size_t locus ) {
 }
 
 void    Sequence::resizeSeq( size_t nLoci ) {
-    allele_t * tmp = new allele_t[ nLoci ];
+    shared_ptr< allele_t [] > tmp( new allele_t[ nLoci ] );
     if( m_allocatedLoci != 0 ) {
         // copy current loci values over
-        memcpy( tmp, m_alleles, m_allocatedLoci * sizeof( allele_t ) );
+        memcpy( &tmp[0], &m_alleles[0], m_allocatedLoci * sizeof( allele_t ) );
 
         // delete currently allocated memory
-        delete [] m_alleles;
+        //delete [] m_alleles;
+        m_alleles.reset();
     }
 
     // establish new memory space
+//    m_alleles = tmp;
     m_alleles = tmp;
     m_allocatedLoci = nLoci;
 }
 
 Sequence::~Sequence() {
-    if( m_nLoci > 0 )   delete [] m_alleles;
+//    if( m_nLoci > 0 )   delete [] m_alleles;
+    m_alleles.reset();
 }

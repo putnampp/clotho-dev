@@ -32,6 +32,7 @@
 
 #include "common.h"
 #include <cassert>
+#include "Cloneable.h"
 #include "Configurable.h"
 
 #include <map>
@@ -41,7 +42,7 @@ using std::make_pair;
 
 #define DEFAULT_CHROMOSOME_LEN 100
 
-typedef unsigned char chromid_t;
+typedef unsigned int chromid_t;
 #define UNKNOWN_CHROM -1
 
 class ChromosomeMap;
@@ -53,7 +54,7 @@ class ChromosomeMap;
  * The chromosome length is at least the largest position.
  *
  */
-class Chromosome {
+class Chromosome : public Cloneable {
 public:
     friend class ChromosomeMap;
 
@@ -61,8 +62,10 @@ public:
     Chromosome( const Chromosome & c );
 
     virtual void setLength( size_t len );
+    virtual Cloneable * clone();
 
-    virtual void    add_site( size_t pos );
+    virtual bool    add_site( size_t pos );
+    virtual void    clear_sites();
 
     chromid_t id() const;
     String  name() const;
@@ -85,5 +88,7 @@ private:
 };
 
 typedef shared_ptr< Chromosome > ChromosomePtr;
+
+static const ChromosomePtr NULL_CHROMOSOME = ChromosomePtr();
 
 #endif  // CHROMOSOME_H_

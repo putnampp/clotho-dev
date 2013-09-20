@@ -42,6 +42,11 @@ Chromosome::Chromosome( const Chromosome & c ) {
     m_sites.insert( c.m_sites.begin(), c.m_sites.end() );
 }
 
+Cloneable * Chromosome::clone() {
+    Chromosome * c = new Chromosome( *this );
+    return c;
+}
+
 /**
  *
  * Change the chromosome length. New size cannot be smaller
@@ -62,21 +67,22 @@ void Chromosome::setLength( size_t size ) {
  *
  * The length of the chromosome will be extended to 
  * include this site should it not be long enough
- *
  */
-void Chromosome::add_site( size_t pos ) {
+bool Chromosome::add_site( size_t pos ) {
     Sites::const_iterator it = m_sites.find(pos);
 
-    if( it == m_sites.end() ) {
+    bool bNewSite = (it == m_sites.end());
+    if( bNewSite ) {
         // new position to be added
         m_sites.insert( make_pair(pos, m_sites.size()) );
         if( pos >= m_size )
             m_size = pos + 1;
     }
+    return bNewSite;
 }
 
 chromid_t Chromosome::id() const {
-    return m_id;
+return m_id;
 }
 
 String Chromosome::name() const {
@@ -100,9 +106,13 @@ bool    Chromosome::is_locus( size_t pos, size_t & offset ) const {
     return bFound;
 }
 
+void Chromosome::clear_sites() {
+    m_sites.clear();
+}
+
 chromid_t Chromosome::nextID() {
     static chromid_t next_id = 0;
-    assert( next_id != UNKNOWN_CHROM );
+    assert( next_id != (chromid_t)UNKNOWN_CHROM );
     return next_id++;
 }
 

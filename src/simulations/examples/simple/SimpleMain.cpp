@@ -26,42 +26,10 @@
  * of the authors and should not be interpreted as representing official policies,
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
+#include "SimpleApplication.h"
+#include "warped/WarpedMain.h"
 
-#include "StatisticFactory.h"
-
-size_t StatisticFactory::count() const {
-    return m_stats.size();
+int main( int argc, char ** argv ) {
+    WarpedMain  wm( new SimpleApplication() );
+    return wm.main( argc, argv );
 }
-
-bool StatisticFactory::add( iStatCreator * stat ) {
-    std::pair< RegisteredStats::iterator, bool> res = m_stats.insert( std::make_pair( stat->name(), stat) );
-    return res.second;
-}
-
-void StatisticFactory::remove( iStatCreator * stat ) {
-    RegisteredStats::iterator it = m_stats.find( stat->name() );
-
-    if( it != m_stats.end() ) {
-        m_stats.erase( it );
-    }
-}
-
-void StatisticFactory::buildEval( std::istream & config, StatisticEval * eval ) {
-
-}
-
-boost::shared_ptr< Statistic > StatisticFactory::create( const String & name ) {
-    RegisteredStats::iterator it = m_stats.find( name );
-
-    if( it == m_stats.end() ) {
-        return shared_ptr<Statistic>();
-    }
-
-    return it->second->create();
-}
-
-StatisticFactory::~StatisticFactory() {
-    if(!m_stats.empty())
-        m_stats.clear();
-}
-

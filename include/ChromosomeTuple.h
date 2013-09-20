@@ -36,60 +36,39 @@
 #include "Sequence.h"
 #include "Chromosome.h"
 #include "Locus.h"
+#include "Genotype.h"
 
 struct chromosome_set {
+    virtual chromid_t id()    const = 0;
     virtual size_t   length() const = 0;
     virtual ploidy_t ploidy() const = 0;
+
     virtual bool allele( ploidy_t copy, size_t locus, allele_t & all ) = 0;
+    virtual SequencePtr sequence( ploidy_t p ) = 0;
+    virtual void    getGenotype( const LocusPtr l, genotype & g ) = 0;
 };
 
-template < ploidy_t P >
 class ChromosomeTuple : public chromosome_set {
 public:
-    ChromosomeTuple( const ChromosomePtr c ) : m_chrom(c) {
-        for( ploidy_t p = 0; p < PLOIDY; ++p ) {
-            m_seqs[p].reset(new Sequence( m_chrom->loci() ));
-        }
-    }
+    ChromosomeTuple( const ChromosomePtr c, ploidy_t copies );
 
-    virtual chromid_t   id()     const { return m_chrom->id(); }
-    virtual size_t      length() const { return m_chrom->length(); }
-    virtual ploidy_t    ploidy() const { return PLOIDY; }
+    virtual chromid_t   id()     const;
+    virtual size_t      length() const;
+    virtual ploidy_t    ploidy() const;
 
-    virtual bool  allele( ploidy_t copy, size_t locus, allele_t & all ) {
-        assert( copy < PLOIDY );
+    virtual bool  allele( ploidy_t copy, size_t locus, allele_t & all );
 
-        size_t offset = 0;
-        bool bIsLocus = m_chrom->is_locus( locus, offset );
-        if( bIsLocus ) {
-            all = m_seqs[ copy ]->allele( locus );
-        }
-        return bIsLocus;
-    }
+    virtual SequencePtr sequence( ploidy_t copy );
 
-    virtual SequencePtr sequence( ploidy_t copy ) {
-        assert( copy < PLOIDY );
-        return m_seqs[ copy ];
-    }
+    virtual void getGenotype( const LocusPtr l, genotype & g );
 
-    virtual void genotype( const LocusPtr l, Genotype< P > & g ) {  
-        size_t   pos = l->start;
-        ploidy_t p = 0;
-        g.bHomo = true;
-        g.geno[p] = m_seqs[p]->allele(pos);
-        while( ++p < PLOIDY ) {
-            g.geno[p] = m_seqs[p]->allele(pos);
-            g.bHomo = (g.bHomo && (g.geno[0] == g.geno[p]));
-        }
-
-        g.bDominant = (g.bHomo && (g.geno[0] == l->dominant_allele ));
-    }
-
-    virtual ~ChromosomeTuple() {}
+    virtual ~ChromosomeTuple();
 protected:
-    static const ploidy_t PLOIDY = P;
+    ploidy_t        m_nPloid;
     ChromosomePtr   m_chrom;
-    SequencePtr     m_seqs[ P ];
+    SequencePtr     *m_seqs;
 };
+
+typedef shared_ptr< chromosome_set > ChromosomeTuplePtr;
 
 #endif  // CHROMOSOMETUPLE_H_

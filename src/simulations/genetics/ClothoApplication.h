@@ -27,41 +27,29 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#include "StatisticFactory.h"
+#ifndef CLOTHOAPPLICATION_H_
+#define CLOTHOAPPLICATION_H_
 
-size_t StatisticFactory::count() const {
-    return m_stats.size();
-}
+#include "warped/Application.h"
 
-bool StatisticFactory::add( iStatCreator * stat ) {
-    std::pair< RegisteredStats::iterator, bool> res = m_stats.insert( std::make_pair( stat->name(), stat) );
-    return res.second;
-}
+class ClothoApplication : public Application {
+public:
 
-void StatisticFactory::remove( iStatCreator * stat ) {
-    RegisteredStats::iterator it = m_stats.find( stat->name() );
+    int initialize( vector< string > & args );
+    int finalize( );
 
-    if( it != m_stats.end() ) {
-        m_stats.erase( it );
-    }
-}
+    const PartitionInfo * getPartitionInfo( unsigned int nPE );
+    int     getNumberOfSimulationObjects( int mgrID ) const;
 
-void StatisticFactory::buildEval( std::istream & config, StatisticEval * eval ) {
+    string getCommandLineParameters() const;
 
-}
+    void registerDeserializers();
 
-boost::shared_ptr< Statistic > StatisticFactory::create( const String & name ) {
-    RegisteredStats::iterator it = m_stats.find( name );
+    const VTime & getPositiveInfinity();
+    const VTime & getZero();
+    const VTime & getTime( string & );
+protected:
+    virtual ArgumentParser & getArgumentParser();
+};
 
-    if( it == m_stats.end() ) {
-        return shared_ptr<Statistic>();
-    }
-
-    return it->second->create();
-}
-
-StatisticFactory::~StatisticFactory() {
-    if(!m_stats.empty())
-        m_stats.clear();
-}
-
+#endif  // CLOTHOAPPLICATION_H_

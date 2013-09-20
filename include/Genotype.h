@@ -35,20 +35,50 @@
 #include "Allele.h"
 #include "Locus.h"
 
-template < ploidy_t P >
-struct Genotype {
-    static const ploidy_t PLOIDY = P;
-    allele_t    geno[ PLOIDY ];
-    bool        bHomo;
-    bool        bDominant;
+enum GenotypeFlag { HOMOZYGOUS  = 1,
+                     DOMINANT   = 2 };
+
+typedef unsigned short flag_t;
+
+class genotype {
+public:
+    virtual ploidy_t    ploidy() const = 0;
+    virtual flag_t      getFlags() const = 0;
+    virtual void        setFlag( GenotypeFlag f, bool bVal ) = 0;
+    virtual bool        isFlag( GenotypeFlag f ) const = 0;
+
+    virtual allele_t & operator[]( ploidy_t p ) = 0;
+
+    virtual ~genotype() {}
+protected:
+    genotype(){}
 };
 
+/*
 template < ploidy_t P >
+struct Genotype : public genotype {
+public:
+    Genotype() : m_flags(0) {}
+
+    ploidy_t ploidy() const {   return PLOIDY; }
+    flag_t   getFlags() const { return m_flags; }
+    void     setFlag( GenotypeFlag f, bool bVal = true ) { m_flags = ((bVal) ? (m_flags | f) : (m_flags & (~f))); }
+    bool     isFlag( GenotypeFlag f ) const { return ((m_flags & f ) > 0); }
+
+    allele_t & operator[]( ploidy_t p ) { assert( p < PLOIDY ); return m_geno[ p ]; }
+    
+    virtual ~Genotype() {}
+protected:
+    static const ploidy_t PLOIDY = P;
+    flag_t      m_flags; 
+    allele_t    m_geno[ PLOIDY ];
+};
+*/
+
 struct Genotypeable {
     virtual bool isHomozygous( const LocusPtr l ) = 0;
     virtual bool isDominant( const LocusPtr l ) = 0;
-    virtual void genotype( const LocusPtr l, Genotype< P > & g ) = 0;
+    virtual const genotype & operator[]( const LocusPtr l ) = 0;
 };
-
 
 #endif  // GENOTYPE_H_

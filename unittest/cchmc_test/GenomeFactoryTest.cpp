@@ -35,66 +35,71 @@ BOOST_AUTO_TEST_SUITE( test_genome_factory )
 const chromid_t chrom = 23;
 const ploidy_t  ploid = 2;
 
-typedef GenomeFactory< chrom > GF;
-
 BOOST_AUTO_TEST_CASE( genome_factory_create ) {
-    BOOST_REQUIRE_MESSAGE( (GF::getInstance() != NULL), "Unable to create GenomeFactory<" << chrom << ">" );
+    GenomeFactory g;
+
+    BOOST_REQUIRE_MESSAGE( g.size() == 0, "Unexpected size of genome");
 }
 
-BOOST_AUTO_TEST_CASE( genome_factory_default_size ) {
-    BOOST_REQUIRE_MESSAGE( (GF::getInstance()->total_size() == (chrom * DEFAULT_CHROMOSOME_LEN)), "Unexpected length of the default genome: " << (GF::getInstance()->total_size()));
-    BOOST_REQUIRE_MESSAGE( (GF::getInstance()->loci() == 0), "Unexpected number of loci in default genome");
+BOOST_AUTO_TEST_CASE( genome_factory_create2 ) {
+    GenomeFactory g( chrom );
+
+    BOOST_REQUIRE_MESSAGE( g.chromosomes() == chrom, "Unexpected number of chromosomes");
+
+    BOOST_REQUIRE_MESSAGE( (g.size() == (chrom * DEFAULT_CHROMOSOME_LEN)), "Unexpected length of the default genome: " << (g.size()));
+    BOOST_REQUIRE_MESSAGE( (g.loci() == 0), "Unexpected number of loci in default genome");
 }
 
 BOOST_AUTO_TEST_CASE( genome_factory_reset ) {
     // add a site of interest to each chromosome
     // site pos is unimportant, just needs to be smaller
     // than the chrom_len
+    GenomeFactory g( chrom );
     for( chromid_t c = 0; c < chrom; ++c ) {
-        size_t before = GF::getInstance()->getChromosome(c)->loci();
+        size_t before = g.getChromosomeByIndex(c)->loci();
 
-        GF::getInstance()->addChromosomeSite( c, (size_t) 33 );
-
-        BOOST_REQUIRE_MESSAGE( (GF::getInstance()->getChromosome(c)->loci() == before + 1), "Site was not added");
+        if( g.addChromosomeSite( c, (size_t) 33 ) ) {
+            BOOST_REQUIRE_MESSAGE( (g.getChromosomeByIndex(c)->loci() == before + 1), "Site was not added");
+        } else {
+            BOOST_REQUIRE_MESSAGE( false, "Failed to add site on chromosome (" << (int)c << ")");
+        }
     }
 
     // reset the GenomeFactory to default
-    GF::getInstance()->reset();
+    g.reset();
 
     for( chromid_t c = 0; c < chrom; ++c ) {
-        for( ploidy_t p = 0; p < ploid; ++p ) {
-            ChromosomePtr chr = GF::getInstance()->getChromosome(c);
+        ChromosomePtr chr = g.getChromosomeByIndex(c);
 
-            BOOST_REQUIRE_MESSAGE( (chr->length() == DEFAULT_CHROMOSOME_LEN), "Unexpected size of chromosome after reset" );
-            BOOST_REQUIRE_MESSAGE( (chr->loci() == 0), "Unexpected number of loci after reset");
-        }
+        BOOST_REQUIRE_MESSAGE( (chr->length() == DEFAULT_CHROMOSOME_LEN), "Unexpected size of chromosome after reset" );
+        BOOST_REQUIRE_MESSAGE( (chr->loci() == 0), "Unexpected number of loci after reset");
     }
 }
-
+/*
 BOOST_AUTO_TEST_CASE( genome_factory_chrom_sizes ) {
-    GF::getInstance()->reset();
+    GenomeFactory g(chrom);
 
     const size_t new_size = 3000;
     for( chromid_t c = 0; c < chrom; ++c ) {
-        GF::getInstance()->setChromosomeSize( c, new_size );
+        g.setChromosomeSize( c, new_size );
     }
 
-    BOOST_REQUIRE_MESSAGE( GF::getInstance()->total_size() == new_size * chrom, "Unexpected genome size after resizing");
+    BOOST_REQUIRE_MESSAGE( g.size() == new_size * chrom, "Unexpected genome size after resizing");
 }
-
+*/
 BOOST_AUTO_TEST_CASE( genome_factory_chrom_site ) {
-    GF::getInstance()->reset();
+    GenomeFactory g(chrom);
 
-    size_t genome_size = GF::getInstance()->total_size();
-    const size_t locus_pos = 25;
+    size_t genome_size = g.size();
+    const size_t locus_pos = DEFAULT_CHROMOSOME_LEN + 10;
 
-    GF::getInstance()->addChromosomeSite( 1, locus_pos );
+    g.addChromosomeSite( 1, locus_pos );
 
     if( locus_pos >= DEFAULT_CHROMOSOME_LEN ) {
-        BOOST_REQUIRE_MESSAGE( (GF::getInstance()->total_size() - 1 - locus_pos + DEFAULT_CHROMOSOME_LEN == genome_size),
-        "Unexpected genome size: " << GF::getInstance()->total_size() << " was " << genome_size );
+        BOOST_REQUIRE_MESSAGE( (g.size() - 1 - locus_pos + DEFAULT_CHROMOSOME_LEN == genome_size),
+        "Unexpected genome size: " << g.size() << " was " << genome_size );
     } else {
-        BOOST_REQUIRE_MESSAGE( (GF::getInstance()->total_size() == genome_size), "Genome Size should not have changed when site " << locus_pos << " was added");
+        BOOST_REQUIRE_MESSAGE( (g.size() == genome_size), "Genome Size should not have changed when site " << locus_pos << " was added");
     }
 }
 

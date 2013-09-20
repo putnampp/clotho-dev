@@ -26,11 +26,9 @@
 # of the authors and should not be interpreted as representing official policies,
 # either expressed or implied, of the FreeBSD Project.
 ################################################################################
-SET( DIRS sandbox )
+SET( DIRS examples )
 
-LIST(APPEND DIRS cchmc)
-LIST(APPEND DIRS engine)
-LIST(APPEND DIRS simulations)
+LIST( APPEND DIRS genetics )
 
 FOREACH( D ${DIRS} )
     ADD_SUBDIRECTORY( ${D} )

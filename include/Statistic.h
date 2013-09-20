@@ -37,6 +37,7 @@
 
 #include <fstream>
 
+using std::istream;
 using std::ostream;
 
 /*******************************************************************************
@@ -50,7 +51,7 @@ class Statistic : public Describable, public Configurable {
 public:
     Statistic( const String & desc ) : Describable( desc ) {}
 
-    virtual void configure( std::istream & in ) = 0;
+    virtual void configure( istream & in ) = 0;
     virtual void operator()( const Population & p ) = 0;
 
     friend ostream & operator<<( ostream & out, const Statistic & stat );

@@ -26,12 +26,13 @@
 # of the authors and should not be interpreted as representing official policies,
 # either expressed or implied, of the FreeBSD Project.
 ################################################################################
-SET( DIRS sandbox )
+INCLUDE_DIRECTORIES( ${${PROJECT_NAME}_INCLUDE_DIR} )
+#LINK_DIRECTORIES( ${Warped_LIBRARIES} )
+LINK_DIRECTORIES( ${Warped_DIR}/warped/lib ${Warped_DIR}/utils/lib )
 
-LIST(APPEND DIRS cchmc)
-LIST(APPEND DIRS engine)
-LIST(APPEND DIRS simulations)
+LIST( APPEND SRCS main.cpp)
+LIST( APPEND SRCS ClothoApplication.cpp)
 
-FOREACH( D ${DIRS} )
-    ADD_SUBDIRECTORY( ${D} )
-ENDFOREACH( D )
+ADD_EXECUTABLE(WarpedClotho ${SRCS} )
+
+TARGET_LINK_LIBRARIES(WarpedClotho ${Boost_LIBRARIES} warped utils )

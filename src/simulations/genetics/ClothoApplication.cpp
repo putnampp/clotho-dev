@@ -27,41 +27,53 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#include "StatisticFactory.h"
+#include "ClothoApplication.h"
+#include "warped/IntVTime.h"
+#include "utils/ArgumentParser.h"
 
-size_t StatisticFactory::count() const {
-    return m_stats.size();
+int ClothoApplication::initialize( vector< string > & args ) {
+    getArgumentParser().checkArgs(args);
+    return 0;
 }
 
-bool StatisticFactory::add( iStatCreator * stat ) {
-    std::pair< RegisteredStats::iterator, bool> res = m_stats.insert( std::make_pair( stat->name(), stat) );
-    return res.second;
+int ClothoApplication::finalize( ) {
+    return 0;
 }
 
-void StatisticFactory::remove( iStatCreator * stat ) {
-    RegisteredStats::iterator it = m_stats.find( stat->name() );
-
-    if( it != m_stats.end() ) {
-        m_stats.erase( it );
-    }
-}
-
-void StatisticFactory::buildEval( std::istream & config, StatisticEval * eval ) {
+const PartitionInfo * ClothoApplication::getPartitionInfo( unsigned int nPE ) {
 
 }
 
-boost::shared_ptr< Statistic > StatisticFactory::create( const String & name ) {
-    RegisteredStats::iterator it = m_stats.find( name );
+int     ClothoApplication::getNumberOfSimulationObjects( int mgrID ) const {
 
-    if( it == m_stats.end() ) {
-        return shared_ptr<Statistic>();
-    }
-
-    return it->second->create();
 }
 
-StatisticFactory::~StatisticFactory() {
-    if(!m_stats.empty())
-        m_stats.clear();
+string ClothoApplication::getCommandLineParameters() const {
+
 }
 
+void ClothoApplication::registerDeserializers() {
+
+}
+
+const VTime & ClothoApplication::getPositiveInfinity() { 
+    return IntVTime::getIntVTimePositiveInfinity(); 
+}
+
+const VTime & ClothoApplication::getZero() { 
+    return IntVTime::getIntVTimeZero(); 
+}
+
+const VTime & ClothoApplication::getTime( string & ) { 
+    return IntVTime::getIntVTimeZero(); 
+}
+
+ArgumentParser & ClothoApplication::getArgumentParser() {
+    // ArgRecord is a nested class of ArgumentParser
+    static ArgumentParser::ArgRecord args[] = {
+    {"","",0 }
+    };
+
+    static ArgumentParser * ap = new ArgumentParser( args );
+    return *ap;
+}

@@ -29,52 +29,56 @@
 
 #include <boost/test/unit_test.hpp>
 #include "Individual.hpp"
+#include "GenomeFactory.hpp"
 
 BOOST_AUTO_TEST_SUITE( test_individual )
 
 const chromid_t chroms = 23;
 const ploidy_t  ploid = 2;
 
-typedef Individual< chroms, ploid > Ind;
-typedef GenomeFactory< chroms > GF;
+static GenomeFactory g(chroms);
 
 BOOST_AUTO_TEST_CASE( ind_create ) {
-    Ind ind;
+    IndividualPtr ind = g.createIndividual( ploid );
+
+    BOOST_REQUIRE_MESSAGE( ind->chromosomes() == chroms, "Unexpected number of chromosomes" );
 }
 
 BOOST_AUTO_TEST_CASE( ind_chrom_size ) {
-    GF::getInstance()->reset();
-    Ind human;
+    IndividualPtr ind = g.createIndividual( ploid );
 
     for( chromid_t c = 0; c < chroms; ++c ) {
         for( ploidy_t p = 0; p < ploid; ++p ) {
             // A default genome has no loci set, therefore all sequences should have 0 length
-            BOOST_REQUIRE_MESSAGE( (human.getSequence( c, p )->length() == 0), "Unexpected length of sequence for chromosome " << c << " copy " << p);
+            SequencePtr sq = ind->getSequenceByIndex(c, p);
+            BOOST_REQUIRE_MESSAGE( (sq != NULL), "Unexpected NULL_SEQUENCE at " << c << ", " << p);
+            BOOST_REQUIRE_MESSAGE( (sq->length() == 0), "Unexpected length of sequence for chromosome " << c << " copy " << p << ", " << sq->length());
         }
     }
 }
 
 BOOST_AUTO_TEST_CASE( ind_chrom_size2 ) {
-    GF::getInstance()->reset();
-
     // add site to all chromosomes
     //
+    g.reset();
     for( chromid_t c = 0; c < chroms; ++c ) {
-        for( ploidy_t p = 0; p < ploid; ++p ) {
-            GF::getInstance()->getChromosome(c)->add_site( (size_t) 42 );
-        }
+        BOOST_REQUIRE_MESSAGE( g.addChromosomeSite(c, (size_t) 42 ), "Site not added" );
     }
+
+    BOOST_REQUIRE_MESSAGE( g.loci() == chroms, "Unexpected number of loci: " << g.loci() << " v " << chroms );
 
     // Individual object assumes underlying genome has already been constructed
-    Ind h;
+    IndividualPtr h = g.createIndividual(ploid);
 
     for( chromid_t c = 0; c < chroms; ++c ) {
         for( ploidy_t p = 0; p < ploid; ++p ) {
-            BOOST_REQUIRE_MESSAGE( (h.getSequence(c, p)->length() == 1), "Unexpected sequence length");
+            SequencePtr sq = h->getSequenceByIndex( c, p );
+            BOOST_REQUIRE_MESSAGE( (sq != NULL), "Unexpected NULL_SEQUENCE at " << c << ", " << p);
+            BOOST_REQUIRE_MESSAGE( (sq->length() == 1), "Unexpected sequence length");
         }
     }
 
-    GF::getInstance()->reset();
+    g.reset();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

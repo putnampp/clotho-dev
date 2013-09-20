@@ -27,41 +27,37 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#include "StatisticFactory.h"
+#ifndef SIMPLEOBJECT_H_
+#define SIMPLEOBJECT_H_
 
-size_t StatisticFactory::count() const {
-    return m_stats.size();
-}
+#include "warped/warped.h"
+#include "warped/SimulationObject.h"
 
-bool StatisticFactory::add( iStatCreator * stat ) {
-    std::pair< RegisteredStats::iterator, bool> res = m_stats.insert( std::make_pair( stat->name(), stat) );
-    return res.second;
-}
+class SimpleObject : public SimulationObject {
+public:
+    SimpleObject( );
 
-void StatisticFactory::remove( iStatCreator * stat ) {
-    RegisteredStats::iterator it = m_stats.find( stat->name() );
+    ~SimpleObject();
 
-    if( it != m_stats.end() ) {
-        m_stats.erase( it );
-    }
-}
+    void initialize();
+    void finalize();
 
-void StatisticFactory::buildEval( std::istream & config, StatisticEval * eval ) {
+    void executeProcess();
+    State * allocateState();
+    void    deallocateState( const State * state );
 
-}
+    void    reclaimEvent( const Event * event );
 
-boost::shared_ptr< Statistic > StatisticFactory::create( const String & name ) {
-    RegisteredStats::iterator it = m_stats.find( name );
+    const string &getName() const;
 
-    if( it == m_stats.end() ) {
-        return shared_ptr<Statistic>();
-    }
+private:
+    void    sendEvent( const string &name );
+    static int nextID();
 
-    return it->second->create();
-}
+    int     m_id;
+    const string  m_name;
 
-StatisticFactory::~StatisticFactory() {
-    if(!m_stats.empty())
-        m_stats.clear();
-}
 
+};
+
+#endif  // SIMPLEOBJECT_H_

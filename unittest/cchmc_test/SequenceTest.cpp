@@ -34,14 +34,33 @@ BOOST_AUTO_TEST_SUITE( test_sequence )
 
 
 BOOST_AUTO_TEST_CASE( seq_create ) {
-    Sequence s;
-}
-
-BOOST_AUTO_TEST_CASE( seq_create2 ) {
     const size_t size = 35;
     Sequence s(size);
 
     BOOST_REQUIRE_MESSAGE( s.length() == size, "Failed to create a sequence with " << size << " loci" );
+}
+
+BOOST_AUTO_TEST_CASE( seq_create2 ) {
+    const size_t size = 35;
+    shared_ptr< allele_t [] > alleles( new allele_t[size]);
+
+    for(size_t i = 0; i < size; ++i ) {
+        alleles[i] = (i % MAX_ALLELES);
+    }
+
+    Sequence s(alleles, size);
+
+    BOOST_REQUIRE_MESSAGE( s.length() == size, "Failed to create a sequence with " << size << " loci" );
+
+    for( size_t i = 0; i < size; ++i ) {
+        BOOST_REQUIRE_MESSAGE( s.allele( i ) == (i % MAX_ALLELES), "Unexpected allele value at " << i );
+    }
+
+    // modify sequence allele
+    s.allele(25) = (allele_t)24;
+
+    BOOST_REQUIRE_MESSAGE( alleles[25] == (allele_t)24, "Change to sequence should be reflected in original vector");
+    alleles.reset();
 }
 
 BOOST_AUTO_TEST_CASE( seq_set_locus ) {

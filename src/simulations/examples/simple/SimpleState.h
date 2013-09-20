@@ -27,41 +27,25 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#include "StatisticFactory.h"
+#ifndef SIMPLESTATE_H_
+#define SIMPLESTATE_H_
 
-size_t StatisticFactory::count() const {
-    return m_stats.size();
-}
+#include "warped/State.h"
 
-bool StatisticFactory::add( iStatCreator * stat ) {
-    std::pair< RegisteredStats::iterator, bool> res = m_stats.insert( std::make_pair( stat->name(), stat) );
-    return res.second;
-}
+class SimpleState : public State {
+public:
+    SimpleState() {}
 
-void StatisticFactory::remove( iStatCreator * stat ) {
-    RegisteredStats::iterator it = m_stats.find( stat->name() );
+    ~SimpleState() {}
 
-    if( it != m_stats.end() ) {
-        m_stats.erase( it );
-    }
-}
+    void copyState( const State * to) {
+        ASSERT( to != NULL );
 
-void StatisticFactory::buildEval( std::istream & config, StatisticEval * eval ) {
-
-}
-
-boost::shared_ptr< Statistic > StatisticFactory::create( const String & name ) {
-    RegisteredStats::iterator it = m_stats.find( name );
-
-    if( it == m_stats.end() ) {
-        return shared_ptr<Statistic>();
+        //const SimpleState * s = dynamic_cast< const SimpleState * >(to);
     }
 
-    return it->second->create();
-}
+    unsigned int getStateSize() const { return sizeof(SimpleState); }
 
-StatisticFactory::~StatisticFactory() {
-    if(!m_stats.empty())
-        m_stats.clear();
-}
+};
 
+#endif  // SIMPLESTATE_H_

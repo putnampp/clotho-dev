@@ -29,9 +29,12 @@
 INCLUDE_DIRECTORIES( ${${PROJECT_NAME}_INCLUDE_DIR} )
 
 LIST( APPEND SRCS StatisticFactory.cpp)
+LIST( APPEND SRCS GenomeFactory.cpp)
 LIST( APPEND SRCS ChromosomeMap.cpp)
 LIST( APPEND SRCS Chromosome.cpp)
 LIST( APPEND SRCS human.cpp)
 LIST( APPEND SRCS Sequence.cpp)
+LIST( APPEND SRCS Individual.cpp)
+LIST( APPEND SRCS ChromosomeTuple.cpp)
 
 ADD_LIBRARY(cchmc SHARED ${SRCS})
