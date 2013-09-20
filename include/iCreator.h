@@ -30,6 +30,8 @@
 #ifndef ICREATOR_H_
 #define ICREATOR_H_
 
+#include "common.h"
+
 template < class C >
 struct iCreator {
     virtual String name() const = 0;

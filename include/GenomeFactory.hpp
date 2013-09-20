@@ -56,10 +56,13 @@ public:
     typedef Chromosomes::const_iterator ChromosomeIter;
 
     GenomeFactory ( );
-    GenomeFactory( size_t chroms );
-    GenomeFactory( const vector< ChromosomePtr > & c );
+
+    virtual bool empty() const;
 
     virtual IndividualPtr createIndividual( ploidy_t p );
+
+    virtual bool addChromosome( ChromosomePtr c );
+    virtual bool addChromosome( const vector<ChromosomePtr> & c );
 
     virtual bool addChromosomeSite( chromid_t c, size_t posi, bool bByIndex = true );
 

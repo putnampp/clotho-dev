@@ -37,25 +37,16 @@ using std::endl;
 
 GenomeFactory::GenomeFactory() : m_nBases(0), m_nLoci(0) {}
 
-GenomeFactory::GenomeFactory( size_t chroms ) : m_nBases(0), m_nLoci(0) {
-    for( size_t i = 0; i < chroms; ++i ) {
-        ChromosomePtr c( new Chromosome( "chr" + boost::lexical_cast<String>( i ) ) );
-        m_chroms.insert( make_pair(c->id(), c) );
-
-        m_nBases += c->length();
-        m_nLoci += c->loci();
+GenomeFactory::~GenomeFactory() {
+    for(  Chromosomes::iterator it = m_chroms.begin(); it != m_chroms.end(); it++ ) {
+        it->second.reset();
     }
+    m_chroms.clear();
 }
 
-GenomeFactory::GenomeFactory( const vector< ChromosomePtr > & c ) : m_nBases(0), m_nLoci(0) {
-    for( vector< ChromosomePtr >::const_iterator it = c.begin(); it != c.end(); it++ ) {
-        m_chroms.insert( make_pair( (*it)->id(), (*it) ));
-        m_nBases += (*it)->length();
-        m_nLoci += (*it)->loci();
-    }
+bool GenomeFactory::empty() const {
+    return m_chroms.empty();
 }
-
-GenomeFactory::~GenomeFactory() { reset(); }
 
 IndividualPtr   GenomeFactory::createIndividual( ploidy_t p ) {
     IndividualPtr ind( new Individual(m_chroms.size(), p )  );
@@ -66,6 +57,29 @@ IndividualPtr   GenomeFactory::createIndividual( ploidy_t p ) {
     }
 
     return ind;
+}
+
+bool GenomeFactory::addChromosome( ChromosomePtr c ) {
+    Chromosomes::iterator it = m_chroms.find( c->id() );
+    if( it == m_chroms.end() ) {
+        m_chroms.insert( make_pair( c->id(), c ) );
+    } else {
+        m_nBases -= it->second->length();
+        m_nLoci -= it->second->loci();
+        it->second = c;
+    }
+    m_nBases += c->length();
+    m_nLoci += c->loci();
+
+    return true;
+}
+
+bool GenomeFactory::addChromosome( const vector< ChromosomePtr > & c ) {
+    for( vector< ChromosomePtr >::const_iterator it = c.begin(); it != c.end(); it++ ) {
+        addChromosome( (*it ) );
+    }
+
+    return true;
 }
 
 bool GenomeFactory::addChromosomeSite( chromid_t c, size_t pos, bool bByIndex ) {

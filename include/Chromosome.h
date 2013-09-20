@@ -54,7 +54,7 @@ class ChromosomeMap;
  * The chromosome length is at least the largest position.
  *
  */
-class Chromosome : public Cloneable {
+class Chromosome : public Cloneable, public Configurable {
 public:
     friend class ChromosomeMap;
 
@@ -63,6 +63,7 @@ public:
 
     virtual void setLength( size_t len );
     virtual Cloneable * clone();
+    virtual void    configure( istream & config );
 
     virtual bool    add_site( size_t pos );
     virtual void    clear_sites();

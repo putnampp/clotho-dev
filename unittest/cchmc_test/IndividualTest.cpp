@@ -31,21 +31,35 @@
 #include "Individual.hpp"
 #include "GenomeFactory.hpp"
 
+#include <boost/lexical_cast.hpp>
+
 BOOST_AUTO_TEST_SUITE( test_individual )
 
 const chromid_t chroms = 23;
 const ploidy_t  ploid = 2;
 
-static GenomeFactory g(chroms);
+static GenomeFactory * getHuman() {
+    static GenomeFactory * g = new GenomeFactory();
+
+    if( g->empty() ) {
+        for( chromid_t i = 0; i < chroms; ++i ) {
+            ChromosomePtr chr( new Chromosome( "chr" + boost::lexical_cast<String>(i) ) );
+            g->addChromosome( chr );
+        }
+    }
+
+    return g;
+}
+
 
 BOOST_AUTO_TEST_CASE( ind_create ) {
-    IndividualPtr ind = g.createIndividual( ploid );
+    IndividualPtr ind = getHuman()->createIndividual( ploid );
 
     BOOST_REQUIRE_MESSAGE( ind->chromosomes() == chroms, "Unexpected number of chromosomes" );
 }
 
 BOOST_AUTO_TEST_CASE( ind_chrom_size ) {
-    IndividualPtr ind = g.createIndividual( ploid );
+    IndividualPtr ind = getHuman()->createIndividual( ploid );
 
     for( chromid_t c = 0; c < chroms; ++c ) {
         for( ploidy_t p = 0; p < ploid; ++p ) {
@@ -60,15 +74,16 @@ BOOST_AUTO_TEST_CASE( ind_chrom_size ) {
 BOOST_AUTO_TEST_CASE( ind_chrom_size2 ) {
     // add site to all chromosomes
     //
-    g.reset();
+    GenomeFactory * g = getHuman();
+    g->reset();
     for( chromid_t c = 0; c < chroms; ++c ) {
-        BOOST_REQUIRE_MESSAGE( g.addChromosomeSite(c, (size_t) 42 ), "Site not added" );
+        BOOST_REQUIRE_MESSAGE( g->addChromosomeSite(c, (size_t) 42 ), "Site not added" );
     }
 
-    BOOST_REQUIRE_MESSAGE( g.loci() == chroms, "Unexpected number of loci: " << g.loci() << " v " << chroms );
+    BOOST_REQUIRE_MESSAGE( g->loci() == chroms, "Unexpected number of loci: " << g->loci() << " v " << chroms );
 
     // Individual object assumes underlying genome has already been constructed
-    IndividualPtr h = g.createIndividual(ploid);
+    IndividualPtr h = g->createIndividual(ploid);
 
     for( chromid_t c = 0; c < chroms; ++c ) {
         for( ploidy_t p = 0; p < ploid; ++p ) {
@@ -78,7 +93,7 @@ BOOST_AUTO_TEST_CASE( ind_chrom_size2 ) {
         }
     }
 
-    g.reset();
+    g->reset();
 }
 
 BOOST_AUTO_TEST_SUITE_END()
