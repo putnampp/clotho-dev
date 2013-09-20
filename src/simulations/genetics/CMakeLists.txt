@@ -26,8 +26,13 @@
 # of the authors and should not be interpreted as representing official policies,
 # either expressed or implied, of the FreeBSD Project.
 ################################################################################
-SET( DIRS simple )
+INCLUDE_DIRECTORIES( ${${PROJECT_NAME}_INCLUDE_DIR} )
+#LINK_DIRECTORIES( ${Warped_LIBRARIES} )
+LINK_DIRECTORIES( ${Warped_DIR}/warped/lib ${Warped_DIR}/utils/lib )
 
-FOREACH( D ${DIRS} )
-    ADD_SUBDIRECTORY( ${D} )
-ENDFOREACH( D )
+LIST( APPEND SRCS main.cpp)
+LIST( APPEND SRCS ClothoApplication.cpp)
+
+ADD_EXECUTABLE(WarpedClotho ${SRCS} )
+
+TARGET_LINK_LIBRARIES(WarpedClotho ${Boost_LIBRARIES} warped utils )

@@ -27,61 +27,10 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef GENOME_H_
-#define GENOME_H_
+#include "warped/WarpedMain.h"
+#include "ClothoApplication.h"
 
-#include "common.h"
-#include "ploidy.h"
-#include "Chromosome.h"
-#include "Sequence.h"
-
-#include "Individual.hpp"
-
-#include <vector>
-#include <map>
-using std::vector;
-using std::map;
-using std::make_pair;
-
-
-/***
- *
- * GenomeFactory maintains the set of chromosomes in an indexed
- * array.
- *
- */
-class GenomeFactory {
-public:
-    typedef map< chromid_t, ChromosomePtr > Chromosomes;
-    typedef Chromosomes::const_iterator ChromosomeIter;
-
-    GenomeFactory ( );
-    GenomeFactory( size_t chroms );
-    GenomeFactory( const vector< ChromosomePtr > & c );
-
-    virtual IndividualPtr createIndividual( ploidy_t p );
-
-    virtual bool addChromosomeSite( chromid_t c, size_t posi, bool bByIndex = true );
-
-    virtual ChromosomePtr getChromosomeByID( chromid_t c ) const;
-    virtual ChromosomePtr getChromosomeByIndex( size_t ) const;
-
-    virtual bool isChromosome( chromid_t c );
-
-    virtual size_t chromosomes() const;
-    virtual size_t size() const;
-    virtual size_t loci() const;
-
-    virtual ChromosomeIter begin() const;
-    virtual ChromosomeIter end() const;
-
-    virtual void reset();
-
-    virtual ~GenomeFactory();
-protected:
-    size_t          m_nBases;
-    size_t          m_nLoci;
-    Chromosomes     m_chroms;
-};
-
-#endif  // GENOME_H_
+int main( int argc, char ** argv ) {
+    WarpedMain wm( new ClothoApplication());
+    return wm.main( argc, argv );
+}

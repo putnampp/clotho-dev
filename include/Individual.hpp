@@ -33,7 +33,6 @@
 #include "common.h"
 #include "Allele.h"
 
-//#include "GenomeFactory.hpp"
 #include "Sequence.h"
 
 #include "Genotype.h"
@@ -79,8 +78,6 @@ public:
 
     virtual ~Individual() {}
 protected:
-    //virtual void initialize( const GenomeFactory * );
-
     Individual( size_t chroms, ploidy_t copies = 1 );
 
     size_t m_nChroms;
@@ -93,59 +90,4 @@ protected:
 
 typedef shared_ptr< Individual > IndividualPtr;
 
-/**
- *
- * IMPLEMENTATION
- *
- */
-/*
-#define IND_MEMBER_DECL(t, f) template < chromid_t C, ploidy_t P > t Individual<C,P>::f
-
-IND_MEMBER_DECL(sex_t, sex)() const {
-    return m_sex;
-}
-
-IND_MEMBER_DECL( SequencePtr, getSequence)( chromid_t c, ploidy_t p ) {
-    assert( c < CHROMOSOMES && p < PLOIDY );
-    return m_seqs[ c ]->sequence( p );
-}
-
-IND_MEMBER_DECL( allele_t, allele)( const LocusPtr locus ) {
-    assert( locus->chrom < CHROMOSOMES && locus->ploid < PLOIDY );
-    allele_t a;
-    m_seqs[locus->chrom ]->allele(locus->ploid, locus->start, a);
-    return a;
-}
-
-IND_MEMBER_DECL( bool, isHomozygous)( const LocusPtr locus ) {
-    inspectLocus( locus, *m_geno );
-    return m_geno->isFlag( HOMOZYGOUS );
-}
-
-IND_MEMBER_DECL( bool, isDominant )( const LocusPtr locus ) {
-    inspectLocus( locus, *m_geno );
-    return m_geno->isFlag( DOMINANT );
-}
-
-IND_MEMBER_DECL( void, initialize )( ) {
-    for( chromid_t c = 0; c < CHROMOSOMES; ++c ) {
-        m_seqs[c].reset(new ChromosomeTuple<PLOIDY>( GF::getInstance()->getChromosome( c )));
-    }
-}
-
-IND_MEMBER_DECL( void, inspectLocus)( const LocusPtr l, genotype & g ) {
-    assert( l->chrom < CHROMOSOMES );
-    m_seqs[ l->chrom ]->genotype( l, g );
-}
-
-
-
-IND_MEMBER_DECL( void, genotype)( const LocusPtr locus, genotype & g ) {
-    inspectLocus( locus, g );
-}
-
-IND_MEMBER_DECL( void, phenotype)( iTrait * trait, Phenotype * p ) {
-    
-} 
-*/
 #endif  // INDIVIDUAL_H_

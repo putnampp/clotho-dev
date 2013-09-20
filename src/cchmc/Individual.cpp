@@ -38,16 +38,6 @@ Individual::Individual( size_t chroms, ploidy_t ploid )
     m_seqs = new ChromosomeTuplePtr[ m_nChroms ];
 }
 
-/*
-void Individual::initialize( const GenomeFactory * gf) {
-    m_seqs = new ChromosomeTuplePtr[ m_nChroms ];
-    size_t i = 0;
-    for( GenomeFactory::ChromosomeIter it = gf->begin(); it != gf->end(); it++ ) {
-        m_seqs[ i++ ].reset( new ChromosomeTuple( it->second , m_nPloid ) );
-    }
-}
-*/
-
 size_t   Individual::chromosomes() const {
     return m_nChroms;
 }

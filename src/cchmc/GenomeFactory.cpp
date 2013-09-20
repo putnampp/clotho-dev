@@ -85,16 +85,6 @@ bool GenomeFactory::addChromosomeSite( chromid_t c, size_t pos, bool bByIndex ) 
 
     return bRet;
 }
-/*
-SequencePtr GenomeFactory::build_sequence( chromid_t c ) {
-    ChromosomePtr chr = getChromosomeByIndex( c );
-    if( chr == NULL ) {
-        cout << "Null chromosome" << endl;
-    }
-    return ((chr == NULL ) ? NULL_SEQUENCE :
-                SequencePtr( new Sequence( chr->loci() ) ));
-}
-*/
 
 ChromosomePtr GenomeFactory::getChromosomeByID( chromid_t c ) const {
     ChromosomeIter it = m_chroms.find( c );

@@ -27,61 +27,29 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef GENOME_H_
-#define GENOME_H_
+#ifndef CLOTHOAPPLICATION_H_
+#define CLOTHOAPPLICATION_H_
 
-#include "common.h"
-#include "ploidy.h"
-#include "Chromosome.h"
-#include "Sequence.h"
+#include "warped/Application.h"
 
-#include "Individual.hpp"
-
-#include <vector>
-#include <map>
-using std::vector;
-using std::map;
-using std::make_pair;
-
-
-/***
- *
- * GenomeFactory maintains the set of chromosomes in an indexed
- * array.
- *
- */
-class GenomeFactory {
+class ClothoApplication : public Application {
 public:
-    typedef map< chromid_t, ChromosomePtr > Chromosomes;
-    typedef Chromosomes::const_iterator ChromosomeIter;
 
-    GenomeFactory ( );
-    GenomeFactory( size_t chroms );
-    GenomeFactory( const vector< ChromosomePtr > & c );
+    int initialize( vector< string > & args );
+    int finalize( );
 
-    virtual IndividualPtr createIndividual( ploidy_t p );
+    const PartitionInfo * getPartitionInfo( unsigned int nPE );
+    int     getNumberOfSimulationObjects( int mgrID ) const;
 
-    virtual bool addChromosomeSite( chromid_t c, size_t posi, bool bByIndex = true );
+    string getCommandLineParameters() const;
 
-    virtual ChromosomePtr getChromosomeByID( chromid_t c ) const;
-    virtual ChromosomePtr getChromosomeByIndex( size_t ) const;
+    void registerDeserializers();
 
-    virtual bool isChromosome( chromid_t c );
-
-    virtual size_t chromosomes() const;
-    virtual size_t size() const;
-    virtual size_t loci() const;
-
-    virtual ChromosomeIter begin() const;
-    virtual ChromosomeIter end() const;
-
-    virtual void reset();
-
-    virtual ~GenomeFactory();
+    const VTime & getPositiveInfinity();
+    const VTime & getZero();
+    const VTime & getTime( string & );
 protected:
-    size_t          m_nBases;
-    size_t          m_nLoci;
-    Chromosomes     m_chroms;
+    virtual ArgumentParser & getArgumentParser();
 };
 
-#endif  // GENOME_H_
+#endif  // CLOTHOAPPLICATION_H_
