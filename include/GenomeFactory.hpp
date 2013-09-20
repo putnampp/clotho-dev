@@ -35,6 +35,8 @@
 #include "Chromosome.h"
 #include "Sequence.h"
 
+#include "Individual.hpp"
+
 #include <vector>
 #include <map>
 using std::vector;
@@ -56,6 +58,8 @@ public:
     GenomeFactory ( );
     GenomeFactory( size_t chroms );
     GenomeFactory( const vector< ChromosomePtr > & c );
+
+    virtual IndividualPtr createIndividual( ploidy_t p );
 
     virtual bool addChromosomeSite( chromid_t c, size_t posi, bool bByIndex = true );
 //    virtual SequencePtr build_sequence( chromid_t c );

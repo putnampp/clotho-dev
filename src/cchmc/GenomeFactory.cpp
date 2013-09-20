@@ -57,6 +57,17 @@ GenomeFactory::GenomeFactory( const vector< ChromosomePtr > & c ) : m_nBases(0),
 
 GenomeFactory::~GenomeFactory() { reset(); }
 
+IndividualPtr   GenomeFactory::createIndividual( ploidy_t p ) {
+    IndividualPtr ind( new Individual(m_chroms.size(), p )  );
+
+    size_t i = 0;
+    for( ChromosomeIter it = m_chroms.begin(); it != m_chroms.end(); it++ ) {
+        ind->m_seqs[ i++ ].reset( new ChromosomeTuple(it->second, p));
+    }
+
+    return ind;
+}
+
 bool GenomeFactory::addChromosomeSite( chromid_t c, size_t pos, bool bByIndex ) {
 
     ChromosomePtr chr = ((bByIndex) ? getChromosomeByIndex( (size_t) c ) : getChromosomeByID( c ));

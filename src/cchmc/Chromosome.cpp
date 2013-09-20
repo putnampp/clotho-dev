@@ -42,6 +42,11 @@ Chromosome::Chromosome( const Chromosome & c ) {
     m_sites.insert( c.m_sites.begin(), c.m_sites.end() );
 }
 
+Cloneable * Chromosome::clone() {
+    Chromosome * c = new Chromosome( *this );
+    return c;
+}
+
 /**
  *
  * Change the chromosome length. New size cannot be smaller

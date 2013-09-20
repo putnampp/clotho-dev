@@ -27,37 +27,11 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef SIMPLE_APPLICATION_H_
-#define SIMPLE_APPLICATION_H_
+#ifndef CLONEABLE_H_
+#define CLONEABLE_H_
 
-#include "warped/Application.h"
-#include "warped/IntVTime.h"
-
-class SimpleApplication : public Application {
-public:
-    SimpleApplication();
-
-    int initialize( vector< string > & args );
-
-    int getNumberOfSimulationObjects( int mgrId ) const;
-
-    const PartitionInfo * getPartitionInfo( unsigned int nPE );
-
-    int     finalize();
-    void    registerDeserializers();
-
-    string  getCommandLineParameters() const;
-
-    const   VTime   & getPositiveInfinity();
-    const   VTime   & getZero();
-
-    const   VTime   & getTime( string & time );
-
-private:
-    ArgumentParser & getArgumentParser();
-    vector< SimulationObject * > * getSimulationObjects();
-    unsigned int     m_nObjects;
-    string  m_strInFile;
+struct Cloneable {
+    virtual Cloneable * clone() = 0;
 };
 
-#endif  // SIMPLE_APPLICATION_H_
+#endif  // CLONEABLE_H_

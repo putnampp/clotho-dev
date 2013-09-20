@@ -41,7 +41,7 @@ public:
     void copyState( const State * to) {
         ASSERT( to != NULL );
 
-        const SimpleState * s = dynamic_cast< const SimpleState * >(to);
+        //const SimpleState * s = dynamic_cast< const SimpleState * >(to);
     }
 
     unsigned int getStateSize() const { return sizeof(SimpleState); }

@@ -33,11 +33,12 @@
 using std::cout;
 using std::endl;
 
-Individual::Individual( const GenomeFactory * gf, ploidy_t ploid ) 
-    : m_nChroms( gf->chromosomes() ), m_nPloid( ploid ) {
-    initialize(gf);
+Individual::Individual( size_t chroms, ploidy_t ploid ) 
+    : m_nChroms( chroms ), m_nPloid( ploid ) {
+    m_seqs = new ChromosomeTuplePtr[ m_nChroms ];
 }
 
+/*
 void Individual::initialize( const GenomeFactory * gf) {
     m_seqs = new ChromosomeTuplePtr[ m_nChroms ];
     size_t i = 0;
@@ -45,8 +46,9 @@ void Individual::initialize( const GenomeFactory * gf) {
         m_seqs[ i++ ].reset( new ChromosomeTuple( it->second , m_nPloid ) );
     }
 }
+*/
 
-chromid_t   Individual::chromosomes() const {
+size_t   Individual::chromosomes() const {
     return m_nChroms;
 }
 

@@ -29,6 +29,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include "Individual.hpp"
+#include "GenomeFactory.hpp"
 
 BOOST_AUTO_TEST_SUITE( test_individual )
 
@@ -38,18 +39,18 @@ const ploidy_t  ploid = 2;
 static GenomeFactory g(chroms);
 
 BOOST_AUTO_TEST_CASE( ind_create ) {
-    Individual ind( &g, ploid );
+    IndividualPtr ind = g.createIndividual( ploid );
 
-    BOOST_REQUIRE_MESSAGE( ind.chromosomes() == chroms, "Unexpected number of chromosomes" );
+    BOOST_REQUIRE_MESSAGE( ind->chromosomes() == chroms, "Unexpected number of chromosomes" );
 }
 
 BOOST_AUTO_TEST_CASE( ind_chrom_size ) {
-    Individual ind( &g, ploid );
+    IndividualPtr ind = g.createIndividual( ploid );
 
     for( chromid_t c = 0; c < chroms; ++c ) {
         for( ploidy_t p = 0; p < ploid; ++p ) {
             // A default genome has no loci set, therefore all sequences should have 0 length
-            SequencePtr sq = ind.getSequenceByIndex(c, p);
+            SequencePtr sq = ind->getSequenceByIndex(c, p);
             BOOST_REQUIRE_MESSAGE( (sq != NULL), "Unexpected NULL_SEQUENCE at " << c << ", " << p);
             BOOST_REQUIRE_MESSAGE( (sq->length() == 0), "Unexpected length of sequence for chromosome " << c << " copy " << p << ", " << sq->length());
         }
@@ -67,11 +68,11 @@ BOOST_AUTO_TEST_CASE( ind_chrom_size2 ) {
     BOOST_REQUIRE_MESSAGE( g.loci() == chroms, "Unexpected number of loci: " << g.loci() << " v " << chroms );
 
     // Individual object assumes underlying genome has already been constructed
-    Individual h(&g, ploid);
+    IndividualPtr h = g.createIndividual(ploid);
 
     for( chromid_t c = 0; c < chroms; ++c ) {
         for( ploidy_t p = 0; p < ploid; ++p ) {
-            SequencePtr sq = h.getSequenceByIndex( c, p );
+            SequencePtr sq = h->getSequenceByIndex( c, p );
             BOOST_REQUIRE_MESSAGE( (sq != NULL), "Unexpected NULL_SEQUENCE at " << c << ", " << p);
             BOOST_REQUIRE_MESSAGE( (sq->length() == 1), "Unexpected sequence length");
         }

@@ -33,7 +33,7 @@
 #include "common.h"
 #include "Allele.h"
 
-#include "GenomeFactory.hpp"
+//#include "GenomeFactory.hpp"
 #include "Sequence.h"
 
 #include "Genotype.h"
@@ -63,9 +63,7 @@ class Individual : public Genotypeable, public Phenotypeable {
 public:
     friend class GenomeFactory;
 
-    Individual( const GenomeFactory * gf, ploidy_t copies = 1 );
-
-    virtual chromid_t   chromosomes() const;
+    virtual size_t   chromosomes() const;
     virtual sex_t sex() const;
 
     virtual SequencePtr getSequenceByID( chromid_t c, ploidy_t p );
@@ -81,15 +79,19 @@ public:
 
     virtual ~Individual() {}
 protected:
-    virtual void initialize( const GenomeFactory * );
+    //virtual void initialize( const GenomeFactory * );
 
-    chromid_t m_nChroms;
+    Individual( size_t chroms, ploidy_t copies = 1 );
+
+    size_t m_nChroms;
     ploidy_t  m_nPloid;
     sex_t   m_sex;
     
     ChromosomeTuplePtr  * m_seqs;
     genotype            * m_geno;
 };
+
+typedef shared_ptr< Individual > IndividualPtr;
 
 /**
  *

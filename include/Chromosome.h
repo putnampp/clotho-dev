@@ -32,6 +32,7 @@
 
 #include "common.h"
 #include <cassert>
+#include "Cloneable.h"
 #include "Configurable.h"
 
 #include <map>
@@ -53,7 +54,7 @@ class ChromosomeMap;
  * The chromosome length is at least the largest position.
  *
  */
-class Chromosome {
+class Chromosome : public Cloneable {
 public:
     friend class ChromosomeMap;
 
@@ -61,6 +62,7 @@ public:
     Chromosome( const Chromosome & c );
 
     virtual void setLength( size_t len );
+    virtual Cloneable * clone();
 
     virtual bool    add_site( size_t pos );
     virtual void    clear_sites();
