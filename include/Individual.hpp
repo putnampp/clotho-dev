@@ -53,6 +53,8 @@ struct individual {
     virtual allele_t    allele( const LocusPtr l ) = 0;
 };
 
+class IndividualCreator;
+
 /*******************************************************************************
  * An Individual is an encapsulation object consisting of a genotype and
  * phenotype.
@@ -89,5 +91,10 @@ protected:
 };
 
 typedef shared_ptr< Individual > IndividualPtr;
+
+class IndividualCreator {
+public:
+    virtual IndividualPtr create( istream & is ) = 0;
+};
 
 #endif  // INDIVIDUAL_H_

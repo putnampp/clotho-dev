@@ -27,4 +27,47 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#include "human.h"
+#include "DeathEvent.h"
+#include "warped/SerializedInstance.h"
+
+DeathEvent::DeathEvent( const VTime & tSend, const VTime &tRecv,
+                 SimulationObject * sender, 
+                 SimulationObject * receiver ) :
+                 DefaultEvent( tSend, tRecv, sender, receiver ) {}
+
+DeathEvent::DeathEvent( const VTime & tSend, const VTime & tRecv,
+                 const ObjectID &sender, 
+                 const ObjectID & receiver,
+                 const unsigned int evtID ) :
+                 DefaultEvent( tSend, tRecv, sender, receiver, evtID ) {}
+
+DeathEvent::DeathEvent( const DeathEvent & ce ) :
+                 DefaultEvent( ce.getSendTime(), ce.getReceiveTime(),
+                                ce.getSender(), ce.getReceiver(),
+                                ce.getEventId() ) {}
+
+
+bool DeathEvent::eventCompare( const Event * evt ) {
+    const DeathEvent * e = dynamic_cast< const DeathEvent * >(evt);
+    return (compareEvents( this, e ) );
+}
+
+DeathEvent::~DeathEvent() {}
+
+DEFINE_CLOTHO_EVENT_DESERIALIZATION_METHOD( DeathEvent ) {
+    shared_ptr< VTime > tSend( dynamic_cast< VTime * >(inst->getSerializable()));
+    shared_ptr< VTime > tRecv( dynamic_cast< VTime * >(inst->getSerializable()));
+
+    unsigned int sSimManID = inst->getUnsigned();
+    unsigned int sSimObjID = inst->getUnsigned();
+    unsigned int rSimManID = inst->getUnsigned();
+    unsigned int rSimObjID = inst->getUnsigned();
+    unsigned int eventID = inst->getUnsigned();
+
+    ObjectID send( sSimObjID, sSimManID );
+    ObjectID recv( rSimObjID, rSimManID );
+
+    DeathEvent * e = new DeathEvent( *tSend, *tRecv, send, recv, eventID );
+
+    return e;
+}

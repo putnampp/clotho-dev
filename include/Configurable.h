@@ -31,9 +31,12 @@
 #define CONFIGURABLE_H_
 
 #include "common.h"
+#include <istream>
+
+using std::istream;
 
 struct Configurable {
-    virtual void configure( std::istream & config ) = 0;
+    virtual void configure( istream & config ) = 0;
 };
 
 #endif  // CONFIGURABLE_H_

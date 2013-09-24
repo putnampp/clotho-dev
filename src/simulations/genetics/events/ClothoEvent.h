@@ -27,15 +27,24 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef HUMAN_H_
-#define HUMAN_H_
+#ifndef CLOTHOEVENT_H_
+#define CLOTHOEVENT_H_
 
-#include "Individual.hpp"
+#include "ClothoEventStub.h"
+#include "warped/SimulationObject.h"
 
-#define HUMAN_GERM_LINE 23
-#define HUMAN_PLOIDY    DIPLOID
+REGISTERED_CLOTHO_EVENT_BEGIN( ClothoEvent )
+public:
+    virtual ~ClothoEvent();
+protected:
+    ClothoEvent( const VTime & tSend, const VTime &tRecv,
+                 SimulationObject * sender, 
+                 SimulationObject * receiver );
+    ClothoEvent( const VTime & tSend, const VTime & tRecv,
+                 const ObjectID &sender, 
+                 const ObjectID & receiver,
+                 const unsigned int evtID );
+    ClothoEvent( const ClothoEvent & ce );
+REGISTERED_CLOTHO_EVENT_END( ClothoEvent )
 
-//typedef GenomeFactory< HUMAN_GERM_LINE > HumanFactory;
-//typedef Individual< HumanFactory::CHROMOSOMES, HUMAN_PLOIDY > HumanIndividual;
-
-#endif  // HUMAN_H_
+#endif  // CLOTHOEVENT_H_

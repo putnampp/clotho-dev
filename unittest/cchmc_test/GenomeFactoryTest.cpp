@@ -30,10 +30,19 @@
 #include <boost/test/unit_test.hpp>
 #include "GenomeFactory.hpp"
 
+#include <boost/lexical_cast.hpp>
+
 BOOST_AUTO_TEST_SUITE( test_genome_factory )
 
 const chromid_t chrom = 23;
 const ploidy_t  ploid = 2;
+
+void build_basic_gf( GenomeFactory & g ) {
+    for( chromid_t i = 0; i < chrom; ++i ) {
+        ChromosomePtr c( new Chromosome( "chr" + boost::lexical_cast<String>(i) ) );
+        g.addChromosome( c );
+    }
+}
 
 BOOST_AUTO_TEST_CASE( genome_factory_create ) {
     GenomeFactory g;
@@ -42,19 +51,36 @@ BOOST_AUTO_TEST_CASE( genome_factory_create ) {
 }
 
 BOOST_AUTO_TEST_CASE( genome_factory_create2 ) {
-    GenomeFactory g( chrom );
+    GenomeFactory g;
+
+    ChromosomePtr c( new Chromosome( "chr0") );
+
+    g.addChromosome( c );
+
+    BOOST_REQUIRE_MESSAGE( g.chromosomes() == 1, "Individual chromosome not added" );
+
+    vector< ChromosomePtr > chrs;
+    for( chromid_t i = 1; i < chrom; ++i ) {
+        chrs.push_back( ChromosomePtr( new Chromosome( "chr" + boost::lexical_cast<String>(i) ) ) );
+    }
+
+    g.addChromosome( chrs );
 
     BOOST_REQUIRE_MESSAGE( g.chromosomes() == chrom, "Unexpected number of chromosomes");
 
     BOOST_REQUIRE_MESSAGE( (g.size() == (chrom * DEFAULT_CHROMOSOME_LEN)), "Unexpected length of the default genome: " << (g.size()));
     BOOST_REQUIRE_MESSAGE( (g.loci() == 0), "Unexpected number of loci in default genome");
+    chrs.clear();
 }
 
 BOOST_AUTO_TEST_CASE( genome_factory_reset ) {
     // add a site of interest to each chromosome
     // site pos is unimportant, just needs to be smaller
     // than the chrom_len
-    GenomeFactory g( chrom );
+    GenomeFactory g;
+
+    build_basic_gf( g );
+    
     for( chromid_t c = 0; c < chrom; ++c ) {
         size_t before = g.getChromosomeByIndex(c)->loci();
 
@@ -88,7 +114,9 @@ BOOST_AUTO_TEST_CASE( genome_factory_chrom_sizes ) {
 }
 */
 BOOST_AUTO_TEST_CASE( genome_factory_chrom_site ) {
-    GenomeFactory g(chrom);
+    GenomeFactory g;
+
+    build_basic_gf( g );
 
     size_t genome_size = g.size();
     const size_t locus_pos = DEFAULT_CHROMOSOME_LEN + 10;

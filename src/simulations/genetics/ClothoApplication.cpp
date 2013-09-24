@@ -45,16 +45,13 @@ const PartitionInfo * ClothoApplication::getPartitionInfo( unsigned int nPE ) {
 }
 
 int     ClothoApplication::getNumberOfSimulationObjects( int mgrID ) const {
-
 }
 
 string ClothoApplication::getCommandLineParameters() const {
-
+    return string("");
 }
 
-void ClothoApplication::registerDeserializers() {
-
-}
+void ClothoApplication::registerDeserializers() { }
 
 const VTime & ClothoApplication::getPositiveInfinity() { 
     return IntVTime::getIntVTimePositiveInfinity(); 

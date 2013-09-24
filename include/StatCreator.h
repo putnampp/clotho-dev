@@ -56,7 +56,7 @@ public:
         out << m_name << " - " << m_desc << std::endl;
     }
 
-    shared_ptr< Statistic > create() {
+    shared_ptr< Statistic > create() const {
         return shared_ptr< Statistic >( new STAT() );
     }
 
@@ -71,7 +71,7 @@ protected:
 
 #define REGISTERED_STATISTIC(name, desc)                 \
     class name;                                          \
-    StatCreator< name >   stat_##name( #name, desc);    \
+    const StatCreator< name >   stat_##name( #name, desc);    \
     class name : public Statistic
 
 #define REGISTER_STATISTIC( name )    REGISTERED_STATISTIC( name, #name )

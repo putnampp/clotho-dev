@@ -27,29 +27,24 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef CLOTHOAPPLICATION_H_
-#define CLOTHOAPPLICATION_H_
+#ifndef DEATHEVENT_H_
+#define DEATHEVENT_H_
 
-#include "warped/Application.h"
+#include "ClothoEventStub.h"
 
-class ClothoApplication : public Application {
+REGISTERED_CLOTHO_EVENT_BEGIN( DeathEvent )
 public:
+    virtual ~DeathEvent();
 
-    virtual int initialize( vector< string > & args );
-    virtual int finalize( );
-
-    virtual const PartitionInfo * getPartitionInfo( unsigned int nPE );
-    virtual int     getNumberOfSimulationObjects( int mgrID ) const;
-
-    virtual string getCommandLineParameters() const;
-
-    virtual void registerDeserializers();
-
-    virtual const VTime & getPositiveInfinity();
-    virtual const VTime & getZero();
-    virtual const VTime & getTime( string & );
 protected:
-    virtual ArgumentParser & getArgumentParser();
-};
+    DeathEvent( const VTime & tSend, const VTime &tRecv,
+                 SimulationObject * sender, 
+                 SimulationObject * receiver );
+    DeathEvent( const VTime & tSend, const VTime & tRecv,
+                 const ObjectID &sender, 
+                 const ObjectID & receiver,
+                 const unsigned int evtID );
+    DeathEvent( const DeathEvent & ce );
+REGISTERED_CLOTHO_EVENT_END( DeathEvent )
 
-#endif  // CLOTHOAPPLICATION_H_
+#endif  // DEATHEVENT_H_

@@ -42,6 +42,8 @@ Chromosome::Chromosome( const Chromosome & c ) {
     m_sites.insert( c.m_sites.begin(), c.m_sites.end() );
 }
 
+void Chromosome::configure( istream & is ) {}
+
 Cloneable * Chromosome::clone() {
     Chromosome * c = new Chromosome( *this );
     return c;

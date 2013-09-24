@@ -27,29 +27,46 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef CLOTHOAPPLICATION_H_
-#define CLOTHOAPPLICATION_H_
+#include "ClothoEvent.h"
 
-#include "warped/Application.h"
+#include "warped/SerializedInstance.h"
 
-class ClothoApplication : public Application {
-public:
+ClothoEvent::ClothoEvent(    const VTime & tSend, const VTime &tRecv,
+                    SimulationObject * sender,
+                    SimulationObject * receiver ) :
+                    DefaultEvent( tSend, tRecv, sender, receiver ) {}
 
-    virtual int initialize( vector< string > & args );
-    virtual int finalize( );
+ClothoEvent::ClothoEvent(    const VTime & tSend, const VTime & tRecv,
+                    const ObjectID &sender, const ObjectID & receiver,
+                    const unsigned int evtID ) :
+                    DefaultEvent( tSend, tRecv, sender, receiver, evtID ) {}
 
-    virtual const PartitionInfo * getPartitionInfo( unsigned int nPE );
-    virtual int     getNumberOfSimulationObjects( int mgrID ) const;
+ClothoEvent::ClothoEvent( const ClothoEvent & ce ) :
+                    DefaultEvent( ce.getSendTime(), ce.getReceiveTime(),
+                                    ce.getSender(), ce.getReceiver(), ce.getEventId() ) {}
 
-    virtual string getCommandLineParameters() const;
+ClothoEvent::~ClothoEvent() {}
 
-    virtual void registerDeserializers();
+bool ClothoEvent::eventCompare( const Event * evt ) {
+    const ClothoEvent *e = dynamic_cast< const ClothoEvent * >(evt);
+    return (compareEvents(this, e ));
+}
 
-    virtual const VTime & getPositiveInfinity();
-    virtual const VTime & getZero();
-    virtual const VTime & getTime( string & );
-protected:
-    virtual ArgumentParser & getArgumentParser();
-};
 
-#endif  // CLOTHOAPPLICATION_H_
+DEFINE_CLOTHO_EVENT_DESERIALIZATION_METHOD( ClothoEvent ) {
+    shared_ptr< VTime > tSend( dynamic_cast< VTime * >(inst->getSerializable()));
+    shared_ptr< VTime > tRecv( dynamic_cast< VTime * >(inst->getSerializable()));
+
+    unsigned int sSimManID = inst->getUnsigned();
+    unsigned int sSimObjID = inst->getUnsigned();
+    unsigned int rSimManID = inst->getUnsigned();
+    unsigned int rSimObjID = inst->getUnsigned();
+    unsigned int eventID = inst->getUnsigned();
+
+    ObjectID send( sSimObjID, sSimManID );
+    ObjectID recv( rSimObjID, rSimManID );
+
+    ClothoEvent * e = new ClothoEvent( *tSend, *tRecv, send, recv, eventID );
+
+    return e;
+}
