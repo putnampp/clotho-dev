@@ -30,15 +30,7 @@ INCLUDE_DIRECTORIES( ${${PROJECT_NAME}_INCLUDE_DIR} )
 #LINK_DIRECTORIES( ${Warped_LIBRARIES} )
 LINK_DIRECTORIES( ${Warped_DIR}/warped/lib ${Warped_DIR}/utils/lib )
 
-LIST( APPEND CLOTHOLIBS events )
+LIST( APPEND SRCS ClothoEvent.cpp)
+LIST( APPEND SRCS DeathEvent.cpp)
 
-FOREACH( D ${CLOTHOLIBS} )
-    ADD_SUBDIRECTORY( ${D} )
-ENDFOREACH(D)
-
-LIST( APPEND SRCS main.cpp)
-LIST( APPEND SRCS ClothoApplication.cpp)
-
-ADD_EXECUTABLE(WarpedClotho ${SRCS} )
-
-TARGET_LINK_LIBRARIES(WarpedClotho ${Boost_LIBRARIES} warped utils ${CLOTHOLIBS} )
+ADD_LIBRARY( events SHARED ${SRCS} )

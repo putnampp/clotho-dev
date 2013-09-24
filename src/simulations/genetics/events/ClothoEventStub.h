@@ -27,29 +27,51 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef CLOTHOAPPLICATION_H_
-#define CLOTHOAPPLICATION_H_
+#ifndef CLOTHOEVENTSTUB_H_
+#define CLOTHOEVENTSTUB_H_
 
-#include "warped/Application.h"
+#include "common.h"
+#include "warped/DefaultEvent.h"
+#include "warped/DeserializerManager.h"
 
-class ClothoApplication : public Application {
+template < class EVT >
+class ClothoEventStub {
 public:
+    typedef EVT event_t;
+    ClothoEventStub( const char * name) : m_name( name ) {
+        DeserializerManager::instance()->registerDeserializer( this->getDataType(), &ClothoEventStub< EVT >::deserialize );
+    }
 
-    virtual int initialize( vector< string > & args );
-    virtual int finalize( );
+    const String & getDataType() const {
+        return m_name;
+    }
 
-    virtual const PartitionInfo * getPartitionInfo( unsigned int nPE );
-    virtual int     getNumberOfSimulationObjects( int mgrID ) const;
+    static Serializable * deserialize( SerializedInstance * si ) {
+        return new EVT( si );
+    }
 
-    virtual string getCommandLineParameters() const;
+    virtual ~ClothoEventStub() {}
 
-    virtual void registerDeserializers();
-
-    virtual const VTime & getPositiveInfinity();
-    virtual const VTime & getZero();
-    virtual const VTime & getTime( string & );
-protected:
-    virtual ArgumentParser & getArgumentParser();
+private:
+    const String    m_name;
 };
 
-#endif  // CLOTHOAPPLICATION_H_
+#define REGISTERED_CLOTHO_EVENT_BEGIN( name )               \
+    class name;                                             \
+    const ClothoEventStub< name > evt_##name( #name );      \
+    class name : public DefaultEvent {                      \
+        friend class ClothoEventStub< name >;               \
+    public: \
+        const string & getDataType() const {                \
+            return evt_##name.getDataType();                \
+        } \
+        unsigned int getEventSize() const { return sizeof( name ); }  \
+        bool eventCompare( const Event * e );
+        
+
+#define REGISTERED_CLOTHO_EVENT_END( name ) };
+
+#define DEFINE_CLOTHO_EVENT_DESERIALIZATION_METHOD( name )   \
+    template <> Serializable * ClothoEventStub< name >::deserialize( SerializedInstance * inst )
+
+#endif  // CLOTHOEVENTSTUB_H_

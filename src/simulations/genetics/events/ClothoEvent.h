@@ -27,29 +27,24 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef CLOTHOAPPLICATION_H_
-#define CLOTHOAPPLICATION_H_
+#ifndef CLOTHOEVENT_H_
+#define CLOTHOEVENT_H_
 
-#include "warped/Application.h"
+#include "ClothoEventStub.h"
+#include "warped/SimulationObject.h"
 
-class ClothoApplication : public Application {
+REGISTERED_CLOTHO_EVENT_BEGIN( ClothoEvent )
 public:
-
-    virtual int initialize( vector< string > & args );
-    virtual int finalize( );
-
-    virtual const PartitionInfo * getPartitionInfo( unsigned int nPE );
-    virtual int     getNumberOfSimulationObjects( int mgrID ) const;
-
-    virtual string getCommandLineParameters() const;
-
-    virtual void registerDeserializers();
-
-    virtual const VTime & getPositiveInfinity();
-    virtual const VTime & getZero();
-    virtual const VTime & getTime( string & );
+    virtual ~ClothoEvent();
 protected:
-    virtual ArgumentParser & getArgumentParser();
-};
+    ClothoEvent( const VTime & tSend, const VTime &tRecv,
+                 SimulationObject * sender, 
+                 SimulationObject * receiver );
+    ClothoEvent( const VTime & tSend, const VTime & tRecv,
+                 const ObjectID &sender, 
+                 const ObjectID & receiver,
+                 const unsigned int evtID );
+    ClothoEvent( const ClothoEvent & ce );
+REGISTERED_CLOTHO_EVENT_END( ClothoEvent )
 
-#endif  // CLOTHOAPPLICATION_H_
+#endif  // CLOTHOEVENT_H_

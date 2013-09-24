@@ -39,7 +39,7 @@ struct iCreator {
 
     virtual void     print( std::ostream & out ) const = 0;
 
-    virtual shared_ptr< C > create() = 0;
+    virtual shared_ptr< C > create() const = 0;
 };
 
 #endif  // ICREATOR_H_
