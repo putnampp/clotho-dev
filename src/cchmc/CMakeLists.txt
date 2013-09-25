@@ -34,6 +34,6 @@ LIST( APPEND SRCS ChromosomeMap.cpp)
 LIST( APPEND SRCS Chromosome.cpp)
 LIST( APPEND SRCS Sequence.cpp)
 LIST( APPEND SRCS Individual.cpp)
-LIST( APPEND SRCS ChromosomeTuple.cpp)
+LIST( APPEND SRCS ChromosomeCopies.cpp)
 
 ADD_LIBRARY(cchmc SHARED ${SRCS})

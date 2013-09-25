@@ -53,7 +53,7 @@ IndividualPtr   GenomeFactory::createIndividual( ploidy_t p ) {
 
     size_t i = 0;
     for( ChromosomeIter it = m_chroms.begin(); it != m_chroms.end(); it++ ) {
-        ind->m_seqs[ i++ ].reset( new ChromosomeTuple(it->second, p));
+        ind->m_seqs[ i++ ].reset( new ChromosomeCopies(it->second, p));
     }
 
     return ind;

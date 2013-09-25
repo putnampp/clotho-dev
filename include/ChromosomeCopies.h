@@ -48,9 +48,9 @@ struct chromosome_set {
     virtual void    getGenotype( const LocusPtr l, genotype & g ) = 0;
 };
 
-class ChromosomeTuple : public chromosome_set {
+class ChromosomeCopies : public chromosome_set {
 public:
-    ChromosomeTuple( const ChromosomePtr c, ploidy_t copies );
+    ChromosomeCopies( const ChromosomePtr c, ploidy_t copies );
 
     virtual chromid_t   id()     const;
     virtual size_t      length() const;
@@ -62,13 +62,13 @@ public:
 
     virtual void getGenotype( const LocusPtr l, genotype & g );
 
-    virtual ~ChromosomeTuple();
+    virtual ~ChromosomeCopies();
 protected:
     ploidy_t        m_nPloid;
     ChromosomePtr   m_chrom;
     SequencePtr     *m_seqs;
 };
 
-typedef shared_ptr< chromosome_set > ChromosomeTuplePtr;
+typedef shared_ptr< chromosome_set > ChromosomeCopiesPtr;
 
 #endif  // CHROMOSOMETUPLE_H_

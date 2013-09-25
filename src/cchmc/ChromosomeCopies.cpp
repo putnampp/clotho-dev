@@ -27,32 +27,32 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#include "ChromosomeTuple.h"
+#include "ChromosomeCopies.h"
 
-ChromosomeTuple::ChromosomeTuple( const ChromosomePtr c, ploidy_t copies ) : m_nPloid( copies ), m_chrom(c) {
+ChromosomeCopies::ChromosomeCopies( const ChromosomePtr c, ploidy_t copies ) : m_nPloid( copies ), m_chrom(c) {
     m_seqs = new SequencePtr[ m_nPloid ];
     for( ploidy_t p = 0; p < m_nPloid; ++p ) {
         m_seqs[p].reset(new Sequence( m_chrom->loci() ));
     }
 }
 
-ChromosomeTuple::~ChromosomeTuple() {
+ChromosomeCopies::~ChromosomeCopies() {
     delete [] m_seqs;
 }
 
-chromid_t ChromosomeTuple::id() const {
+chromid_t ChromosomeCopies::id() const {
     return m_chrom->id();
 }
 
-size_t  ChromosomeTuple::length() const {
+size_t  ChromosomeCopies::length() const {
     return m_chrom->length();
 }
 
-ploidy_t ChromosomeTuple::ploidy() const {
+ploidy_t ChromosomeCopies::ploidy() const {
     return m_nPloid;
 }
 
-bool    ChromosomeTuple::allele( ploidy_t copy, size_t pos, allele_t & all ) {
+bool    ChromosomeCopies::allele( ploidy_t copy, size_t pos, allele_t & all ) {
     assert( copy < m_nPloid );
 
     size_t offset = 0;
@@ -63,12 +63,12 @@ bool    ChromosomeTuple::allele( ploidy_t copy, size_t pos, allele_t & all ) {
     return bIsLocus;
 }
 
-SequencePtr ChromosomeTuple::sequence( ploidy_t copy ) {
+SequencePtr ChromosomeCopies::sequence( ploidy_t copy ) {
     assert( copy < m_nPloid );
     return m_seqs[ copy ];
 }
 
-void ChromosomeTuple::getGenotype( const LocusPtr l, genotype & g ) {
+void ChromosomeCopies::getGenotype( const LocusPtr l, genotype & g ) {
     size_t   pos = l->start;
     ploidy_t p = 0;
     bool bHomo = true;

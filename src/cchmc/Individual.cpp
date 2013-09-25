@@ -35,7 +35,7 @@ using std::endl;
 
 Individual::Individual( size_t chroms, ploidy_t ploid ) 
     : m_nChroms( chroms ), m_nPloid( ploid ) {
-    m_seqs = new ChromosomeTuplePtr[ m_nChroms ];
+    m_seqs = new ChromosomeCopiesPtr[ m_nChroms ];
 }
 
 size_t   Individual::chromosomes() const {
