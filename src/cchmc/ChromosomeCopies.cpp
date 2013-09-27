@@ -27,46 +27,56 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef MATINGMODELCREATOR_H_
-#define MATINGMODELCREATOR_H_
+#include "ChromosomeCopies.h"
 
-#include "common.h"
-#include "iMatingModelCreator.h"
-#include "MatingModelFactory.h"
-
-template < class MODEL >
-class MatingModelCreator : public iMatingModelCreator {
-public:
-    MatingModelCreator( const char * name, const char * desc ) :
-        m_name(name), m_desc( desc ) {
-        MatingModelFactory::getInstance()->add( this );
+ChromosomeCopies::ChromosomeCopies( const ChromosomePtr c, ploidy_t copies ) : m_nPloid( copies ), m_chrom(c) {
+    m_seqs = new SequencePtr[ m_nPloid ];
+    for( ploidy_t p = 0; p < m_nPloid; ++p ) {
+        m_seqs[p].reset(new Sequence( m_chrom->loci() ));
     }
+}
 
-    virtual string & name() const {
-        return m_name;
+ChromosomeCopies::~ChromosomeCopies() {
+    delete [] m_seqs;
+}
+
+chromid_t ChromosomeCopies::id() const {
+    return m_chrom->id();
+}
+
+size_t  ChromosomeCopies::length() const {
+    return m_chrom->length();
+}
+
+ploidy_t ChromosomeCopies::ploidy() const {
+    return m_nPloid;
+}
+
+bool    ChromosomeCopies::allele( ploidy_t copy, pos_t pos, allele_t & all ) {
+    assert( copy < m_nPloid );
+
+    pos_t offset = 0;
+    bool bIsLocus = m_chrom->is_locus( pos, offset );
+    if( bIsLocus ) {
+        all = m_seqs[ copy ]->allele( pos );
     }
+    return bIsLocus;
+}
 
-    virtual string & description() const {
-        return m_desc;
+SequencePtr ChromosomeCopies::sequence( ploidy_t copy ) {
+    assert( copy < m_nPloid );
+    return m_seqs[ copy ];
+}
+
+void ChromosomeCopies::getGenotype( const LocusPtr l, genotype & g ) {
+    pos_t   pos = l->start;
+    ploidy_t p = 0;
+    bool bHomo = true;
+    g[p] = m_seqs[p]->allele(pos);
+    while( ++p < m_nPloid ) {
+        g[p] = m_seqs[p]->allele(pos);
+        bHomo = (bHomo && (g[0] == g[p]));
     }
-
-    virtual void    print( std::ostream & out ) const;
-
-    virtual shared_ptr< MatingModel > create() {
-        return shared_ptr< MatingModel >( new MODEL() );
-    }
-
-    virtual ~MatingModelCreator() {
-        MatingModelFactory::getInstance()->remove( this );
-    }
-private:
-    string  m_name;
-    string  m_desc;
-};
-
-#define REGISTERED_MATINGMODEL( name, desc )                \
-    class name;                                             \
-    MatingModelCreator< name >  mm_##name( #name, #desc );  \
-    class name : public MatingModel
-
-#endif  // MATINGMODELCREATOR_H_
+    g.setFlag(HOMOZYGOUS, bHomo );
+    g.setFlag( DOMINANT, (bHomo && (g[0] == l->dominant_allele )));
+}

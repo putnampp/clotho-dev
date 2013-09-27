@@ -27,48 +27,39 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef CHROMOSOMETUPLE_H_
-#define CHROMOSOMETUPLE_H_
+#ifndef GENETICEVENT_H_
+#define GENETICEVENT_H_
 
 #include "common.h"
-#include "ploidy.h"
 #include "Allele.h"
-#include "Sequence.h"
-#include "Chromosome.h"
-#include "Locus.h"
-#include "Genotype.h"
+#include "ChromosomeSegment.h"
 
-struct chromosome_set {
-    virtual chromid_t id()    const = 0;
-    virtual size_t   length() const = 0;
-    virtual ploidy_t ploidy() const = 0;
+#include <vector>
 
-    virtual bool allele( ploidy_t copy, size_t locus, allele_t & all ) = 0;
-    virtual SequencePtr sequence( ploidy_t p ) = 0;
-    virtual void    getGenotype( const LocusPtr l, genotype & g ) = 0;
-};
+using std::vector;
 
-class ChromosomeTuple : public chromosome_set {
+enum GeneticEventType { SUBSTITUTION, INSERTION, DELETION, RECOMBINATION };
+
+class GeneticEvent : public chromosome_segment {
 public:
-    ChromosomeTuple( const ChromosomePtr c, ploidy_t copies );
+    virtual GeneticEventType getType() const = 0;
+    virtual pos_t   getStart() const = 0;
+    virtual pos_t   getEnd() const = 0;
+    virtual pos_t   length() const = 0;
 
-    virtual chromid_t   id()     const;
-    virtual size_t      length() const;
-    virtual ploidy_t    ploidy() const;
+    virtual bool allele( pos_t & pos, allele_t & all ) const = 0;
 
-    virtual bool  allele( ploidy_t copy, size_t locus, allele_t & all );
+    virtual bool operator==( const GeneticEvent & ge ) const = 0;
 
-    virtual SequencePtr sequence( ploidy_t copy );
+/**
+ *  splits the GeneticEvent relative to the supplied GeneticEvent
+ */
+    virtual void split( GeneticEvent * ge, vector< GeneticEvent * > & events ) const = 0;
+    virtual void    combine( GeneticEvent * ge ) = 0;
 
-    virtual void getGenotype( const LocusPtr l, genotype & g );
-
-    virtual ~ChromosomeTuple();
+    virtual ~GeneticEvent() {}
 protected:
-    ploidy_t        m_nPloid;
-    ChromosomePtr   m_chrom;
-    SequencePtr     *m_seqs;
+    GeneticEvent( pos_t s, pos_t l ) : chromosome_segment(s, l) {}
 };
 
-typedef shared_ptr< chromosome_set > ChromosomeTuplePtr;
-
-#endif  // CHROMOSOMETUPLE_H_
+#endif  //  GENETICEVENT_H_

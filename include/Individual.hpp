@@ -38,7 +38,7 @@
 #include "Genotype.h"
 #include "Phenotype.h"
 
-#include "ChromosomeTuple.h"
+#include "ChromosomeCopies.h"
 
 enum SEX { MALE = 0, FEMALE, UNKNOWN_SEX };
 
@@ -86,7 +86,7 @@ protected:
     ploidy_t  m_nPloid;
     sex_t   m_sex;
     
-    ChromosomeTuplePtr  * m_seqs;
+    ChromosomeCopiesPtr  * m_seqs;
     genotype            * m_geno;
 };
 

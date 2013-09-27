@@ -34,8 +34,8 @@
 
 template < class C >
 struct iCreator {
-    virtual String name() const = 0;
-    virtual String description() const = 0;
+    virtual string name() const = 0;
+    virtual string description() const = 0;
 
     virtual void     print( std::ostream & out ) const = 0;
 

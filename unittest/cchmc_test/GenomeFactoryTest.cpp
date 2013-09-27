@@ -39,7 +39,7 @@ const ploidy_t  ploid = 2;
 
 void build_basic_gf( GenomeFactory & g ) {
     for( chromid_t i = 0; i < chrom; ++i ) {
-        ChromosomePtr c( new Chromosome( "chr" + boost::lexical_cast<String>(i) ) );
+        ChromosomePtr c( new Chromosome( "chr" + boost::lexical_cast<string>(i) ) );
         g.addChromosome( c );
     }
 }
@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE( genome_factory_create2 ) {
 
     vector< ChromosomePtr > chrs;
     for( chromid_t i = 1; i < chrom; ++i ) {
-        chrs.push_back( ChromosomePtr( new Chromosome( "chr" + boost::lexical_cast<String>(i) ) ) );
+        chrs.push_back( ChromosomePtr( new Chromosome( "chr" + boost::lexical_cast<string>(i) ) ) );
     }
 
     g.addChromosome( chrs );

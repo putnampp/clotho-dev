@@ -50,7 +50,7 @@ void StatisticFactory::buildEval( std::istream & config, StatisticEval * eval ) 
 
 }
 
-boost::shared_ptr< Statistic > StatisticFactory::create( const String & name ) {
+boost::shared_ptr< Statistic > StatisticFactory::create( const string & name ) {
     RegisteredStats::iterator it = m_stats.find( name );
 
     if( it == m_stats.end() ) {

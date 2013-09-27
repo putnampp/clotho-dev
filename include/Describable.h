@@ -35,7 +35,7 @@
 class Describable {
 public:
     Describable( const char * desc ) : m_desc( desc ) {}
-    Describable( const String & desc ) : m_desc( desc ) {}
+    Describable( const string & desc ) : m_desc( desc ) {}
 
     friend std::ostream & operator<<( std::ostream & out, const Describable & d );
     virtual ~Describable() {}
@@ -43,7 +43,7 @@ protected:
     virtual void write_desc( std::ostream & out ) const {
         out << m_desc;
     }
-    String  m_desc;
+    string  m_desc;
 };
 
 std::ostream & operator<<( std::ostream & out, const Describable & d ) {

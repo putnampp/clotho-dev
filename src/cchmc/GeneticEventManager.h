@@ -27,56 +27,62 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#include "ChromosomeTuple.h"
+#ifndef GENETICEVENTMANAGER_H_
+#define GENETICEVENTMANAGER_H_
 
-ChromosomeTuple::ChromosomeTuple( const ChromosomePtr c, ploidy_t copies ) : m_nPloid( copies ), m_chrom(c) {
-    m_seqs = new SequencePtr[ m_nPloid ];
-    for( ploidy_t p = 0; p < m_nPloid; ++p ) {
-        m_seqs[p].reset(new Sequence( m_chrom->loci() ));
-    }
-}
+#include "common.h"
+#include <vector>
 
-ChromosomeTuple::~ChromosomeTuple() {
-    delete [] m_seqs;
-}
+using std::vector;
 
-chromid_t ChromosomeTuple::id() const {
-    return m_chrom->id();
-}
+class GeneticEvent;
 
-size_t  ChromosomeTuple::length() const {
-    return m_chrom->length();
-}
+typedef unsigned long long index_t;
 
-ploidy_t ChromosomeTuple::ploidy() const {
-    return m_nPloid;
-}
+union long_id {
+    unsigned long long id;
+    struct { index_t format_idx; };
+    struct { unsigned int lo, hi; };
+    struct { unsigned int format_pos, data; };
+    struct { unsigned short lo_lo, lo_hi, hi_lo, hi_hi; };
+    unsigned char bytes[ sizeof( index_t ) ];
+};
 
-bool    ChromosomeTuple::allele( ploidy_t copy, size_t pos, allele_t & all ) {
-    assert( copy < m_nPloid );
+typedef long_id ge_id_t;
 
-    size_t offset = 0;
-    bool bIsLocus = m_chrom->is_locus( pos, offset );
-    if( bIsLocus ) {
-        all = m_seqs[ copy ]->allele( pos );
-    }
-    return bIsLocus;
-}
+#define FORMAT_BITS     4
+#define FORMAT_MASK        0x000000000000000F
+#define INDEX_OVERFLOW     0xF000000000000000
+#define POS_OVERFLOW       0xF0000000
 
-SequencePtr ChromosomeTuple::sequence( ploidy_t copy ) {
-    assert( copy < m_nPloid );
-    return m_seqs[ copy ];
-}
+#define removeFormat( id ) (id >> FORMAT_BITS)
+#define addFormat(id, format) ((id << FORMAT_BITS) | format)
 
-void ChromosomeTuple::getGenotype( const LocusPtr l, genotype & g ) {
-    size_t   pos = l->start;
-    ploidy_t p = 0;
-    bool bHomo = true;
-    g[p] = m_seqs[p]->allele(pos);
-    while( ++p < m_nPloid ) {
-        g[p] = m_seqs[p]->allele(pos);
-        bHomo = (bHomo && (g[0] == g[p]));
-    }
-    g.setFlag(HOMOZYGOUS, bHomo );
-    g.setFlag( DOMINANT, (bHomo && (g[0] == l->dominant_allele )));
-}
+class EventAlignment;
+
+class GeneticEventManager {
+public:
+    typedef vector< const GeneticEvent * > GeneticEvents;
+
+    GeneticEventManager();
+    GeneticEventManager( const GeneticEventManager & gem);
+
+    bool decode_allele(ge_id_t e, pos_t & pos, allele_t & all );
+
+    bool    decode_event( ge_id_t e, GeneticEvent * ge );
+    ge_id_t encode_event( const GeneticEvent * e );
+
+    EventAlignment alignGeneticEvents( GeneticEvent * ge, ge_id_t id );
+
+    virtual ~GeneticEventManager();
+protected:
+    inline bool handleIndex( ge_id_t eID, pos_t & pos, allele_t & all );
+
+    bool handleShortSubstitution( ge_id_t eID, int len, pos_t & pos, allele_t & all );
+    bool handleDeletion( ge_id_t eID, pos_t & pos, allele_t & all );
+    bool handleShortInsert( ge_id_t eID, int len, pos_t & pos, allele_t & all );
+
+    shared_ptr< GeneticEvents >    m_events;
+};
+
+#endif  // GENETICEVENTMANAGER_H_

@@ -41,7 +41,7 @@ using std::map;
 
 class ChromosomeMap : public Configurable {
 public:
-    typedef map< const String, ChromosomePtr > Chromosomes;
+    typedef map< const string, ChromosomePtr > Chromosomes;
     typedef Chromosomes::const_iterator ChromosomesIter;
 
     static ChromosomeMap * getInstance() {
@@ -61,9 +61,9 @@ public:
  *
  *  It is possible to create missing chromosomes
  *
- *  String matching is done case-sensitively, by default
+ *  string matching is done case-sensitively, by default
  */
-    virtual chromid_t find( const String & name, bool bCreateMissing = false );
+    virtual chromid_t find( const string & name, bool bCreateMissing = false );
 
     virtual ChromosomePtr find( chromid_t id );
 

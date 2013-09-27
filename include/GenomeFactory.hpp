@@ -64,7 +64,7 @@ public:
     virtual bool addChromosome( ChromosomePtr c );
     virtual bool addChromosome( const vector<ChromosomePtr> & c );
 
-    virtual bool addChromosomeSite( chromid_t c, size_t posi, bool bByIndex = true );
+    virtual bool addChromosomeSite( chromid_t c, pos_t posi, bool bByIndex = true );
 
     virtual ChromosomePtr getChromosomeByID( chromid_t c ) const;
     virtual ChromosomePtr getChromosomeByIndex( size_t ) const;

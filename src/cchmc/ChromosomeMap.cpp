@@ -35,7 +35,7 @@ size_t ChromosomeMap::size() const {
     return m_chroms.size();
 }
 
-chromid_t   ChromosomeMap::find( const String & name, bool bCreateMissing ) {
+chromid_t   ChromosomeMap::find( const string & name, bool bCreateMissing ) {
     chromid_t id = UNKNOWN_CHROM;
     
     Chromosomes::iterator it = m_chroms.find(name);

@@ -53,7 +53,7 @@ IndividualPtr   GenomeFactory::createIndividual( ploidy_t p ) {
 
     size_t i = 0;
     for( ChromosomeIter it = m_chroms.begin(); it != m_chroms.end(); it++ ) {
-        ind->m_seqs[ i++ ].reset( new ChromosomeTuple(it->second, p));
+        ind->m_seqs[ i++ ].reset( new ChromosomeCopies(it->second, p));
     }
 
     return ind;
@@ -82,7 +82,7 @@ bool GenomeFactory::addChromosome( const vector< ChromosomePtr > & c ) {
     return true;
 }
 
-bool GenomeFactory::addChromosomeSite( chromid_t c, size_t pos, bool bByIndex ) {
+bool GenomeFactory::addChromosomeSite( chromid_t c, pos_t pos, bool bByIndex ) {
 
     ChromosomePtr chr = ((bByIndex) ? getChromosomeByIndex( (size_t) c ) : getChromosomeByID( c ));
 

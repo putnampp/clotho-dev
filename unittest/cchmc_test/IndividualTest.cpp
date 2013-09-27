@@ -43,7 +43,7 @@ static GenomeFactory * getHuman() {
 
     if( g->empty() ) {
         for( chromid_t i = 0; i < chroms; ++i ) {
-            ChromosomePtr chr( new Chromosome( "chr" + boost::lexical_cast<String>(i) ) );
+            ChromosomePtr chr( new Chromosome( "chr" + boost::lexical_cast<string>(i) ) );
             g->addChromosome( chr );
         }
     }

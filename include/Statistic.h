@@ -49,7 +49,7 @@ using std::ostream;
  ******************************************************************************/
 class Statistic : public Describable, public Configurable {
 public:
-    Statistic( const String & desc ) : Describable( desc ) {}
+    Statistic( const string & desc ) : Describable( desc ) {}
 
     virtual void configure( istream & in ) = 0;
     virtual void operator()( const Population & p ) = 0;
