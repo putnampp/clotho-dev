@@ -54,8 +54,8 @@ BOOST_AUTO_TEST_CASE( sfAutoRegistration ) {
 }
 
 BOOST_AUTO_TEST_CASE( sfCreation ) {
-    String  name("testA");
-    String  dne_name("dne_test");
+    string  name("testA");
+    string  dne_name("dne_test");
 
     boost::shared_ptr< Statistic > stat = StatisticFactory::getInstance()->create( name );
 

@@ -82,7 +82,7 @@ bool GenomeFactory::addChromosome( const vector< ChromosomePtr > & c ) {
     return true;
 }
 
-bool GenomeFactory::addChromosomeSite( chromid_t c, size_t pos, bool bByIndex ) {
+bool GenomeFactory::addChromosomeSite( chromid_t c, pos_t pos, bool bByIndex ) {
 
     ChromosomePtr chr = ((bByIndex) ? getChromosomeByIndex( (size_t) c ) : getChromosomeByID( c ));
 

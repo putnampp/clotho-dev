@@ -40,8 +40,10 @@
 
 #include "Allele.h"
 
-typedef std::string String;
-typedef unsigned char Byte;
+using std::string;
+
+typedef unsigned char   byte_t;
+typedef unsigned int    pos_t;
 
 using boost::shared_ptr;
 using boost::scoped_ptr;

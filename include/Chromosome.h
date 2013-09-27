@@ -58,28 +58,28 @@ class Chromosome : public Cloneable, public Configurable {
 public:
     friend class ChromosomeMap;
 
-    Chromosome( const String & n, size_t s = DEFAULT_CHROMOSOME_LEN);
+    Chromosome( const string & n, size_t s = DEFAULT_CHROMOSOME_LEN);
     Chromosome( const Chromosome & c );
 
     virtual void setLength( size_t len );
     virtual Cloneable * clone();
     virtual void    configure( istream & config );
 
-    virtual bool    add_site( size_t pos );
+    virtual bool    add_site( pos_t pos );
     virtual void    clear_sites();
 
     chromid_t id() const;
-    String  name() const;
+    string  name() const;
     size_t  length() const;
 
     size_t  loci() const;
-    bool    is_locus( size_t pos, size_t & offset ) const;
+    bool    is_locus( pos_t pos, pos_t & offset ) const;
 
     virtual ~Chromosome();
 protected:
-    String      m_name;
+    string      m_name;
     chromid_t   m_id;
-    size_t      m_size;
+    pos_t       m_size;
 
     typedef map<size_t, size_t> Sites;
     Sites m_sites;

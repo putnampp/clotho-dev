@@ -42,7 +42,7 @@ public:
         DeserializerManager::instance()->registerDeserializer( this->getDataType(), &ClothoEventStub< EVT >::deserialize );
     }
 
-    const String & getDataType() const {
+    const string & getDataType() const {
         return m_name;
     }
 
@@ -53,7 +53,7 @@ public:
     virtual ~ClothoEventStub() {}
 
 private:
-    const String    m_name;
+    const string    m_name;
 };
 
 #define REGISTERED_CLOTHO_EVENT_BEGIN( name )               \

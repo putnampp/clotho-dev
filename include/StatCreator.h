@@ -44,11 +44,11 @@ public:
         StatisticFactory::getInstance()->add( this );
     }
 
-    String     name() const {
+    string     name() const {
         return m_name;
     }
 
-    String     description() const {
+    string     description() const {
         return m_desc;
     }
 
@@ -65,8 +65,8 @@ public:
     }
 
 protected:
-    String m_name;
-    String m_desc;
+    string m_name;
+    string m_desc;
 };
 
 #define REGISTERED_STATISTIC(name, desc)                 \

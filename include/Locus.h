@@ -50,8 +50,8 @@ using std::vector;
  *
  */
 struct Locus {
-    String      name;
-    size_t      start, end;
+    string      name;
+    pos_t      start, end;
     size_t      alt_count;
     mutrate_t   mutation_rate;
     shared_ptr< allele_t [] > alleles;

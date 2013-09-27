@@ -43,7 +43,7 @@ struct chromosome_set {
     virtual size_t   length() const = 0;
     virtual ploidy_t ploidy() const = 0;
 
-    virtual bool allele( ploidy_t copy, size_t locus, allele_t & all ) = 0;
+    virtual bool allele( ploidy_t copy, pos_t locus, allele_t & all ) = 0;
     virtual SequencePtr sequence( ploidy_t p ) = 0;
     virtual void    getGenotype( const LocusPtr l, genotype & g ) = 0;
 };
@@ -56,7 +56,7 @@ public:
     virtual size_t      length() const;
     virtual ploidy_t    ploidy() const;
 
-    virtual bool  allele( ploidy_t copy, size_t locus, allele_t & all );
+    virtual bool  allele( ploidy_t copy, pos_t locus, allele_t & all );
 
     virtual SequencePtr sequence( ploidy_t copy );
 

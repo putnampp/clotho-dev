@@ -52,10 +52,10 @@ ploidy_t ChromosomeCopies::ploidy() const {
     return m_nPloid;
 }
 
-bool    ChromosomeCopies::allele( ploidy_t copy, size_t pos, allele_t & all ) {
+bool    ChromosomeCopies::allele( ploidy_t copy, pos_t pos, allele_t & all ) {
     assert( copy < m_nPloid );
 
-    size_t offset = 0;
+    pos_t offset = 0;
     bool bIsLocus = m_chrom->is_locus( pos, offset );
     if( bIsLocus ) {
         all = m_seqs[ copy ]->allele( pos );
@@ -69,7 +69,7 @@ SequencePtr ChromosomeCopies::sequence( ploidy_t copy ) {
 }
 
 void ChromosomeCopies::getGenotype( const LocusPtr l, genotype & g ) {
-    size_t   pos = l->start;
+    pos_t   pos = l->start;
     ploidy_t p = 0;
     bool bHomo = true;
     g[p] = m_seqs[p]->allele(pos);

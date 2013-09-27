@@ -42,11 +42,11 @@ public:
         MatingModelFactory::getInstance()->add( this );
     }
 
-    virtual String & name() const {
+    virtual string & name() const {
         return m_name;
     }
 
-    virtual String & description() const {
+    virtual string & description() const {
         return m_desc;
     }
 
@@ -60,8 +60,8 @@ public:
         MatingModelFactory::getInstance()->remove( this );
     }
 private:
-    String  m_name;
-    String  m_desc;
+    string  m_name;
+    string  m_desc;
 };
 
 #define REGISTERED_MATINGMODEL( name, desc )                \

@@ -29,7 +29,7 @@
 
 #include "Chromosome.h"
 
-Chromosome::Chromosome( const String & n, size_t len ) :
+Chromosome::Chromosome( const string & n, size_t len ) :
         m_name(n), 
         m_id( nextID() ),
         m_size(len) { }
@@ -70,7 +70,7 @@ void Chromosome::setLength( size_t size ) {
  * The length of the chromosome will be extended to 
  * include this site should it not be long enough
  */
-bool Chromosome::add_site( size_t pos ) {
+bool Chromosome::add_site( pos_t pos ) {
     Sites::const_iterator it = m_sites.find(pos);
 
     bool bNewSite = (it == m_sites.end());
@@ -87,7 +87,7 @@ chromid_t Chromosome::id() const {
 return m_id;
 }
 
-String Chromosome::name() const {
+string Chromosome::name() const {
     return m_name;
 }
 
@@ -99,7 +99,7 @@ size_t Chromosome::loci() const {
     return m_sites.size();
 }
 
-bool    Chromosome::is_locus( size_t pos, size_t & offset ) const {
+bool    Chromosome::is_locus( pos_t pos, pos_t & offset ) const {
     Sites::const_iterator it = m_sites.find( pos );
     bool bFound = (it != m_sites.end() );
     if( bFound ) {

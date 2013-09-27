@@ -41,7 +41,7 @@ using std::map;
 using std::istream;
 using std::ostream;
 
-typedef map< String, iStatCreator * >   RegisteredStats;
+typedef map< string, iStatCreator * >   RegisteredStats;
 
 class StatisticFactory {
 public:
@@ -59,7 +59,7 @@ public:
     
     void buildEval( istream & configuration, StatisticEval * eval );
 
-    virtual shared_ptr<Statistic> create( const String & name);
+    virtual shared_ptr<Statistic> create( const string & name);
 
     friend ostream & operator<<( ostream & out, const StatisticFactory & sf );
     virtual ~StatisticFactory();

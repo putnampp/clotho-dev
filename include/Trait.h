@@ -75,10 +75,10 @@ class Trait : public iTrait,
     public Configurable 
 {
 public:
-    Trait( const String & name, const String & desc );
+    Trait( const string & name, const string & desc );
 
-    String getName() const;
-    String getDescription() const;
+    string getName() const;
+    string getDescription() const;
 
     virtual void configure( istream & config );
 
@@ -95,8 +95,8 @@ private:
     static const ploidy_t PLOIDY = P;
 
     Loci    m_loci;
-    String  m_name;
-    String  m_desc;
+    string  m_name;
+    string  m_desc;
 };
 
 /**
@@ -107,11 +107,11 @@ private:
 
 #define TRAIT_DECL( t, f ) template < ploidy_t P > t Trait<P>::f
 
-TRAIT_DECL( String, getName )() const {
+TRAIT_DECL( string, getName )() const {
     return m_name;
 }
 
-TRAIT_DECL( String, getDescription )() const {
+TRAIT_DECL( string, getDescription )() const {
     return m_desc;
 }
 
