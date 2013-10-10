@@ -27,56 +27,45 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef GENOTYPE_H_
-#define GENOTYPE_H_
+#include "IndividualObject.h"
+#include "IndividualObjectState.h"
 
-#include "common.h"
-#include "ploidy.h"
-#include "Allele.h"
-#include "Locus.h"
+#include "events/ClothoEvent.h"
 
-enum GenotypeFlag { HOMOZYGOUS  = 1,
-                     DOMINANT   = 2 };
+IndividualObject::IndividualObject() { }
 
-typedef unsigned short flag_t;
+IndividualObject::~IndividualObject() {}
 
-class genotype {
-public:
-    virtual ploidy_t    ploidy() const = 0;
-    virtual flag_t      getFlags() const = 0;
-    virtual void        setFlag( GenotypeFlag f, bool bVal ) = 0;
-    virtual bool        isFlag( GenotypeFlag f ) const = 0;
+void IndividualObject::initialize() {
+       
+}
 
-    virtual allele_t & operator[]( ploidy_t p ) = 0;
-
-    virtual ~genotype() {}
-protected:
-    genotype(){}
-};
-
-template < ploidy_t P >
-struct Genotype : public genotype {
-public:
-    Genotype() : m_flags(0) {}
-
-    ploidy_t ploidy() const {   return PLOIDY; }
-    flag_t   getFlags() const { return m_flags; }
-    void     setFlag( GenotypeFlag f, bool bVal = true ) { m_flags = ((bVal) ? (m_flags | f) : (m_flags & (~f))); }
-    bool     isFlag( GenotypeFlag f ) const { return ((m_flags & f ) > 0); }
-
-    allele_t & operator[]( ploidy_t p ) { assert( p < PLOIDY ); return m_geno[ p ]; }
+void IndividualObject::reinitialize( const State * state ) {
     
-    virtual ~Genotype() {}
-protected:
-    static const ploidy_t PLOIDY = P;
-    flag_t      m_flags; 
-    allele_t    m_geno[ PLOIDY ];
-};
+}
 
-struct Genotypeable {
-    virtual bool isHomozygous( const LocusPtr l ) = 0;
-    virtual bool isDominant( const LocusPtr l ) = 0;
-    virtual const genotype & operator[]( const LocusPtr l ) = 0;
-};
+void IndividualObject::finalize() {
 
-#endif  // GENOTYPE_H_
+}
+
+void IndividualObject::executeProcess() {
+    IndividualObjectState * iso = static_cast< IndividualObjectState * >(getState());
+    ASSERT( iso != NULL );
+
+    while( haveMoreEvents() ) {
+        const ClothoEvent * event = dynamic_cast< const ClothoEvent * >( getEvent() );
+        
+    }
+}
+
+State * IndividualObject::allocateState()  {
+    return new IndividualObjectState( getSimulationTime() );
+}
+
+void IndividualObject::deallocateState( const State * state ) {
+    delete state;
+}
+
+void IndividualObject::reclaimEvent( const Event * event ) {
+    delete event;
+}

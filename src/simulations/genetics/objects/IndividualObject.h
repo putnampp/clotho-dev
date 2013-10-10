@@ -27,56 +27,33 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef GENOTYPE_H_
-#define GENOTYPE_H_
+#ifndef INDIVIDUALOBJECT_H_
+#define INDIVIDUALOBJECT_H_
+
+#include "warped/warped.h"
+#include "warped/SimulationObject.h"
 
 #include "common.h"
-#include "ploidy.h"
-#include "Allele.h"
-#include "Locus.h"
+#include <vector>
 
-enum GenotypeFlag { HOMOZYGOUS  = 1,
-                     DOMINANT   = 2 };
+using std::vector;
 
-typedef unsigned short flag_t;
-
-class genotype {
+class IndividualObject : public SimulationObject {
 public:
-    virtual ploidy_t    ploidy() const = 0;
-    virtual flag_t      getFlags() const = 0;
-    virtual void        setFlag( GenotypeFlag f, bool bVal ) = 0;
-    virtual bool        isFlag( GenotypeFlag f ) const = 0;
+    IndividualObject( );
 
-    virtual allele_t & operator[]( ploidy_t p ) = 0;
+    ~IndividualObject();
 
-    virtual ~genotype() {}
-protected:
-    genotype(){}
+    void initialize();
+    void reinitialize( const State * state );
+    void finalize();
+
+    void executeProcess();
+
+    State * allocateState();
+    void    deallocateState( const State * state );
+
+    void reclaimEvent( const Event * event );
 };
 
-template < ploidy_t P >
-struct Genotype : public genotype {
-public:
-    Genotype() : m_flags(0) {}
-
-    ploidy_t ploidy() const {   return PLOIDY; }
-    flag_t   getFlags() const { return m_flags; }
-    void     setFlag( GenotypeFlag f, bool bVal = true ) { m_flags = ((bVal) ? (m_flags | f) : (m_flags & (~f))); }
-    bool     isFlag( GenotypeFlag f ) const { return ((m_flags & f ) > 0); }
-
-    allele_t & operator[]( ploidy_t p ) { assert( p < PLOIDY ); return m_geno[ p ]; }
-    
-    virtual ~Genotype() {}
-protected:
-    static const ploidy_t PLOIDY = P;
-    flag_t      m_flags; 
-    allele_t    m_geno[ PLOIDY ];
-};
-
-struct Genotypeable {
-    virtual bool isHomozygous( const LocusPtr l ) = 0;
-    virtual bool isDominant( const LocusPtr l ) = 0;
-    virtual const genotype & operator[]( const LocusPtr l ) = 0;
-};
-
-#endif  // GENOTYPE_H_
+#endif  // INDIVIDUALOBJECT_H_

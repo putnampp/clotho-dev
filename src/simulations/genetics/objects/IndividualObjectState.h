@@ -26,57 +26,75 @@
  * of the authors and should not be interpreted as representing official policies,
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
+#ifndef INDIVIDUALOBJETSTATE_H_
+#define INDIVIDUALOBJETSTATE_H_
 
-#ifndef GENOTYPE_H_
-#define GENOTYPE_H_
+#include "warped/State.h"
 
 #include "common.h"
-#include "ploidy.h"
-#include "Allele.h"
-#include "Locus.h"
+#include "Genotype.h"
+#include <vector>
 
-enum GenotypeFlag { HOMOZYGOUS  = 1,
-                     DOMINANT   = 2 };
+using std::vector;
 
-typedef unsigned short flag_t;
+enum Sex { FEMALE, MALE, UNK_SEX };
+enum Genotype { HOMOZYGOUS_REF, HETEROZYGOUS, HOMOZYGOUS_ALT };
 
-class genotype {
+typedef Sex     sex_t;
+typedef size_t  variant_index_t;
+typedef VTime   age_t;
+
+
+typedef Genotype< DIPLOID > genotype_t;
+typedef double  phenotype_t;
+
+static const int MAX_VARIANTS = 100;
+static const ploidy_t DEFAULT_PLOID = 2;
+
+class IndividualObjectState : public State {
 public:
-    virtual ploidy_t    ploidy() const = 0;
-    virtual flag_t      getFlags() const = 0;
-    virtual void        setFlag( GenotypeFlag f, bool bVal ) = 0;
-    virtual bool        isFlag( GenotypeFlag f ) const = 0;
+    IndividualObjectState(const VTime & t) :
+        m_dob( t.clone() ),
+        m_sex( UNK_SEX ),
+        m_genotypes( new vector< genotype_t > ),
+        m_phenotype(0.0) {
+        m_genotypes->reserve( MAX_VARIANTS );
+    }
 
-    virtual allele_t & operator[]( ploidy_t p ) = 0;
+    void    copyState( const State * toCopy ) {
+        ASSERT( toCopy );
+        const IndividualObjectState * c = static_cast< const IndividualObjectState * >(toCopy);
 
-    virtual ~genotype() {}
-protected:
-    genotype(){}
+        m_dob = c->m_dob->clone();
+        m_sex = c->m_sex;
+
+        m_genotypes->insert(m_genotypes->begin(), c->m_genotypes->begin(), c->m_genotypes->end() );
+        m_phenotype = c->m_phenotype;
+    }
+
+    sex_t   getSex() const { return m_sex; }
+    void    setSex( sex_t s) { m_sex = s; }
+
+    const age_t &   getDOB() const { return *m_dob; }
+    void            setDOB( const VTime & t ) {
+        m_dob = t.clone();
+    }
+
+    const genotype_t & getGenotypeAt( variant_index_t idx ) const {
+        return m_genotypes->at( idx );
+    }
+
+    phenotype_t getPhenotype() const { return m_phenotype; }
+
+    virtual ~IndividualStateObject() {
+        delete m_dob;
+        delete m_genotypes;
+    }
+private:
+    age_t *         m_dob;
+    sex_t           m_sex;
+    vector< genotype_t > * m_genotypes;
+    phenotype_t     m_phenotype;
 };
 
-template < ploidy_t P >
-struct Genotype : public genotype {
-public:
-    Genotype() : m_flags(0) {}
-
-    ploidy_t ploidy() const {   return PLOIDY; }
-    flag_t   getFlags() const { return m_flags; }
-    void     setFlag( GenotypeFlag f, bool bVal = true ) { m_flags = ((bVal) ? (m_flags | f) : (m_flags & (~f))); }
-    bool     isFlag( GenotypeFlag f ) const { return ((m_flags & f ) > 0); }
-
-    allele_t & operator[]( ploidy_t p ) { assert( p < PLOIDY ); return m_geno[ p ]; }
-    
-    virtual ~Genotype() {}
-protected:
-    static const ploidy_t PLOIDY = P;
-    flag_t      m_flags; 
-    allele_t    m_geno[ PLOIDY ];
-};
-
-struct Genotypeable {
-    virtual bool isHomozygous( const LocusPtr l ) = 0;
-    virtual bool isDominant( const LocusPtr l ) = 0;
-    virtual const genotype & operator[]( const LocusPtr l ) = 0;
-};
-
-#endif  // GENOTYPE_H_
+#endif  // INDIVIDUALOBJETSTATE_H_
