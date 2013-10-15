@@ -27,46 +27,41 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#include "ClothoEvent.h"
+#ifndef CLOTHOOBJECTCREATOR_H_
+#define CLOTHOOBJECTCREATOR_H_
 
-#include "warped/SerializedInstance.h"
+#include "common.h"
+#include "ClothoObject.h"
+#include "ClothoObjectManager.h"
 
-ClothoEvent::ClothoEvent(    const VTime & tSend, const VTime &tRecv,
-                    SimulationObject * sender,
-                    SimulationObject * receiver ) :
-                    DefaultEvent( tSend, tRecv, sender, receiver ) {}
+#include "yaml-cpp/yaml.h"
 
-ClothoEvent::ClothoEvent(    const VTime & tSend, const VTime & tRecv,
-                    const ObjectID &sender, const ObjectID & receiver,
-                    const unsigned int evtID ) :
-                    DefaultEvent( tSend, tRecv, sender, receiver, evtID ) {}
+template < class OBJ >
+class ClothoObjectCreator : public SimObjectCreator {
+public:
+    ClothoObjectCreator( const char * name ) : m_name(name) {
+        ClothoObjectManager::getInstance()->registerObject( this );
+    }
 
-ClothoEvent::ClothoEvent( const ClothoEvent & ce ) :
-                    DefaultEvent( ce.getSendTime(), ce.getReceiveTime(),
-                                    ce.getSender(), ce.getReceiver(), ce.getEventId() ) {}
+    const string & name() {
+        return m_name;
+    }
 
-ClothoEvent::~ClothoEvent() {}
+    SimulationObject * createObject() {
+        return new OBJ();
+    }
 
-bool ClothoEvent::eventCompare( const Event * evt ) {
-    const ClothoEvent *e = dynamic_cast< const ClothoEvent * >(evt);
-    return (compareEvents(this, e ));
-}
+    SimulationObject * createObjectFrom( const YAML::Node & n ) {
+        return new OBJ( n );
+    }
+private:
+    const string m_name;
+};
 
+#define CLOTHO_OBJECT( name )           \
+    class name;                         \
+    const ClothoObjectCreator< name > objc_##name( #name  ); \
+    class name : public ClothoObject
+    
 
-DEFINE_CLOTHO_EVENT_DESERIALIZATION_METHOD( ClothoEvent ) {
-    shared_ptr< VTime > tSend( dynamic_cast< VTime * >(inst->getSerializable()));
-    shared_ptr< VTime > tRecv( dynamic_cast< VTime * >(inst->getSerializable()));
-
-    unsigned int sSimManID = inst->getUnsigned();
-    unsigned int sSimObjID = inst->getUnsigned();
-    unsigned int rSimManID = inst->getUnsigned();
-    unsigned int rSimObjID = inst->getUnsigned();
-    unsigned int eventID = inst->getUnsigned();
-
-    ObjectID send( sSimObjID, sSimManID );
-    ObjectID recv( rSimObjID, rSimManID );
-
-    ClothoEvent * e = new ClothoEvent( *tSend, *tRecv, send, recv, eventID );
-
-    return e;
-}
+#endif  // CLOTHOOBJECTCREATOR_H_

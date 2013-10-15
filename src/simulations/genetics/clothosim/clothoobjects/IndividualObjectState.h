@@ -29,6 +29,7 @@
 #ifndef INDIVIDUALOBJETSTATE_H_
 #define INDIVIDUALOBJETSTATE_H_
 
+#include "warped/warped.h"
 #include "warped/State.h"
 
 #include "common.h"
@@ -38,14 +39,14 @@
 using std::vector;
 
 enum Sex { FEMALE, MALE, UNK_SEX };
-enum Genotype { HOMOZYGOUS_REF, HETEROZYGOUS, HOMOZYGOUS_ALT };
+//enum Genotype { HOMOZYGOUS_REF, HETEROZYGOUS, HOMOZYGOUS_ALT };
 
 typedef Sex     sex_t;
 typedef size_t  variant_index_t;
 typedef VTime   age_t;
 
 
-typedef Genotype< DIPLOID > genotype_t;
+//typedef Genotype< 2 > genotype_t;
 typedef double  phenotype_t;
 
 static const int MAX_VARIANTS = 100;
@@ -53,12 +54,12 @@ static const ploidy_t DEFAULT_PLOID = 2;
 
 class IndividualObjectState : public State {
 public:
-    IndividualObjectState(const VTime & t) :
+    IndividualObjectState(const VTime & t, sex_t s = UNK_SEX) :
         m_dob( t.clone() ),
         m_sex( UNK_SEX ),
-        m_genotypes( new vector< genotype_t > ),
+//        m_genotypes( new vector< genotype_t > ),
         m_phenotype(0.0) {
-        m_genotypes->reserve( MAX_VARIANTS );
+//        m_genotypes->reserve( MAX_VARIANTS );
     }
 
     void    copyState( const State * toCopy ) {
@@ -68,8 +69,12 @@ public:
         m_dob = c->m_dob->clone();
         m_sex = c->m_sex;
 
-        m_genotypes->insert(m_genotypes->begin(), c->m_genotypes->begin(), c->m_genotypes->end() );
+//        m_genotypes->insert(m_genotypes->begin(), c->m_genotypes->begin(), c->m_genotypes->end() );
         m_phenotype = c->m_phenotype;
+    }
+
+    unsigned int getStateSize() const {
+        return sizeof(IndividualObjectState);
     }
 
     sex_t   getSex() const { return m_sex; }
@@ -80,20 +85,20 @@ public:
         m_dob = t.clone();
     }
 
-    const genotype_t & getGenotypeAt( variant_index_t idx ) const {
-        return m_genotypes->at( idx );
-    }
+//    const genotype_t & getGenotypeAt( variant_index_t idx ) const {
+//        return m_genotypes->at( idx );
+//    }
 
     phenotype_t getPhenotype() const { return m_phenotype; }
 
-    virtual ~IndividualStateObject() {
+    virtual ~IndividualObjectState() {
         delete m_dob;
-        delete m_genotypes;
+//        delete m_genotypes;
     }
 private:
     age_t *         m_dob;
     sex_t           m_sex;
-    vector< genotype_t > * m_genotypes;
+//    vector< genotype_t > * m_genotypes;
     phenotype_t     m_phenotype;
 };
 

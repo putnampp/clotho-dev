@@ -30,6 +30,7 @@
 #ifndef CLOTHOAPPLICATION_H_
 #define CLOTHOAPPLICATION_H_
 
+#include "common.h"
 #include "warped/Application.h"
 
 class ClothoApplication : public Application {
@@ -50,6 +51,7 @@ public:
     virtual const VTime & getTime( string & );
 protected:
     virtual ArgumentParser & getArgumentParser();
+    string  m_config;
 };
 
 #endif  // CLOTHOAPPLICATION_H_

@@ -40,6 +40,6 @@ LIST( APPEND SRCS ChromosomeCopies.cpp)
 #LIST( APPEND SRCS MutatedChromosome.cpp)
 #LIST( APPEND SRCS InsertedChromosome.cpp)
 #LIST( APPEND SRCS DeletedChromosome.cpp)
-LIST( APPEND SRCS GeneticEventManager.cpp)
+#LIST( APPEND SRCS GeneticEventManager.cpp)
 
 ADD_LIBRARY(cchmc SHARED ${SRCS})

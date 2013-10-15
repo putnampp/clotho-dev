@@ -26,24 +26,21 @@
 # of the authors and should not be interpreted as representing official policies,
 # either expressed or implied, of the FreeBSD Project.
 ################################################################################
-INCLUDE_DIRECTORIES( ${${PROJECT_NAME}_INCLUDE_DIR} )
-#LINK_DIRECTORIES( ${Warped_LIBRARIES} )
-LINK_DIRECTORIES( ${Warped_DIR}/warped/lib ${Warped_DIR}/utils/lib )
 
-LIST( APPEND CLOTHOLIBS clothosim )
-#LIST( APPEND CLOTHOLIBS events )
-#LIST( APPEND CLOTHOLIBS clothoobjects )
+LIST( APPEND SIM_SRC clothoobjects/events/ClothoEvent.cpp )
+LIST( APPEND SIM_SRC clothoobjects/events/DeathEvent.cpp )
 
-FOREACH( D ${CLOTHOLIBS} )
-    ADD_SUBDIRECTORY( ${D} )
-ENDFOREACH(D)
+LIST( APPEND SIM_SRC clothoobjects/ClothoObject.cpp )
+LIST( APPEND SIM_SRC clothoobjects/ClothoObjectManager.cpp )
+LIST( APPEND SIM_SRC clothoobjects/EnvironmentObject.cpp )
+LIST( APPEND SIM_SRC clothoobjects/EnvironmentObjectState.cpp )
+LIST( APPEND SIM_SRC clothoobjects/IndividualObject.cpp )
+LIST( APPEND SIM_SRC clothoobjects/IndividualObjectState.cpp )
 
-#ADD_DEPENDENCIES( clothoobjects events )
+#LIST( APPEND SIM_LIBS clothoobjects )
 
-LIST( APPEND SRCS main.cpp)
-LIST( APPEND SRCS ClothoApplication.cpp)
-LIST( APPEND SRCS YamlConfig.cpp)
+#FOREACH( D ${SIM_LIBS} )
+#    ADD_SUBDIRECTORY( ${D} )
+#ENDFOREACH(D)
 
-ADD_EXECUTABLE(WarpedClotho ${SRCS} )
-
-TARGET_LINK_LIBRARIES(WarpedClotho ${Boost_LIBRARIES} warped utils ${CLOTHOLIBS} ${YAML_LIB} )
+ADD_LIBRARY(clothosim SHARED ${SIM_SRC})

@@ -28,11 +28,22 @@
  ******************************************************************************/
 
 #include "ClothoApplication.h"
+#include "ClothoPartitioner.h"
 #include "warped/IntVTime.h"
 #include "utils/ArgumentParser.h"
+#include "YamlConfig.h"
+
+#include <iostream>
+using std::cerr;
+using std::endl;
 
 int ClothoApplication::initialize( vector< string > & args ) {
     getArgumentParser().checkArgs(args);
+
+    if( m_config.empty() ) {
+        cerr << "Please specify a configuration file" << endl;
+        abort();
+    }
     return 0;
 }
 
@@ -42,6 +53,15 @@ int ClothoApplication::finalize( ) {
 
 const PartitionInfo * ClothoApplication::getPartitionInfo( unsigned int nPE ) {
 
+    ClothoPartitioner *part = new ClothoPartitioner();
+
+    shared_ptr< YamlConfig > config( new YamlConfig( m_config ) );
+
+    shared_ptr< vector< SimulationObject * > > objs = config->getSimulationObjects();
+
+    const PartitionInfo * ret = part->partition( &*objs, nPE );
+
+    return ret;
 }
 
 int     ClothoApplication::getNumberOfSimulationObjects( int mgrID ) const {
@@ -68,6 +88,7 @@ const VTime & ClothoApplication::getTime( string & ) {
 ArgumentParser & ClothoApplication::getArgumentParser() {
     // ArgRecord is a nested class of ArgumentParser
     static ArgumentParser::ArgRecord args[] = {
+    { "-sim", "Simulation configuration file", &m_config, ArgumentParser::STRING, false },
     {"","",0 }
     };
 

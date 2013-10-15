@@ -27,47 +27,39 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#include "DeathEvent.h"
-#include "warped/SerializedInstance.h"
+#include "ClothoObjectManager.h"
 
-DeathEvent::DeathEvent( const VTime & tSend, const VTime &tRecv,
-                 SimulationObject * sender, 
-                 SimulationObject * receiver ) :
-                 DefaultEvent( tSend, tRecv, sender, receiver ) {}
+ClothoObjectManager::ClothoObjectManager(){}
 
-DeathEvent::DeathEvent( const VTime & tSend, const VTime & tRecv,
-                 const ObjectID &sender, 
-                 const ObjectID & receiver,
-                 const unsigned int evtID ) :
-                 DefaultEvent( tSend, tRecv, sender, receiver, evtID ) {}
-
-DeathEvent::DeathEvent( const DeathEvent & ce ) :
-                 DefaultEvent( ce.getSendTime(), ce.getReceiveTime(),
-                                ce.getSender(), ce.getReceiver(),
-                                ce.getEventId() ) {}
-
-
-bool DeathEvent::eventCompare( const Event * evt ) {
-    const DeathEvent * e = dynamic_cast< const DeathEvent * >(evt);
-    return (compareEvents( this, e ) );
+shared_ptr< ClothoObjectManager > ClothoObjectManager::getInstance() {
+    static shared_ptr< ClothoObjectManager > inst( new ClothoObjectManager() );
+    return inst;
 }
 
-DeathEvent::~DeathEvent() {}
+void ClothoObjectManager::registerObject( SimObjectCreator * soc ) {
+    m_creators[ soc->name() ] = soc;
+}
 
-DEFINE_CLOTHO_EVENT_DESERIALIZATION_METHOD( DeathEvent ) {
-    shared_ptr< VTime > tSend( dynamic_cast< VTime * >(inst->getSerializable()));
-    shared_ptr< VTime > tRecv( dynamic_cast< VTime * >(inst->getSerializable()));
+SimulationObject * ClothoObjectManager::createObject( const string & name ) {
+    iterator it = m_creators.find( name );
 
-    unsigned int sSimManID = inst->getUnsigned();
-    unsigned int sSimObjID = inst->getUnsigned();
-    unsigned int rSimManID = inst->getUnsigned();
-    unsigned int rSimObjID = inst->getUnsigned();
-    unsigned int eventID = inst->getUnsigned();
+    if( it == m_creators.end() )
+        return NULL;
 
-    ObjectID send( sSimObjID, sSimManID );
-    ObjectID recv( rSimObjID, rSimManID );
+    return it->second->createObject();
+}
 
-    DeathEvent * e = new DeathEvent( *tSend, *tRecv, send, recv, eventID );
+SimulationObject * ClothoObjectManager::createObjectFrom( const YAML::Node & n ) {
+    string name = n[ "object" ].as<string>();
 
-    return e;
+    iterator it = m_creators.find( name );
+
+    if( it == m_creators.end() )
+        return NULL;
+
+    return it->second->createObjectFrom(n);
+}
+
+ClothoObjectManager::~ClothoObjectManager() {
+    m_creators.clear();
 }

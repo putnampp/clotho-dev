@@ -27,10 +27,14 @@
 # either expressed or implied, of the FreeBSD Project.
 ################################################################################
 INCLUDE_DIRECTORIES( ${${PROJECT_NAME}_INCLUDE_DIR} )
-#LINK_DIRECTORIES( ${Warped_LIBRARIES} )
 LINK_DIRECTORIES( ${Warped_DIR}/warped/lib ${Warped_DIR}/utils/lib )
 
-LIST( APPEND SRCS ClothoEvent.cpp)
-LIST( APPEND SRCS DeathEvent.cpp)
+LIST( APPEND OBJ_SRC ClothoObjectManager.cpp )
+LIST( APPEND OBJ_SRC ClothoObject.cpp )
+LIST( APPEND OBJ_SRC EnvironmentObject.cpp )
+LIST( APPEND OBJ_SRC EnvironmentObjectState.cpp )
+LIST( APPEND OBJ_SRC IndividualObject.cpp )
+LIST( APPEND OBJ_SRC IndividualObjectState.cpp )
 
-ADD_LIBRARY( events SHARED ${SRCS} )
+ADD_LIBRARY( clothoobjects SHARED ${OBJ_SRC} )
+TARGET_LINK_LIBRARIES( clothoobjects events )

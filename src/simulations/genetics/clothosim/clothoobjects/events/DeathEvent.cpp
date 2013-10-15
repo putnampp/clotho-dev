@@ -26,50 +26,50 @@
  * of the authors and should not be interpreted as representing official policies,
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
-#ifndef CLOTHO_CONFIG_H_
-#define CLOTHO_CONFIG_H_
 
-#include "log_levels.h"
+#include "DeathEvent.h"
+#include "warped/SerializedInstance.h"
 
-#define MAJOR_VERSION  "0.1"
-#define MINOR_VERSION  "0"
-#define CLOTHO_VERSION        "CLOTHO 0.1.0"
+DEFINE_REGISTERED_CLOTHO_EVENT( DeathEvent )
 
-/* #undef LOG */
-/* #undef LOG_LEVEL */
+DeathEvent::DeathEvent( const VTime & tSend, const VTime &tRecv,
+                 SimulationObject * sender, 
+                 SimulationObject * receiver ) :
+                 DefaultEvent( tSend, tRecv, sender, receiver ) {}
 
-#ifdef LOG_LEVEL  // log_level defined
-    #if LOG_LEVEL == LOG_OFF // but it is set to be off
-        #ifdef LOG
-            #warning "Turning Logging OFF"
-            #undef LOG      // make sure logging is off
-        #endif 
-    #else   // LOG_LEVEL
-        #ifndef LOG   // debug not turned
-            #define LOG   // turn it on
-        #endif
+DeathEvent::DeathEvent( const VTime & tSend, const VTime & tRecv,
+                 const ObjectID &sender, 
+                 const ObjectID & receiver,
+                 const unsigned int evtID ) :
+                 DefaultEvent( tSend, tRecv, sender, receiver, evtID ) {}
 
-        #if LOG_LEVEL == LOG_CRIT
-        #elif LOG_LEVEL == LOG_ERROR
-        #elif LOG_LEVEL == LOG_WARN
-        #elif LOG_LEVEL == LOG_STATUS
-        #elif LOG_LEVEL == LOG_NOTE
-        #elif LOG_LEVEL == LOG_DEBUG
-        #elif LOG_LEVEL == LOG_ALL
-        #else
-            #error "UNKNOWN LOG LEVEL DEFINED."
-        #endif // LOG_LEVEL
-    #endif  // LOG_LEVEL
-#elif defined LOG     // debugging turned on, but debug_level not defined
-    #define LOG_LEVEL LOG_DEFAULT
-#endif  // end verifications
+DeathEvent::DeathEvent( const DeathEvent & ce ) :
+                 DefaultEvent( ce.getSendTime(), ce.getReceiveTime(),
+                                ce.getSender(), ce.getReceiver(),
+                                ce.getEventId() ) {}
 
-#ifndef MAX_ALLELES
-#define    MAX_ALLELES 256
-#endif  // MAX_ALLELES
 
-#if MAX_ALLELES < 0
-#error  Cannot have negative alleles
-#endif  // MAX_ALLELES
+bool DeathEvent::eventCompare( const Event * evt ) {
+    const DeathEvent * e = dynamic_cast< const DeathEvent * >(evt);
+    return (compareEvents( this, e ) );
+}
 
-#endif  // CLOTHO_CONFIG_H_
+DeathEvent::~DeathEvent() {}
+
+DEFINE_CLOTHO_EVENT_DESERIALIZATION_METHOD( DeathEvent ) {
+    shared_ptr< VTime > tSend( dynamic_cast< VTime * >(inst->getSerializable()));
+    shared_ptr< VTime > tRecv( dynamic_cast< VTime * >(inst->getSerializable()));
+
+    unsigned int sSimManID = inst->getUnsigned();
+    unsigned int sSimObjID = inst->getUnsigned();
+    unsigned int rSimManID = inst->getUnsigned();
+    unsigned int rSimObjID = inst->getUnsigned();
+    unsigned int eventID = inst->getUnsigned();
+
+    ObjectID send( sSimObjID, sSimManID );
+    ObjectID recv( rSimObjID, rSimManID );
+
+    DeathEvent * e = new DeathEvent( *tSend, *tRecv, send, recv, eventID );
+
+    return e;
+}

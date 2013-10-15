@@ -27,45 +27,4 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#include "IndividualObject.h"
 #include "IndividualObjectState.h"
-
-#include "events/ClothoEvent.h"
-
-IndividualObject::IndividualObject() { }
-
-IndividualObject::~IndividualObject() {}
-
-void IndividualObject::initialize() {
-       
-}
-
-void IndividualObject::reinitialize( const State * state ) {
-    
-}
-
-void IndividualObject::finalize() {
-
-}
-
-void IndividualObject::executeProcess() {
-    IndividualObjectState * iso = static_cast< IndividualObjectState * >(getState());
-    ASSERT( iso != NULL );
-
-    while( haveMoreEvents() ) {
-        const ClothoEvent * event = dynamic_cast< const ClothoEvent * >( getEvent() );
-        
-    }
-}
-
-State * IndividualObject::allocateState()  {
-    return new IndividualObjectState( getSimulationTime() );
-}
-
-void IndividualObject::deallocateState( const State * state ) {
-    delete state;
-}
-
-void IndividualObject::reclaimEvent( const Event * event ) {
-    delete event;
-}

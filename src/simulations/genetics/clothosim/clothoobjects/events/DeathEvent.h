@@ -27,24 +27,24 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef CLOTHOEVENT_H_
-#define CLOTHOEVENT_H_
+#ifndef DEATHEVENT_H_
+#define DEATHEVENT_H_
 
 #include "ClothoEventStub.h"
-#include "warped/SimulationObject.h"
 
-REGISTERED_CLOTHO_EVENT_BEGIN( ClothoEvent )
+DECLARE_CLOTHO_EVENT( DeathEvent )
 public:
-    virtual ~ClothoEvent();
-protected:
-    ClothoEvent( const VTime & tSend, const VTime &tRecv,
+    DeathEvent( const VTime & tSend, const VTime &tRecv,
                  SimulationObject * sender, 
                  SimulationObject * receiver );
-    ClothoEvent( const VTime & tSend, const VTime & tRecv,
+    DeathEvent( const VTime & tSend, const VTime & tRecv,
                  const ObjectID &sender, 
                  const ObjectID & receiver,
                  const unsigned int evtID );
-    ClothoEvent( const ClothoEvent & ce );
-REGISTERED_CLOTHO_EVENT_END( ClothoEvent )
+    DeathEvent( const DeathEvent & ce );
+    virtual ~DeathEvent();
+};
 
-#endif  // CLOTHOEVENT_H_
+DECLARE_REGISTERED_CLOTHO_EVENT( DeathEvent );
+
+#endif  // DEATHEVENT_H_

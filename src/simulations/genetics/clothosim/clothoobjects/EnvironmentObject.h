@@ -27,24 +27,27 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef DEATHEVENT_H_
-#define DEATHEVENT_H_
+#ifndef ENVIRONMENTOBJECT_H_
+#define ENVIRONMENTOBJECT_H_
 
-#include "ClothoEventStub.h"
+#include "ClothoObjectCreator.h"
 
-REGISTERED_CLOTHO_EVENT_BEGIN( DeathEvent )
+CLOTHO_OBJECT( Environment ) {
 public:
-    virtual ~DeathEvent();
+    Environment();
+    Environment( const YAML::Node & n);
 
-protected:
-    DeathEvent( const VTime & tSend, const VTime &tRecv,
-                 SimulationObject * sender, 
-                 SimulationObject * receiver );
-    DeathEvent( const VTime & tSend, const VTime & tRecv,
-                 const ObjectID &sender, 
-                 const ObjectID & receiver,
-                 const unsigned int evtID );
-    DeathEvent( const DeathEvent & ce );
-REGISTERED_CLOTHO_EVENT_END( DeathEvent )
+    virtual ~Environment();
 
-#endif  // DEATHEVENT_H_
+    void initialize();
+    void finalize();
+
+    void executeProcess();
+    
+    State * allocateState();
+    const string & getName() const;
+private:
+    const string m_name;
+};
+
+#endif  // ENVIRONMENTOBJECT_H_

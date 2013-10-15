@@ -27,51 +27,43 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef CLOTHOEVENTSTUB_H_
-#define CLOTHOEVENTSTUB_H_
+#ifndef CLOTHOOBJECTMANAGER_H_
+#define CLOTHOOBJECTMANAGER_H_
 
 #include "common.h"
-#include "warped/DefaultEvent.h"
-#include "warped/DeserializerManager.h"
 
-template < class EVT >
-class ClothoEventStub {
-public:
-    typedef EVT event_t;
-    ClothoEventStub( const char * name) : m_name( name ) {
-        DeserializerManager::instance()->registerDeserializer( this->getDataType(), &ClothoEventStub< EVT >::deserialize );
-    }
+#include "warped/SimulationObject.h"
+#include "yaml-cpp/yaml.h"
 
-    const string & getDataType() const {
-        return m_name;
-    }
+#include <map>
 
-    static Serializable * deserialize( SerializedInstance * si ) {
-        return new EVT( si );
-    }
+using std::map;
 
-    virtual ~ClothoEventStub() {}
+struct SimObjectCreator {
+    virtual const string & name() = 0;
+    virtual SimulationObject * createObject() = 0;
 
-private:
-    const string    m_name;
+    virtual SimulationObject * createObjectFrom( const YAML::Node & n ) = 0;
 };
 
-#define REGISTERED_CLOTHO_EVENT_BEGIN( name )               \
-    class name;                                             \
-    const ClothoEventStub< name > evt_##name( #name );      \
-    class name : public DefaultEvent {                      \
-        friend class ClothoEventStub< name >;               \
-    public: \
-        const string & getDataType() const {                \
-            return evt_##name.getDataType();                \
-        } \
-        unsigned int getEventSize() const { return sizeof( name ); }  \
-        bool eventCompare( const Event * e );
-        
+class ClothoObjectManager {
+public:
+    typedef map< const string, SimObjectCreator * > SimObjects;
+    typedef SimObjects::iterator  iterator;
 
-#define REGISTERED_CLOTHO_EVENT_END( name ) };
+    static shared_ptr< ClothoObjectManager > getInstance();
 
-#define DEFINE_CLOTHO_EVENT_DESERIALIZATION_METHOD( name )   \
-    template <> Serializable * ClothoEventStub< name >::deserialize( SerializedInstance * inst )
+    void registerObject( SimObjectCreator * soc );
 
-#endif  // CLOTHOEVENTSTUB_H_
+    SimulationObject * createObject( const string & name );
+
+    SimulationObject * createObjectFrom( const YAML::Node & yaml );
+
+    virtual ~ClothoObjectManager();
+protected:
+    ClothoObjectManager();
+
+    SimObjects m_creators;
+};
+
+#endif  // CLOTHOOBJECTMANAGER_H_
