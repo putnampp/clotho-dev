@@ -29,6 +29,18 @@
 
 #include "YamlConfig.h"
 
+#include <fstream>
+#include <iostream>
+#include <vector>
+
+#include "clothosim/clothoobjects/ClothoObjectManager.h"
+
+using std::ifstream;
+using std::vector;
+
+using std::cout;
+using std::endl;
+
 YamlConfig::YamlConfig( const string & file ) :
     m_config( file )
 {}
@@ -36,6 +48,19 @@ YamlConfig::YamlConfig( const string & file ) :
 shared_ptr< vector< SimulationObject * > > YamlConfig::getSimulationObjects() {
     shared_ptr< vector< SimulationObject * > > objs( new vector< SimulationObject * >() );
 
+    vector< YAML::Node > docs = YAML::LoadAllFromFile( m_config );
+
+    cout << "\nFound " << docs.size() << " documents." << endl;
+    for( vector< YAML::Node >::iterator it = docs.begin(); it != docs.end(); it++ ) {
+        if( it->IsMap() ) {
+            cout << (*it) << endl;
+            SimulationObject * so = ClothoObjectManager::getInstance()->createObjectFrom( (*it) );
+
+            if( so )
+                objs->push_back( so );
+        }
+    }
+    
     return objs;
 }
 

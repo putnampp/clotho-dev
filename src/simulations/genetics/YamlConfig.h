@@ -48,6 +48,6 @@ public:
 
     virtual ~YamlConfig();
 private:
-    YAML::Node m_config;
+    string m_config;
 };
 #endif  // YAMLCONFIG_H_
