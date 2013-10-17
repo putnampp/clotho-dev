@@ -27,37 +27,24 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef SIMPLE_APPLICATION_H_
-#define SIMPLE_APPLICATION_H_
+#ifndef DEATHEVENT_H_
+#define DEATHEVENT_H_
 
-#include "Application.h"
-#include "IntVTime.h"
+#include "ClothoEventStub.h"
 
-class SimpleApplication : public Application {
+DECLARE_CLOTHO_EVENT( DeathEvent )
 public:
-    SimpleApplication();
-
-    int initialize( vector< string > & args );
-
-    int getNumberOfSimulationObjects( int mgrId ) const;
-
-    const PartitionInfo * getPartitionInfo( unsigned int nPE );
-
-    int     finalize();
-    void    registerDeserializers();
-
-    string  getCommandLineParameters() const;
-
-    const   VTime   & getPositiveInfinity();
-    const   VTime   & getZero();
-
-    const   VTime   & getTime( string & time );
-
-private:
-//    ArgumentParser & getArgumentParser();
-    vector< SimulationObject * > * getSimulationObjects();
-    unsigned int     m_nObjects;
-    string  m_strInFile;
+    DeathEvent( const VTime & tSend, const VTime &tRecv,
+                 SimulationObject * sender, 
+                 SimulationObject * receiver );
+    DeathEvent( const VTime & tSend, const VTime & tRecv,
+                 const ObjectID &sender, 
+                 const ObjectID & receiver,
+                 const unsigned int evtID );
+    DeathEvent( const DeathEvent & ce );
+    virtual ~DeathEvent();
 };
 
-#endif  // SIMPLE_APPLICATION_H_
+DECLARE_REGISTERED_CLOTHO_EVENT( DeathEvent );
+
+#endif  // DEATHEVENT_H_

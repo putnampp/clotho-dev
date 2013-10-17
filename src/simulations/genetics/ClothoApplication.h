@@ -30,12 +30,15 @@
 #ifndef CLOTHOAPPLICATION_H_
 #define CLOTHOAPPLICATION_H_
 
-#include "warped/Application.h"
+#include "common.h"
+#include "Application.h"
+#include "SimulationConfiguration.h"
 
 class ClothoApplication : public Application {
 public:
 
-    virtual int initialize( vector< string > & args );
+    //virtual int initialize( vector< string > & args );
+    virtual void configure( SimulationConfiguration & config );
     virtual int finalize( );
 
     virtual const PartitionInfo * getPartitionInfo( unsigned int nPE );
@@ -49,7 +52,7 @@ public:
     virtual const VTime & getZero();
     virtual const VTime & getTime( string & );
 protected:
-    virtual ArgumentParser & getArgumentParser();
+    string  m_config;
 };
 
 #endif  // CLOTHOAPPLICATION_H_

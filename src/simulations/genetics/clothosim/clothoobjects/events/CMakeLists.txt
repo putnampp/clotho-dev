@@ -27,19 +27,10 @@
 # either expressed or implied, of the FreeBSD Project.
 ################################################################################
 INCLUDE_DIRECTORIES( ${${PROJECT_NAME}_INCLUDE_DIR} )
+INCLUDE_DIRECTORIES( ${Warped_INCLUDE_DIRS} )
+LINK_DIRECTORIES( ${Warped_LIBRARIES} )
 
-LIST( APPEND SRCS StatisticFactory.cpp)
-LIST( APPEND SRCS GenomeFactory.cpp)
-LIST( APPEND SRCS ChromosomeMap.cpp)
-LIST( APPEND SRCS Chromosome.cpp)
-LIST( APPEND SRCS Sequence.cpp)
-LIST( APPEND SRCS Individual.cpp)
-LIST( APPEND SRCS ChromosomeCopies.cpp)
-#LIST( APPEND SRCS ChromosomeSegments.cpp)
-#LIST( APPEND SRCS AncestralChromosome.cpp)
-#LIST( APPEND SRCS MutatedChromosome.cpp)
-#LIST( APPEND SRCS InsertedChromosome.cpp)
-#LIST( APPEND SRCS DeletedChromosome.cpp)
-#LIST( APPEND SRCS GeneticEventManager.cpp)
+#LIST( APPEND SRCS ClothoEvent.cpp)
+LIST( APPEND SRCS DeathEvent.cpp)
 
-ADD_LIBRARY(cchmc SHARED ${SRCS})
+ADD_LIBRARY( events SHARED ${SRCS} )

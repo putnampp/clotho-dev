@@ -27,37 +27,17 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef SIMPLE_APPLICATION_H_
-#define SIMPLE_APPLICATION_H_
+#include "EnvironmentObjectState.h"
 
-#include "Application.h"
-#include "IntVTime.h"
+EnvironmentObjectState::EnvironmentObjectState( LifeExpectancyModel * female, LifeExpectancyModel * male ) : 
+    m_lemFemale( female ), 
+    m_lemMale( male ) 
+{}
 
-class SimpleApplication : public Application {
-public:
-    SimpleApplication();
+void EnvironmentObjectState::copyState( const State * copy ) {}
 
-    int initialize( vector< string > & args );
+unsigned int EnvironmentObjectState::getStateSize() const {
+    return sizeof(EnvironmentObjectState);
+}
 
-    int getNumberOfSimulationObjects( int mgrId ) const;
-
-    const PartitionInfo * getPartitionInfo( unsigned int nPE );
-
-    int     finalize();
-    void    registerDeserializers();
-
-    string  getCommandLineParameters() const;
-
-    const   VTime   & getPositiveInfinity();
-    const   VTime   & getZero();
-
-    const   VTime   & getTime( string & time );
-
-private:
-//    ArgumentParser & getArgumentParser();
-    vector< SimulationObject * > * getSimulationObjects();
-    unsigned int     m_nObjects;
-    string  m_strInFile;
-};
-
-#endif  // SIMPLE_APPLICATION_H_
+EnvironmentObjectState::~EnvironmentObjectState() {}

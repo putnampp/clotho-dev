@@ -28,12 +28,34 @@
  ******************************************************************************/
 
 #include "ClothoApplication.h"
-#include "warped/IntVTime.h"
-#include "utils/ArgumentParser.h"
+#include "ClothoPartitioner.h"
+#include "IntVTime.h"
+#include "YamlConfig.h"
 
-int ClothoApplication::initialize( vector< string > & args ) {
-    getArgumentParser().checkArgs(args);
+#include <iostream>
+using std::cerr;
+using std::cout;
+using std::endl;
+
+/*
+ int ClothoApplication::initialize( vector< string > & args ) {
+    if( m_config.empty() ) {
+        cerr << "Please specify a configuration file" << endl;
+        abort();
+    }
     return 0;
+}
+*/
+
+void ClothoApplication::configure( SimulationConfiguration & config ) {
+    cout << "configure called" << endl;
+    m_config = config.as_string( {"sim"} );
+    if( m_config.empty() ) {
+        cerr << "Please specify a configuration file" << endl;
+        abort();
+    }
+
+    cout << m_config << endl;
 }
 
 int ClothoApplication::finalize( ) {
@@ -41,10 +63,24 @@ int ClothoApplication::finalize( ) {
 }
 
 const PartitionInfo * ClothoApplication::getPartitionInfo( unsigned int nPE ) {
+    if( m_config.empty() ) {
+        cerr << "Unspecified configuration file " << endl;
+        abort();
+    }
 
+    ClothoPartitioner *part = new ClothoPartitioner();
+
+    shared_ptr< YamlConfig > config( new YamlConfig( m_config ) );
+
+    shared_ptr< vector< SimulationObject * > > objs = config->getSimulationObjects();
+
+    const PartitionInfo * ret = part->partition( &*objs, nPE );
+
+    return ret;
 }
 
 int     ClothoApplication::getNumberOfSimulationObjects( int mgrID ) const {
+    return 0;
 }
 
 string ClothoApplication::getCommandLineParameters() const {
@@ -65,12 +101,15 @@ const VTime & ClothoApplication::getTime( string & ) {
     return IntVTime::getIntVTimeZero(); 
 }
 
+/*
 ArgumentParser & ClothoApplication::getArgumentParser() {
     // ArgRecord is a nested class of ArgumentParser
     static ArgumentParser::ArgRecord args[] = {
+    { "-sim", "Simulation configuration file", &m_config, ArgumentParser::STRING, false },
     {"","",0 }
     };
 
     static ArgumentParser * ap = new ArgumentParser( args );
     return *ap;
 }
+*/

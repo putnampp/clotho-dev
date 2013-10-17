@@ -27,37 +27,29 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef SIMPLE_APPLICATION_H_
-#define SIMPLE_APPLICATION_H_
+#include "ClothoObject.h"
 
-#include "Application.h"
-#include "IntVTime.h"
+objectid_t ClothoObject::next_id = 0;
 
-class SimpleApplication : public Application {
-public:
-    SimpleApplication();
+ClothoObject::ClothoObject() : SimulationObject(), m_id( next_id++) {}
 
-    int initialize( vector< string > & args );
+ClothoObject::~ClothoObject() {}
 
-    int getNumberOfSimulationObjects( int mgrId ) const;
+objectid_t ClothoObject::getID() const {
+    return m_id;
+}
 
-    const PartitionInfo * getPartitionInfo( unsigned int nPE );
+void ClothoObject::deallocateState( const State * state ) {
+    delete state;
+}
 
-    int     finalize();
-    void    registerDeserializers();
+void ClothoObject::reclaimEvent( const Event * event ) {
+    delete event;
+}
 
-    string  getCommandLineParameters() const;
+//void ClothoObject::print( ostream & out ) const { }
 
-    const   VTime   & getPositiveInfinity();
-    const   VTime   & getZero();
-
-    const   VTime   & getTime( string & time );
-
-private:
-//    ArgumentParser & getArgumentParser();
-    vector< SimulationObject * > * getSimulationObjects();
-    unsigned int     m_nObjects;
-    string  m_strInFile;
-};
-
-#endif  // SIMPLE_APPLICATION_H_
+ostream & operator<<( ostream & out, const ClothoObject * co ) {
+    co->print( out );
+    return out;
+}

@@ -33,7 +33,7 @@
 
 #define MAJOR_VERSION  "0.1"
 #define MINOR_VERSION  "0"
-#define VERSION        "CLOTHO 0.1.0"
+#define CLOTHO_VERSION        "CLOTHO 0.1.0"
 
 /* #undef LOG */
 /* #undef LOG_LEVEL */

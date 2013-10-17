@@ -27,37 +27,33 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef SIMPLE_APPLICATION_H_
-#define SIMPLE_APPLICATION_H_
+#ifndef CLOTHOOBJECT_H_
+#define CLOTHOOBJECT_H_
 
-#include "Application.h"
-#include "IntVTime.h"
+#include "warped.h"
+#include "SimulationObject.h"
 
-class SimpleApplication : public Application {
+#include <ostream>
+
+using std::ostream;
+
+typedef unsigned long objectid_t;
+
+class ClothoObject : public SimulationObject {
 public:
-    SimpleApplication();
+    friend ostream & operator<<( ostream & out, const ClothoObject * co );
 
-    int initialize( vector< string > & args );
+    objectid_t getID() const;
+    void deallocateState( const State * state );
+    void reclaimEvent( const Event * event );
 
-    int getNumberOfSimulationObjects( int mgrId ) const;
+    virtual void print( ostream & out ) const = 0;
+    virtual ~ClothoObject();
+protected:
+    ClothoObject();
+    objectid_t        m_id;
 
-    const PartitionInfo * getPartitionInfo( unsigned int nPE );
+    static objectid_t next_id;
+}; 
 
-    int     finalize();
-    void    registerDeserializers();
-
-    string  getCommandLineParameters() const;
-
-    const   VTime   & getPositiveInfinity();
-    const   VTime   & getZero();
-
-    const   VTime   & getTime( string & time );
-
-private:
-//    ArgumentParser & getArgumentParser();
-    vector< SimulationObject * > * getSimulationObjects();
-    unsigned int     m_nObjects;
-    string  m_strInFile;
-};
-
-#endif  // SIMPLE_APPLICATION_H_
+#endif  // CLOTHOOBJECT_H_

@@ -27,37 +27,25 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef SIMPLE_APPLICATION_H_
-#define SIMPLE_APPLICATION_H_
+#ifndef BIRTHEVENT_H_
+#define BIRTHEVENT_H_
 
-#include "Application.h"
-#include "IntVTime.h"
+#include "ClothoEventStub.h"
 
-class SimpleApplication : public Application {
+DECLARE_CLOTHO_EVENT( BirthEvent )
 public:
-    SimpleApplication();
-
-    int initialize( vector< string > & args );
-
-    int getNumberOfSimulationObjects( int mgrId ) const;
-
-    const PartitionInfo * getPartitionInfo( unsigned int nPE );
-
-    int     finalize();
-    void    registerDeserializers();
-
-    string  getCommandLineParameters() const;
-
-    const   VTime   & getPositiveInfinity();
-    const   VTime   & getZero();
-
-    const   VTime   & getTime( string & time );
-
-private:
-//    ArgumentParser & getArgumentParser();
-    vector< SimulationObject * > * getSimulationObjects();
-    unsigned int     m_nObjects;
-    string  m_strInFile;
+    BirthEvent( const VTime & tSend, const VTime &tRecv,
+                 SimulationObject * sender, 
+                 SimulationObject * receiver );
+    BirthEvent( const VTime & tSend, const VTime & tRecv,
+                 const ObjectID &sender, 
+                 const ObjectID & receiver,
+                 const unsigned int evtID );
+    BirthEvent( const BirthEvent & ce );
+    virtual ~BirthEvent();
 };
 
-#endif  // SIMPLE_APPLICATION_H_
+DECLARE_REGISTERED_CLOTHO_EVENT( BirthEvent );
+
+#endif  // BIRTHEVENT_H_
+

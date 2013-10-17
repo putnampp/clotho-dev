@@ -27,37 +27,49 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef SIMPLE_APPLICATION_H_
-#define SIMPLE_APPLICATION_H_
+#include "DeathEvent.h"
+#include "SerializedInstance.h"
 
-#include "Application.h"
-#include "IntVTime.h"
+DEFINE_REGISTERED_CLOTHO_EVENT( DeathEvent )
 
-class SimpleApplication : public Application {
-public:
-    SimpleApplication();
+DeathEvent::DeathEvent( const VTime & tSend, const VTime &tRecv,
+                 SimulationObject * sender, 
+                 SimulationObject * receiver ) :
+                 DefaultEvent( tSend, tRecv, sender, receiver ) {}
 
-    int initialize( vector< string > & args );
+DeathEvent::DeathEvent( const VTime & tSend, const VTime & tRecv,
+                 const ObjectID &sender, 
+                 const ObjectID & receiver,
+                 const unsigned int evtID ) :
+                 DefaultEvent( tSend, tRecv, sender, receiver, evtID ) {}
 
-    int getNumberOfSimulationObjects( int mgrId ) const;
+DeathEvent::DeathEvent( const DeathEvent & ce ) :
+                 DefaultEvent( ce.getSendTime(), ce.getReceiveTime(),
+                                ce.getSender(), ce.getReceiver(),
+                                ce.getEventId() ) {}
 
-    const PartitionInfo * getPartitionInfo( unsigned int nPE );
 
-    int     finalize();
-    void    registerDeserializers();
+bool DeathEvent::eventCompare( const Event * evt ) {
+    const DeathEvent * e = dynamic_cast< const DeathEvent * >(evt);
+    return (compareEvents( this, e ) );
+}
 
-    string  getCommandLineParameters() const;
+DeathEvent::~DeathEvent() {}
 
-    const   VTime   & getPositiveInfinity();
-    const   VTime   & getZero();
+DEFINE_CLOTHO_EVENT_DESERIALIZATION_METHOD( DeathEvent ) {
+    shared_ptr< VTime > tSend( dynamic_cast< VTime * >(inst->getSerializable()));
+    shared_ptr< VTime > tRecv( dynamic_cast< VTime * >(inst->getSerializable()));
 
-    const   VTime   & getTime( string & time );
+    unsigned int sSimManID = inst->getUnsigned();
+    unsigned int sSimObjID = inst->getUnsigned();
+    unsigned int rSimManID = inst->getUnsigned();
+    unsigned int rSimObjID = inst->getUnsigned();
+    unsigned int eventID = inst->getUnsigned();
 
-private:
-//    ArgumentParser & getArgumentParser();
-    vector< SimulationObject * > * getSimulationObjects();
-    unsigned int     m_nObjects;
-    string  m_strInFile;
-};
+    ObjectID send( sSimObjID, sSimManID );
+    ObjectID recv( rSimObjID, rSimManID );
 
-#endif  // SIMPLE_APPLICATION_H_
+    DeathEvent * e = new DeathEvent( *tSend, *tRecv, send, recv, eventID );
+
+    return e;
+}

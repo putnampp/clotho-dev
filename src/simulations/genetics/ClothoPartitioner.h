@@ -27,24 +27,11 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef CLOTHOEVENT_H_
-#define CLOTHOEVENT_H_
+#ifndef CLOTHOPARTITIONER_H_
+#define CLOTHOPARTITIONER_H_
 
-#include "ClothoEventStub.h"
-#include "warped/SimulationObject.h"
+#include "RoundRobinPartitioner.h"
 
-REGISTERED_CLOTHO_EVENT_BEGIN( ClothoEvent )
-public:
-    virtual ~ClothoEvent();
-protected:
-    ClothoEvent( const VTime & tSend, const VTime &tRecv,
-                 SimulationObject * sender, 
-                 SimulationObject * receiver );
-    ClothoEvent( const VTime & tSend, const VTime & tRecv,
-                 const ObjectID &sender, 
-                 const ObjectID & receiver,
-                 const unsigned int evtID );
-    ClothoEvent( const ClothoEvent & ce );
-REGISTERED_CLOTHO_EVENT_END( ClothoEvent )
+typedef RoundRobinPartitioner ClothoPartitioner;
 
-#endif  // CLOTHOEVENT_H_
+#endif

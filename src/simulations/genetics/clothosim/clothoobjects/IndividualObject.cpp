@@ -27,37 +27,86 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef SIMPLE_APPLICATION_H_
-#define SIMPLE_APPLICATION_H_
+#include "IndividualObject.h"
 
-#include "Application.h"
+#include "events/BirthEvent.h"
+#include "events/DeathEvent.h"
+
 #include "IntVTime.h"
 
-class SimpleApplication : public Application {
-public:
-    SimpleApplication();
+#include <boost/lexical_cast.hpp>
 
-    int initialize( vector< string > & args );
+#include <iostream>
 
-    int getNumberOfSimulationObjects( int mgrId ) const;
+using std::cout;
+using std::endl;
 
-    const PartitionInfo * getPartitionInfo( unsigned int nPE );
+DECLARE_REGISTERED_CLOTHO_OBJECT( Individual )
 
-    int     finalize();
-    void    registerDeserializers();
+Individual::Individual() : 
+    m_name( "IND"  +  boost::lexical_cast<string>( m_id ) ) {
+}
 
-    string  getCommandLineParameters() const;
+Individual::Individual( const YAML::Node & n ) {
+    try {
+        m_name = n[ "name" ].as< string >();
+    } catch ( ... ) {
+        m_name = "IND";
+        m_name.append( boost::lexical_cast<string>( m_id ) );
+    }
+}
 
-    const   VTime   & getPositiveInfinity();
-    const   VTime   & getZero();
+Individual::Individual( sex_t s, const vector< genotype_t > & genos ) :
+    m_name( "IND"  +  boost::lexical_cast<string>(m_id)) {
 
-    const   VTime   & getTime( string & time );
+}
 
-private:
-//    ArgumentParser & getArgumentParser();
-    vector< SimulationObject * > * getSimulationObjects();
-    unsigned int     m_nObjects;
-    string  m_strInFile;
-};
+Individual::~Individual() {}
 
-#endif  // SIMPLE_APPLICATION_H_
+void Individual::initialize() {
+    m_environment = dynamic_cast< ClothoObject * >( getObjectHandle( "ENV" ));
+
+    if( !m_environment ) {
+        abort();
+    }
+
+    born();
+}
+
+void Individual::finalize() {
+
+}
+
+void Individual::executeProcess() {
+    IndividualObjectState * iso = static_cast< IndividualObjectState * >(getState());
+    ASSERT( iso != NULL );
+
+    while( haveMoreEvents() ) {
+        const Event * evt = getEvent();
+        if( evt->getDataType() == "DeathEvent" ) {
+            cout << "Processing DeathEvent (" << getSimulationTime() << ") ... " << *evt << endl;
+        }
+    }
+}
+
+State * Individual::allocateState()  {
+    return new IndividualObjectState( getSimulationTime() );
+}
+
+const string & Individual::getName() const {
+    return m_name;
+}
+
+void Individual::born() {
+    IntVTime recvTime = dynamic_cast< const IntVTime &>(getSimulationTime());
+    Event * eBorn = new BirthEvent( recvTime, recvTime, this, m_environment );
+
+    m_environment->receiveEvent( eBorn );
+}
+
+void Individual::died() {
+}
+
+void Individual::print( ostream & out ) const {
+    out << m_name << "\n";
+}

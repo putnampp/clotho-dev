@@ -27,37 +27,45 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef SIMPLE_APPLICATION_H_
-#define SIMPLE_APPLICATION_H_
+#ifndef CLOTHOOBJECTMANAGER_H_
+#define CLOTHOOBJECTMANAGER_H_
 
-#include "Application.h"
-#include "IntVTime.h"
+#include "common.h"
 
-class SimpleApplication : public Application {
-public:
-    SimpleApplication();
+#include "SimulationObject.h"
+#include "yaml-cpp/yaml.h"
 
-    int initialize( vector< string > & args );
+#include <map>
+#include <vector>
 
-    int getNumberOfSimulationObjects( int mgrId ) const;
+using std::map;
+using std::vector;
 
-    const PartitionInfo * getPartitionInfo( unsigned int nPE );
+struct SimObjectCreator {
+    virtual const string & name() = 0;
+    virtual SimulationObject * createObject() = 0;
 
-    int     finalize();
-    void    registerDeserializers();
-
-    string  getCommandLineParameters() const;
-
-    const   VTime   & getPositiveInfinity();
-    const   VTime   & getZero();
-
-    const   VTime   & getTime( string & time );
-
-private:
-//    ArgumentParser & getArgumentParser();
-    vector< SimulationObject * > * getSimulationObjects();
-    unsigned int     m_nObjects;
-    string  m_strInFile;
+    virtual SimulationObject * createObjectFrom( const YAML::Node & n ) = 0;
 };
 
-#endif  // SIMPLE_APPLICATION_H_
+class ClothoObjectManager {
+public:
+    typedef map< const string, SimObjectCreator * > SimObjects;
+    typedef SimObjects::iterator  iterator;
+
+    static shared_ptr< ClothoObjectManager > getInstance();
+
+    void registerObject( SimObjectCreator * soc );
+
+    SimulationObject * createObject( const string & name );
+
+    SimulationObject * createObjectFrom( const YAML::Node & yaml );
+
+    virtual ~ClothoObjectManager();
+protected:
+    ClothoObjectManager();
+
+    SimObjects m_creators;
+};
+
+#endif  // CLOTHOOBJECTMANAGER_H_

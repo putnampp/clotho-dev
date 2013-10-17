@@ -27,37 +27,47 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef SIMPLE_APPLICATION_H_
-#define SIMPLE_APPLICATION_H_
+#include "ClothoEvent.h"
 
-#include "Application.h"
-#include "IntVTime.h"
+#include "SerializedInstance.h"
 
-class SimpleApplication : public Application {
-public:
-    SimpleApplication();
+DEFINE_REGISTERED_CLOTHO_EVENT( ClothoEvent )
 
-    int initialize( vector< string > & args );
+ClothoEvent::ClothoEvent(    const VTime & tSend, const VTime &tRecv,
+                    SimulationObject * sender,
+                    SimulationObject * receiver ) :
+                    DefaultEvent( tSend, tRecv, sender, receiver ) {}
 
-    int getNumberOfSimulationObjects( int mgrId ) const;
+ClothoEvent::ClothoEvent(    const VTime & tSend, const VTime & tRecv,
+                    const ObjectID &sender, const ObjectID & receiver,
+                    const unsigned int evtID ) :
+                    DefaultEvent( tSend, tRecv, sender, receiver, evtID ) {}
 
-    const PartitionInfo * getPartitionInfo( unsigned int nPE );
+ClothoEvent::ClothoEvent( const ClothoEvent & ce ) :
+                    DefaultEvent( ce.getSendTime(), ce.getReceiveTime(),
+                                    ce.getSender(), ce.getReceiver(), ce.getEventId() ) {}
 
-    int     finalize();
-    void    registerDeserializers();
+ClothoEvent::~ClothoEvent() {}
 
-    string  getCommandLineParameters() const;
+bool ClothoEvent::eventCompare( const Event * evt ) {
+    const ClothoEvent *e = dynamic_cast< const ClothoEvent * >(evt);
+    return (compareEvents(this, e ));
+}
 
-    const   VTime   & getPositiveInfinity();
-    const   VTime   & getZero();
+DEFINE_CLOTHO_EVENT_DESERIALIZATION_METHOD( ClothoEvent ) {
+    shared_ptr< VTime > tSend( dynamic_cast< VTime * >(inst->getSerializable()));
+    shared_ptr< VTime > tRecv( dynamic_cast< VTime * >(inst->getSerializable()));
 
-    const   VTime   & getTime( string & time );
+    unsigned int sSimManID = inst->getUnsigned();
+    unsigned int sSimObjID = inst->getUnsigned();
+    unsigned int rSimManID = inst->getUnsigned();
+    unsigned int rSimObjID = inst->getUnsigned();
+    unsigned int eventID = inst->getUnsigned();
 
-private:
-//    ArgumentParser & getArgumentParser();
-    vector< SimulationObject * > * getSimulationObjects();
-    unsigned int     m_nObjects;
-    string  m_strInFile;
-};
+    ObjectID send( sSimObjID, sSimManID );
+    ObjectID recv( rSimObjID, rSimManID );
 
-#endif  // SIMPLE_APPLICATION_H_
+    ClothoEvent * e = new ClothoEvent( *tSend, *tRecv, send, recv, eventID );
+
+    return e;
+}

@@ -27,37 +27,25 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef SIMPLE_APPLICATION_H_
-#define SIMPLE_APPLICATION_H_
+#ifndef CLOTHOEVENT_H_
+#define CLOTHOEVENT_H_
 
-#include "Application.h"
-#include "IntVTime.h"
+#include "ClothoEventStub.h"
+#include "SimulationObject.h"
 
-class SimpleApplication : public Application {
+DECLARE_CLOTHO_EVENT( ClothoEvent )
 public:
-    SimpleApplication();
-
-    int initialize( vector< string > & args );
-
-    int getNumberOfSimulationObjects( int mgrId ) const;
-
-    const PartitionInfo * getPartitionInfo( unsigned int nPE );
-
-    int     finalize();
-    void    registerDeserializers();
-
-    string  getCommandLineParameters() const;
-
-    const   VTime   & getPositiveInfinity();
-    const   VTime   & getZero();
-
-    const   VTime   & getTime( string & time );
-
-private:
-//    ArgumentParser & getArgumentParser();
-    vector< SimulationObject * > * getSimulationObjects();
-    unsigned int     m_nObjects;
-    string  m_strInFile;
+    ClothoEvent( const VTime & tSend, const VTime &tRecv,
+                 SimulationObject * sender, 
+                 SimulationObject * receiver );
+    ClothoEvent( const VTime & tSend, const VTime & tRecv,
+                 const ObjectID & sender, 
+                 const ObjectID & receiver,
+                 const unsigned int evtID );
+    ClothoEvent( const ClothoEvent & ce );
+    virtual ~ClothoEvent();
 };
 
-#endif  // SIMPLE_APPLICATION_H_
+DECLARE_REGISTERED_CLOTHO_EVENT( ClothoEvent );
+
+#endif  // CLOTHOEVENT_H_

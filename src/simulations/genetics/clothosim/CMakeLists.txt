@@ -26,11 +26,25 @@
 # of the authors and should not be interpreted as representing official policies,
 # either expressed or implied, of the FreeBSD Project.
 ################################################################################
-INCLUDE_DIRECTORIES( ${${PROJECT_NAME}_INCLUDE_DIR} )
-#LINK_DIRECTORIES( ${Warped_LIBRARIES} )
-LINK_DIRECTORIES( ${Warped_DIR}/warped/lib ${Warped_DIR}/utils/lib )
+INCLUDE_DIRECTORIES( ${Warped_INCLUDE_DIRS} )
+LINK_DIRECTORIES( ${Warped_LIBRARIES} )
 
-LIST( APPEND SRCS ClothoEvent.cpp)
-LIST( APPEND SRCS DeathEvent.cpp)
+LIST( APPEND SIM_SRC clothoobjects/events/ClothoEvent.cpp )
+LIST( APPEND SIM_SRC clothoobjects/events/DeathEvent.cpp )
+LIST( APPEND SIM_SRC clothoobjects/events/BirthEvent.cpp )
 
-ADD_LIBRARY( events SHARED ${SRCS} )
+LIST( APPEND SIM_SRC clothoobjects/ClothoObject.cpp )
+LIST( APPEND SIM_SRC clothoobjects/ClothoObjectManager.cpp )
+LIST( APPEND SIM_SRC clothoobjects/EnvironmentObject.cpp )
+LIST( APPEND SIM_SRC clothoobjects/EnvironmentObjectState.cpp )
+LIST( APPEND SIM_SRC clothoobjects/IndividualObject.cpp )
+LIST( APPEND SIM_SRC clothoobjects/RandomIndividualObject.cpp )
+LIST( APPEND SIM_SRC clothoobjects/IndividualObjectState.cpp )
+
+#LIST( APPEND SIM_LIBS clothoobjects )
+
+#FOREACH( D ${SIM_LIBS} )
+#    ADD_SUBDIRECTORY( ${D} )
+#ENDFOREACH(D)
+
+ADD_LIBRARY(clothosim SHARED ${SIM_SRC})

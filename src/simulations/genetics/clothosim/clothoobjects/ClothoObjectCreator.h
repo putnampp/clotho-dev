@@ -27,37 +27,45 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef SIMPLE_APPLICATION_H_
-#define SIMPLE_APPLICATION_H_
+#ifndef CLOTHOOBJECTCREATOR_H_
+#define CLOTHOOBJECTCREATOR_H_
 
-#include "Application.h"
-#include "IntVTime.h"
+#include "common.h"
+#include "ClothoObject.h"
+#include "ClothoObjectManager.h"
 
-class SimpleApplication : public Application {
+#include "yaml-cpp/yaml.h"
+
+template < class OBJ >
+class ClothoObjectCreator : public SimObjectCreator {
 public:
-    SimpleApplication();
+    ClothoObjectCreator( const char * name ) : m_name(name) {
+        ClothoObjectManager::getInstance()->registerObject( this );
+    }
 
-    int initialize( vector< string > & args );
+    const string & name() {
+        return m_name;
+    }
 
-    int getNumberOfSimulationObjects( int mgrId ) const;
+    SimulationObject * createObject() {
+        return new OBJ();
+    }
 
-    const PartitionInfo * getPartitionInfo( unsigned int nPE );
-
-    int     finalize();
-    void    registerDeserializers();
-
-    string  getCommandLineParameters() const;
-
-    const   VTime   & getPositiveInfinity();
-    const   VTime   & getZero();
-
-    const   VTime   & getTime( string & time );
-
+    SimulationObject * createObjectFrom( const YAML::Node & n ) {
+        return new OBJ( n );
+    }
 private:
-//    ArgumentParser & getArgumentParser();
-    vector< SimulationObject * > * getSimulationObjects();
-    unsigned int     m_nObjects;
-    string  m_strInFile;
+    const string m_name;
 };
 
-#endif  // SIMPLE_APPLICATION_H_
+#define DEFINE_CLOTHO_OBJECT( name )                            \
+    class name : public ClothoObject
+
+#define DEFINE_REGISTERED_CLOTHO_OBJECT( name )                 \
+    extern ClothoObjectCreator< name > objc_##name;
+
+#define DECLARE_REGISTERED_CLOTHO_OBJECT( name )                \
+    ClothoObjectCreator< name > objc_##name( #name );
+    
+
+#endif  // CLOTHOOBJECTCREATOR_H_

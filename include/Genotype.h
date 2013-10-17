@@ -35,6 +35,10 @@
 #include "Allele.h"
 #include "Locus.h"
 
+#include <vector>
+
+using std::vector;
+
 enum GenotypeFlag { HOMOZYGOUS  = 1,
                      DOMINANT   = 2 };
 
@@ -54,11 +58,17 @@ protected:
     genotype(){}
 };
 
-/*
 template < ploidy_t P >
 struct Genotype : public genotype {
 public:
-    Genotype() : m_flags(0) {}
+    static const ploidy_t PLOIDY = P;
+    Genotype( const vector< allele_t > & alleles) : m_flags(0) {
+        vector< allele_t >::const_iterator it = alleles.begin();
+        ploidy_t p = 0;
+        while( it != alleles.end() && p < PLOIDY ) {
+            m_geno[ p++ ] = (*it++);
+        }
+    }
 
     ploidy_t ploidy() const {   return PLOIDY; }
     flag_t   getFlags() const { return m_flags; }
@@ -69,11 +79,9 @@ public:
     
     virtual ~Genotype() {}
 protected:
-    static const ploidy_t PLOIDY = P;
     flag_t      m_flags; 
     allele_t    m_geno[ PLOIDY ];
 };
-*/
 
 struct Genotypeable {
     virtual bool isHomozygous( const LocusPtr l ) = 0;

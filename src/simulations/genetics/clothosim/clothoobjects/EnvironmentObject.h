@@ -27,37 +27,35 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef SIMPLE_APPLICATION_H_
-#define SIMPLE_APPLICATION_H_
+#ifndef ENVIRONMENTOBJECT_H_
+#define ENVIRONMENTOBJECT_H_
 
-#include "Application.h"
-#include "IntVTime.h"
+#include "ClothoObjectCreator.h"
 
-class SimpleApplication : public Application {
+DEFINE_CLOTHO_OBJECT( Environment ) {
 public:
-    SimpleApplication();
+    Environment();
+    Environment( const YAML::Node & n);
 
-    int initialize( vector< string > & args );
+    virtual ~Environment();
 
-    int getNumberOfSimulationObjects( int mgrId ) const;
+    void initialize();
+    void finalize();
 
-    const PartitionInfo * getPartitionInfo( unsigned int nPE );
+    void executeProcess();
+    
+    State * allocateState();
+    const string & getName() const;
 
-    int     finalize();
-    void    registerDeserializers();
-
-    string  getCommandLineParameters() const;
-
-    const   VTime   & getPositiveInfinity();
-    const   VTime   & getZero();
-
-    const   VTime   & getTime( string & time );
+    void print( ostream & out ) const;
+protected:
+    template< class EVT >
+    void handleEvent( const EVT * evt );
 
 private:
-//    ArgumentParser & getArgumentParser();
-    vector< SimulationObject * > * getSimulationObjects();
-    unsigned int     m_nObjects;
-    string  m_strInFile;
+    string m_name;
 };
 
-#endif  // SIMPLE_APPLICATION_H_
+DEFINE_REGISTERED_CLOTHO_OBJECT( Environment )
+
+#endif  // ENVIRONMENTOBJECT_H_

@@ -30,9 +30,9 @@
 #ifndef SIMPLEEVENT_H_
 #define SIMPLEEVENT_H_
 
-#include "warped/DefaultEvent.h"
-#include "warped/IntVTime.h"
-#include "warped/SerializedInstance.h"
+#include "DefaultEvent.h"
+#include "IntVTime.h"
+#include "SerializedInstance.h"
 
 
 class SimpleEvent : public DefaultEvent {

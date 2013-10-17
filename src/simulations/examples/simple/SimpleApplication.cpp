@@ -31,19 +31,19 @@
 #include "SimpleEvent.h"
 #include "SimpleObject.h"
 
-#include "warped/PartitionInfo.h"
-#include "warped/DeserializerManager.h"
+#include "PartitionInfo.h"
+#include "DeserializerManager.h"
 
-#include "warped/RoundRobinPartitioner.h"
+#include "RoundRobinPartitioner.h"
 
-#include "utils/ArgumentParser.h"
+//#include "utils/ArgumentParser.h"
 
 #include <iostream>
 
 SimpleApplication::SimpleApplication() : m_nObjects( 0 ), m_strInFile("") {}
 
 int SimpleApplication::initialize( vector< string > & args ) {
-    getArgumentParser().checkArgs( args );
+//    getArgumentParser().checkArgs( args );
     return 0;
 }
 
@@ -89,7 +89,7 @@ const VTime & SimpleApplication::getTime( string & time ) {
     return *t;
 }
 
-ArgumentParser & SimpleApplication::getArgumentParser() {
+/*ArgumentParser & SimpleApplication::getArgumentParser() {
     static ArgumentParser::ArgRecord    args[] = {
         {"-nObjects", "some number", &m_nObjects, ArgumentParser::INTEGER, false },
         {"", "", 0}
@@ -97,7 +97,7 @@ ArgumentParser & SimpleApplication::getArgumentParser() {
 
     static ArgumentParser * myArgParser = new ArgumentParser( args );
     return *myArgParser;
-}
+}*/
 
 vector< SimulationObject * > * SimpleApplication::getSimulationObjects() {
     vector< SimulationObject * > * rval = new vector< SimulationObject * >();

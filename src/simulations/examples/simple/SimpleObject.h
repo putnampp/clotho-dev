@@ -30,8 +30,9 @@
 #ifndef SIMPLEOBJECT_H_
 #define SIMPLEOBJECT_H_
 
-#include "warped/warped.h"
-#include "warped/SimulationObject.h"
+#include "warped.h"
+#include "SimulationObject.h"
+#include "DefaultEvent.h"
 
 class SimpleObject : public SimulationObject {
 public:

@@ -27,37 +27,13 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef SIMPLE_APPLICATION_H_
-#define SIMPLE_APPLICATION_H_
+#ifndef RANDOMINDIVIDUALOBJECT_H_
+#define RANDOMINDIVIDUALOBJECT_H_
 
-#include "Application.h"
-#include "IntVTime.h"
+#include "IndividualObject.h"
 
-class SimpleApplication : public Application {
-public:
-    SimpleApplication();
+class RandomIndividual : public Individual {};
 
-    int initialize( vector< string > & args );
+DEFINE_REGISTERED_CLOTHO_OBJECT( RandomIndividual )
 
-    int getNumberOfSimulationObjects( int mgrId ) const;
-
-    const PartitionInfo * getPartitionInfo( unsigned int nPE );
-
-    int     finalize();
-    void    registerDeserializers();
-
-    string  getCommandLineParameters() const;
-
-    const   VTime   & getPositiveInfinity();
-    const   VTime   & getZero();
-
-    const   VTime   & getTime( string & time );
-
-private:
-//    ArgumentParser & getArgumentParser();
-    vector< SimulationObject * > * getSimulationObjects();
-    unsigned int     m_nObjects;
-    string  m_strInFile;
-};
-
-#endif  // SIMPLE_APPLICATION_H_
+#endif  // RANDOMINDIVIDUALOBJECT_H_

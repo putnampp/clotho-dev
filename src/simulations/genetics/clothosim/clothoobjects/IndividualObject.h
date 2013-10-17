@@ -27,24 +27,51 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef DEATHEVENT_H_
-#define DEATHEVENT_H_
+#ifndef INDIVIDUALOBJECT_H_
+#define INDIVIDUALOBJECT_H_
 
-#include "ClothoEventStub.h"
+#include "warped.h"
+#include "SimulationObject.h"
+#include "SerializedInstance.h"
 
-REGISTERED_CLOTHO_EVENT_BEGIN( DeathEvent )
+#include "common.h"
+#include <vector>
+
+#include "ClothoObjectCreator.h"
+#include "IndividualObjectState.h"
+
+using std::vector;
+
+DEFINE_CLOTHO_OBJECT( Individual ) {
 public:
-    virtual ~DeathEvent();
+    Individual( );
+    Individual( const YAML::Node & n );
+
+    Individual( sex_t s, const vector< genotype_t > & genos);
+
+    ~Individual();
+
+    void initialize();
+    void reinitialize( const State * state );
+    void finalize();
+
+    void executeProcess();
+
+    State * allocateState();
+    const string & getName() const;
+
+    void print( ostream & out ) const;
 
 protected:
-    DeathEvent( const VTime & tSend, const VTime &tRecv,
-                 SimulationObject * sender, 
-                 SimulationObject * receiver );
-    DeathEvent( const VTime & tSend, const VTime & tRecv,
-                 const ObjectID &sender, 
-                 const ObjectID & receiver,
-                 const unsigned int evtID );
-    DeathEvent( const DeathEvent & ce );
-REGISTERED_CLOTHO_EVENT_END( DeathEvent )
+    void born();
+    void died();
 
-#endif  // DEATHEVENT_H_
+private:
+    string m_name;
+
+    ClothoObject *  m_environment;
+};
+
+DEFINE_REGISTERED_CLOTHO_OBJECT( Individual )
+
+#endif  // INDIVIDUALOBJECT_H_

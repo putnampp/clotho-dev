@@ -27,37 +27,41 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef SIMPLE_APPLICATION_H_
-#define SIMPLE_APPLICATION_H_
+#include "ClothoObjectManager.h"
 
-#include "Application.h"
-#include "IntVTime.h"
+ClothoObjectManager::ClothoObjectManager(){}
 
-class SimpleApplication : public Application {
-public:
-    SimpleApplication();
+shared_ptr< ClothoObjectManager > ClothoObjectManager::getInstance() {
+    static shared_ptr< ClothoObjectManager > inst( new ClothoObjectManager() );
+    return inst;
+}
 
-    int initialize( vector< string > & args );
+void ClothoObjectManager::registerObject( SimObjectCreator * soc ) {
+    m_creators[ soc->name() ] = soc;
+}
 
-    int getNumberOfSimulationObjects( int mgrId ) const;
+SimulationObject * ClothoObjectManager::createObject( const string & name ) {
+    iterator it = m_creators.find( name );
 
-    const PartitionInfo * getPartitionInfo( unsigned int nPE );
+    if( it == m_creators.end() )
+        return NULL;
 
-    int     finalize();
-    void    registerDeserializers();
+    return it->second->createObject();
+}
 
-    string  getCommandLineParameters() const;
+SimulationObject * ClothoObjectManager::createObjectFrom( const YAML::Node & n ) {
+    try {
+        string name = n[ "object" ].as<string>();
 
-    const   VTime   & getPositiveInfinity();
-    const   VTime   & getZero();
+        iterator it = m_creators.find( name );
 
-    const   VTime   & getTime( string & time );
+        if( it != m_creators.end() )
+            return it->second->createObjectFrom(n);
+    } catch ( ... ) {    }
 
-private:
-//    ArgumentParser & getArgumentParser();
-    vector< SimulationObject * > * getSimulationObjects();
-    unsigned int     m_nObjects;
-    string  m_strInFile;
-};
+    return NULL;
+}
 
-#endif  // SIMPLE_APPLICATION_H_
+ClothoObjectManager::~ClothoObjectManager() {
+    m_creators.clear();
+}

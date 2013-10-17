@@ -27,51 +27,59 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef CLOTHOEVENTSTUB_H_
-#define CLOTHOEVENTSTUB_H_
+#include "YamlConfig.h"
 
-#include "common.h"
-#include "warped/DefaultEvent.h"
-#include "warped/DeserializerManager.h"
+#include <fstream>
+#include <iostream>
+#include <vector>
 
-template < class EVT >
-class ClothoEventStub {
-public:
-    typedef EVT event_t;
-    ClothoEventStub( const char * name) : m_name( name ) {
-        DeserializerManager::instance()->registerDeserializer( this->getDataType(), &ClothoEventStub< EVT >::deserialize );
+#include "clothosim/clothoobjects/ClothoObjectManager.h"
+#include "clothosim/clothoobjects/ClothoObject.h"
+
+using std::ifstream;
+using std::vector;
+
+using std::cout;
+using std::endl;
+
+YamlConfig::YamlConfig( const string & file ) :
+    m_config( file )
+{}
+
+shared_ptr< vector< SimulationObject * > > YamlConfig::getSimulationObjects() {
+    shared_ptr< vector< SimulationObject * > > objs( new vector< SimulationObject * >() );
+
+    vector< YAML::Node > docs = YAML::LoadAllFromFile( m_config );
+
+    cout << "\nFound " << docs.size() << " documents." << endl;
+    for( vector< YAML::Node >::iterator it = docs.begin(); it != docs.end(); it++ ) {
+        if( it->IsMap() ) {
+            cout << (*it) << "\n" << endl;
+            
+            unsigned int count = 1;
+            try {
+                count = (*it)[ "count" ].as< unsigned int >();
+                if( count > 1 ) {
+                    objs->reserve( objs->size() + count );
+                }
+            } catch ( ... ) {
+                count = 1;
+            }
+
+            for( unsigned int i = 0; i < count; ++i ) {
+                SimulationObject * so = ClothoObjectManager::getInstance()->createObjectFrom( (*it) );
+
+                if( so ) {
+                    cout << (ClothoObject *)so << endl;
+                    objs->push_back( so );
+                }
+            }
+
+            cout << "SimulationObjects created: " << objs->size() << "( " << objs->capacity() << " )" << endl;
+        }
     }
+    
+    return objs;
+}
 
-    const string & getDataType() const {
-        return m_name;
-    }
-
-    static Serializable * deserialize( SerializedInstance * si ) {
-        return new EVT( si );
-    }
-
-    virtual ~ClothoEventStub() {}
-
-private:
-    const string    m_name;
-};
-
-#define REGISTERED_CLOTHO_EVENT_BEGIN( name )               \
-    class name;                                             \
-    const ClothoEventStub< name > evt_##name( #name );      \
-    class name : public DefaultEvent {                      \
-        friend class ClothoEventStub< name >;               \
-    public: \
-        const string & getDataType() const {                \
-            return evt_##name.getDataType();                \
-        } \
-        unsigned int getEventSize() const { return sizeof( name ); }  \
-        bool eventCompare( const Event * e );
-        
-
-#define REGISTERED_CLOTHO_EVENT_END( name ) };
-
-#define DEFINE_CLOTHO_EVENT_DESERIALIZATION_METHOD( name )   \
-    template <> Serializable * ClothoEventStub< name >::deserialize( SerializedInstance * inst )
-
-#endif  // CLOTHOEVENTSTUB_H_
+YamlConfig::~YamlConfig() {}
