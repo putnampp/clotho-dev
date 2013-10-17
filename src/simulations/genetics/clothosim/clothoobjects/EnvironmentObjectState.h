@@ -30,7 +30,7 @@
 #ifndef ENVIRONMENTOBJECTSTATE_H_
 #define ENVIRONMENTOBJECTSTATE_H_
 
-#include "warped/State.h"
+#include "State.h"
 
 class LifeExpectancyModel;
 
@@ -45,7 +45,7 @@ public:
 
     virtual ~EnvironmentObjectState();
 protected:
-    LifeExpectancyModel * m_lemMale, * m_lemFemale;
+    LifeExpectancyModel * m_lemFemale, * m_lemMale;
 };
 
 #endif  // ENVIRONMENTOBJECTSTATE_H_

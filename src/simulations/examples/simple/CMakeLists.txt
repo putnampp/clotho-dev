@@ -27,8 +27,8 @@
 # either expressed or implied, of the FreeBSD Project.
 ################################################################################
 INCLUDE_DIRECTORIES( ${${PROJECT_NAME}_INCLUDE_DIR} )
-#LINK_DIRECTORIES( ${Warped_LIBRARIES} )
-LINK_DIRECTORIES( ${Warped_DIR}/warped/lib ${Warped_DIR}/utils/lib )
+INCLUDE_DIRECTORIES( ${Warped_INCLUDE_DIRS} )
+LINK_DIRECTORIES( ${Warped_LIBRARIES} )
 
 LIST( APPEND SRCS SimpleObject.cpp)
 LIST( APPEND SRCS SimpleApplication.cpp)
@@ -36,4 +36,4 @@ LIST( APPEND SRCS SimpleMain.cpp)
 
 ADD_EXECUTABLE(Simple ${SRCS} )
 
-TARGET_LINK_LIBRARIES(Simple ${Boost_LIBRARIES} warped utils )
+TARGET_LINK_LIBRARIES(Simple ${Boost_LIBRARIES} warped jsoncpp )

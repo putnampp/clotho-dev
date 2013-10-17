@@ -30,15 +30,65 @@
 #include "EnvironmentObject.h"
 #include "EnvironmentObjectState.h"
 
-Environment::Environment( ) : m_name( "Env" ) {}
+#include "IntVTime.h"
 
-Environment::Environment( const YAML::Node & n) {}
+#include "events/BirthEvent.h"
+#include "events/DeathEvent.h"
+
+#include <boost/lexical_cast.hpp>
+
+#include <iostream>
+
+using std::cout;
+using std::endl;
+
+template<>
+void Environment::handleEvent< BirthEvent >( const BirthEvent * evt ) {
+    // upon receiving a birth event we should predict a DeathEvent
+    // for the sender
+    //
+    SimulationObject * sender = getObjectHandle( &(evt->getSender()) );
+    IntVTime death = dynamic_cast< const IntVTime & >( evt->getSendTime() ) + 90;
+
+    Event * dEvent = new DeathEvent( getSimulationTime(), death, this, sender );
+
+    sender->receiveEvent( dEvent );
+}
+
+Environment::Environment( ) : m_name( "ENV" ) {}
+
+Environment::Environment( const YAML::Node & n) : m_name( "ENV" ) {
+}
 
 Environment::~Environment() {}
 void Environment::initialize(){}
 void Environment::finalize(){}
 
-void Environment::executeProcess(){}
+void Environment::executeProcess(){
+    while( haveMoreEvents() ) {
+        const Event * evt = getEvent();
+        if( evt->getDataType() == "BirthEvent" ) {
+            cout << "Processing Birth Event (" << getSimulationTime() << ") ..." << *evt << endl;
+
+            const BirthEvent * eB = dynamic_cast< const BirthEvent *>(evt);
+            handleEvent( eB );
+        }
+    }
+}
+/*
+template<>
+void Environment::handleEvent< BirthEvent >( const BirthEvent * evt ) {
+    // upon receiving a birth event we should predict a DeathEvent
+    // for the sender
+    //
+    SimulationObject * sender = getObjectHandle( evt->getSender() );
+    IntVTime death = dynamic_cast< const IntVTime & >( evt->getSendTime() + 90 );
+
+    Event * dEvent = new DeathEvent( getSimulationTime(), death, this, sender );
+
+    sender->receiveEvent( dEvent );
+}
+*/
     
 State * Environment::allocateState() {
     return new EnvironmentObjectState(NULL, NULL);
@@ -47,3 +97,9 @@ State * Environment::allocateState() {
 const string & Environment::getName() const {
     return m_name;
 }
+
+void Environment::print( ostream & out ) const {
+    out << m_name << "\n";
+}
+
+DECLARE_REGISTERED_CLOTHO_OBJECT( Environment )

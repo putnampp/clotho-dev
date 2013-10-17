@@ -27,59 +27,50 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#include "YamlConfig.h"
+#include "BirthEvent.h"
+#include "SerializedInstance.h"
 
-#include <fstream>
-#include <iostream>
-#include <vector>
+DEFINE_REGISTERED_CLOTHO_EVENT( BirthEvent )
 
-#include "clothosim/clothoobjects/ClothoObjectManager.h"
-#include "clothosim/clothoobjects/ClothoObject.h"
+BirthEvent::BirthEvent( const VTime & tSend, const VTime &tRecv,
+                 SimulationObject * sender, 
+                 SimulationObject * receiver ) :
+                 DefaultEvent( tSend, tRecv, sender, receiver ) {}
 
-using std::ifstream;
-using std::vector;
+BirthEvent::BirthEvent( const VTime & tSend, const VTime & tRecv,
+                 const ObjectID &sender, 
+                 const ObjectID & receiver,
+                 const unsigned int evtID ) :
+                 DefaultEvent( tSend, tRecv, sender, receiver, evtID ) {}
 
-using std::cout;
-using std::endl;
+BirthEvent::BirthEvent( const BirthEvent & ce ) :
+                 DefaultEvent( ce.getSendTime(), ce.getReceiveTime(),
+                                ce.getSender(), ce.getReceiver(),
+                                ce.getEventId() ) {}
 
-YamlConfig::YamlConfig( const string & file ) :
-    m_config( file )
-{}
 
-shared_ptr< vector< SimulationObject * > > YamlConfig::getSimulationObjects() {
-    shared_ptr< vector< SimulationObject * > > objs( new vector< SimulationObject * >() );
-
-    vector< YAML::Node > docs = YAML::LoadAllFromFile( m_config );
-
-    cout << "\nFound " << docs.size() << " documents." << endl;
-    for( vector< YAML::Node >::iterator it = docs.begin(); it != docs.end(); it++ ) {
-        if( it->IsMap() ) {
-            cout << (*it) << "\n" << endl;
-            
-            unsigned int count = 1;
-            try {
-                count = (*it)[ "count" ].as< unsigned int >();
-                if( count > 1 ) {
-                    objs->reserve( objs->size() + count );
-                }
-            } catch ( ... ) {
-                count = 1;
-            }
-
-            for( unsigned int i = 0; i < count; ++i ) {
-                SimulationObject * so = ClothoObjectManager::getInstance()->createObjectFrom( (*it) );
-
-                if( so ) {
-                    cout << (ClothoObject *)so << endl;
-                    objs->push_back( so );
-                }
-            }
-
-            cout << "SimulationObjects created: " << objs->size() << "( " << objs->capacity() << " )" << endl;
-        }
-    }
-    
-    return objs;
+bool BirthEvent::eventCompare( const Event * evt ) {
+    const BirthEvent * e = dynamic_cast< const BirthEvent * >(evt);
+    return (compareEvents( this, e ) );
 }
 
-YamlConfig::~YamlConfig() {}
+BirthEvent::~BirthEvent() {}
+
+DEFINE_CLOTHO_EVENT_DESERIALIZATION_METHOD( BirthEvent ) {
+    shared_ptr< VTime > tSend( dynamic_cast< VTime * >(inst->getSerializable()));
+    shared_ptr< VTime > tRecv( dynamic_cast< VTime * >(inst->getSerializable()));
+
+    unsigned int sSimManID = inst->getUnsigned();
+    unsigned int sSimObjID = inst->getUnsigned();
+    unsigned int rSimManID = inst->getUnsigned();
+    unsigned int rSimObjID = inst->getUnsigned();
+    unsigned int eventID = inst->getUnsigned();
+
+    ObjectID send( sSimObjID, sSimManID );
+    ObjectID recv( rSimObjID, rSimManID );
+
+    BirthEvent * e = new BirthEvent( *tSend, *tRecv, send, recv, eventID );
+
+    return e;
+}
+

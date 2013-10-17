@@ -27,59 +27,13 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#include "YamlConfig.h"
+#ifndef RANDOMINDIVIDUALOBJECT_H_
+#define RANDOMINDIVIDUALOBJECT_H_
 
-#include <fstream>
-#include <iostream>
-#include <vector>
+#include "IndividualObject.h"
 
-#include "clothosim/clothoobjects/ClothoObjectManager.h"
-#include "clothosim/clothoobjects/ClothoObject.h"
+class RandomIndividual : public Individual {};
 
-using std::ifstream;
-using std::vector;
+DEFINE_REGISTERED_CLOTHO_OBJECT( RandomIndividual )
 
-using std::cout;
-using std::endl;
-
-YamlConfig::YamlConfig( const string & file ) :
-    m_config( file )
-{}
-
-shared_ptr< vector< SimulationObject * > > YamlConfig::getSimulationObjects() {
-    shared_ptr< vector< SimulationObject * > > objs( new vector< SimulationObject * >() );
-
-    vector< YAML::Node > docs = YAML::LoadAllFromFile( m_config );
-
-    cout << "\nFound " << docs.size() << " documents." << endl;
-    for( vector< YAML::Node >::iterator it = docs.begin(); it != docs.end(); it++ ) {
-        if( it->IsMap() ) {
-            cout << (*it) << "\n" << endl;
-            
-            unsigned int count = 1;
-            try {
-                count = (*it)[ "count" ].as< unsigned int >();
-                if( count > 1 ) {
-                    objs->reserve( objs->size() + count );
-                }
-            } catch ( ... ) {
-                count = 1;
-            }
-
-            for( unsigned int i = 0; i < count; ++i ) {
-                SimulationObject * so = ClothoObjectManager::getInstance()->createObjectFrom( (*it) );
-
-                if( so ) {
-                    cout << (ClothoObject *)so << endl;
-                    objs->push_back( so );
-                }
-            }
-
-            cout << "SimulationObjects created: " << objs->size() << "( " << objs->capacity() << " )" << endl;
-        }
-    }
-    
-    return objs;
-}
-
-YamlConfig::~YamlConfig() {}
+#endif  // RANDOMINDIVIDUALOBJECT_H_

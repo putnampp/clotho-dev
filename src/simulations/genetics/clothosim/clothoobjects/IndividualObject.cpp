@@ -28,22 +28,49 @@
  ******************************************************************************/
 
 #include "IndividualObject.h"
-#include "IndividualObjectState.h"
 
-#include "events/clotho_events.h"
+#include "events/BirthEvent.h"
+#include "events/DeathEvent.h"
 
-Individual::Individual() : m_name( "IND" ) { }
+#include "IntVTime.h"
 
-Individual::Individual( const YAML::Node & n ) {}
+#include <boost/lexical_cast.hpp>
+
+#include <iostream>
+
+using std::cout;
+using std::endl;
+
+DECLARE_REGISTERED_CLOTHO_OBJECT( Individual )
+
+Individual::Individual() : 
+    m_name( "IND"  +  boost::lexical_cast<string>( m_id ) ) {
+}
+
+Individual::Individual( const YAML::Node & n ) {
+    try {
+        m_name = n[ "name" ].as< string >();
+    } catch ( ... ) {
+        m_name = "IND";
+        m_name.append( boost::lexical_cast<string>( m_id ) );
+    }
+}
+
+Individual::Individual( sex_t s, const vector< genotype_t > & genos ) :
+    m_name( "IND"  +  boost::lexical_cast<string>(m_id)) {
+
+}
 
 Individual::~Individual() {}
 
 void Individual::initialize() {
-       
-}
+    m_environment = dynamic_cast< ClothoObject * >( getObjectHandle( "ENV" ));
 
-void Individual::reinitialize( const State * state ) {
-    
+    if( !m_environment ) {
+        abort();
+    }
+
+    born();
 }
 
 void Individual::finalize() {
@@ -55,8 +82,10 @@ void Individual::executeProcess() {
     ASSERT( iso != NULL );
 
     while( haveMoreEvents() ) {
-        const ClothoEvent * event = dynamic_cast< const ClothoEvent * >( getEvent() );
-        
+        const Event * evt = getEvent();
+        if( evt->getDataType() == "DeathEvent" ) {
+            cout << "Processing DeathEvent (" << getSimulationTime() << ") ... " << *evt << endl;
+        }
     }
 }
 
@@ -66,4 +95,18 @@ State * Individual::allocateState()  {
 
 const string & Individual::getName() const {
     return m_name;
+}
+
+void Individual::born() {
+    IntVTime recvTime = dynamic_cast< const IntVTime &>(getSimulationTime());
+    Event * eBorn = new BirthEvent( recvTime, recvTime, this, m_environment );
+
+    m_environment->receiveEvent( eBorn );
+}
+
+void Individual::died() {
+}
+
+void Individual::print( ostream & out ) const {
+    out << m_name << "\n";
 }

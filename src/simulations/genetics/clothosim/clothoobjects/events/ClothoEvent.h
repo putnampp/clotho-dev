@@ -31,7 +31,7 @@
 #define CLOTHOEVENT_H_
 
 #include "ClothoEventStub.h"
-#include "warped/SimulationObject.h"
+#include "SimulationObject.h"
 
 DECLARE_CLOTHO_EVENT( ClothoEvent )
 public:

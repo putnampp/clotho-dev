@@ -42,7 +42,7 @@ void SimpleObject::finalize() {
     SEVERITY sev = NOTE;
 
     SimpleState * s = static_cast< SimpleState * >( getState() );
-    ASSERT( s != NULL );
+    ASSERT( s != 0 );
 
     string msg = "Getting here\n";
     reportError( msg, sev );
@@ -50,7 +50,7 @@ void SimpleObject::finalize() {
 
 void SimpleObject::executeProcess() {
     SimpleState * myState = static_cast< SimpleState * >( getState() );
-    ASSERT( myState != NULL );
+    ASSERT( myState != 0 );
 }
 
 State * SimpleObject::allocateState() {

@@ -31,9 +31,9 @@
 #define CLOTHOEVENTSTUB_H_
 
 #include "common.h"
-#include "warped/DefaultEvent.h"
-#include "warped/DeserializerManager.h"
-#include "warped/SerializedInstance.h"
+#include "DefaultEvent.h"
+#include "DeserializerManager.h"
+#include "SerializedInstance.h"
 
 template < class EVT >
 class ClothoEventStub {

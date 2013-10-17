@@ -27,10 +27,24 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#include "warped/WarpedMain.h"
+#include "WarpedMain.h"
 #include "ClothoApplication.h"
 
+#include <iostream>
+#include <cstdlib>
+
+using std::cerr;
+using std::endl;
+
 int main( int argc, char ** argv ) {
-    WarpedMain wm( new ClothoApplication());
+
+    if( argc != 2 ) {
+        cerr << "Expected Usage: WarpedClotho <config_file>" << endl;
+        return EXIT_FAILURE;
+    }
+
+    string config( argv[1] );
+
+    WarpedMain wm( new ClothoApplication(), config);
     return wm.main( argc, argv );
 }

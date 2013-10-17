@@ -31,8 +31,8 @@
 #define YAMLCONFIG_H_
 
 #include "common.h"
-#include "warped/warped.h"
-#include "warped/SimulationObject.h"
+#include "warped.h"
+#include "SimulationObject.h"
 
 #include "yaml-cpp/yaml.h"
 

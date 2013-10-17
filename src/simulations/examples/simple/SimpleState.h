@@ -30,7 +30,7 @@
 #ifndef SIMPLESTATE_H_
 #define SIMPLESTATE_H_
 
-#include "warped/State.h"
+#include "State.h"
 
 class SimpleState : public State {
 public:
@@ -39,7 +39,7 @@ public:
     ~SimpleState() {}
 
     void copyState( const State * to) {
-        ASSERT( to != NULL );
+        ASSERT( to != 0 );
 
         //const SimpleState * s = dynamic_cast< const SimpleState * >(to);
     }

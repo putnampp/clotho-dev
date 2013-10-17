@@ -32,12 +32,14 @@
 
 #include "common.h"
 
-#include "warped/SimulationObject.h"
+#include "SimulationObject.h"
 #include "yaml-cpp/yaml.h"
 
 #include <map>
+#include <vector>
 
 using std::map;
+using std::vector;
 
 struct SimObjectCreator {
     virtual const string & name() = 0;

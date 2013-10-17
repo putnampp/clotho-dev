@@ -30,16 +30,30 @@
 #ifndef CLOTHOOBJECT_H_
 #define CLOTHOOBJECT_H_
 
-#include "warped/warped.h"
-#include "warped/SimulationObject.h"
+#include "warped.h"
+#include "SimulationObject.h"
+
+#include <ostream>
+
+using std::ostream;
+
+typedef unsigned long objectid_t;
 
 class ClothoObject : public SimulationObject {
 public:
+    friend ostream & operator<<( ostream & out, const ClothoObject * co );
+
+    objectid_t getID() const;
     void deallocateState( const State * state );
     void reclaimEvent( const Event * event );
+
+    virtual void print( ostream & out ) const = 0;
     virtual ~ClothoObject();
 protected:
     ClothoObject();
+    objectid_t        m_id;
+
+    static objectid_t next_id;
 }; 
 
 #endif  // CLOTHOOBJECT_H_

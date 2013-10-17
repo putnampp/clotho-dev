@@ -30,21 +30,24 @@
 #ifndef INDIVIDUALOBJECT_H_
 #define INDIVIDUALOBJECT_H_
 
-#include "warped/warped.h"
-#include "warped/SimulationObject.h"
-#include "warped/SerializedInstance.h"
+#include "warped.h"
+#include "SimulationObject.h"
+#include "SerializedInstance.h"
 
 #include "common.h"
 #include <vector>
 
 #include "ClothoObjectCreator.h"
+#include "IndividualObjectState.h"
 
 using std::vector;
 
-CLOTHO_OBJECT( Individual ) {
+DEFINE_CLOTHO_OBJECT( Individual ) {
 public:
     Individual( );
     Individual( const YAML::Node & n );
+
+    Individual( sex_t s, const vector< genotype_t > & genos);
 
     ~Individual();
 
@@ -57,8 +60,18 @@ public:
     State * allocateState();
     const string & getName() const;
 
+    void print( ostream & out ) const;
+
+protected:
+    void born();
+    void died();
+
 private:
-    const string m_name;
+    string m_name;
+
+    ClothoObject *  m_environment;
 };
+
+DEFINE_REGISTERED_CLOTHO_OBJECT( Individual )
 
 #endif  // INDIVIDUALOBJECT_H_

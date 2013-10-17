@@ -32,7 +32,7 @@
 
 #include "ClothoObjectCreator.h"
 
-CLOTHO_OBJECT( Environment ) {
+DEFINE_CLOTHO_OBJECT( Environment ) {
 public:
     Environment();
     Environment( const YAML::Node & n);
@@ -46,8 +46,16 @@ public:
     
     State * allocateState();
     const string & getName() const;
+
+    void print( ostream & out ) const;
+protected:
+    template< class EVT >
+    void handleEvent( const EVT * evt );
+
 private:
-    const string m_name;
+    string m_name;
 };
+
+DEFINE_REGISTERED_CLOTHO_OBJECT( Environment )
 
 #endif  // ENVIRONMENTOBJECT_H_

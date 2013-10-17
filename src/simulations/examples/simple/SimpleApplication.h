@@ -30,8 +30,8 @@
 #ifndef SIMPLE_APPLICATION_H_
 #define SIMPLE_APPLICATION_H_
 
-#include "warped/Application.h"
-#include "warped/IntVTime.h"
+#include "Application.h"
+#include "IntVTime.h"
 
 class SimpleApplication : public Application {
 public:
@@ -54,7 +54,7 @@ public:
     const   VTime   & getTime( string & time );
 
 private:
-    ArgumentParser & getArgumentParser();
+//    ArgumentParser & getArgumentParser();
     vector< SimulationObject * > * getSimulationObjects();
     unsigned int     m_nObjects;
     string  m_strInFile;

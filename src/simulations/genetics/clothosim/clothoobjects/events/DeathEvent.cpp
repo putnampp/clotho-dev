@@ -28,7 +28,7 @@
  ******************************************************************************/
 
 #include "DeathEvent.h"
-#include "warped/SerializedInstance.h"
+#include "SerializedInstance.h"
 
 DEFINE_REGISTERED_CLOTHO_EVENT( DeathEvent )
 

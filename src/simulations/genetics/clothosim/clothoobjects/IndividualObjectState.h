@@ -29,8 +29,8 @@
 #ifndef INDIVIDUALOBJETSTATE_H_
 #define INDIVIDUALOBJETSTATE_H_
 
-#include "warped/warped.h"
-#include "warped/State.h"
+#include "warped.h"
+#include "State.h"
 
 #include "common.h"
 #include "Genotype.h"
@@ -46,7 +46,7 @@ typedef size_t  variant_index_t;
 typedef VTime   age_t;
 
 
-//typedef Genotype< 2 > genotype_t;
+typedef Genotype< 2 > genotype_t;
 typedef double  phenotype_t;
 
 static const int MAX_VARIANTS = 100;

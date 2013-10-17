@@ -26,15 +26,19 @@
 # of the authors and should not be interpreted as representing official policies,
 # either expressed or implied, of the FreeBSD Project.
 ################################################################################
+INCLUDE_DIRECTORIES( ${Warped_INCLUDE_DIRS} )
+LINK_DIRECTORIES( ${Warped_LIBRARIES} )
 
 LIST( APPEND SIM_SRC clothoobjects/events/ClothoEvent.cpp )
 LIST( APPEND SIM_SRC clothoobjects/events/DeathEvent.cpp )
+LIST( APPEND SIM_SRC clothoobjects/events/BirthEvent.cpp )
 
 LIST( APPEND SIM_SRC clothoobjects/ClothoObject.cpp )
 LIST( APPEND SIM_SRC clothoobjects/ClothoObjectManager.cpp )
 LIST( APPEND SIM_SRC clothoobjects/EnvironmentObject.cpp )
 LIST( APPEND SIM_SRC clothoobjects/EnvironmentObjectState.cpp )
 LIST( APPEND SIM_SRC clothoobjects/IndividualObject.cpp )
+LIST( APPEND SIM_SRC clothoobjects/RandomIndividualObject.cpp )
 LIST( APPEND SIM_SRC clothoobjects/IndividualObjectState.cpp )
 
 #LIST( APPEND SIM_LIBS clothoobjects )

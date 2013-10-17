@@ -30,7 +30,7 @@
 #ifndef CLOTHOPARTITIONER_H_
 #define CLOTHOPARTITIONER_H_
 
-#include "warped/RoundRobinPartitioner.h"
+#include "RoundRobinPartitioner.h"
 
 typedef RoundRobinPartitioner ClothoPartitioner;
 

@@ -31,6 +31,8 @@ PROJECT( CLOTHO CXX )
 
 SET (${PROJECT_NAME}_LIB_CORENAME "clotho")
 
+set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
+
 SET (${PROJECT_NAME}_VER_MAJ 0)
 SET (${PROJECT_NAME}_VER_MIN 1)
 SET (${PROJECT_NAME}_VER_RELEASE 0 )
@@ -92,9 +94,17 @@ IF( CUDA_FOUND )
     MESSAGE(STATUS "CUDA Library: " ${CUDA_LIBRARIES} )
 ENDIF( CUDA_FOUND )
 
+FIND_PACKAGE( GSL REQUIRED )
+IF( GSL_FOUND )
+    MESSAGE( STATUS "GSL Library: " ${GSL_LIBRARIES} )
+ENDIF( GSL_FOUND )
+
 SET( Warped_DIR "/opt/warped" CACHE PATH "Path to warped libraries")
 #SET( Warped_LIBRARIES "/opt/warped/utils/lib/libutils.so/opt/warped/warped/lib/libwarped.so")
 MESSAGE( STATUS "Warped DIR: " ${Warped_DIR})
+
+SET( Warped_INCLUDE_DIRS "${Warped_DIR}/include")
+SET( Warped_LIBRARIES "${Warped_DIR}/lib")
 
 Set( YAML_LIB "yaml-cpp" )
 
@@ -117,7 +127,7 @@ CONFIGURE_FILE( ${${PROJECT_NAME}_INCLUDE_DIR}/config.h.in ${${PROJECT_NAME}_INC
 
 CONFIGURE_FILE( ${${PROJECT_NAME}_UNITTEST_DIR}/test_main.cpp.in ${${PROJECT_NAME}_UNITTEST_DIR}/test_main.cpp )
 
-set(CMAKE_CXX_FLAGS "-g -fPIC -Wall -O3" )
+set(CMAKE_CXX_FLAGS "-g -fPIC -Wall -O3 -std=c++0x" )
 
 LINK_DIRECTORIES( ${PROJECT_BINARY_DIR}/bin )
 

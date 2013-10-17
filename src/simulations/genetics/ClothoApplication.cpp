@@ -29,22 +29,33 @@
 
 #include "ClothoApplication.h"
 #include "ClothoPartitioner.h"
-#include "warped/IntVTime.h"
-#include "utils/ArgumentParser.h"
+#include "IntVTime.h"
 #include "YamlConfig.h"
 
 #include <iostream>
 using std::cerr;
+using std::cout;
 using std::endl;
 
-int ClothoApplication::initialize( vector< string > & args ) {
-    getArgumentParser().checkArgs(args);
-
+/*
+ int ClothoApplication::initialize( vector< string > & args ) {
     if( m_config.empty() ) {
         cerr << "Please specify a configuration file" << endl;
         abort();
     }
     return 0;
+}
+*/
+
+void ClothoApplication::configure( SimulationConfiguration & config ) {
+    cout << "configure called" << endl;
+    m_config = config.as_string( {"sim"} );
+    if( m_config.empty() ) {
+        cerr << "Please specify a configuration file" << endl;
+        abort();
+    }
+
+    cout << m_config << endl;
 }
 
 int ClothoApplication::finalize( ) {
@@ -52,6 +63,10 @@ int ClothoApplication::finalize( ) {
 }
 
 const PartitionInfo * ClothoApplication::getPartitionInfo( unsigned int nPE ) {
+    if( m_config.empty() ) {
+        cerr << "Unspecified configuration file " << endl;
+        abort();
+    }
 
     ClothoPartitioner *part = new ClothoPartitioner();
 
@@ -65,6 +80,7 @@ const PartitionInfo * ClothoApplication::getPartitionInfo( unsigned int nPE ) {
 }
 
 int     ClothoApplication::getNumberOfSimulationObjects( int mgrID ) const {
+    return 0;
 }
 
 string ClothoApplication::getCommandLineParameters() const {
@@ -85,6 +101,7 @@ const VTime & ClothoApplication::getTime( string & ) {
     return IntVTime::getIntVTimeZero(); 
 }
 
+/*
 ArgumentParser & ClothoApplication::getArgumentParser() {
     // ArgRecord is a nested class of ArgumentParser
     static ArgumentParser::ArgRecord args[] = {
@@ -95,3 +112,4 @@ ArgumentParser & ClothoApplication::getArgumentParser() {
     static ArgumentParser * ap = new ArgumentParser( args );
     return *ap;
 }
+*/

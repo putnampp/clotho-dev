@@ -1,0 +1,39 @@
+# simulation environment configuration
+---
+object: Environment
+lifeexpectancy: { 
+    male: {
+        distribution: gaussian,
+        mean: 80,
+        stdev: 8
+    },
+    female: {
+        distribution: gaussian,
+        mean: 82,
+        stdev: 8
+    }
+}
+...
+# variants of interest
+---
+-[ variant_name, chromosome, position, ref, alt ]
+-[ rs0, chr1, 100, A, G ]
+-[ rs2, chr1, 102, T, C ]
+-[ rs4, chr1, 104, T, A ]
+-[ rs6, chr1, 106, C, G ]
+-[ rs8, chr1, 108, G, A ]
+-[ rs10, chr1, 110, C, G ]
+...
+
+# traits
+---
+
+...
+
+# simulation individuals
+---
+count:  5
+object: RandomIndividual
+max_variants:   1000
+founder_variants: 150
+...

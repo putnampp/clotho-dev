@@ -27,9 +27,9 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 #include "SimpleApplication.h"
-#include "warped/WarpedMain.h"
+#include "WarpedMain.h"
 
 int main( int argc, char ** argv ) {
-    WarpedMain  wm( new SimpleApplication() );
+    WarpedMain  wm( new SimpleApplication(), "" );
     return wm.main( argc, argv );
 }

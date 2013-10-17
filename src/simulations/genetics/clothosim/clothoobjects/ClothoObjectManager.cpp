@@ -50,14 +50,16 @@ SimulationObject * ClothoObjectManager::createObject( const string & name ) {
 }
 
 SimulationObject * ClothoObjectManager::createObjectFrom( const YAML::Node & n ) {
-    string name = n[ "object" ].as<string>();
+    try {
+        string name = n[ "object" ].as<string>();
 
-    iterator it = m_creators.find( name );
+        iterator it = m_creators.find( name );
 
-    if( it == m_creators.end() )
-        return NULL;
+        if( it != m_creators.end() )
+            return it->second->createObjectFrom(n);
+    } catch ( ... ) {    }
 
-    return it->second->createObjectFrom(n);
+    return NULL;
 }
 
 ClothoObjectManager::~ClothoObjectManager() {

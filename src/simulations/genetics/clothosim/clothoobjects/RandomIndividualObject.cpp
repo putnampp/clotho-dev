@@ -27,20 +27,22 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef CLOTHOOBJECTCREATOR_H_
-#define CLOTHOOBJECTCREATOR_H_
+#include "RandomIndividualObject.h"
+#include "IndividualObjectState.h"
 
-#include "common.h"
-#include "ClothoObject.h"
-#include "ClothoObjectManager.h"
+#include "events/clotho_events.h"
 
-#include "yaml-cpp/yaml.h"
+#include <gsl/gsl_rng.h>
 
-template < class OBJ >
-class ClothoObjectCreator : public SimObjectCreator {
+template<>
+class ClothoObjectCreator< RandomIndividual > : public SimObjectCreator {
 public:
-    ClothoObjectCreator( const char * name ) : m_name(name) {
+    ClothoObjectCreator( const char * name ) : m_name( name ), m_T(), m_rng(NULL) {
         ClothoObjectManager::getInstance()->registerObject( this );
+
+        gsl_rng_env_setup();
+        m_T = gsl_rng_default;
+        m_rng = gsl_rng_alloc( m_T );
     }
 
     const string & name() {
@@ -48,24 +50,53 @@ public:
     }
 
     SimulationObject * createObject() {
-        return new OBJ();
+        return new Individual();
     }
 
-    SimulationObject * createObjectFrom( const YAML::Node & n ) {
-        return new OBJ( n );
+    SimulationObject * createObjectFrom( const YAML::Node & n) {
+        try {
+            unsigned int max_variants = n[ "max_variants" ].as< unsigned int >();
+            unsigned int founder_variants = n[ "founder_variants" ].as< unsigned int > ();
+            unsigned int rnd = gsl_rng_get( m_rng );
+
+            sex_t s = (( rnd & 0x00000001 )? MALE : FEMALE );
+            rnd >>= 1;
+            unsigned int j = 1;
+            const unsigned int MAX_J = (sizeof( unsigned int ) << 2);
+
+            vector< allele_t > alleles;
+            alleles.reserve( genotype_t::PLOIDY );
+
+            vector< genotype_t > genotypes;
+            genotypes.reserve( max_variants );
+            for( unsigned int i = 0; i < founder_variants; ++i ) {
+                alleles.clear();
+                for( ploidy_t p = 0; p < genotype_t::PLOIDY; ++p ) {
+                    if( j++ >= MAX_J ) {
+                        rnd = gsl_rng_get( m_rng );
+                        j = 1;
+                    }
+                    alleles.push_back( (allele_t) (rnd & 0x00000001));
+                    rnd >>= 1;
+                }
+
+                genotype_t g( alleles );
+                genotypes.push_back( g );
+            }
+
+            return new Individual( s, genotypes );
+        } catch( ... ) {}
+
+        return NULL;
     }
-private:
+
+    virtual ~ClothoObjectCreator() {
+        gsl_rng_free( m_rng );
+    }
+protected:
     const string m_name;
+    const gsl_rng_type * m_T;
+    gsl_rng * m_rng;
 };
 
-#define DEFINE_CLOTHO_OBJECT( name )                            \
-    class name : public ClothoObject
-
-#define DEFINE_REGISTERED_CLOTHO_OBJECT( name )                 \
-    extern ClothoObjectCreator< name > objc_##name;
-
-#define DECLARE_REGISTERED_CLOTHO_OBJECT( name )                \
-    ClothoObjectCreator< name > objc_##name( #name );
-    
-
-#endif  // CLOTHOOBJECTCREATOR_H_
+DECLARE_REGISTERED_CLOTHO_OBJECT( RandomIndividual )

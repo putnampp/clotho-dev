@@ -29,9 +29,15 @@
 
 #include "ClothoObject.h"
 
-ClothoObject::ClothoObject() : SimulationObject() {}
+objectid_t ClothoObject::next_id = 0;
+
+ClothoObject::ClothoObject() : SimulationObject(), m_id( next_id++) {}
 
 ClothoObject::~ClothoObject() {}
+
+objectid_t ClothoObject::getID() const {
+    return m_id;
+}
 
 void ClothoObject::deallocateState( const State * state ) {
     delete state;
@@ -39,4 +45,11 @@ void ClothoObject::deallocateState( const State * state ) {
 
 void ClothoObject::reclaimEvent( const Event * event ) {
     delete event;
+}
+
+//void ClothoObject::print( ostream & out ) const { }
+
+ostream & operator<<( ostream & out, const ClothoObject * co ) {
+    co->print( out );
+    return out;
 }
