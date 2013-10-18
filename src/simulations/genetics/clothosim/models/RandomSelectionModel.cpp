@@ -27,33 +27,27 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef BIRTHEVENT_H_
-#define BIRTHEVENT_H_
+#include "RandomSelectionModel.h"
 
-#include "../common_types.h"
-#include "ClothoEventStub.h"
+template <>
+OBJECT_ID Environment::select_individual< RandomSelectionModel >( OBJECT_ID & id ) const {
+    Individual * ind = dynamic_cast< Individual * >( getObjectHandle( &id ) );
 
-DECLARE_CLOTHO_EVENT( BirthEvent )
-public:
-    BirthEvent( const VTime & tSend, const VTime &tRecv,
-                 SimulationObject * sender, 
-                 SimulationObject * receiver,
-                sex_t s );
-    BirthEvent( const VTime & tSend, const VTime & tRecv,
-                 const ObjectID &sender, 
-                 const ObjectID & receiver,
-                 const unsigned int evtID,
-                sex_t s );
-    BirthEvent( const BirthEvent & ce );
-    virtual ~BirthEvent();
+    OBJECT_ID selected;
+    if( ind->getSex() == FEMALE ) {
+        // select male
+        selected = (*m_males.begin());
+    } else if( ind->getSex() == MALE ) {
+        selected = (*m_females.begin());
+    } else {
+        selected = (*m_males.begin());
+    }
 
-    sex_t getSex() const;
+    return selected;
+}
 
-protected:
-    sex_t m_sex;
-};
+RandomSelectionModel::RandomSelectionModel( const Environment * env ) : SelectionModel( env ) {}
 
-DECLARE_REGISTERED_CLOTHO_EVENT( BirthEvent );
-
-#endif  // BIRTHEVENT_H_
-
+OBJECT_ID RandomSelectionModel::select_individual( OBJECT_ID & id ) const {
+    return m_env->select_individual< RandomSelectionModel >( id );
+}

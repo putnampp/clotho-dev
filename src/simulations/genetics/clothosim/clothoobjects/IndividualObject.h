@@ -37,7 +37,7 @@
 #include "common.h"
 #include <vector>
 
-#include "ClothoObjectCreator.h"
+#include "../ClothoObjectCreator.h"
 #include "IndividualObjectState.h"
 
 using std::vector;
@@ -62,12 +62,16 @@ public:
 
     void print( ostream & out ) const;
 
+    sex_t   getSex() const;
+
 protected:
     void born();
     void died();
 
 private:
-    string m_name;
+    string  m_name;
+
+    sex_t   m_sex;
 
     ClothoObject *  m_environment;
 };

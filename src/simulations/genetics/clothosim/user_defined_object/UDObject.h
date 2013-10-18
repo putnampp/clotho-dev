@@ -27,33 +27,32 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef BIRTHEVENT_H_
-#define BIRTHEVENT_H_
+#ifndef UDOBJECT_H_
+#define UDOBJECT_H_
 
-#include "../common_types.h"
-#include "ClothoEventStub.h"
+#include "../ClothoObjectCreator.h"
 
-DECLARE_CLOTHO_EVENT( BirthEvent )
+DEFINE_CLOTHO_OBJECT( UDObject ) {
 public:
-    BirthEvent( const VTime & tSend, const VTime &tRecv,
-                 SimulationObject * sender, 
-                 SimulationObject * receiver,
-                sex_t s );
-    BirthEvent( const VTime & tSend, const VTime & tRecv,
-                 const ObjectID &sender, 
-                 const ObjectID & receiver,
-                 const unsigned int evtID,
-                sex_t s );
-    BirthEvent( const BirthEvent & ce );
-    virtual ~BirthEvent();
+    UDObject( );
+    UDObject( const YAML::Node & n );
 
-    sex_t getSex() const;
+    ~UDObject();
 
+    void initialize();
+    void finalize();
+
+    void executeProcess();
+
+    State * allocateState();
+    const string & getName() const;
+
+    void print( ostream & out ) const;
 protected:
-    sex_t m_sex;
+    string m_name;
 };
 
-DECLARE_REGISTERED_CLOTHO_EVENT( BirthEvent );
+DEFINE_REGISTERED_CLOTHO_OBJECT( UDObject )
 
-#endif  // BIRTHEVENT_H_
+#endif  // UDOBJECT_H_
 

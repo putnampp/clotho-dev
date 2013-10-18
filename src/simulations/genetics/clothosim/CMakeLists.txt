@@ -29,22 +29,36 @@
 INCLUDE_DIRECTORIES( ${Warped_INCLUDE_DIRS} )
 LINK_DIRECTORIES( ${Warped_LIBRARIES} )
 
+LIST( APPEND OBJECT_MNGR_SRC ClothoObject.cpp )
+LIST( APPEND OBJECT_MNGR_SRC ClothoObjectManager.cpp )
+
+LIST( APPEND SIM_SRC clothoobjects/common_types.cpp )
+
 LIST( APPEND SIM_SRC clothoobjects/events/ClothoEvent.cpp )
 LIST( APPEND SIM_SRC clothoobjects/events/DeathEvent.cpp )
 LIST( APPEND SIM_SRC clothoobjects/events/BirthEvent.cpp )
 
-LIST( APPEND SIM_SRC clothoobjects/ClothoObject.cpp )
-LIST( APPEND SIM_SRC clothoobjects/ClothoObjectManager.cpp )
 LIST( APPEND SIM_SRC clothoobjects/EnvironmentObject.cpp )
 LIST( APPEND SIM_SRC clothoobjects/EnvironmentObjectState.cpp )
 LIST( APPEND SIM_SRC clothoobjects/IndividualObject.cpp )
 LIST( APPEND SIM_SRC clothoobjects/RandomIndividualObject.cpp )
 LIST( APPEND SIM_SRC clothoobjects/IndividualObjectState.cpp )
 
-#LIST( APPEND SIM_LIBS clothoobjects )
+ADD_LIBRARY(cobjmanager SHARED ${OBJECT_MNGR_SRC} )
 
-#FOREACH( D ${SIM_LIBS} )
-#    ADD_SUBDIRECTORY( ${D} )
-#ENDFOREACH(D)
+ADD_LIBRARY(cobjcommon SHARED ${SIM_SRC})
 
-ADD_LIBRARY(clothosim SHARED ${SIM_SRC})
+ADD_DEPENDENCIES( cobjcommon cobjmanager )
+
+LIST( APPEND USER_SRC user_defined_object/UDObject.cpp )
+
+ADD_LIBRARY(udobjects SHARED ${USER_SRC} )
+
+ADD_DEPENDENCIES( udobjects cobjmanager )
+
+LIST( APPEND MODEL_SRC models/SelectionModel.cpp )
+LIST( APPEND MODEL_SRC models/RandomSelectionModel.cpp )
+
+ADD_LIBRARY(cmodels SHARED ${MODEL_SRC} )
+
+ADD_DEPENDENCIES(cmodels cobjcommon)

@@ -34,6 +34,12 @@
 
 #include <gsl/gsl_rng.h>
 
+#include <iostream>
+#include <time.h>
+
+using std::cout;
+using std::endl;
+
 template<>
 class ClothoObjectCreator< RandomIndividual > : public SimObjectCreator {
 public:
@@ -43,6 +49,9 @@ public:
         gsl_rng_env_setup();
         m_T = gsl_rng_default;
         m_rng = gsl_rng_alloc( m_T );
+
+        long seed = time(NULL);
+        gsl_rng_set( m_rng, seed );
     }
 
     const string & name() {

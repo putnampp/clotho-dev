@@ -48,9 +48,20 @@ void Environment::handleEvent< BirthEvent >( const BirthEvent * evt ) {
     // for the sender
     //
     SimulationObject * sender = getObjectHandle( &(evt->getSender()) );
-    IntVTime death = dynamic_cast< const IntVTime & >( evt->getSendTime() ) + 90;
+    IntVTime tDeath = dynamic_cast< const IntVTime & >( evt->getSendTime() ) + 90;
 
-    Event * dEvent = new DeathEvent( getSimulationTime(), death, this, sender );
+    switch( evt->getSex() ) {
+    case FEMALE:
+        m_females.push_back( OBJECT_ID(evt->getSender()) );
+        break;
+    case MALE:
+        m_males.push_back( OBJECT_ID(evt->getSender()) );
+        break;
+    default:
+        break;
+    }
+
+    Event * dEvent = new DeathEvent( getSimulationTime(), tDeath, this, sender );
 
     sender->receiveEvent( dEvent );
 }

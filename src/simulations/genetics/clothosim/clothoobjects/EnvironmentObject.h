@@ -30,7 +30,11 @@
 #ifndef ENVIRONMENTOBJECT_H_
 #define ENVIRONMENTOBJECT_H_
 
-#include "ClothoObjectCreator.h"
+#include "warped.h"
+#include "common_types.h"
+#include "../ClothoObjectCreator.h"
+
+#include <vector>
 
 DEFINE_CLOTHO_OBJECT( Environment ) {
 public:
@@ -47,14 +51,25 @@ public:
     State * allocateState();
     const string & getName() const;
 
+    template < class SEL_MODEL >
+    OBJECT_ID select_individual( OBJECT_ID & ) const;
+
     void print( ostream & out ) const;
 protected:
     template< class EVT >
     void handleEvent( const EVT * evt );
 
+    vector< OBJECT_ID > m_females, m_males;
+
 private:
     string m_name;
 };
+
+template < class SEL_MODEL >
+OBJECT_ID Environment::select_individual( OBJECT_ID &  id) const {
+    // alone for another night ...
+    return id;
+}
 
 DEFINE_REGISTERED_CLOTHO_OBJECT( Environment )
 

@@ -33,33 +33,23 @@
 #include "State.h"
 
 #include "common.h"
+#include "common_types.h"
 #include "Genotype.h"
 #include <vector>
 
 using std::vector;
 
-enum Sex { FEMALE, MALE, UNK_SEX };
 //enum Genotype { HOMOZYGOUS_REF, HETEROZYGOUS, HOMOZYGOUS_ALT };
-
-typedef Sex     sex_t;
-typedef size_t  variant_index_t;
-typedef VTime   age_t;
-
 
 typedef Genotype< 2 > genotype_t;
 typedef double  phenotype_t;
-
-static const int MAX_VARIANTS = 100;
-static const ploidy_t DEFAULT_PLOID = 2;
 
 class IndividualObjectState : public State {
 public:
     IndividualObjectState(const VTime & t, sex_t s = UNK_SEX) :
         m_dob( t.clone() ),
         m_sex( UNK_SEX ),
-//        m_genotypes( new vector< genotype_t > ),
         m_phenotype(0.0) {
-//        m_genotypes->reserve( MAX_VARIANTS );
     }
 
     void    copyState( const State * toCopy ) {
