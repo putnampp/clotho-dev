@@ -27,33 +27,45 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef BIRTHEVENT_H_
-#define BIRTHEVENT_H_
+#include "UDObject.h"
 
-#include "../common_types.h"
-#include "ClothoEventStub.h"
+#include <boost/lexical_cast.hpp>
 
-DECLARE_CLOTHO_EVENT( BirthEvent )
-public:
-    BirthEvent( const VTime & tSend, const VTime &tRecv,
-                 SimulationObject * sender, 
-                 SimulationObject * receiver,
-                sex_t s );
-    BirthEvent( const VTime & tSend, const VTime & tRecv,
-                 const ObjectID &sender, 
-                 const ObjectID & receiver,
-                 const unsigned int evtID,
-                sex_t s );
-    BirthEvent( const BirthEvent & ce );
-    virtual ~BirthEvent();
+DECLARE_REGISTERED_CLOTHO_OBJECT( UDObject )
 
-    sex_t getSex() const;
+UDObject::UDObject() : 
+    m_name( "UD"  +  boost::lexical_cast<string>( m_id ) ) {
+}
 
-protected:
-    sex_t m_sex;
-};
+UDObject::UDObject( const YAML::Node & n ) {
+    try {
+        m_name = n[ "name" ].as< string >();
+    } catch ( ... ) {
+        m_name = "UD";
+        m_name.append( boost::lexical_cast<string>( m_id ) );
+    }
+}
 
-DECLARE_REGISTERED_CLOTHO_EVENT( BirthEvent );
+UDObject::~UDObject() {}
 
-#endif  // BIRTHEVENT_H_
+void UDObject::initialize() {
+}
 
+void UDObject::finalize() {
+
+}
+
+void UDObject::executeProcess() {
+}
+
+State * UDObject::allocateState()  {
+    return NULL;
+}
+
+const string & UDObject::getName() const {
+    return m_name;
+}
+
+void UDObject::print( ostream & out ) const {
+    out << m_name << "\n";
+}

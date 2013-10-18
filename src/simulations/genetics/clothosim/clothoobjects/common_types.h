@@ -27,33 +27,20 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef BIRTHEVENT_H_
-#define BIRTHEVENT_H_
+#ifndef CLOTHOOBJECTCOMMONTYPES_H_
+#define CLOTHOOBJECTCOMMONTYPES_H_
 
-#include "../common_types.h"
-#include "ClothoEventStub.h"
+#include "VTime.h"
+#include <ostream>
 
-DECLARE_CLOTHO_EVENT( BirthEvent )
-public:
-    BirthEvent( const VTime & tSend, const VTime &tRecv,
-                 SimulationObject * sender, 
-                 SimulationObject * receiver,
-                sex_t s );
-    BirthEvent( const VTime & tSend, const VTime & tRecv,
-                 const ObjectID &sender, 
-                 const ObjectID & receiver,
-                 const unsigned int evtID,
-                sex_t s );
-    BirthEvent( const BirthEvent & ce );
-    virtual ~BirthEvent();
+using std::ostream;
 
-    sex_t getSex() const;
+enum Sex { FEMALE, MALE, UNK_SEX };
+typedef Sex     sex_t;
 
-protected:
-    sex_t m_sex;
-};
+typedef size_t  variant_index_t;
+typedef VTime   age_t;
 
-DECLARE_REGISTERED_CLOTHO_EVENT( BirthEvent );
+ostream & operator<<( ostream & out, const Sex s );
 
-#endif  // BIRTHEVENT_H_
-
+#endif  // CLOTHOOBJECTCOMMONTYPES_H_

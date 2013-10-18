@@ -26,34 +26,15 @@
  * of the authors and should not be interpreted as representing official policies,
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
+#ifndef RANDOMSELECTIONMODEL_H_
+#define RANDOMSELECTIONMODEL_H_
 
-#ifndef BIRTHEVENT_H_
-#define BIRTHEVENT_H_
+#include "SelectionModel.h"
 
-#include "../common_types.h"
-#include "ClothoEventStub.h"
-
-DECLARE_CLOTHO_EVENT( BirthEvent )
+class RandomSelectionModel : public SelectionModel {
 public:
-    BirthEvent( const VTime & tSend, const VTime &tRecv,
-                 SimulationObject * sender, 
-                 SimulationObject * receiver,
-                sex_t s );
-    BirthEvent( const VTime & tSend, const VTime & tRecv,
-                 const ObjectID &sender, 
-                 const ObjectID & receiver,
-                 const unsigned int evtID,
-                sex_t s );
-    BirthEvent( const BirthEvent & ce );
-    virtual ~BirthEvent();
-
-    sex_t getSex() const;
-
-protected:
-    sex_t m_sex;
+    RandomSelectionModel( const Environment * env );
+    OBJECT_ID select_individual( OBJECT_ID & ) const;
 };
 
-DECLARE_REGISTERED_CLOTHO_EVENT( BirthEvent );
-
-#endif  // BIRTHEVENT_H_
-
+#endif  // RANDOMSELECTIONMODEL_H_

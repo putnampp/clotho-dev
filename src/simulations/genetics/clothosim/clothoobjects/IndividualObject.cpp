@@ -44,20 +44,35 @@ using std::endl;
 DECLARE_REGISTERED_CLOTHO_OBJECT( Individual )
 
 Individual::Individual() : 
-    m_name( "IND"  +  boost::lexical_cast<string>( m_id ) ) {
+    m_name( "IND"  +  boost::lexical_cast<string>( m_id ) ),
+    m_sex( UNK_SEX ) {
 }
 
 Individual::Individual( const YAML::Node & n ) {
     try {
         m_name = n[ "name" ].as< string >();
+        switch( n[ "sex" ].as<unsigned int>() ) {
+        case 0:
+            m_sex = FEMALE;
+            break;
+        case 1:
+            m_sex = MALE;
+            break;
+        default:
+            m_sex = UNK_SEX;
+            break;
+        }
     } catch ( ... ) {
         m_name = "IND";
         m_name.append( boost::lexical_cast<string>( m_id ) );
+
+        m_sex = UNK_SEX;
     }
 }
 
 Individual::Individual( sex_t s, const vector< genotype_t > & genos ) :
-    m_name( "IND"  +  boost::lexical_cast<string>(m_id)) {
+    m_name( "IND"  +  boost::lexical_cast<string>(m_id)),
+    m_sex( s ) {
 
 }
 
@@ -97,9 +112,13 @@ const string & Individual::getName() const {
     return m_name;
 }
 
+sex_t Individual::getSex() const {
+    return m_sex;
+}
+
 void Individual::born() {
     IntVTime recvTime = dynamic_cast< const IntVTime &>(getSimulationTime());
-    Event * eBorn = new BirthEvent( recvTime, recvTime, this, m_environment );
+    Event * eBorn = new BirthEvent( recvTime, recvTime, this, m_environment, m_sex );
 
     m_environment->receiveEvent( eBorn );
 }
@@ -108,5 +127,5 @@ void Individual::died() {
 }
 
 void Individual::print( ostream & out ) const {
-    out << m_name << "\n";
+    out << m_name << ", " << m_sex << "\n";
 }

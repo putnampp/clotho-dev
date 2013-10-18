@@ -37,3 +37,9 @@ object: RandomIndividual
 max_variants:   1000
 founder_variants: 150
 ...
+
+# user defined object
+---
+object: UDObject
+name: juan
+...

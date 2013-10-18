@@ -34,20 +34,28 @@ DEFINE_REGISTERED_CLOTHO_EVENT( BirthEvent )
 
 BirthEvent::BirthEvent( const VTime & tSend, const VTime &tRecv,
                  SimulationObject * sender, 
-                 SimulationObject * receiver ) :
-                 DefaultEvent( tSend, tRecv, sender, receiver ) {}
+                 SimulationObject * receiver,
+                 sex_t sex ) :
+                 DefaultEvent( tSend, tRecv, sender, receiver ),
+                 m_sex( sex ) {}
 
 BirthEvent::BirthEvent( const VTime & tSend, const VTime & tRecv,
                  const ObjectID &sender, 
                  const ObjectID & receiver,
-                 const unsigned int evtID ) :
-                 DefaultEvent( tSend, tRecv, sender, receiver, evtID ) {}
+                 const unsigned int evtID,
+                 sex_t sex ) :
+                 DefaultEvent( tSend, tRecv, sender, receiver, evtID ),
+                 m_sex( sex ) {}
 
 BirthEvent::BirthEvent( const BirthEvent & ce ) :
                  DefaultEvent( ce.getSendTime(), ce.getReceiveTime(),
                                 ce.getSender(), ce.getReceiver(),
-                                ce.getEventId() ) {}
+                                ce.getEventId() ),
+                 m_sex( ce.m_sex) {}
 
+sex_t BirthEvent::getSex() const {
+    return m_sex;
+}
 
 bool BirthEvent::eventCompare( const Event * evt ) {
     const BirthEvent * e = dynamic_cast< const BirthEvent * >(evt);
@@ -66,10 +74,12 @@ DEFINE_CLOTHO_EVENT_DESERIALIZATION_METHOD( BirthEvent ) {
     unsigned int rSimObjID = inst->getUnsigned();
     unsigned int eventID = inst->getUnsigned();
 
+    sex_t sex = static_cast< sex_t > (inst->getUnsigned());
+
     ObjectID send( sSimObjID, sSimManID );
     ObjectID recv( rSimObjID, rSimManID );
 
-    BirthEvent * e = new BirthEvent( *tSend, *tRecv, send, recv, eventID );
+    BirthEvent * e = new BirthEvent( *tSend, *tRecv, send, recv, eventID, sex );
 
     return e;
 }

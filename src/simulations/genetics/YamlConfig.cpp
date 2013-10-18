@@ -33,8 +33,8 @@
 #include <iostream>
 #include <vector>
 
-#include "clothosim/clothoobjects/ClothoObjectManager.h"
-#include "clothosim/clothoobjects/ClothoObject.h"
+#include "clothosim/ClothoObjectManager.h"
+#include "clothosim/ClothoObject.h"
 
 using std::ifstream;
 using std::vector;
