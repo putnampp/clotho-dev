@@ -36,7 +36,7 @@
 
 #include <vector>
 
-DEFINE_CLOTHO_OBJECT( Environment ) {
+DECLARE_CLOTHO_OBJECT( Environment ) {
 public:
     Environment();
     Environment( const YAML::Node & n);
@@ -71,6 +71,6 @@ OBJECT_ID Environment::select_individual( OBJECT_ID &  id) const {
     return id;
 }
 
-DEFINE_REGISTERED_CLOTHO_OBJECT( Environment )
+DECLARE_REGISTERED_CLOTHO_OBJECT( Environment )
 
 #endif  // ENVIRONMENTOBJECT_H_

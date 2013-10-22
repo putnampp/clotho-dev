@@ -27,30 +27,51 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef YAMLCONFIG_H_
-#define YAMLCONFIG_H_
+#include "ClothoModelCoordinator.h"
 
-#include "common.h"
-#include "warped.h"
-#include "SimulationObject.h"
+using std::pair;
+using std::make_pair;
 
-#include "yaml-cpp/yaml.h"
+ClothoModelCoordinator::ClothoModelCoordinator() { }
 
-#include <vector>
+ClothoModelCoordinator::~ClothoModelCoordinator() {
+    m_models.clear();
+}
 
-using std::vector;
+shared_ptr< ClothoModelCoordinator > ClothoModelCoordinator::getInstance() {
+    static shared_ptr< ClothoModelCoordinator > inst( new ClothoModelCoordinator() );
+    return inst;
+}
+/*
+void ClothoModelCoordinator::registerModel( shared_ptr< ClothoModel > cm ) {
 
-class YamlConfig {
-public:
-    YamlConfig( const string & file );
+    const ClothoModel::Listeners listeners = cm->getListeners();
+    ClothoModel::Listeners::const_iterator it = listeners.begin();
 
-    shared_ptr< vector< SimulationObject * > > getSimulationObjects();
+    while( it != listeners.end() ) {
+        m_models.insert( make_pair( *it, cm ) );
+    }
+}
+*/
 
-    virtual ~YamlConfig();
-protected:
-    void parseObjectDocument( const YAML::Node & n, vector< SimulationObject * > & objs );
+void ClothoModelCoordinator::addEventHandler( const string & name, shared_ptr< ClothoModel > handle) {
+    m_models.insert( make_pair( name, handle ) );
+}
 
-private:
-    string m_config;
-};
-#endif  // YAMLCONFIG_H_
+void ClothoModelCoordinator::handleEvent( const Event * evt ) const {
+    //const string name = evt->getDataType();
+
+    typedef pair< Models::const_iterator, Models::const_iterator > ModelRange;
+    
+    ModelRange mr = m_models.equal_range( evt->getDataType() );
+
+    for( Models::const_iterator it = mr.first; it != mr.second; it++ ) {
+        it->second->handle( evt );
+    }
+
+    mr = m_models.equal_range( ANY_EVENTS );
+
+    for( Models::const_iterator it = mr.first; it != mr.second; it++ ) {
+        it->second->handle( evt );
+    }
+}

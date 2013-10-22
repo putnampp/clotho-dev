@@ -35,12 +35,16 @@
 
 #include "clothosim/ClothoObjectManager.h"
 #include "clothosim/ClothoObject.h"
+#include "clothosim/ClothoModelManager.h"
+#include "clothosim/ClothoModel.h"
 
 using std::ifstream;
 using std::vector;
 
 using std::cout;
 using std::endl;
+
+const string COUNT_K = "count";
 
 YamlConfig::YamlConfig( const string & file ) :
     m_config( file )
@@ -53,17 +57,16 @@ shared_ptr< vector< SimulationObject * > > YamlConfig::getSimulationObjects() {
 
     cout << "\nFound " << docs.size() << " documents." << endl;
     for( vector< YAML::Node >::iterator it = docs.begin(); it != docs.end(); it++ ) {
-        if( it->IsMap() ) {
+        if( !it->IsMap() ) continue;
+
+        if( (*it)[ OBJECT_K ] ) {
             cout << (*it) << "\n" << endl;
-            
             unsigned int count = 1;
-            try {
-                count = (*it)[ "count" ].as< unsigned int >();
+            if( (*it)[ COUNT_K ] ) {
+                count = (*it)[ COUNT_K ].as< unsigned int >();
                 if( count > 1 ) {
                     objs->reserve( objs->size() + count );
                 }
-            } catch ( ... ) {
-                count = 1;
             }
 
             for( unsigned int i = 0; i < count; ++i ) {
@@ -76,6 +79,8 @@ shared_ptr< vector< SimulationObject * > > YamlConfig::getSimulationObjects() {
             }
 
             cout << "SimulationObjects created: " << objs->size() << "( " << objs->capacity() << " )" << endl;
+        } else if( (*it)[ MODEL_K ] ) {
+            ClothoModel * cm = ClothoModelManager::getInstance()->createModelFrom( (*it) );
         }
     }
     

@@ -58,13 +58,13 @@ private:
     const string m_name;
 };
 
-#define DEFINE_CLOTHO_OBJECT( name )                            \
+#define DECLARE_CLOTHO_OBJECT( name )                            \
     class name : public ClothoObject
 
-#define DEFINE_REGISTERED_CLOTHO_OBJECT( name )                 \
+#define DECLARE_REGISTERED_CLOTHO_OBJECT( name )                 \
     extern ClothoObjectCreator< name > objc_##name;
 
-#define DECLARE_REGISTERED_CLOTHO_OBJECT( name )                \
+#define DEFINE_REGISTERED_CLOTHO_OBJECT( name )                \
     ClothoObjectCreator< name > objc_##name( #name );
     
 

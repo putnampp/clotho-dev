@@ -27,30 +27,31 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef YAMLCONFIG_H_
-#define YAMLCONFIG_H_
+#ifndef POPULATIONMODEL_H_
+#define POPULATIONMODEL_H_
 
-#include "common.h"
-#include "warped.h"
-#include "SimulationObject.h"
+#include "../ClothoModelCreator.h"
 
-#include "yaml-cpp/yaml.h"
+#include "../clothoobjects/events/BirthEvent.h"
+#include "../clothoobjects/events/DeathEvent.h"
 
-#include <vector>
-
-using std::vector;
-
-class YamlConfig {
+DECLARE_CLOTHO_MODEL( PopulationModel ) {
 public:
-    YamlConfig( const string & file );
+    PopulationModel();
 
-    shared_ptr< vector< SimulationObject * > > getSimulationObjects();
+    void configure( const YAML::Node & n );
 
-    virtual ~YamlConfig();
+    void handle( const Event * evt );
+    void handle( const BirthEvent * evt );
+    void handle( const DeathEvent * evt );
+
+    void dump( ostream & out );
+
+    ~PopulationModel();
 protected:
-    void parseObjectDocument( const YAML::Node & n, vector< SimulationObject * > & objs );
-
-private:
-    string m_config;
+    unsigned int m_living, m_lived, m_pop_size;
 };
-#endif  // YAMLCONFIG_H_
+
+DECLARE_REGISTERED_CLOTHO_MODEL( PopulationModel )
+
+#endif  // POPULATIONMODEL_H_

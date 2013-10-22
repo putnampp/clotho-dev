@@ -32,7 +32,7 @@
 
 #include "../ClothoObjectCreator.h"
 
-DEFINE_CLOTHO_OBJECT( UDObject ) {
+DECLARE_CLOTHO_OBJECT( UDObject ) {
 public:
     UDObject( );
     UDObject( const YAML::Node & n );
@@ -52,7 +52,7 @@ protected:
     string m_name;
 };
 
-DEFINE_REGISTERED_CLOTHO_OBJECT( UDObject )
+DECLARE_REGISTERED_CLOTHO_OBJECT( UDObject )
 
 #endif  // UDOBJECT_H_
 

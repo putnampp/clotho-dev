@@ -27,30 +27,46 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef YAMLCONFIG_H_
-#define YAMLCONFIG_H_
+#ifndef CLOTHOMODELCREATOR_H_
+#define CLOTHOMODELCREATOR_H_
 
 #include "common.h"
-#include "warped.h"
-#include "SimulationObject.h"
+#include "ClothoModel.h"
+#include "ClothoModelManager.h"
 
 #include "yaml-cpp/yaml.h"
 
-#include <vector>
-
-using std::vector;
-
-class YamlConfig {
+template < class OBJ >
+class ClothoModelCreator : public SimModelCreator {
 public:
-    YamlConfig( const string & file );
+    ClothoModelCreator( const char * name ) : m_name(name) {
+        ClothoModelManager::getInstance()->registerModel( this );
+    }
 
-    shared_ptr< vector< SimulationObject * > > getSimulationObjects();
+    const string & name() {
+        return m_name;
+    }
 
-    virtual ~YamlConfig();
-protected:
-    void parseObjectDocument( const YAML::Node & n, vector< SimulationObject * > & objs );
+    ClothoModel * createModel() {
+        return new OBJ();
+    }
 
+    ClothoModel * createModelFrom( const YAML::Node & n ) {
+        return new OBJ( n );
+    }
 private:
-    string m_config;
+    const string m_name;
 };
-#endif  // YAMLCONFIG_H_
+
+#define DECLARE_CLOTHO_MODEL( name )                            \
+    class name : public ClothoModel
+
+#define DECLARE_REGISTERED_CLOTHO_MODEL( name )                 \
+    extern ClothoModelCreator< name > cmc_##name;
+
+#define DEFINE_REGISTERED_CLOTHO_MODEL( name )                \
+    ClothoModelCreator< name > cmc_##name( #name );
+    
+
+#endif  // CLOTHOMODELCREATOR_H_
+

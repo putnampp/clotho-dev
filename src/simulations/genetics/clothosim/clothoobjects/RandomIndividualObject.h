@@ -34,6 +34,6 @@
 
 class RandomIndividual : public Individual {};
 
-DEFINE_REGISTERED_CLOTHO_OBJECT( RandomIndividual )
+DECLARE_REGISTERED_CLOTHO_OBJECT( RandomIndividual )
 
 #endif  // RANDOMINDIVIDUALOBJECT_H_

@@ -113,4 +113,4 @@ void Environment::print( ostream & out ) const {
     out << m_name << "\n";
 }
 
-DECLARE_REGISTERED_CLOTHO_OBJECT( Environment )
+DEFINE_REGISTERED_CLOTHO_OBJECT( Environment )

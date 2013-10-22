@@ -27,30 +27,30 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef YAMLCONFIG_H_
-#define YAMLCONFIG_H_
+#ifndef CLOTHOMODELCOORDINATOR_H_
+#define CLOTHOMODELCOORDINATOR_H_
 
 #include "common.h"
-#include "warped.h"
-#include "SimulationObject.h"
+#include "ClothoModel.h"
 
-#include "yaml-cpp/yaml.h"
+#include <map>
 
-#include <vector>
+using std::multimap;
 
-using std::vector;
-
-class YamlConfig {
+class ClothoModelCoordinator {
 public:
-    YamlConfig( const string & file );
+    typedef multimap< string, shared_ptr< ClothoModel > > Models;
+    static shared_ptr< ClothoModelCoordinator > getInstance();
 
-    shared_ptr< vector< SimulationObject * > > getSimulationObjects();
+//    void registerModel( shared_ptr< ClothoModel > cm );
+    void addEventHandler( const string & name, shared_ptr< ClothoModel > cm );
+    void handleEvent( const Event * evt ) const;
 
-    virtual ~YamlConfig();
+    virtual ~ClothoModelCoordinator();
 protected:
-    void parseObjectDocument( const YAML::Node & n, vector< SimulationObject * > & objs );
+    ClothoModelCoordinator();
 
-private:
-    string m_config;
+    Models  m_models;
 };
-#endif  // YAMLCONFIG_H_
+
+#endif  // CLOTHOMODELCOORDINATOR_H_

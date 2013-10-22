@@ -31,7 +31,6 @@
 
 #include "config.h"
 
-#include <iostream>
 #include <string>
 #include <stdint.h>
 

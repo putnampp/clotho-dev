@@ -29,6 +29,8 @@
 
 #include "ClothoObjectManager.h"
 
+const string OBJECT_K = "object";
+
 ClothoObjectManager::ClothoObjectManager(){}
 
 shared_ptr< ClothoObjectManager > ClothoObjectManager::getInstance() {

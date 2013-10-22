@@ -27,30 +27,29 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef YAMLCONFIG_H_
-#define YAMLCONFIG_H_
+#ifndef MATURITYEVENT_H_
+#define MATURITYEVENT_H_
 
-#include "common.h"
-#include "warped.h"
-#include "SimulationObject.h"
+#include "ClothoEventStub.h"
 
-#include "yaml-cpp/yaml.h"
-
-#include <vector>
-
-using std::vector;
-
-class YamlConfig {
+DECLARE_CLOTHO_EVENT( MaturityEvent )
 public:
-    YamlConfig( const string & file );
+    MaturityEvent( const VTime & tSend, const VTime &tRecv,
+                 SimulationObject * sender, 
+                 SimulationObject * receiver );
+    MaturityEvent( const VTime & tSend, const VTime & tRecv,
+                 const ObjectID &sender, 
+                 const ObjectID & receiver,
+                 const unsigned int evtID );
+    MaturityEvent( const MaturityEvent & ce );
+    virtual ~MaturityEvent();
 
-    shared_ptr< vector< SimulationObject * > > getSimulationObjects();
+    const VTime & getAgeOfMaturity() const;
 
-    virtual ~YamlConfig();
 protected:
-    void parseObjectDocument( const YAML::Node & n, vector< SimulationObject * > & objs );
-
-private:
-    string m_config;
+    const VTime m_age_of_maturity;
 };
-#endif  // YAMLCONFIG_H_
+
+DECLARE_REGISTERED_CLOTHO_EVENT( MaturityEvent );
+
+#endif  // MATURITYEVENT_H_

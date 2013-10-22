@@ -27,30 +27,43 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef YAMLCONFIG_H_
-#define YAMLCONFIG_H_
+#include "ClothoModelManager.h"
 
-#include "common.h"
-#include "warped.h"
-#include "SimulationObject.h"
+const string MODEL_K = "model";
 
-#include "yaml-cpp/yaml.h"
+ClothoModelManager::ClothoModelManager() {}
 
-#include <vector>
+shared_ptr< ClothoModelManager > ClothoModelManager::getInstance() {
+    static shared_ptr< ClothoModelManager > inst( new ClothoModelManager() );
+    return inst;
+}
 
-using std::vector;
+void ClothoModelManager::registerModel( SimModelCreator * smc ) {
+    m_creators[ smc->name() ] = smc;
+}
 
-class YamlConfig {
-public:
-    YamlConfig( const string & file );
+ClothoModel * ClothoModelManager::createModel( const string & name ) {
+    iterator it = m_creators.find( name );
 
-    shared_ptr< vector< SimulationObject * > > getSimulationObjects();
+    if( it == m_creators.end() )
+        return NULL;
 
-    virtual ~YamlConfig();
-protected:
-    void parseObjectDocument( const YAML::Node & n, vector< SimulationObject * > & objs );
+    return it->second->createModel();
+}
 
-private:
-    string m_config;
-};
-#endif  // YAMLCONFIG_H_
+ClothoModel * ClothoModelManager::createModelFrom( const YAML::Node & n ) {
+    try {
+        string name = n[ "model" ].as<string>();
+
+        iterator it = m_creators.find( name );
+
+        if( it != m_creators.end() )
+            return it->second->createModelFrom(n);
+    } catch ( ... ) {    }
+
+    return NULL;
+}
+
+ClothoModelManager::~ClothoModelManager() {
+    m_creators.clear();
+}

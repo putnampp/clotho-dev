@@ -27,55 +27,53 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef INDIVIDUALOBJECT_H_
-#define INDIVIDUALOBJECT_H_
-
-#include "warped.h"
-#include "SimulationObject.h"
+#include "MaturityEvent.h"
 #include "SerializedInstance.h"
 
-#include "common.h"
-#include <vector>
+DEFINE_REGISTERED_CLOTHO_EVENT( MaturityEvent )
 
-#include "../ClothoObjectCreator.h"
-#include "IndividualObjectState.h"
+MaturityEvent::MaturityEvent( const VTime & tSend, const VTime &tRecv,
+                 SimulationObject * sender, 
+                 SimulationObject * receiver ) :
+                 DefaultEvent( tSend, tRecv, sender, receiver ) {}
 
-using std::vector;
+MaturityEvent::MaturityEvent( const VTime & tSend, const VTime & tRecv,
+                 const ObjectID &sender, 
+                 const ObjectID & receiver,
+                 const unsigned int evtID ) :
+                 DefaultEvent( tSend, tRecv, sender, receiver, evtID ) {}
 
-DECLARE_CLOTHO_OBJECT( Individual ) {
-public:
-    Individual( );
-    Individual( const YAML::Node & n );
+MaturityEvent::MaturityEvent( const MaturityEvent & ce ) :
+                 DefaultEvent( ce.getSendTime(), ce.getReceiveTime(),
+                                ce.getSender(), ce.getReceiver(),
+                                ce.getEventId() ) {}
 
-    Individual( sex_t s, const vector< genotype_t > & genos);
 
-    ~Individual();
+bool MaturityEvent::eventCompare( const Event * evt ) {
+    const MaturityEvent * e = dynamic_cast< const MaturityEvent * >(evt);
+    return (compareEvents( this, e ) );
+}
 
-    void initialize();
-    void reinitialize( const State * state );
-    void finalize();
+const VTime & MaturityEvent::getAgeOfMaturity() const {
+    return m_age_of_maturity;
+}
 
-    void executeProcess();
+MaturityEvent::~MaturityEvent() {}
 
-    State * allocateState();
-    const string & getName() const;
+DEFINE_CLOTHO_EVENT_DESERIALIZATION_METHOD( MaturityEvent ) {
+    shared_ptr< VTime > tSend( dynamic_cast< VTime * >(inst->getSerializable()));
+    shared_ptr< VTime > tRecv( dynamic_cast< VTime * >(inst->getSerializable()));
 
-    void print( ostream & out ) const;
+    unsigned int sSimManID = inst->getUnsigned();
+    unsigned int sSimObjID = inst->getUnsigned();
+    unsigned int rSimManID = inst->getUnsigned();
+    unsigned int rSimObjID = inst->getUnsigned();
+    unsigned int eventID = inst->getUnsigned();
 
-    sex_t   getSex() const;
+    ObjectID send( sSimObjID, sSimManID );
+    ObjectID recv( rSimObjID, rSimManID );
 
-protected:
-    void born();
-    void died();
+    MaturityEvent * e = new MaturityEvent( *tSend, *tRecv, send, recv, eventID );
 
-private:
-    string  m_name;
-
-    sex_t   m_sex;
-
-    ClothoObject *  m_environment;
-};
-
-DECLARE_REGISTERED_CLOTHO_OBJECT( Individual )
-
-#endif  // INDIVIDUALOBJECT_H_
+    return e;
+}

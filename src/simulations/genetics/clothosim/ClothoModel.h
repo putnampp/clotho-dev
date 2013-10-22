@@ -27,30 +27,35 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef YAMLCONFIG_H_
-#define YAMLCONFIG_H_
+#ifndef CLOTHOMODEL_H_
+#define CLOTHOMODEL_H_
 
 #include "common.h"
-#include "warped.h"
-#include "SimulationObject.h"
-
+#include "Event.h"
 #include "yaml-cpp/yaml.h"
 
 #include <vector>
+#include <ostream>
 
-using std::vector;
+//using std::vector;
+using std::ostream;
 
-class YamlConfig {
+class ClothoModel {
 public:
-    YamlConfig( const string & file );
+    //typedef vector< string > Listeners;
+    //virtual const Listeners & getListeners( ) const;
+    virtual void configure( const YAML::Node & n ) = 0;
 
-    shared_ptr< vector< SimulationObject * > > getSimulationObjects();
+    virtual void handle( const Event * evt ) = 0;
 
-    virtual ~YamlConfig();
+    virtual void dump( ostream & out ) = 0;
+
+    virtual ~ClothoModel();
 protected:
-    void parseObjectDocument( const YAML::Node & n, vector< SimulationObject * > & objs );
-
-private:
-    string m_config;
+    ClothoModel();
+    //Listeners   m_listened_events;
 };
-#endif  // YAMLCONFIG_H_
+
+extern const string ANY_EVENTS;
+
+#endif  // CLOTHOMODEL_H_

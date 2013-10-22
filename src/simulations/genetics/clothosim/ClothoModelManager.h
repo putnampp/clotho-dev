@@ -27,30 +27,48 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef YAMLCONFIG_H_
-#define YAMLCONFIG_H_
+#ifndef CLOTHOMODELMANAGER_H_
+#define CLOTHOMODELMANAGER_H_
 
 #include "common.h"
-#include "warped.h"
-#include "SimulationObject.h"
 
 #include "yaml-cpp/yaml.h"
 
+#include "ClothoModelCoordinator.h"
+
+#include <map>
 #include <vector>
 
+using std::map;
 using std::vector;
 
-class YamlConfig {
-public:
-    YamlConfig( const string & file );
+extern const string MODEL_K;
 
-    shared_ptr< vector< SimulationObject * > > getSimulationObjects();
+struct SimModelCreator {
+    virtual const string & name() = 0;
 
-    virtual ~YamlConfig();
-protected:
-    void parseObjectDocument( const YAML::Node & n, vector< SimulationObject * > & objs );
-
-private:
-    string m_config;
+    virtual ClothoModel * createModel() = 0;
+    virtual ClothoModel * createModelFrom( const YAML::Node & n ) = 0;
 };
-#endif  // YAMLCONFIG_H_
+
+class ClothoModelManager {
+public:
+    typedef map< const string, SimModelCreator * > SimModels;
+    typedef SimModels::iterator  iterator;
+
+    static shared_ptr< ClothoModelManager > getInstance();
+
+    void registerModel( SimModelCreator * soc );
+
+    ClothoModel * createModel( const string & name );
+
+    ClothoModel * createModelFrom( const YAML::Node & yaml );
+
+    virtual ~ClothoModelManager();
+protected:
+    ClothoModelManager();
+
+    SimModels m_creators;
+};
+
+#endif  // CLOTHOMODELMANAGER_H_

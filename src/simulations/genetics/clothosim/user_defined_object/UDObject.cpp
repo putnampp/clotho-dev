@@ -31,7 +31,7 @@
 
 #include <boost/lexical_cast.hpp>
 
-DECLARE_REGISTERED_CLOTHO_OBJECT( UDObject )
+DEFINE_REGISTERED_CLOTHO_OBJECT( UDObject )
 
 UDObject::UDObject() : 
     m_name( "UD"  +  boost::lexical_cast<string>( m_id ) ) {

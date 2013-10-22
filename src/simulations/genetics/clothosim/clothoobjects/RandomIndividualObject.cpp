@@ -108,4 +108,4 @@ protected:
     gsl_rng * m_rng;
 };
 
-DECLARE_REGISTERED_CLOTHO_OBJECT( RandomIndividual )
+DEFINE_REGISTERED_CLOTHO_OBJECT( RandomIndividual )

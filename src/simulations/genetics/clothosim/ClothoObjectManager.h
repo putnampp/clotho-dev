@@ -41,6 +41,8 @@
 using std::map;
 using std::vector;
 
+extern const string OBJECT_K;
+
 struct SimObjectCreator {
     virtual const string & name() = 0;
     virtual SimulationObject * createObject() = 0;

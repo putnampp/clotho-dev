@@ -41,7 +41,7 @@
 using std::cout;
 using std::endl;
 
-DECLARE_REGISTERED_CLOTHO_OBJECT( Individual )
+DEFINE_REGISTERED_CLOTHO_OBJECT( Individual )
 
 Individual::Individual() : 
     m_name( "IND"  +  boost::lexical_cast<string>( m_id ) ),
