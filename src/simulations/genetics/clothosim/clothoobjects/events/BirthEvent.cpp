@@ -35,8 +35,18 @@ DEFINE_REGISTERED_CLOTHO_EVENT( BirthEvent )
 BirthEvent::BirthEvent( const VTime & tSend, const VTime &tRecv,
                  SimulationObject * sender, 
                  SimulationObject * receiver,
-                 sex_t sex ) :
+                sex_t s ) :
+                DefaultEvent( tSend, tRecv, sender, receiver ),
+                m_birth( tSend.clone() ),
+                m_sex( s ) {}
+
+BirthEvent::BirthEvent( const VTime & tSend, const VTime &tRecv,
+                 SimulationObject * sender, 
+                 SimulationObject * receiver,
+                 sex_t sex,
+                 const VTime & tBirth) :
                  DefaultEvent( tSend, tRecv, sender, receiver ),
+                 m_birth( tBirth.clone() ),
                  m_sex( sex ) {}
 
 BirthEvent::BirthEvent( const VTime & tSend, const VTime & tRecv,
@@ -45,16 +55,32 @@ BirthEvent::BirthEvent( const VTime & tSend, const VTime & tRecv,
                  const unsigned int evtID,
                  sex_t sex ) :
                  DefaultEvent( tSend, tRecv, sender, receiver, evtID ),
+                 m_birth( tSend.clone() ),
+                 m_sex( sex ) {}
+
+BirthEvent::BirthEvent( const VTime & tSend, const VTime &tRecv,
+                 const ObjectID &sender, 
+                 const ObjectID & receiver,
+                 const unsigned int evtID,
+                 sex_t sex,
+                 const VTime & tBirth ) :
+                 DefaultEvent( tSend, tRecv, sender, receiver, evtID ),
+                 m_birth( tBirth.clone() ),
                  m_sex( sex ) {}
 
 BirthEvent::BirthEvent( const BirthEvent & ce ) :
                  DefaultEvent( ce.getSendTime(), ce.getReceiveTime(),
                                 ce.getSender(), ce.getReceiver(),
                                 ce.getEventId() ),
+                 m_birth( ce.getBirthTime().clone() ),
                  m_sex( ce.m_sex) {}
 
 sex_t BirthEvent::getSex() const {
     return m_sex;
+}
+
+const VTime & BirthEvent::getBirthTime() const {
+    return  *m_birth;
 }
 
 bool BirthEvent::eventCompare( const Event * evt ) {

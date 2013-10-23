@@ -27,25 +27,34 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef CLOTHOOBJECTCOMMONTYPES_H_
-#define CLOTHOOBJECTCOMMONTYPES_H_
+#ifndef LIFEEXPECTANCYMODEL_H_
+#define LIFEEXPECTANCYMODEL_H_
 
-#include "VTime.h"
-#include <ostream>
+#include "../ClothoModelCreator.h"
 
-using std::ostream;
+#include "../clothoobjects/events/BirthEvent.h"
 
-enum Sex { FEMALE, MALE, UNK_SEX };
-typedef Sex     sex_t;
+#include "gsl/gsl_rng.h"
 
-extern const string SEX_K;
-extern const string MALE_K;
-extern const string FEMALE_K;
-extern const string UNKSEX_K;
+DECLARE_CLOTHO_MODEL( LifeExpectancyModel ) {
+public:
+    LifeExpectancyModel();
 
-typedef size_t  variant_index_t;
-typedef VTime   age_t;
+    void configure( const YAML::Node & n );
 
-ostream & operator<<( ostream & out, const Sex s );
+    void handle( const Event * evt );
+    void handle( const BirthEvent * evt );
 
-#endif  // CLOTHOOBJECTCOMMONTYPES_H_
+    void dump( ostream & out );
+
+    ~LifeExpectancyModel();
+protected:
+    gsl_rng * m_rng;
+    double  m_female_mean, m_female_sigma;
+    double  m_male_mean, m_male_sigma;
+    double  m_unk_mean, m_unk_sigma;
+};
+
+DECLARE_REGISTERED_CLOTHO_MODEL( LifeExpectancyModel )
+
+#endif  // LIFEEXPECTANCYMODEL_H_

@@ -28,11 +28,10 @@
  ******************************************************************************/
 
 #include "IndividualObject.h"
+#include "common_types.h"
+#include "../ClothoModelCoordinator.h"
 
 #include "events/BirthEvent.h"
-#include "events/DeathEvent.h"
-
-#include "IntVTime.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -41,17 +40,28 @@
 using std::cout;
 using std::endl;
 
+const string IND_K = "IND";
+const string NAME_K = "name";
+
 DEFINE_REGISTERED_CLOTHO_OBJECT( Individual )
 
 Individual::Individual() : 
-    m_name( "IND"  +  boost::lexical_cast<string>( m_id ) ),
-    m_sex( UNK_SEX ) {
+    m_name( IND_K  +  boost::lexical_cast<string>( m_id ) ),
+    m_sex( UNK_SEX ),
+    m_offspring(0), 
+    m_dob( NULL ),
+    m_eol( NULL ) {
 }
 
 Individual::Individual( const YAML::Node & n ) {
-    try {
-        m_name = n[ "name" ].as< string >();
-        switch( n[ "sex" ].as<unsigned int>() ) {
+    if( n[ NAME_K ] ) {
+        m_name = n[ NAME_K ].as< string >();
+    } else {
+        m_name = IND_K +  boost::lexical_cast<string>( m_id );
+    }
+
+    if( n[ SEX_K ] ) {
+        switch( n[ SEX_K ].as<unsigned int>() ) {
         case 0:
             m_sex = FEMALE;
             break;
@@ -62,17 +72,23 @@ Individual::Individual( const YAML::Node & n ) {
             m_sex = UNK_SEX;
             break;
         }
-    } catch ( ... ) {
-        m_name = "IND";
-        m_name.append( boost::lexical_cast<string>( m_id ) );
-
+    } else {
         m_sex = UNK_SEX;
     }
+
+    m_alive = false;
+    m_offspring = 0;
+    m_dob = NULL;
+    m_eol = NULL;
 }
 
 Individual::Individual( sex_t s, const vector< genotype_t > & genos ) :
     m_name( "IND"  +  boost::lexical_cast<string>(m_id)),
-    m_sex( s ) {
+    m_sex( s ),
+    m_alive(false),
+    m_offspring(0),
+    m_dob( NULL ),
+    m_eol( NULL ) {
 
 }
 
@@ -96,11 +112,14 @@ void Individual::executeProcess() {
     IndividualObjectState * iso = static_cast< IndividualObjectState * >(getState());
     ASSERT( iso != NULL );
 
-    while( haveMoreEvents() ) {
+    while( m_alive && haveMoreEvents() ) {
         const Event * evt = getEvent();
         if( evt->getDataType() == "DeathEvent" ) {
-            cout << "Processing DeathEvent (" << getSimulationTime() << ") ... " << *evt << endl;
+            const DeathEvent * dEvt = dynamic_cast< const DeathEvent * >( evt );
+            died( dEvt );
         }
+
+        ClothoModelCoordinator::getInstance()->handleEvent( evt );
     }
 }
 
@@ -117,15 +136,29 @@ sex_t Individual::getSex() const {
 }
 
 void Individual::born() {
-    IntVTime recvTime = dynamic_cast< const IntVTime &>(getSimulationTime());
-    Event * eBorn = new BirthEvent( recvTime, recvTime, this, m_environment, m_sex );
+    m_dob = dynamic_cast< IntVTime *>(getSimulationTime().clone());
+    Event * eBorn = new BirthEvent( *m_dob, *m_dob, this, m_environment, m_sex );
+    
 
     m_environment->receiveEvent( eBorn );
+
+    ClothoModelCoordinator::getInstance()->handleEvent( eBorn );
+    m_alive = true;
 }
 
-void Individual::died() {
+void Individual::died( const DeathEvent * evt ) {
+    m_eol = dynamic_cast< IntVTime * >(evt->getReceiveTime().clone());
+    m_alive= false;
+    print( cout );
 }
 
 void Individual::print( ostream & out ) const {
-    out << m_name << ", " << m_sex << "\n";
+    out << m_name
+        << ", " << m_sex 
+        << ", " << m_offspring
+        ;
+    if( m_dob && m_eol ) {
+        out << ", " << (*m_eol - *m_dob);
+    }
+    out << "\n";
 }

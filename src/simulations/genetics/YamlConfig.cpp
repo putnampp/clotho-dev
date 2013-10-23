@@ -38,6 +38,8 @@
 #include "clothosim/ClothoModelManager.h"
 #include "clothosim/ClothoModel.h"
 
+#include "clothosim/ClothoModelCoordinator.h"
+
 using std::ifstream;
 using std::vector;
 
@@ -83,6 +85,8 @@ shared_ptr< vector< SimulationObject * > > YamlConfig::getSimulationObjects() {
             ClothoModel * cm = ClothoModelManager::getInstance()->createModelFrom( (*it) );
         }
     }
+
+    objs->push_back( &*ClothoModelCoordinator::getInstance() );
     
     return objs;
 }

@@ -39,6 +39,9 @@
 
 #include "../ClothoObjectCreator.h"
 #include "IndividualObjectState.h"
+#include "IntVTime.h"
+
+#include "events/DeathEvent.h"
 
 using std::vector;
 
@@ -66,12 +69,16 @@ public:
 
 protected:
     void born();
-    void died();
+    void died( const DeathEvent * evt );
 
 private:
     string  m_name;
 
     sex_t   m_sex;
+    bool    m_alive;
+    unsigned int    m_offspring;
+    IntVTime    * m_dob;
+    IntVTime    * m_eol;
 
     ClothoObject *  m_environment;
 };

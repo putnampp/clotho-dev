@@ -62,6 +62,7 @@ ADD_DEPENDENCIES( udobjects cobjmanager )
 LIST( APPEND MODEL_SRC models/SelectionModel.cpp )
 LIST( APPEND MODEL_SRC models/RandomSelectionModel.cpp )
 LIST( APPEND MODEL_SRC models/PopulationModel.cpp )
+LIST( APPEND MODEL_SRC models/LifeExpectancyModel.cpp )
 
 
 ADD_LIBRARY(cmodels SHARED ${MODEL_SRC} )

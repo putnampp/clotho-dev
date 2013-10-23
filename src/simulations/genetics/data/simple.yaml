@@ -32,7 +32,7 @@ lifeexpectancy: {
 
 # simulation individuals
 ---
-count:  5
+count:  500
 object: RandomIndividual
 max_variants:   1000
 founder_variants: 150
@@ -43,3 +43,22 @@ founder_variants: 150
 object: UDObject
 name: juan
 ...
+# population model
+---
+model: PopulationModel
+popsize: 10
+...
+# life expectancy model males
+---
+model: LifeExpectancyModel
+male: {
+    distribution: gaussian,
+    mean: 80,
+    stdev: 8
+}
+female: {
+    distribution: gaussian,
+    mean: 82,
+    stdev: 8
+}
+..

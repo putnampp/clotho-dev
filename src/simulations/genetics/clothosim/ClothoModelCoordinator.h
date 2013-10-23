@@ -32,24 +32,38 @@
 
 #include "common.h"
 #include "ClothoModel.h"
+#include "ClothoObject.h"
 
 #include <map>
 
 using std::multimap;
 
-class ClothoModelCoordinator {
+class ClothoModelCoordinator : public ClothoObject {
 public:
     typedef multimap< string, shared_ptr< ClothoModel > > Models;
     static shared_ptr< ClothoModelCoordinator > getInstance();
+
+    void initialize();
+    void finalize();
+
+    const string & getName() const;
+
+    void executeProcess();
+    State * allocateState();
+
+    void print( ostream & ) const;
 
 //    void registerModel( shared_ptr< ClothoModel > cm );
     void addEventHandler( const string & name, shared_ptr< ClothoModel > cm );
     void handleEvent( const Event * evt ) const;
 
+    void routeEvent( const Event * evt ) const;
+
     virtual ~ClothoModelCoordinator();
 protected:
     ClothoModelCoordinator();
 
+    string  m_name;
     Models  m_models;
 };
 

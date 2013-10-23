@@ -47,9 +47,6 @@ void Environment::handleEvent< BirthEvent >( const BirthEvent * evt ) {
     // upon receiving a birth event we should predict a DeathEvent
     // for the sender
     //
-    SimulationObject * sender = getObjectHandle( &(evt->getSender()) );
-    IntVTime tDeath = dynamic_cast< const IntVTime & >( evt->getSendTime() ) + 90;
-
     switch( evt->getSex() ) {
     case FEMALE:
         m_females.push_back( OBJECT_ID(evt->getSender()) );
@@ -61,9 +58,6 @@ void Environment::handleEvent< BirthEvent >( const BirthEvent * evt ) {
         break;
     }
 
-    Event * dEvent = new DeathEvent( getSimulationTime(), tDeath, this, sender );
-
-    sender->receiveEvent( dEvent );
 }
 
 Environment::Environment( ) : m_name( "ENV" ) {}
@@ -79,27 +73,11 @@ void Environment::executeProcess(){
     while( haveMoreEvents() ) {
         const Event * evt = getEvent();
         if( evt->getDataType() == "BirthEvent" ) {
-            cout << "Processing Birth Event (" << getSimulationTime() << ") ..." << *evt << endl;
-
             const BirthEvent * eB = dynamic_cast< const BirthEvent *>(evt);
             handleEvent( eB );
         }
     }
 }
-/*
-template<>
-void Environment::handleEvent< BirthEvent >( const BirthEvent * evt ) {
-    // upon receiving a birth event we should predict a DeathEvent
-    // for the sender
-    //
-    SimulationObject * sender = getObjectHandle( evt->getSender() );
-    IntVTime death = dynamic_cast< const IntVTime & >( evt->getSendTime() + 90 );
-
-    Event * dEvent = new DeathEvent( getSimulationTime(), death, this, sender );
-
-    sender->receiveEvent( dEvent );
-}
-*/
     
 State * Environment::allocateState() {
     return new EnvironmentObjectState(NULL, NULL);

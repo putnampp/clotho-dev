@@ -29,6 +29,11 @@
 
 #include "common_types.h"
 
+const string SEX_K = "sex";
+const string MALE_K = "male";
+const string FEMALE_K = "female";
+const string UNKSEX_K = "?";
+
 ostream & operator<<( ostream & out, const Sex s ) {
     switch( s ) {
     case FEMALE:

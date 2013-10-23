@@ -29,10 +29,14 @@
 
 #include "ClothoModelCoordinator.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 using std::pair;
 using std::make_pair;
 
-ClothoModelCoordinator::ClothoModelCoordinator() { }
+ClothoModelCoordinator::ClothoModelCoordinator() : ClothoObject(), m_name("coordinator") { }
 
 ClothoModelCoordinator::~ClothoModelCoordinator() {
     m_models.clear();
@@ -42,6 +46,21 @@ shared_ptr< ClothoModelCoordinator > ClothoModelCoordinator::getInstance() {
     static shared_ptr< ClothoModelCoordinator > inst( new ClothoModelCoordinator() );
     return inst;
 }
+
+void ClothoModelCoordinator::initialize() { }
+
+void ClothoModelCoordinator::finalize() { }
+
+const string & ClothoModelCoordinator::getName() const {
+    return m_name;
+}
+
+void ClothoModelCoordinator::executeProcess() { }
+
+State * ClothoModelCoordinator::allocateState() { return NULL; }
+
+void ClothoModelCoordinator::print( ostream & out ) const { }
+
 /*
 void ClothoModelCoordinator::registerModel( shared_ptr< ClothoModel > cm ) {
 
@@ -74,4 +93,10 @@ void ClothoModelCoordinator::handleEvent( const Event * evt ) const {
     for( Models::const_iterator it = mr.first; it != mr.second; it++ ) {
         it->second->handle( evt );
     }
+}
+
+void ClothoModelCoordinator::routeEvent( const Event * evt ) const {
+//    cout << "Routing an event: " << evt->getSender() << " -> " << evt->getReceiver() << endl;
+    SimulationObject * so = getObjectHandle( &evt->getReceiver() );
+    so->receiveEvent( evt );
 }

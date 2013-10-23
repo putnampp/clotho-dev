@@ -39,17 +39,31 @@ public:
                  SimulationObject * sender, 
                  SimulationObject * receiver,
                 sex_t s );
+    BirthEvent( const VTime & tSend, const VTime &tRecv,
+                 SimulationObject * sender, 
+                 SimulationObject * receiver,
+                sex_t s,
+                const VTime & tBirth);
     BirthEvent( const VTime & tSend, const VTime & tRecv,
                  const ObjectID &sender, 
                  const ObjectID & receiver,
                  const unsigned int evtID,
                 sex_t s );
+    BirthEvent( const VTime & tSend, const VTime & tRecv,
+                 const ObjectID &sender, 
+                 const ObjectID & receiver,
+                 const unsigned int evtID,
+                sex_t s,
+                const VTime & tBirth);
+
     BirthEvent( const BirthEvent & ce );
     virtual ~BirthEvent();
 
     sex_t getSex() const;
+    const VTime & getBirthTime() const;
 
 protected:
+    const VTime * m_birth;
     sex_t m_sex;
 };
 
