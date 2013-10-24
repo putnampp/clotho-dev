@@ -53,7 +53,6 @@ public:
 
     void print( ostream & ) const;
 
-//    void registerModel( shared_ptr< ClothoModel > cm );
     void addEventHandler( const string & name, shared_ptr< ClothoModel > cm );
     void handleEvent( const Event * evt ) const;
 
