@@ -42,45 +42,62 @@
 using std::cout;
 using std::endl;
 
-template<>
-void Environment::handleEvent< BirthEvent >( const BirthEvent * evt ) {
-    // upon receiving a birth event we should predict a DeathEvent
-    // for the sender
-    //
-    switch( evt->getSex() ) {
-    case FEMALE:
-        m_females.push_back( OBJECT_ID(evt->getSender()) );
-        break;
-    case MALE:
-        m_males.push_back( OBJECT_ID(evt->getSender()) );
-        break;
-    default:
-        break;
-    }
-
-}
-
 Environment::Environment( ) : m_name( "ENV" ) {}
 
-Environment::Environment( const YAML::Node & n) : m_name( "ENV" ) {
+Environment::Environment( const YAML::Node & n) : m_name( "ENV" ) { }
+
+Environment::~Environment() {
+    m_handlers.clear();
 }
 
-Environment::~Environment() {}
-void Environment::initialize(){}
-void Environment::finalize(){}
+void Environment::initialize() {
+    initializeHandlers();
+}
+
+void Environment::finalize() {}
+
+void Environment::initializeHandlers() {
+    m_handlers.insert( make_pair( evt_BirthEvent.getDataType(), &Environment::handleBirth ) );
+    m_handlers.insert( make_pair( evt_DeathEvent.getDataType(), &Environment::handleDeath ) );
+}
 
 void Environment::executeProcess(){
     while( haveMoreEvents() ) {
         const Event * evt = getEvent();
-        if( evt->getDataType() == "BirthEvent" ) {
-            const BirthEvent * eB = dynamic_cast< const BirthEvent *>(evt);
-            handleEvent( eB );
+        TypedHandlersIter it = m_handlers.find( evt->getDataType() );
+        if( it != m_handlers.end() ) {
+            EventHandler h = (it++)->second;
+            (this->*h)( evt );
         }
     }
 }
     
+void Environment::handleBirth( const Event * evt ) {
+    // upon receiving a birth event we should predict a DeathEvent
+    // for the sender
+    //
+    const BirthEvent * bEvt = dynamic_cast< const BirthEvent * >( evt );
+    switch( bEvt->getSex() ) {
+    case FEMALE:
+        m_females.push_back( OBJECT_ID(bEvt->getSender()) );
+        break;
+    case MALE:
+        m_males.push_back( OBJECT_ID(bEvt->getSender()) );
+        break;
+    default:
+        break;
+    }
+}
+
+void Environment::handleDeath( const Event * evt ) {
+    // const DeathEvent * dEvt = dynamic_cast< const DeathEvent * >( evt );
+
+    // remove individual from appropriate set
+    //
+}
+
 State * Environment::allocateState() {
-    return new EnvironmentObjectState(NULL, NULL);
+    return new EnvironmentObjectState();
 }
 
 const string & Environment::getName() const {

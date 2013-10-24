@@ -35,6 +35,9 @@
 #include "../ClothoObjectCreator.h"
 
 #include <vector>
+#include <unordered_map>
+
+using std::unordered_map;
 
 DECLARE_CLOTHO_OBJECT( Environment ) {
 public:
@@ -56,13 +59,23 @@ public:
 
     void print( ostream & out ) const;
 protected:
-    template< class EVT >
-    void handleEvent( const EVT * evt );
+    typedef void (Environment::*EventHandler)( const Event * );
+    
+    void initializeHandlers();
+
+    void handleBirth( const Event * evt );
+    void handleDeath( const Event * evt );
 
     vector< OBJECT_ID > m_females, m_males;
 
+    typedef unordered_map< string, EventHandler > TypedHandlers;
+    typedef TypedHandlers::iterator TypedHandlersIter;
+    TypedHandlers    m_handlers;
+
 private:
     string m_name;
+
+    
 };
 
 template < class SEL_MODEL >
