@@ -75,7 +75,6 @@ private:
     string  m_name;
 
     sex_t   m_sex;
-    bool    m_alive;
     unsigned int    m_offspring;
     IntVTime    * m_dob;
     IntVTime    * m_eol;

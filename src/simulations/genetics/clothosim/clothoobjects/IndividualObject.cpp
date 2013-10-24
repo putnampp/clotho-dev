@@ -76,7 +76,6 @@ Individual::Individual( const YAML::Node & n ) {
         m_sex = UNK_SEX;
     }
 
-    m_alive = false;
     m_offspring = 0;
     m_dob = NULL;
     m_eol = NULL;
@@ -85,14 +84,16 @@ Individual::Individual( const YAML::Node & n ) {
 Individual::Individual( sex_t s, const vector< genotype_t > & genos ) :
     m_name( "IND"  +  boost::lexical_cast<string>(m_id)),
     m_sex( s ),
-    m_alive(false),
     m_offspring(0),
     m_dob( NULL ),
     m_eol( NULL ) {
 
 }
 
-Individual::~Individual() {}
+Individual::~Individual() {
+    if( m_dob ) delete m_dob;
+    if( m_eol ) delete m_eol;
+}
 
 void Individual::initialize() {
     m_environment = dynamic_cast< ClothoObject * >( getObjectHandle( "ENV" ));
@@ -112,7 +113,7 @@ void Individual::executeProcess() {
     IndividualObjectState * iso = static_cast< IndividualObjectState * >(getState());
     ASSERT( iso != NULL );
 
-    while( m_alive && haveMoreEvents() ) {
+    while( !m_eol && haveMoreEvents() ) {
         const Event * evt = getEvent();
         if( evt->getDataType() == "DeathEvent" ) {
             const DeathEvent * dEvt = dynamic_cast< const DeathEvent * >( evt );
@@ -139,16 +140,17 @@ void Individual::born() {
     m_dob = dynamic_cast< IntVTime *>(getSimulationTime().clone());
     Event * eBorn = new BirthEvent( *m_dob, *m_dob, this, m_environment, m_sex );
     
-
     m_environment->receiveEvent( eBorn );
 
     ClothoModelCoordinator::getInstance()->handleEvent( eBorn );
-    m_alive = true;
 }
 
 void Individual::died( const DeathEvent * evt ) {
     m_eol = dynamic_cast< IntVTime * >(evt->getReceiveTime().clone());
-    m_alive= false;
+
+    DeathEvent * d = new DeathEvent( evt->getSendTime(), evt->getReceiveTime(), this, m_environment );
+
+    m_environment->receiveEvent( d );
     print( cout );
 }
 
