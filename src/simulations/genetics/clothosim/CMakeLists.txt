@@ -40,6 +40,7 @@ LIST( APPEND SIM_SRC clothoobjects/common_types.cpp )
 LIST( APPEND SIM_SRC clothoobjects/events/ClothoEvent.cpp )
 LIST( APPEND SIM_SRC clothoobjects/events/DeathEvent.cpp )
 LIST( APPEND SIM_SRC clothoobjects/events/BirthEvent.cpp )
+LIST( APPEND SIM_SRC clothoobjects/events/MaturityEvent.cpp )
 
 LIST( APPEND SIM_SRC clothoobjects/EnvironmentObject.cpp )
 LIST( APPEND SIM_SRC clothoobjects/EnvironmentObjectState.cpp )
@@ -63,6 +64,7 @@ LIST( APPEND MODEL_SRC models/SelectionModel.cpp )
 LIST( APPEND MODEL_SRC models/RandomSelectionModel.cpp )
 LIST( APPEND MODEL_SRC models/PopulationModel.cpp )
 LIST( APPEND MODEL_SRC models/LifeExpectancyModel.cpp )
+LIST( APPEND MODEL_SRC models/MaturityModel.cpp )
 
 
 ADD_LIBRARY(cmodels SHARED ${MODEL_SRC} )
