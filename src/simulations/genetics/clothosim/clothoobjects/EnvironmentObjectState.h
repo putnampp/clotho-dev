@@ -32,12 +32,10 @@
 
 #include "State.h"
 
-class LifeExpectancyModel;
-
 class EnvironmentObjectState : public State {
 public:
 
-    EnvironmentObjectState( LifeExpectancyModel * female, LifeExpectancyModel * male );
+    EnvironmentObjectState( );
 
     void copyState( const State * copy );
 
@@ -45,7 +43,6 @@ public:
 
     virtual ~EnvironmentObjectState();
 protected:
-    LifeExpectancyModel * m_lemFemale, * m_lemMale;
 };
 
 #endif  // ENVIRONMENTOBJECTSTATE_H_

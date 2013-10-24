@@ -29,9 +29,7 @@
 
 #include "EnvironmentObjectState.h"
 
-EnvironmentObjectState::EnvironmentObjectState( LifeExpectancyModel * female, LifeExpectancyModel * male ) : 
-    m_lemFemale( female ), 
-    m_lemMale( male ) 
+EnvironmentObjectState::EnvironmentObjectState( ) 
 {}
 
 void EnvironmentObjectState::copyState( const State * copy ) {}
