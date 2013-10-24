@@ -33,20 +33,38 @@
 DEFINE_REGISTERED_CLOTHO_EVENT( MaturityEvent )
 
 MaturityEvent::MaturityEvent( const VTime & tSend, const VTime &tRecv,
-                 SimulationObject * sender, 
-                 SimulationObject * receiver ) :
-                 DefaultEvent( tSend, tRecv, sender, receiver ) {}
+                                SimulationObject * sender, 
+                                SimulationObject * receiver ) :
+                 DefaultEvent( tSend, tRecv, sender, receiver ),
+                 m_age_of_maturity( tRecv.clone() ) {}
+
+MaturityEvent::MaturityEvent( const VTime & tSend, const VTime &tRecv,
+                                SimulationObject * sender, 
+                                SimulationObject * receiver,
+                                const VTime & tMature ) :
+                DefaultEvent( tSend, tRecv, sender, receiver ),
+                m_age_of_maturity( tMature.clone() ) {}
 
 MaturityEvent::MaturityEvent( const VTime & tSend, const VTime & tRecv,
-                 const ObjectID &sender, 
-                 const ObjectID & receiver,
-                 const unsigned int evtID ) :
-                 DefaultEvent( tSend, tRecv, sender, receiver, evtID ) {}
+                                const ObjectID &sender, 
+                                const ObjectID & receiver,
+                                const unsigned int evtID ) :
+                 DefaultEvent( tSend, tRecv, sender, receiver, evtID ),
+                 m_age_of_maturity( tRecv.clone() ) {}
+
+MaturityEvent::MaturityEvent( const VTime & tSend, const VTime & tRecv,
+                                const ObjectID &sender, 
+                                const ObjectID & receiver,
+                                const unsigned int evtID,
+                                const VTime & tMature ) :
+                 DefaultEvent( tSend, tRecv, sender, receiver, evtID ),
+                 m_age_of_maturity( tMature.clone() ) {}
 
 MaturityEvent::MaturityEvent( const MaturityEvent & ce ) :
                  DefaultEvent( ce.getSendTime(), ce.getReceiveTime(),
                                 ce.getSender(), ce.getReceiver(),
-                                ce.getEventId() ) {}
+                                ce.getEventId() ),
+                 m_age_of_maturity( ce.getAgeOfMaturity().clone() ) {}
 
 
 bool MaturityEvent::eventCompare( const Event * evt ) {
@@ -55,10 +73,12 @@ bool MaturityEvent::eventCompare( const Event * evt ) {
 }
 
 const VTime & MaturityEvent::getAgeOfMaturity() const {
-    return m_age_of_maturity;
+    return * m_age_of_maturity;
 }
 
-MaturityEvent::~MaturityEvent() {}
+MaturityEvent::~MaturityEvent() {
+    delete m_age_of_maturity;
+}
 
 DEFINE_CLOTHO_EVENT_DESERIALIZATION_METHOD( MaturityEvent ) {
     shared_ptr< VTime > tSend( dynamic_cast< VTime * >(inst->getSerializable()));

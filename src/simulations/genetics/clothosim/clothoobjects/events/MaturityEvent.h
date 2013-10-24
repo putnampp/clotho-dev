@@ -35,19 +35,29 @@
 DECLARE_CLOTHO_EVENT( MaturityEvent )
 public:
     MaturityEvent( const VTime & tSend, const VTime &tRecv,
-                 SimulationObject * sender, 
-                 SimulationObject * receiver );
+                    SimulationObject * sender, 
+                    SimulationObject * receiver );
+    MaturityEvent( const VTime & tSend, const VTime &tRecv,
+                    SimulationObject * sender, 
+                    SimulationObject * receiver,
+                    const VTime & tMature );
     MaturityEvent( const VTime & tSend, const VTime & tRecv,
-                 const ObjectID &sender, 
-                 const ObjectID & receiver,
-                 const unsigned int evtID );
+                    const ObjectID &sender, 
+                    const ObjectID & receiver,
+                    const unsigned int evtID );
+    MaturityEvent( const VTime & tSend, const VTime & tRecv,
+                    const ObjectID &sender, 
+                    const ObjectID & receiver,
+                    const unsigned int evtID,
+                    const VTime & tMature );
+
     MaturityEvent( const MaturityEvent & ce );
     virtual ~MaturityEvent();
 
     const VTime & getAgeOfMaturity() const;
 
 protected:
-    const VTime m_age_of_maturity;
+    const VTime * m_age_of_maturity;
 };
 
 DECLARE_REGISTERED_CLOTHO_EVENT( MaturityEvent );
