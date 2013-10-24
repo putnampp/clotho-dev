@@ -61,25 +61,11 @@ State * ClothoModelCoordinator::allocateState() { return NULL; }
 
 void ClothoModelCoordinator::print( ostream & out ) const { }
 
-/*
-void ClothoModelCoordinator::registerModel( shared_ptr< ClothoModel > cm ) {
-
-    const ClothoModel::Listeners listeners = cm->getListeners();
-    ClothoModel::Listeners::const_iterator it = listeners.begin();
-
-    while( it != listeners.end() ) {
-        m_models.insert( make_pair( *it, cm ) );
-    }
-}
-*/
-
 void ClothoModelCoordinator::addEventHandler( const string & name, shared_ptr< ClothoModel > handle) {
     m_models.insert( make_pair( name, handle ) );
 }
 
 void ClothoModelCoordinator::handleEvent( const Event * evt ) const {
-    //const string name = evt->getDataType();
-
     typedef pair< Models::const_iterator, Models::const_iterator > ModelRange;
     
     ModelRange mr = m_models.equal_range( evt->getDataType() );
@@ -96,7 +82,6 @@ void ClothoModelCoordinator::handleEvent( const Event * evt ) const {
 }
 
 void ClothoModelCoordinator::routeEvent( const Event * evt ) const {
-//    cout << "Routing an event: " << evt->getSender() << " -> " << evt->getReceiver() << endl;
     SimulationObject * so = getObjectHandle( &evt->getReceiver() );
     so->receiveEvent( evt );
 }
