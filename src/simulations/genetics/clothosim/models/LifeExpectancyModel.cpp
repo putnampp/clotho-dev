@@ -130,7 +130,7 @@ void LifeExpectancyModel::handle( const BirthEvent * evt ) {
     };
 
     IntVTime tDeath = dynamic_cast< const IntVTime & >( evt->getBirthTime() ) + (int)expected_age;
-    Event * dEvent = new DeathEvent( evt->getBirthTime(), tDeath, evt->getSender(), evt->getSender(), evt->getEventId().getEventNum() );
+    Event * dEvent = new DeathEvent( evt->getBirthTime(), tDeath, evt->getSender(), evt->getSender(), evt->getEventId() );
 
     ClothoModelCoordinator::getInstance()->routeEvent( dEvent );
 }
