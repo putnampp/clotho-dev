@@ -130,7 +130,7 @@ void MaturityModel::handle( const BirthEvent * evt ) {
     };
 
     IntVTime tMaturity = dynamic_cast< const IntVTime & >( evt->getBirthTime() ) + (int)expected_age;
-    Event * mEvent = new MaturityEvent( evt->getBirthTime(), tMaturity, evt->getSender(), evt->getSender(), evt->getEventId().getEventNum() );
+    Event * mEvent = new MaturityEvent( evt->getBirthTime(), tMaturity, evt->getSender(), evt->getSender(), evt->getEventId() );
 
     ClothoModelCoordinator::getInstance()->routeEvent( mEvent );
 }
