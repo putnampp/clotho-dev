@@ -37,6 +37,8 @@ using std::cerr;
 using std::cout;
 using std::endl;
 
+ClothoApplication::ClothoApplication( const string & config ) : m_config( config ) {}
+
 /*
  int ClothoApplication::initialize( vector< string > & args ) {
     if( m_config.empty() ) {
@@ -47,6 +49,7 @@ using std::endl;
 }
 */
 
+/*
 void ClothoApplication::configure( SimulationConfiguration & config ) {
     cout << "configure called" << endl;
     m_config = config.as_string( {"sim"} );
@@ -57,6 +60,7 @@ void ClothoApplication::configure( SimulationConfiguration & config ) {
 
     cout << m_config << endl;
 }
+*/
 
 int ClothoApplication::finalize( ) {
     return 0;

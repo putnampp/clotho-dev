@@ -36,9 +36,9 @@
 
 class ClothoApplication : public Application {
 public:
-
+    ClothoApplication( const string & config );
     //virtual int initialize( vector< string > & args );
-    virtual void configure( SimulationConfiguration & config );
+//    virtual void configure( SimulationConfiguration & config );
     virtual int finalize( );
 
     virtual const PartitionInfo * getPartitionInfo( unsigned int nPE );
