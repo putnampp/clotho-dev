@@ -56,6 +56,17 @@ public:
                 sex_t s,
                 const VTime & tBirth);
 
+    BirthEvent( const VTime & tSend, const VTime & tRecv,
+                 const ObjectID &sender, 
+                 const ObjectID & receiver,
+                 const EventId & evtID,
+                sex_t s );
+    BirthEvent( const VTime & tSend, const VTime & tRecv,
+                 const ObjectID &sender, 
+                 const ObjectID & receiver,
+                 const EventId & evtID,
+                sex_t s,
+                const VTime & tBirth);
     BirthEvent( const BirthEvent & ce );
     virtual ~BirthEvent();
 

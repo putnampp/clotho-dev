@@ -68,6 +68,24 @@ BirthEvent::BirthEvent( const VTime & tSend, const VTime &tRecv,
                  m_birth( tBirth.clone() ),
                  m_sex( sex ) {}
 
+BirthEvent::BirthEvent( const VTime & tSend, const VTime & tRecv,
+                 const ObjectID &sender, 
+                 const ObjectID & receiver,
+                 const EventId & evtID,
+                 sex_t sex ) :
+                 DefaultEvent( tSend, tRecv, sender, receiver, evtID ),
+                 m_birth( tSend.clone() ),
+                 m_sex( sex ) {}
+
+BirthEvent::BirthEvent( const VTime & tSend, const VTime &tRecv,
+                 const ObjectID &sender, 
+                 const ObjectID & receiver,
+                 const EventId & evtID,
+                 sex_t sex,
+                 const VTime & tBirth ) :
+                 DefaultEvent( tSend, tRecv, sender, receiver, evtID ),
+                 m_birth( tBirth.clone() ),
+                 m_sex( sex ) {}
 BirthEvent::BirthEvent( const BirthEvent & ce ) :
                  DefaultEvent( ce.getSendTime(), ce.getReceiveTime(),
                                 ce.getSender(), ce.getReceiver(),
