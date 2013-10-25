@@ -4,6 +4,5 @@
 "EventList":  {
     "Type" : "SplayTree",
     "Organization" : "Decentralized"
-},
-"sim": "/media/Data/pat_proj_data/dev/clotho/src/simulations/genetics/data/simple.yaml"
+}
 }
