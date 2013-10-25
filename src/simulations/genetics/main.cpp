@@ -38,13 +38,14 @@ using std::endl;
 
 int main( int argc, char ** argv ) {
 
-    if( argc != 2 ) {
-        cerr << "Expected Usage: WarpedClotho <config_file>" << endl;
+    if( argc != 3 ) {
+        cerr << "Expected Usage: WarpedClotho <warped_config_file> <clotho_config_file>" << endl;
         return EXIT_FAILURE;
     }
 
-    string config( argv[1] );
+    string warped_config( argv[1] );
+    string clotho_config( argv[2] );
 
-    WarpedMain wm( new ClothoApplication(), config);
+    WarpedMain wm( new ClothoApplication(clotho_config), warped_config);
     return wm.main( argc, argv );
 }
