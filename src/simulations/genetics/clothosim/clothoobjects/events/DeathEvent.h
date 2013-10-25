@@ -41,6 +41,10 @@ public:
                  const ObjectID &sender, 
                  const ObjectID & receiver,
                  const unsigned int evtID );
+    DeathEvent( const VTime & tSend, const VTime & tRecv,
+                 const ObjectID &sender, 
+                 const ObjectID & receiver,
+                 const EventId & evtID );
     DeathEvent( const DeathEvent & ce );
     virtual ~DeathEvent();
 };

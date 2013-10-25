@@ -43,6 +43,12 @@ DeathEvent::DeathEvent( const VTime & tSend, const VTime & tRecv,
                  const unsigned int evtID ) :
                  DefaultEvent( tSend, tRecv, sender, receiver, evtID ) {}
 
+DeathEvent::DeathEvent( const VTime & tSend, const VTime & tRecv,
+                 const ObjectID &sender, 
+                 const ObjectID & receiver,
+                 const EventId & evtID ) :
+                 DefaultEvent( tSend, tRecv, sender, receiver, evtID ) {}
+
 DeathEvent::DeathEvent( const DeathEvent & ce ) :
                  DefaultEvent( ce.getSendTime(), ce.getReceiveTime(),
                                 ce.getSender(), ce.getReceiver(),
