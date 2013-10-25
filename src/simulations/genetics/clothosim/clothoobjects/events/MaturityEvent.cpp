@@ -60,6 +60,20 @@ MaturityEvent::MaturityEvent( const VTime & tSend, const VTime & tRecv,
                  DefaultEvent( tSend, tRecv, sender, receiver, evtID ),
                  m_age_of_maturity( tMature.clone() ) {}
 
+MaturityEvent::MaturityEvent( const VTime & tSend, const VTime & tRecv,
+                                const ObjectID &sender, 
+                                const ObjectID & receiver,
+                                const EventId & evtID ) :
+                 DefaultEvent( tSend, tRecv, sender, receiver, evtID ),
+                 m_age_of_maturity( tRecv.clone() ) {}
+
+MaturityEvent::MaturityEvent( const VTime & tSend, const VTime & tRecv,
+                                const ObjectID &sender, 
+                                const ObjectID & receiver,
+                                const EventId & evtID,
+                                const VTime & tMature ) :
+                 DefaultEvent( tSend, tRecv, sender, receiver, evtID ),
+                 m_age_of_maturity( tMature.clone() ) {}
 MaturityEvent::MaturityEvent( const MaturityEvent & ce ) :
                  DefaultEvent( ce.getSendTime(), ce.getReceiveTime(),
                                 ce.getSender(), ce.getReceiver(),

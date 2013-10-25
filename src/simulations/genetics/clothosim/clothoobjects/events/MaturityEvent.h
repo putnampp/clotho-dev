@@ -51,6 +51,16 @@ public:
                     const unsigned int evtID,
                     const VTime & tMature );
 
+    MaturityEvent( const VTime & tSend, const VTime & tRecv,
+                    const ObjectID &sender, 
+                    const ObjectID & receiver,
+                    const EventId & evtID );
+    MaturityEvent( const VTime & tSend, const VTime & tRecv,
+                    const ObjectID &sender, 
+                    const ObjectID & receiver,
+                    const EventId & evtID,
+                    const VTime & tMature );
+
     MaturityEvent( const MaturityEvent & ce );
     virtual ~MaturityEvent();
 
