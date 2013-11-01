@@ -33,19 +33,41 @@
 #include "ClothoEventStub.h"
 #include "SimulationObject.h"
 
-DECLARE_CLOTHO_EVENT( ClothoEvent )
+template < class OBJ >
+class ClothoEvent : public DefaultEvent {
 public:
+    typedef OBJ object_t;
+
+    virtual const string & getDataType() const = 0;
+    virtual unsigned int getEventSize() const = 0;
+    virtual bool eventCompare( const Event * e ) = 0;
+
+    virtual void updateModels( OBJ * o ) const = 0;
+
+    virtual ~ClothoEvent() {}
+protected:
     ClothoEvent( const VTime & tSend, const VTime &tRecv,
                  SimulationObject * sender, 
-                 SimulationObject * receiver );
+                 SimulationObject * receiver ) :
+                    DefaultEvent( tSend, tRecv, sender, receiver ) {}
+
     ClothoEvent( const VTime & tSend, const VTime & tRecv,
-                 const ObjectID & sender, 
+                 const ObjectID &sender, 
                  const ObjectID & receiver,
-                 const unsigned int evtID );
-    ClothoEvent( const ClothoEvent & ce );
-    virtual ~ClothoEvent();
+                 const unsigned int evtID ) :
+                    DefaultEvent( tSend, tRecv, sender, receiver, evtID ) {}
+
+    ClothoEvent( const VTime & tSend, const VTime & tRecv,
+                 const ObjectID &sender, 
+                 const ObjectID & receiver,
+                 const EventId & evtID ) : 
+                    DefaultEvent( tSend, tRecv, sender, receiver, evtID ) {}
+
+    ClothoEvent( const ClothoEvent & ce ) :
+            DefaultEvent( ce.getSendTime(), ce.getReceiveTime(),
+                ce.getSender(), ce.getReceiver(), ce.getEventId() ) {}
 };
 
-DECLARE_REGISTERED_CLOTHO_EVENT( ClothoEvent );
+//DECLARE_REGISTERED_CLOTHO_EVENT( ClothoEvent );
 
 #endif  // CLOTHOEVENT_H_

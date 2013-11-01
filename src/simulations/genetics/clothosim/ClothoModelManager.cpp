@@ -42,26 +42,22 @@ void ClothoModelManager::registerModel( SimModelCreator * smc ) {
     m_creators[ smc->name() ] = smc;
 }
 
-ClothoModel * ClothoModelManager::createModel( const string & name ) {
+void ClothoModelManager::createModel( const string & name ) {
     iterator it = m_creators.find( name );
 
-    if( it == m_creators.end() )
-        return NULL;
-
-    return it->second->createModel();
+    if( it != m_creators.end() )
+        it->second->createModel();
 }
 
-ClothoModel * ClothoModelManager::createModelFrom( const YAML::Node & n ) {
-    try {
-        string name = n[ "model" ].as<string>();
+void ClothoModelManager::createModelFrom( const YAML::Node & n ) {
+    if( n[ MODEL_K ] ) {
+        string name = n[ MODEL_K ].as<string>();
 
         iterator it = m_creators.find( name );
 
         if( it != m_creators.end() )
-            return it->second->createModelFrom(n);
-    } catch ( ... ) {    }
-
-    return NULL;
+            it->second->createModelFrom(n);
+    }
 }
 
 ClothoModelManager::~ClothoModelManager() {

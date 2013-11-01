@@ -57,24 +57,6 @@ private:
     const string    m_name;
 };
 
-/*
-#define REGISTERED_CLOTHO_EVENT_BEGIN( name )               \
-    class name;                                             \
-    const ClothoEventStub< name > evt_##name( #name );      \
-    class name : public DefaultEvent {                      \
-        friend class ClothoEventStub< name >;               \
-    public:                                                 \
-        name ( SerializedInstance * si );                   \
-        const string & getDataType() const {                \
-            return evt_##name.getDataType();                \
-        } \
-        unsigned int getEventSize() const { return sizeof( name ); }  \
-        bool eventCompare( const Event * e );
-        
-
-#define REGISTERED_CLOTHO_EVENT_END( name ) };
-*/
-
 #define DECLARE_CLOTHO_EVENT( name )                                \
     class name : public DefaultEvent {                              \
     public:                                                         \

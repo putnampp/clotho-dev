@@ -31,12 +31,6 @@
 
 const string ANY_EVENTS = "event";
 
-ClothoModel::ClothoModel() {}
+//ClothoModel::ClothoModel() {}
 
-ClothoModel::~ClothoModel() {
-    //m_listened_events.clear();
-}
-
-//const ClothoModel::Listeners & ClothoModel::getListeners() const {
-//    return m_listened_events;
-//}
+//ClothoModel::~ClothoModel() {}

@@ -31,8 +31,11 @@
 #define DEATHEVENT_H_
 
 #include "ClothoEventStub.h"
+#include "ClothoEvent.h"
+#include "../IndividualObject.h"
 
-DECLARE_CLOTHO_EVENT( DeathEvent )
+//DECLARE_CLOTHO_EVENT( DeathEvent )
+class DeathEvent : virtual public ClothoEvent< Individual > {
 public:
     DeathEvent( const VTime & tSend, const VTime &tRecv,
                  SimulationObject * sender, 
@@ -46,6 +49,13 @@ public:
                  const ObjectID & receiver,
                  const EventId & evtID );
     DeathEvent( const DeathEvent & ce );
+
+    virtual const string & getDataType() const;
+    virtual unsigned int getEventSize() const;
+    virtual bool eventCompare( const Event * e );
+
+    virtual void updateModels( Individual * ) const;
+
     virtual ~DeathEvent();
 };
 

@@ -33,11 +33,11 @@ LIST( APPEND OBJECT_MNGR_SRC ClothoObject.cpp )
 LIST( APPEND OBJECT_MNGR_SRC ClothoObjectManager.cpp )
 LIST( APPEND OBJECT_MNGR_SRC ClothoModel.cpp )
 LIST( APPEND OBJECT_MNGR_SRC ClothoModelManager.cpp )
-LIST( APPEND OBJECT_MNGR_SRC ClothoModelCoordinator.cpp )
+#LIST( APPEND OBJECT_MNGR_SRC ClothoModelCoordinator.cpp )
 
 LIST( APPEND SIM_SRC clothoobjects/common_types.cpp )
 
-LIST( APPEND SIM_SRC clothoobjects/events/ClothoEvent.cpp )
+#LIST( APPEND SIM_SRC clothoobjects/events/ClothoEvent.cpp )
 LIST( APPEND SIM_SRC clothoobjects/events/DeathEvent.cpp )
 LIST( APPEND SIM_SRC clothoobjects/events/BirthEvent.cpp )
 LIST( APPEND SIM_SRC clothoobjects/events/MaturityEvent.cpp )
@@ -60,11 +60,11 @@ ADD_LIBRARY(udobjects SHARED ${USER_SRC} )
 
 ADD_DEPENDENCIES( udobjects cobjmanager )
 
-LIST( APPEND MODEL_SRC models/SelectionModel.cpp )
-LIST( APPEND MODEL_SRC models/RandomSelectionModel.cpp )
+#LIST( APPEND MODEL_SRC models/SelectionModel.cpp )
+#LIST( APPEND MODEL_SRC models/RandomSelectionModel.cpp )
 LIST( APPEND MODEL_SRC models/PopulationModel.cpp )
-LIST( APPEND MODEL_SRC models/LifeExpectancyModel.cpp )
-LIST( APPEND MODEL_SRC models/MaturityModel.cpp )
+#LIST( APPEND MODEL_SRC models/LifeExpectancyModel.cpp )
+#LIST( APPEND MODEL_SRC models/MaturityModel.cpp )
 
 
 ADD_LIBRARY(cmodels SHARED ${MODEL_SRC} )

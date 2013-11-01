@@ -30,7 +30,7 @@
 #include "../clothoobjects/common_types.h"
 #include "LifeExpectancyModel.h"
 #include "../ClothoModelCoordinator.h"
-#include "SimulationManager.h"
+//#include "SimulationManager.h"
 
 #include <iostream>
 

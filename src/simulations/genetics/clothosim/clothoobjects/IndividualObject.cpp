@@ -29,9 +29,10 @@
 
 #include "IndividualObject.h"
 #include "common_types.h"
-#include "../ClothoModelCoordinator.h"
+//#include "../ClothoModelCoordinator.h"
 
 #include "events/BirthEvent.h"
+#include "events/DeathEvent.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -102,7 +103,10 @@ void Individual::initialize() {
         abort();
     }
 
-    born();
+    m_dob = dynamic_cast< IntVTime *>(getSimulationTime().clone());
+    Event * eBorn = new BirthEvent( *m_dob, *m_dob, this, this, m_sex );
+
+    this->receiveEvent( eBorn );
 }
 
 void Individual::finalize() {
@@ -114,6 +118,7 @@ void Individual::executeProcess() {
     ASSERT( iso != NULL );
 
     while( !m_eol && haveMoreEvents() ) {
+/*
         const Event * evt = getEvent();
         if( evt->getDataType() == "DeathEvent" ) {
             const DeathEvent * dEvt = dynamic_cast< const DeathEvent * >( evt );
@@ -121,6 +126,11 @@ void Individual::executeProcess() {
         }
 
         ClothoModelCoordinator::getInstance()->handleEvent( evt );
+*/
+        const ClothoEvent< Individual > * evt = dynamic_cast< const ClothoEvent< Individual > * >(getEvent());
+        if( evt ) {
+            evt->updateModels( this );
+        }
     }
 }
 
@@ -135,7 +145,7 @@ const string & Individual::getName() const {
 sex_t Individual::getSex() const {
     return m_sex;
 }
-
+/*
 void Individual::born() {
     m_dob = dynamic_cast< IntVTime *>(getSimulationTime().clone());
     Event * eBorn = new BirthEvent( *m_dob, *m_dob, this, m_environment, m_sex );
@@ -145,7 +155,7 @@ void Individual::born() {
     ClothoModelCoordinator::getInstance()->handleEvent( eBorn );
 }
 
-void Individual::died( const DeathEvent * evt ) {
+void Individual::died( ) {
     m_eol = dynamic_cast< IntVTime * >(evt->getReceiveTime().clone());
 
     DeathEvent * d = new DeathEvent( evt->getSendTime(), evt->getReceiveTime(), this, m_environment );
@@ -153,6 +163,7 @@ void Individual::died( const DeathEvent * evt ) {
     m_environment->receiveEvent( d );
     print( cout );
 }
+*/
 
 void Individual::print( ostream & out ) const {
     out << m_name

@@ -32,7 +32,7 @@ lifeexpectancy: {
 
 # simulation individuals
 ---
-count:  500
+count:  5
 object: RandomIndividual
 max_variants:   1000
 founder_variants: 150

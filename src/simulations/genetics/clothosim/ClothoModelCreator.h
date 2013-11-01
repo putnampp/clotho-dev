@@ -47,12 +47,12 @@ public:
         return m_name;
     }
 
-    ClothoModel * createModel() {
-        return new OBJ();
+    void createModel() {
+       // return new OBJ();
     }
 
-    ClothoModel * createModelFrom( const YAML::Node & n ) {
-        return new OBJ( n );
+    void createModelFrom( const YAML::Node & n ) {
+        //return new OBJ( n );
     }
 private:
     const string m_name;

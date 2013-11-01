@@ -31,31 +31,29 @@
 #define CLOTHOMODEL_H_
 
 #include "common.h"
-#include "Event.h"
+//#include "Event.h"
+#include "clothoobjects/events/ClothoEvent.h"
 #include "yaml-cpp/yaml.h"
 
-#include <vector>
 #include <ostream>
 
-//using std::vector;
+#include <type_traits>
+
 using std::ostream;
-
-class ClothoModel {
-public:
-    //typedef vector< string > Listeners;
-    //virtual const Listeners & getListeners( ) const;
-    virtual void configure( const YAML::Node & n ) = 0;
-
-    virtual void handle( const Event * evt ) = 0;
-
-    virtual void dump( ostream & out ) = 0;
-
-    virtual ~ClothoModel();
-protected:
-    ClothoModel();
-    //Listeners   m_listened_events;
-};
+using std::enable_if;
+using std::is_base_of;
 
 extern const string ANY_EVENTS;
+
+template < class OBJ, class EVT = ClothoEvent< OBJ > >
+struct ClothoModel {
+    virtual void configure( const YAML::Node & n ) = 0;
+    
+    virtual void operator()( const EVT * , const OBJ * ) = 0;
+
+    virtual void dump( ostream & ) = 0;
+
+    virtual ~ClothoModel() {}
+};
 
 #endif  // CLOTHOMODEL_H_

@@ -38,7 +38,7 @@
 #include "clothosim/ClothoModelManager.h"
 #include "clothosim/ClothoModel.h"
 
-#include "clothosim/ClothoModelCoordinator.h"
+//#include "clothosim/ClothoModelCoordinator.h"
 
 using std::ifstream;
 using std::vector;
@@ -82,11 +82,11 @@ shared_ptr< vector< SimulationObject * > > YamlConfig::getSimulationObjects() {
 
             cout << "SimulationObjects created: " << objs->size() << "( " << objs->capacity() << " )" << endl;
         } else if( (*it)[ MODEL_K ] ) {
-            ClothoModel * cm = ClothoModelManager::getInstance()->createModelFrom( (*it) );
+            ClothoModelManager::getInstance()->createModelFrom( (*it) );
         }
     }
 
-    objs->push_back( &*ClothoModelCoordinator::getInstance() );
+//    objs->push_back( &*ClothoModelCoordinator::getInstance() );
     
     return objs;
 }

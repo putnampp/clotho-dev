@@ -32,8 +32,10 @@
 
 #include "../common_types.h"
 #include "ClothoEventStub.h"
+#include "ClothoEvent.h"
+#include "../IndividualObject.h"
 
-DECLARE_CLOTHO_EVENT( BirthEvent )
+class BirthEvent : virtual public ClothoEvent< Individual > {
 public:
     BirthEvent( const VTime & tSend, const VTime &tRecv,
                  SimulationObject * sender, 
@@ -69,6 +71,12 @@ public:
                 const VTime & tBirth);
     BirthEvent( const BirthEvent & ce );
     virtual ~BirthEvent();
+
+    virtual const string & getDataType() const;
+    virtual unsigned int getEventSize() const;
+    virtual bool eventCompare( const Event * e );
+
+    virtual void updateModels( Individual * ) const;
 
     sex_t getSex() const;
     const VTime & getBirthTime() const;

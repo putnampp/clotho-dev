@@ -37,11 +37,11 @@
 #include "common.h"
 #include <vector>
 
+#include "events/ClothoEvent.h"
+
 #include "../ClothoObjectCreator.h"
 #include "IndividualObjectState.h"
 #include "IntVTime.h"
-
-#include "events/DeathEvent.h"
 
 using std::vector;
 
@@ -65,11 +65,15 @@ public:
 
     void print( ostream & out ) const;
 
+    template < class EVT >
+    void handleEvent( const EVT * e ) {}
+
     sex_t   getSex() const;
 
 protected:
-    void born();
-    void died( const DeathEvent * evt );
+//    void born();
+//    void died( const DeathEvent * evt );
+//    void died( );
 
 private:
     string  m_name;

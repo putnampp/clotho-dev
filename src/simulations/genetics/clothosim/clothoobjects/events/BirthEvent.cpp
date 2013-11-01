@@ -30,13 +30,20 @@
 #include "BirthEvent.h"
 #include "SerializedInstance.h"
 
+#include "../../ClothoModelCoordinator.h"
+
 DEFINE_REGISTERED_CLOTHO_EVENT( BirthEvent )
+
+template<>
+void Individual::handleEvent< BirthEvent >( const BirthEvent * e ) {
+    m_dob = (IntVTime *) e->getBirthTime().clone();
+}
 
 BirthEvent::BirthEvent( const VTime & tSend, const VTime &tRecv,
                  SimulationObject * sender, 
                  SimulationObject * receiver,
                 sex_t s ) :
-                DefaultEvent( tSend, tRecv, sender, receiver ),
+                ClothoEvent<Individual>( tSend, tRecv, sender, receiver ),
                 m_birth( tSend.clone() ),
                 m_sex( s ) {}
 
@@ -45,7 +52,7 @@ BirthEvent::BirthEvent( const VTime & tSend, const VTime &tRecv,
                  SimulationObject * receiver,
                  sex_t sex,
                  const VTime & tBirth) :
-                 DefaultEvent( tSend, tRecv, sender, receiver ),
+                 ClothoEvent<Individual>( tSend, tRecv, sender, receiver ),
                  m_birth( tBirth.clone() ),
                  m_sex( sex ) {}
 
@@ -54,7 +61,7 @@ BirthEvent::BirthEvent( const VTime & tSend, const VTime & tRecv,
                  const ObjectID & receiver,
                  const unsigned int evtID,
                  sex_t sex ) :
-                 DefaultEvent( tSend, tRecv, sender, receiver, evtID ),
+                 ClothoEvent<Individual>( tSend, tRecv, sender, receiver, evtID ),
                  m_birth( tSend.clone() ),
                  m_sex( sex ) {}
 
@@ -64,7 +71,7 @@ BirthEvent::BirthEvent( const VTime & tSend, const VTime &tRecv,
                  const unsigned int evtID,
                  sex_t sex,
                  const VTime & tBirth ) :
-                 DefaultEvent( tSend, tRecv, sender, receiver, evtID ),
+                 ClothoEvent<Individual>( tSend, tRecv, sender, receiver, evtID ),
                  m_birth( tBirth.clone() ),
                  m_sex( sex ) {}
 
@@ -73,7 +80,7 @@ BirthEvent::BirthEvent( const VTime & tSend, const VTime & tRecv,
                  const ObjectID & receiver,
                  const EventId & evtID,
                  sex_t sex ) :
-                 DefaultEvent( tSend, tRecv, sender, receiver, evtID ),
+                 ClothoEvent<Individual>( tSend, tRecv, sender, receiver, evtID ),
                  m_birth( tSend.clone() ),
                  m_sex( sex ) {}
 
@@ -83,11 +90,12 @@ BirthEvent::BirthEvent( const VTime & tSend, const VTime &tRecv,
                  const EventId & evtID,
                  sex_t sex,
                  const VTime & tBirth ) :
-                 DefaultEvent( tSend, tRecv, sender, receiver, evtID ),
+                 ClothoEvent<Individual>( tSend, tRecv, sender, receiver, evtID ),
                  m_birth( tBirth.clone() ),
                  m_sex( sex ) {}
+
 BirthEvent::BirthEvent( const BirthEvent & ce ) :
-                 DefaultEvent( ce.getSendTime(), ce.getReceiveTime(),
+                 ClothoEvent<Individual>( ce.getSendTime(), ce.getReceiveTime(),
                                 ce.getSender(), ce.getReceiver(),
                                 ce.getEventId() ),
                  m_birth( ce.getBirthTime().clone() ),
@@ -104,6 +112,12 @@ const VTime & BirthEvent::getBirthTime() const {
 bool BirthEvent::eventCompare( const Event * evt ) {
     const BirthEvent * e = dynamic_cast< const BirthEvent * >(evt);
     return (compareEvents( this, e ) );
+}
+
+void BirthEvent::updateModels( Individual * ind ) const {
+    ind->handleEvent( this );
+
+    ClothoModelCoordinator< Individual, BirthEvent >::getInstance()->handleEvent( this, ind );
 }
 
 BirthEvent::~BirthEvent() {}

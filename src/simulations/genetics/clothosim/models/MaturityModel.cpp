@@ -30,7 +30,6 @@
 #include "../clothoobjects/common_types.h"
 #include "MaturityModel.h"
 #include "../ClothoModelCoordinator.h"
-#include "SimulationManager.h"
 
 #include <iostream>
 

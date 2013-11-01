@@ -32,25 +32,29 @@
 
 DEFINE_REGISTERED_CLOTHO_EVENT( DeathEvent )
 
+template<>
+void Individual::handleEvent< DeathEvent >( const DeathEvent * e ) {
+}
+
 DeathEvent::DeathEvent( const VTime & tSend, const VTime &tRecv,
                  SimulationObject * sender, 
                  SimulationObject * receiver ) :
-                 DefaultEvent( tSend, tRecv, sender, receiver ) {}
+                 ClothoEvent<Individual>( tSend, tRecv, sender, receiver ) {}
 
 DeathEvent::DeathEvent( const VTime & tSend, const VTime & tRecv,
                  const ObjectID &sender, 
                  const ObjectID & receiver,
                  const unsigned int evtID ) :
-                 DefaultEvent( tSend, tRecv, sender, receiver, evtID ) {}
+                 ClothoEvent<Individual>( tSend, tRecv, sender, receiver, evtID ) {}
 
 DeathEvent::DeathEvent( const VTime & tSend, const VTime & tRecv,
                  const ObjectID &sender, 
                  const ObjectID & receiver,
                  const EventId & evtID ) :
-                 DefaultEvent( tSend, tRecv, sender, receiver, evtID ) {}
+                 ClothoEvent<Individual>( tSend, tRecv, sender, receiver, evtID ) {}
 
 DeathEvent::DeathEvent( const DeathEvent & ce ) :
-                 DefaultEvent( ce.getSendTime(), ce.getReceiveTime(),
+                 ClothoEvent<Individual>( ce.getSendTime(), ce.getReceiveTime(),
                                 ce.getSender(), ce.getReceiver(),
                                 ce.getEventId() ) {}
 
@@ -58,6 +62,10 @@ DeathEvent::DeathEvent( const DeathEvent & ce ) :
 bool DeathEvent::eventCompare( const Event * evt ) {
     const DeathEvent * e = dynamic_cast< const DeathEvent * >(evt);
     return (compareEvents( this, e ) );
+}
+
+void DeathEvent::updateModels( Individual * ind ) const {
+    ind->handleEvent( this );
 }
 
 DeathEvent::~DeathEvent() {}

@@ -30,9 +30,12 @@
 #ifndef MATURITYEVENT_H_
 #define MATURITYEVENT_H_
 
+#include "ClothoEvent.h"
 #include "ClothoEventStub.h"
+#include "../IndividualObject.h"
 
-DECLARE_CLOTHO_EVENT( MaturityEvent )
+//DECLARE_CLOTHO_EVENT( MaturityEvent )
+class MaturityEvent : virtual public ClothoEvent< Individual > {
 public:
     MaturityEvent( const VTime & tSend, const VTime &tRecv,
                     SimulationObject * sender, 
@@ -62,10 +65,16 @@ public:
                     const VTime & tMature );
 
     MaturityEvent( const MaturityEvent & ce );
-    virtual ~MaturityEvent();
+
+    virtual const string & getDataType() const;
+    virtual unsigned int getEventSize() const;
+    virtual bool eventCompare( const Event * e );
+
+    virtual void updateModels( Individual * ) const;
 
     const VTime & getAgeOfMaturity() const;
 
+    virtual ~MaturityEvent();
 protected:
     const VTime * m_age_of_maturity;
 };

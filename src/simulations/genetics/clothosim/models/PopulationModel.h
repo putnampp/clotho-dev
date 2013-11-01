@@ -30,21 +30,28 @@
 #ifndef POPULATIONMODEL_H_
 #define POPULATIONMODEL_H_
 
+#include "../ClothoModel.h"
 #include "../ClothoModelCreator.h"
 
 #include "../clothoobjects/events/BirthEvent.h"
 #include "../clothoobjects/events/DeathEvent.h"
 
-DECLARE_CLOTHO_MODEL( PopulationModel ) {
+//DECLARE_CLOTHO_MODEL( PopulationModel ) {
+class PopulationModel : 
+    virtual public ClothoModel< Individual, BirthEvent >, 
+    virtual public ClothoModel< Individual, DeathEvent > {
 public:
     PopulationModel();
 
     void configure( const YAML::Node & n );
 
+/*
     void handle( const Event * evt );
     void handle( const BirthEvent * evt );
     void handle( const DeathEvent * evt );
-
+*/
+    void operator()( const BirthEvent * e, const Individual * ind );
+    void operator()( const DeathEvent * e, const Individual * ind );
     void dump( ostream & out );
 
     ~PopulationModel();

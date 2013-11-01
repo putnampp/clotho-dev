@@ -32,37 +32,44 @@
 
 #include "common.h"
 #include "ClothoModel.h"
-#include "ClothoObject.h"
 
-#include <map>
+#include <vector>
 
-using std::multimap;
+using std::vector;
 
-class ClothoModelCoordinator : public ClothoObject {
+template < class OBJ, class EVT >
+class ClothoModelCoordinator {
 public:
-    typedef multimap< string, shared_ptr< ClothoModel > > Models;
-    static shared_ptr< ClothoModelCoordinator > getInstance();
+    typedef ClothoModel< OBJ, EVT > model_t;
 
-    void initialize();
-    void finalize();
+    typedef vector< shared_ptr< model_t > > Models;
+    typedef typename Models::const_iterator iterator;
 
-    const string & getName() const;
+    static shared_ptr< ClothoModelCoordinator< OBJ, EVT > > getInstance() {
+        static shared_ptr< ClothoModelCoordinator< OBJ, EVT > > inst( new ClothoModelCoordinator<OBJ, EVT>());
+        return inst;
+    }
 
-    void executeProcess();
-    State * allocateState();
+    void print( ostream & ) const {
 
-    void print( ostream & ) const;
+    }
 
-    void addEventHandler( const string & name, shared_ptr< ClothoModel > cm );
-    void handleEvent( const Event * evt ) const;
+    void addEventHandler( shared_ptr< model_t > cm ) {
+        m_models.push_back( cm );
+    }
 
-    void routeEvent( const Event * evt ) const;
+    void handleEvent( const EVT * e, const OBJ * o ) {
+        for( iterator it = m_models.begin(); it != m_models.end(); it++ ) {
+            (*(*it))(e, o);
+        }
+    }
 
-    virtual ~ClothoModelCoordinator();
+    virtual ~ClothoModelCoordinator() {
+        m_models.clear();
+    }
 protected:
-    ClothoModelCoordinator();
+    ClothoModelCoordinator() {}
 
-    string  m_name;
     Models  m_models;
 };
 

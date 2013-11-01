@@ -29,12 +29,14 @@
 
 #include "PopulationModel.h"
 #include "../ClothoModelCoordinator.h"
-#include "SimulationManager.h"
+//#include "SimulationManager.h"
 
 #include <iostream>
 
 using std::cout;
 using std::endl;
+
+using boost::static_pointer_cast;
 
 DEFINE_REGISTERED_CLOTHO_MODEL( PopulationModel )
 
@@ -43,26 +45,27 @@ const string POP_SIZE_K = "popsize";
 #define DEFAULT_POP_SIZE 100
 
 template <>
-ClothoModel * ClothoModelCreator< PopulationModel >::createModel() {
+void ClothoModelCreator< PopulationModel >::createModel() {
     shared_ptr< PopulationModel> pm( new PopulationModel() );
-    shared_ptr<ClothoModelCoordinator> coord = ClothoModelCoordinator::getInstance();
 
-    coord->addEventHandler( evt_BirthEvent.getDataType(), pm );
-    coord->addEventHandler( evt_DeathEvent.getDataType(), pm );
+    ClothoModelCoordinator< Individual, BirthEvent >::getInstance()->addEventHandler(
+            static_pointer_cast< ClothoModel< Individual, BirthEvent > >( pm )  );
 
-    return &*pm;
+    ClothoModelCoordinator< Individual, DeathEvent >::getInstance()->addEventHandler(
+            static_pointer_cast< ClothoModel< Individual, DeathEvent > >( pm ) ); 
+
 }
 
 template<>
-ClothoModel * ClothoModelCreator< PopulationModel >::createModelFrom( const YAML::Node & n ) {
+void ClothoModelCreator< PopulationModel >::createModelFrom( const YAML::Node & n ) {
     shared_ptr< PopulationModel > pm( new PopulationModel() );
     pm->configure( n );
-    shared_ptr<ClothoModelCoordinator> coord = ClothoModelCoordinator::getInstance();
 
-    coord->addEventHandler( evt_BirthEvent.getDataType(), pm );
-    coord->addEventHandler( evt_DeathEvent.getDataType(), pm );
+    ClothoModelCoordinator< Individual, BirthEvent >::getInstance()->addEventHandler(
+            static_pointer_cast< ClothoModel< Individual, BirthEvent > >( pm )  );
 
-    return &*pm;
+    ClothoModelCoordinator< Individual, DeathEvent >::getInstance()->addEventHandler(
+            static_pointer_cast< ClothoModel< Individual, DeathEvent > >( pm ) ); 
 }
 
 PopulationModel::PopulationModel() : m_living(0), m_lived(0), m_pop_size( DEFAULT_POP_SIZE ) {}
@@ -75,32 +78,14 @@ void PopulationModel::configure( const YAML::Node & n ) {
     }
 }
 
-void PopulationModel::handle( const Event * evt ) {
-    const string name = evt->getDataType();
-
-    if( name == evt_BirthEvent.getDataType() ) {
-        const BirthEvent * bEvt = dynamic_cast< const BirthEvent * >( evt );
-        handle( bEvt );
-    } else if( name == evt_DeathEvent.getDataType() ) {
-        const DeathEvent * dEvt = dynamic_cast< const DeathEvent * >( evt );
-        handle( dEvt );
-    }
-}
-
-void PopulationModel::handle( const BirthEvent * evt ) {
-    if(! evt ) return;
-
+void PopulationModel::operator()( const BirthEvent * e, const Individual * ind ) {
+    cout << "Increasing population" << endl;
     if( ++m_living >= m_pop_size ) {
-        // terminate simulation?
-        // Warped is complete when there are no more
-        // events in the queue; need to create an event
-        // which clears the event queue?
+        // trigger termination?
     }
 }
 
-void PopulationModel::handle( const DeathEvent * evt ) {
-    if( ! evt ) return;
-
+void PopulationModel::operator()( const DeathEvent * e, const Individual * ind ) {
     --m_living;
     ++m_lived;
 }

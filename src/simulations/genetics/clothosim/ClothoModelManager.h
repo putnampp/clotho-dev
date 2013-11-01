@@ -34,7 +34,7 @@
 
 #include "yaml-cpp/yaml.h"
 
-#include "ClothoModelCoordinator.h"
+//#include "ClothoModelCoordinator.h"
 
 #include <map>
 #include <vector>
@@ -47,8 +47,8 @@ extern const string MODEL_K;
 struct SimModelCreator {
     virtual const string & name() = 0;
 
-    virtual ClothoModel * createModel() = 0;
-    virtual ClothoModel * createModelFrom( const YAML::Node & n ) = 0;
+    virtual void createModel() = 0;
+    virtual void createModelFrom( const YAML::Node & n ) = 0;
 };
 
 class ClothoModelManager {
@@ -60,9 +60,9 @@ public:
 
     void registerModel( SimModelCreator * soc );
 
-    ClothoModel * createModel( const string & name );
+    void createModel( const string & name );
 
-    ClothoModel * createModelFrom( const YAML::Node & yaml );
+    void createModelFrom( const YAML::Node & yaml );
 
     virtual ~ClothoModelManager();
 protected:
