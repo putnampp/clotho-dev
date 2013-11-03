@@ -27,36 +27,36 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef LIFEEXPECTANCYMODEL_H_
-#define LIFEEXPECTANCYMODEL_H_
+#ifndef LOGMODEL_H_
+#define LOGMODEL_H_
 
 #include "../ClothoModel.h"
 #include "../ClothoModelCreator.h"
 
-#include "../clothoobjects/events/BirthEvent.h"
+#include "../clothoobjects/events/LogEvent.h"
+#include "IntVTime.h"
+#include <fstream>
 
-#include "gsl/gsl_rng.h"
+using std::ofstream;
 
-//DECLARE_CLOTHO_MODEL( LifeExpectancyModel ) {
-class LifeExpectancyModel :
-    virtual public ClothoModel< Individual, BirthEvent > {
+class LogModel : 
+    virtual public ClothoModel< ClothoObject, LogEvent >
 public:
-    LifeExpectancyModel();
+    LogModel();
 
     void configure( const YAML::Node & n );
 
-    void operator()( const BirthEvent * e, const Individual * ind );
-
+    void operator()( const LogEvent * e, const ClothoObject * obj );
     void dump( ostream & out );
 
-    virtual ~LifeExpectancyModel();
+    virtual ~LogModel();
 protected:
-    gsl_rng * m_rng;
-    double  m_female_mean, m_female_sigma;
-    double  m_male_mean, m_male_sigma;
-    double  m_unk_mean, m_unk_sigma;
+    IntVTime * m_cur_period;
+    string m_log_dir;
+
+    ofstream m_logger;
 };
 
-DECLARE_REGISTERED_CLOTHO_MODEL( LifeExpectancyModel )
+DECLARE_REGISTERED_CLOTHO_MODEL( LogModel )
 
-#endif  // LIFEEXPECTANCYMODEL_H_
+#endif  // LOGMODEL_H_

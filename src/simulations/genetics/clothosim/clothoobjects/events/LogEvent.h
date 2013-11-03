@@ -27,36 +27,35 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef LIFEEXPECTANCYMODEL_H_
-#define LIFEEXPECTANCYMODEL_H_
+#ifndef LOGEVENT_H_
+#define LOGEVENT_H_
 
-#include "../ClothoModel.h"
-#include "../ClothoModelCreator.h"
+#include "ClothoEvent.h"
+#include "../../ClothoObject.h"
 
-#include "../clothoobjects/events/BirthEvent.h"
-
-#include "gsl/gsl_rng.h"
-
-//DECLARE_CLOTHO_MODEL( LifeExpectancyModel ) {
-class LifeExpectancyModel :
-    virtual public ClothoModel< Individual, BirthEvent > {
+class LogEvent : public ClothoEvent< ClothoObject > {
 public:
-    LifeExpectancyModel();
+    LogEvent( const VTime & tSend, const VTime &tRecv,
+                 SimulationObject * sender, 
+                 SimulationObject * receiver );
 
-    void configure( const YAML::Node & n );
+    LogEvent( const VTime & tSend, const VTime & tRecv,
+                 const ObjectID &sender, 
+                 const ObjectID & receiver,
+                 const unsigned int evtID);
 
-    void operator()( const BirthEvent * e, const Individual * ind );
+    LogEvent( const VTime & tSend, const VTime & tRecv,
+                 const ObjectID &sender, 
+                 const ObjectID & receiver,
+                 const EventId & evtID );
 
-    void dump( ostream & out );
+    const string & getDataType() const;
+    unsigned int getEventSize() const;
+    bool eventCompare( const Event * e );
 
-    virtual ~LifeExpectancyModel();
-protected:
-    gsl_rng * m_rng;
-    double  m_female_mean, m_female_sigma;
-    double  m_male_mean, m_male_sigma;
-    double  m_unk_mean, m_unk_sigma;
+    void updateModels( ClothoObject * o ) const;
+
+    virtual ~LogEvent();
 };
 
-DECLARE_REGISTERED_CLOTHO_MODEL( LifeExpectancyModel )
-
-#endif  // LIFEEXPECTANCYMODEL_H_
+#endif  // LOGEVENT_H_

@@ -54,7 +54,7 @@ public:
     void operator()( const DeathEvent * e, const Individual * ind );
     void dump( ostream & out );
 
-    ~PopulationModel();
+    virtual ~PopulationModel();
 protected:
     unsigned int m_living, m_lived, m_pop_size;
 };

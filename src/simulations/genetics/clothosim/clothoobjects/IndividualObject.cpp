@@ -118,18 +118,13 @@ void Individual::executeProcess() {
     ASSERT( iso != NULL );
 
     while( !m_eol && haveMoreEvents() ) {
-/*
-        const Event * evt = getEvent();
-        if( evt->getDataType() == "DeathEvent" ) {
-            const DeathEvent * dEvt = dynamic_cast< const DeathEvent * >( evt );
-            died( dEvt );
-        }
-
-        ClothoModelCoordinator::getInstance()->handleEvent( evt );
-*/
-        const ClothoEvent< Individual > * evt = dynamic_cast< const ClothoEvent< Individual > * >(getEvent());
+        Event * e = getEvent();
+        const ClothoEvent< Individual > * evt = dynamic_cast< const ClothoEvent< Individual > * >(e);
         if( evt ) {
             evt->updateModels( this );
+        } else {
+            const ClothoEvent< ClothoObject > * e2 = dynamic_cast< const ClothoEvent< ClothoObject * >( e );
+            e2->updateModel( this );
         }
     }
 }
@@ -145,25 +140,6 @@ const string & Individual::getName() const {
 sex_t Individual::getSex() const {
     return m_sex;
 }
-/*
-void Individual::born() {
-    m_dob = dynamic_cast< IntVTime *>(getSimulationTime().clone());
-    Event * eBorn = new BirthEvent( *m_dob, *m_dob, this, m_environment, m_sex );
-    
-    m_environment->receiveEvent( eBorn );
-
-    ClothoModelCoordinator::getInstance()->handleEvent( eBorn );
-}
-
-void Individual::died( ) {
-    m_eol = dynamic_cast< IntVTime * >(evt->getReceiveTime().clone());
-
-    DeathEvent * d = new DeathEvent( evt->getSendTime(), evt->getReceiveTime(), this, m_environment );
-
-    m_environment->receiveEvent( d );
-    print( cout );
-}
-*/
 
 void Individual::print( ostream & out ) const {
     out << m_name

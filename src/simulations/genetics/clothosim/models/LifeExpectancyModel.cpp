@@ -30,7 +30,6 @@
 #include "../clothoobjects/common_types.h"
 #include "LifeExpectancyModel.h"
 #include "../ClothoModelCoordinator.h"
-//#include "SimulationManager.h"
 
 #include <iostream>
 
@@ -51,24 +50,21 @@ const string STDEV_K = "stdev";
 DEFINE_REGISTERED_CLOTHO_MODEL( LifeExpectancyModel )
 
 template <>
-ClothoModel * ClothoModelCreator< LifeExpectancyModel >::createModel() {
-    shared_ptr< LifeExpectancyModel> pm( new LifeExpectancyModel() );
-    shared_ptr<ClothoModelCoordinator> coord = ClothoModelCoordinator::getInstance();
+void ClothoModelCreator< LifeExpectancyModel >::createModel() {
+    shared_ptr< ClothoModel< Individual, BirthEvent > > pm( new LifeExpectancyModel() );
 
-    coord->addEventHandler( evt_BirthEvent.getDataType(), pm );
+    ClothoModelCoordinator< Individual, BirthEvent >::getInstance()->addEventHandler(
+            static_pointer_cast< ClothoModel< Individual, BirthEvent > >( pm )  );
 
-    return &*pm;
 }
 
 template<>
-ClothoModel * ClothoModelCreator< LifeExpectancyModel >::createModelFrom( const YAML::Node & n ) {
-    shared_ptr< LifeExpectancyModel > pm( new LifeExpectancyModel() );
+void ClothoModelCreator< LifeExpectancyModel >::createModelFrom( const YAML::Node & n ) {
+    shared_ptr< ClothoModel< Individual, BirthEvent > > pm( new LifeExpectancyModel() );
+
     pm->configure( n );
-    shared_ptr<ClothoModelCoordinator> coord = ClothoModelCoordinator::getInstance();
-
-    coord->addEventHandler( evt_BirthEvent.getDataType(), pm );
-
-    return &*pm;
+    ClothoModelCoordinator< Individual, BirthEvent >::getInstance()->addEventHandler(
+            static_pointer_cast< ClothoModel< Individual, BirthEvent > >( pm )  );
 }
 
 LifeExpectancyModel::LifeExpectancyModel() : m_rng( gsl_rng_alloc( gsl_rng_taus ) ) {
@@ -76,7 +72,9 @@ LifeExpectancyModel::LifeExpectancyModel() : m_rng( gsl_rng_alloc( gsl_rng_taus 
     gsl_rng_set( m_rng, seed );
 }
 
-LifeExpectancyModel::~LifeExpectancyModel() {}
+LifeExpectancyModel::~LifeExpectancyModel() {
+    gsl_rng_free( m_rng );
+}
 
 void LifeExpectancyModel::configure( const YAML::Node & n ) {
     if( n[ MALE_K ] ) {
@@ -100,17 +98,8 @@ void LifeExpectancyModel::configure( const YAML::Node & n ) {
     }
 }
 
-void LifeExpectancyModel::handle( const Event * evt ) {
-    const string name = evt->getDataType();
-
-    if( name == evt_BirthEvent.getDataType() ) {
-        const BirthEvent * bEvt = dynamic_cast< const BirthEvent * >( evt );
-        handle( bEvt );
-    }
-}
-
-void LifeExpectancyModel::handle( const BirthEvent * evt ) {
-    if(! evt ) return;
+void LifeExpectancyModel::operator()( const BirthEvent * e, const Individual * ind ) {
+    if(! e ) return;
 
     double expected_age = 0.0;
 
@@ -132,10 +121,9 @@ void LifeExpectancyModel::handle( const BirthEvent * evt ) {
     IntVTime tDeath = dynamic_cast< const IntVTime & >( evt->getBirthTime() ) + (int)expected_age;
     Event * dEvent = new DeathEvent( evt->getBirthTime(), tDeath, evt->getSender(), evt->getSender(), evt->getEventId() );
 
-    ClothoModelCoordinator::getInstance()->routeEvent( dEvent );
+    ind->receiveEvent( dEvent );
 }
 
 void LifeExpectancyModel::dump( ostream & out ) {
 
 }
-

@@ -36,18 +36,19 @@
 
 #include "gsl/gsl_rng.h"
 
-DECLARE_CLOTHO_MODEL( MaturityModel ) {
+//DECLARE_CLOTHO_MODEL( MaturityModel ) {
+class MaturityModel :
+    public ClothoModel< Individual, BirthEvent > {
 public:
     MaturityModel();
 
     void configure( const YAML::Node & n );
 
-    void handle( const Event * evt );
-    void handle( const BirthEvent * evt );
+    void operator()( const BirthEvent *, const Individual * ind );
 
     void dump( ostream & out );
 
-    ~MaturityModel();
+    virtual ~MaturityModel();
 protected:
     gsl_rng * m_rng;
     double  m_female_mean, m_female_sigma;

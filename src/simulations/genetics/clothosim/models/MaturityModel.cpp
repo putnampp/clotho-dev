@@ -75,7 +75,9 @@ MaturityModel::MaturityModel() : m_rng( gsl_rng_alloc( gsl_rng_taus ) ) {
     gsl_rng_set( m_rng, seed );
 }
 
-MaturityModel::~MaturityModel() {}
+MaturityModel::~MaturityModel() {
+    gsl_rng_free( m_rng );
+}
 
 void MaturityModel::configure( const YAML::Node & n ) {
     if( n[ MALE_K ] ) {
@@ -98,7 +100,7 @@ void MaturityModel::configure( const YAML::Node & n ) {
         }
     }
 }
-
+/*
 void MaturityModel::handle( const Event * evt ) {
     const string name = evt->getDataType();
 
@@ -109,6 +111,8 @@ void MaturityModel::handle( const Event * evt ) {
 }
 
 void MaturityModel::handle( const BirthEvent * evt ) {
+*/
+void MaturityModel::operator()(const BirthEvent * evt, const Individual * ind ) {
     if(! evt ) return;
 
     double expected_age = 0.0;
@@ -131,7 +135,8 @@ void MaturityModel::handle( const BirthEvent * evt ) {
     IntVTime tMaturity = dynamic_cast< const IntVTime & >( evt->getBirthTime() ) + (int)expected_age;
     Event * mEvent = new MaturityEvent( evt->getBirthTime(), tMaturity, evt->getSender(), evt->getSender(), evt->getEventId() );
 
-    ClothoModelCoordinator::getInstance()->routeEvent( mEvent );
+//    ClothoModelCoordinator::getInstance()->routeEvent( mEvent );
+    ind->receiveEvent( mEvent );
 }
 
 void MaturityModel::dump( ostream & out ) {
