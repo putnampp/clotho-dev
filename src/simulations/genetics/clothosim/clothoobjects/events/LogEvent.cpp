@@ -28,20 +28,21 @@
  ******************************************************************************/
 
 #include "LogEvent.h"
+#include "../../ClothoModelCoordinator.h"
 
 DEFINE_REGISTERED_CLOTHO_EVENT( LogEvent );
 
 LogEvent::LogEvent( const VTime & tSend, const VTime &tRecv,
                  SimulationObject * sender, 
                  SimulationObject * receiver ) :
-                ClothoEvent<Environment>( tSend, tRecv, sender, receiver )
+                ClothoEvent( tSend, tRecv, sender, receiver )
                 {}
 
 LogEvent::LogEvent( const VTime & tSend, const VTime & tRecv,
                  const ObjectID &sender, 
                  const ObjectID & receiver,
                  const unsigned int evtID ) :
-                 ClothoEvent<Environment>( tSend, tRecv, sender, receiver, evtID )
+                 ClothoEvent( tSend, tRecv, sender, receiver, evtID )
                  {}
 
 bool LogEvent::eventCompare( const Event * evt ) {
@@ -54,7 +55,7 @@ void LogEvent::updateModels( ClothoObject * co ) const {
 
 //    ClothoModelCoordinator< Environment, LogEvent >::getInstance()->handleEvent( this, env );
 //
-    ClothoModelCoordinator< ClothoObject, LogEvent >::getInstance()->handleEvent( this, env );
+    ClothoModelCoordinator< ClothoObject, LogEvent >::getInstance()->handleEvent( this, co );
 }
 
 LogEvent::~LogEvent() {}
@@ -69,12 +70,10 @@ DEFINE_CLOTHO_EVENT_DESERIALIZATION_METHOD( LogEvent ) {
     unsigned int rSimObjID = inst->getUnsigned();
     unsigned int eventID = inst->getUnsigned();
 
-    sex_t sex = static_cast< sex_t > (inst->getUnsigned());
-
     ObjectID send( sSimObjID, sSimManID );
     ObjectID recv( rSimObjID, rSimManID );
 
-    LogEvent * e = new LogEvent( *tSend, *tRecv, send, recv, eventID, sex );
+    LogEvent * e = new LogEvent( *tSend, *tRecv, send, recv, eventID );
 
     return e;
 }

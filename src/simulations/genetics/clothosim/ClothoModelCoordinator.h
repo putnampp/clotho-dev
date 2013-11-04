@@ -58,7 +58,13 @@ public:
         m_models.push_back( cm );
     }
 
-    void handleEvent( const EVT * e, const OBJ * o ) {
+    bool empty() const {
+        return m_models.empty();
+    }
+
+    void handleEvent( const EVT * e, OBJ * o ) {
+        if( m_models.empty() ) return;
+
         for( iterator it = m_models.begin(); it != m_models.end(); it++ ) {
             (*(*it))(e, o);
         }

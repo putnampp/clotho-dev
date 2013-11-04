@@ -30,31 +30,47 @@
 #include "DeathEvent.h"
 #include "SerializedInstance.h"
 
+#include <iostream>
+
+using std::cout;
+using std::endl;
+
 DEFINE_REGISTERED_CLOTHO_EVENT( DeathEvent )
 
 template<>
 void Individual::handleEvent< DeathEvent >( const DeathEvent * e ) {
+    m_eol = dynamic_cast< IntVTime * >( e->getReceiveTime().clone() );
+    //this->print( cout );
+    //
+    Event * de = new DeathEvent( e->getSendTime(), e->getReceiveTime(), this, m_environment );
+
+    m_environment->receiveEvent( de );
+}
+
+template<>
+void Environment::handleEvent< DeathEvent >( const DeathEvent * e ) {
+
 }
 
 DeathEvent::DeathEvent( const VTime & tSend, const VTime &tRecv,
                  SimulationObject * sender, 
                  SimulationObject * receiver ) :
-                 ClothoEvent<Individual>( tSend, tRecv, sender, receiver ) {}
+                 ClothoEvent( tSend, tRecv, sender, receiver ) {}
 
 DeathEvent::DeathEvent( const VTime & tSend, const VTime & tRecv,
                  const ObjectID &sender, 
                  const ObjectID & receiver,
                  const unsigned int evtID ) :
-                 ClothoEvent<Individual>( tSend, tRecv, sender, receiver, evtID ) {}
+                 ClothoEvent( tSend, tRecv, sender, receiver, evtID ) {}
 
 DeathEvent::DeathEvent( const VTime & tSend, const VTime & tRecv,
                  const ObjectID &sender, 
                  const ObjectID & receiver,
                  const EventId & evtID ) :
-                 ClothoEvent<Individual>( tSend, tRecv, sender, receiver, evtID ) {}
+                 ClothoEvent( tSend, tRecv, sender, receiver, evtID ) {}
 
 DeathEvent::DeathEvent( const DeathEvent & ce ) :
-                 ClothoEvent<Individual>( ce.getSendTime(), ce.getReceiveTime(),
+                 ClothoEvent( ce.getSendTime(), ce.getReceiveTime(),
                                 ce.getSender(), ce.getReceiver(),
                                 ce.getEventId() ) {}
 
@@ -66,6 +82,10 @@ bool DeathEvent::eventCompare( const Event * evt ) {
 
 void DeathEvent::updateModels( Individual * ind ) const {
     ind->handleEvent( this );
+}
+
+void DeathEvent::updateModels( Environment * env ) const {
+    env->handleEvent( this );
 }
 
 DeathEvent::~DeathEvent() {}

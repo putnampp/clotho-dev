@@ -29,7 +29,6 @@
 
 #include "LogModel.h"
 #include "../ClothoModelCoordinator.h"
-//#include "SimulationManager.h"
 
 #include <iostream>
 
@@ -46,11 +45,8 @@ template <>
 void ClothoModelCreator< LogModel >::createModel() {
     shared_ptr< LogModel> pm( new LogModel() );
 
-    ClothoModelCoordinator< Individual, BirthEvent >::getInstance()->addEventHandler(
-            static_pointer_cast< ClothoModel< Individual, BirthEvent > >( pm )  );
-
-    ClothoModelCoordinator< Individual, DeathEvent >::getInstance()->addEventHandler(
-            static_pointer_cast< ClothoModel< Individual, DeathEvent > >( pm ) ); 
+    ClothoModelCoordinator< ClothoObject, LogEvent >::getInstance()->addEventHandler(
+            static_pointer_cast< ClothoModel< ClothoObject, LogEvent > >( pm )  );
 
 }
 
@@ -59,11 +55,8 @@ void ClothoModelCreator< LogModel >::createModelFrom( const YAML::Node & n ) {
     shared_ptr< LogModel > pm( new LogModel() );
     pm->configure( n );
 
-    ClothoModelCoordinator< Individual, BirthEvent >::getInstance()->addEventHandler(
-            static_pointer_cast< ClothoModel< Individual, BirthEvent > >( pm )  );
-
-    ClothoModelCoordinator< Individual, DeathEvent >::getInstance()->addEventHandler(
-            static_pointer_cast< ClothoModel< Individual, DeathEvent > >( pm ) ); 
+    ClothoModelCoordinator< ClothoObject, LogEvent >::getInstance()->addEventHandler(
+            static_pointer_cast< ClothoModel< ClothoObject, LogEvent > >( pm )  );
 }
 
 LogModel::LogModel() : m_cur_period(NULL), m_log_dir( "" ) {}
@@ -76,23 +69,21 @@ LogModel::~LogModel() {
 
 void LogModel::configure( const YAML::Node & n ) {
     if( n[ LOGDIR_K ] ) {
-        m_log_dir = n[ LOGDIR_K ].as< string >();   
+        m_log_dir = n[ LOGDIR_K ].as< string >();
     }
 }
 
-void LogModel::operator()( const LogEvent * e, const ClothoObject * obj ) {
+void LogModel::operator()( const LogEvent * e, ClothoObject * obj ) {
     const IntVTime & tmpTime = static_cast< const IntVTime &>( e->getReceiveTime() );
     if( m_cur_period == NULL ||
         *m_cur_period != tmpTime ) {
-        m_cur_period = tmpTime.clone();
+        m_cur_period = dynamic_cast< IntVTime * >( tmpTime.clone() );
 
         if( m_logger.is_open() )    m_logger.close();
 
         string path = m_log_dir + m_cur_period->toString() + ".log";
 
-        if(! m_logger.open( path.c_str() ) ) {
-            return;
-        }
+        m_logger.open( path.c_str() );
     }
 
     if( m_logger.is_open() ) {

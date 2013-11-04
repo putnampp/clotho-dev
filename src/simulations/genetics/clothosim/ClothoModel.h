@@ -45,11 +45,11 @@ using std::is_base_of;
 
 extern const string ANY_EVENTS;
 
-template < class OBJ, class EVT = ClothoEvent< OBJ > >
+template < class OBJ, class EVT = ModelHandler< OBJ > >
 struct ClothoModel {
     virtual void configure( const YAML::Node & n ) = 0;
     
-    virtual void operator()( const EVT * , const OBJ * ) = 0;
+    virtual void operator()( const EVT * , OBJ * ) = 0;
 
     virtual void dump( ostream & ) = 0;
 

@@ -63,31 +63,14 @@ shared_ptr< vector< SimulationObject * > > YamlConfig::getSimulationObjects() {
 
         if( (*it)[ OBJECT_K ] ) {
             cout << (*it) << "\n" << endl;
-            unsigned int count = 1;
-            if( (*it)[ COUNT_K ] ) {
-                count = (*it)[ COUNT_K ].as< unsigned int >();
-                if( count > 1 ) {
-                    objs->reserve( objs->size() + count );
-                }
-            }
 
-            for( unsigned int i = 0; i < count; ++i ) {
-                SimulationObject * so = ClothoObjectManager::getInstance()->createObjectFrom( (*it) );
-
-                if( so ) {
-                    cout << (ClothoObject *)so << endl;
-                    objs->push_back( so );
-                }
-            }
-
+            ClothoObjectManager::getInstance()->createObjectFrom( (*it), objs );
             cout << "SimulationObjects created: " << objs->size() << "( " << objs->capacity() << " )" << endl;
         } else if( (*it)[ MODEL_K ] ) {
             ClothoModelManager::getInstance()->createModelFrom( (*it) );
         }
     }
 
-//    objs->push_back( &*ClothoModelCoordinator::getInstance() );
-    
     return objs;
 }
 

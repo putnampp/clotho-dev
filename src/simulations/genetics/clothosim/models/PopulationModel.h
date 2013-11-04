@@ -45,13 +45,8 @@ public:
 
     void configure( const YAML::Node & n );
 
-/*
-    void handle( const Event * evt );
-    void handle( const BirthEvent * evt );
-    void handle( const DeathEvent * evt );
-*/
-    void operator()( const BirthEvent * e, const Individual * ind );
-    void operator()( const DeathEvent * e, const Individual * ind );
+    void operator()( const BirthEvent * e, Individual * ind );
+    void operator()( const DeathEvent * e, Individual * ind );
     void dump( ostream & out );
 
     virtual ~PopulationModel();

@@ -44,7 +44,7 @@ public:
 
     void configure( const YAML::Node & n );
 
-    void operator()( const BirthEvent *, const Individual * ind );
+    void operator()( const BirthEvent *, Individual * ind );
 
     void dump( ostream & out );
 

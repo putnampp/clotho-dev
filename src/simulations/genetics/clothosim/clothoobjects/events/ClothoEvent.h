@@ -34,15 +34,18 @@
 #include "SimulationObject.h"
 
 template < class OBJ >
-class ClothoEvent : public DefaultEvent {
-public:
-    typedef OBJ object_t;
+struct ModelHandler {
+    virtual void updateModels( OBJ * ) const = 0;
+};
 
+class ClothoEvent : public DefaultEvent,
+    public ModelHandler< SimulationObject > {
+public:
     virtual const string & getDataType() const = 0;
     virtual unsigned int getEventSize() const = 0;
     virtual bool eventCompare( const Event * e ) = 0;
 
-    virtual void updateModels( OBJ * o ) const = 0;
+    virtual void updateModels( SimulationObject * o ) const {}
 
     virtual ~ClothoEvent() {}
 protected:
@@ -67,7 +70,5 @@ protected:
             DefaultEvent( ce.getSendTime(), ce.getReceiveTime(),
                 ce.getSender(), ce.getReceiver(), ce.getEventId() ) {}
 };
-
-//DECLARE_REGISTERED_CLOTHO_EVENT( ClothoEvent );
 
 #endif  // CLOTHOEVENT_H_

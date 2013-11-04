@@ -52,16 +52,28 @@ SimulationObject * ClothoObjectManager::createObject( const string & name ) {
 }
 
 SimulationObject * ClothoObjectManager::createObjectFrom( const YAML::Node & n ) {
-    try {
-        string name = n[ "object" ].as<string>();
+    SimulationObject * so = NULL;
+    if( n[ OBJECT_K ] ) {
+        string name = n[ OBJECT_K ].as<string>();
 
         iterator it = m_creators.find( name );
 
         if( it != m_creators.end() )
-            return it->second->createObjectFrom(n);
-    } catch ( ... ) {    }
+            so = it->second->createObjectFrom(n);
+    }
+    return so;
+}
 
-    return NULL;
+void ClothoObjectManager::createObjectFrom( const YAML::Node & n, shared_ptr< vector< SimulationObject * > > objs ) {
+    if( n[ OBJECT_K ] ) {
+        string name = n[ OBJECT_K ].as<string>();
+
+        iterator it = m_creators.find( name );
+
+        if( it != m_creators.end() ) {
+            it->second->createObjectFrom(n, objs);
+        }
+    }
 }
 
 ClothoObjectManager::~ClothoObjectManager() {

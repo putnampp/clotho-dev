@@ -33,7 +33,8 @@
 #include "ClothoEvent.h"
 #include "../../ClothoObject.h"
 
-class LogEvent : public ClothoEvent< ClothoObject > {
+class LogEvent : public ClothoEvent,
+    public ModelHandler< ClothoObject > {
 public:
     LogEvent( const VTime & tSend, const VTime &tRecv,
                  SimulationObject * sender, 

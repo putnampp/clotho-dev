@@ -32,17 +32,13 @@ lifeexpectancy: {
 
 # simulation individuals
 ---
-count:  5
-object: RandomIndividual
+object: RandomPopulation
+pop_size: 5000
+percent_female: 60
 max_variants:   1000
-founder_variants: 150
+variants: 150
 ...
 
-# user defined object
----
-object: UDObject
-name: juan
-...
 # population model
 ---
 model: PopulationModel
@@ -76,3 +72,8 @@ female: {
     stdev: 1
 }
 ...
+# log model
+#---
+#model: LogModel
+#logdir: log/
+#...

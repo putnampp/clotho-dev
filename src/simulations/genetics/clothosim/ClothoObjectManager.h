@@ -48,6 +48,7 @@ struct SimObjectCreator {
     virtual SimulationObject * createObject() = 0;
 
     virtual SimulationObject * createObjectFrom( const YAML::Node & n ) = 0;
+    virtual void createObjectFrom( const YAML::Node &, shared_ptr< vector< SimulationObject * > > ) = 0;
 };
 
 class ClothoObjectManager {
@@ -62,6 +63,8 @@ public:
     SimulationObject * createObject( const string & name );
 
     SimulationObject * createObjectFrom( const YAML::Node & yaml );
+
+    void createObjectFrom( const YAML::Node & yaml, shared_ptr< vector< SimulationObject * > > objs );
 
     virtual ~ClothoObjectManager();
 protected:

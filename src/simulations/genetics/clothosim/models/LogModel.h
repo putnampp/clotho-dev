@@ -40,13 +40,13 @@
 using std::ofstream;
 
 class LogModel : 
-    virtual public ClothoModel< ClothoObject, LogEvent >
+    virtual public ClothoModel< ClothoObject, LogEvent > {
 public:
     LogModel();
 
     void configure( const YAML::Node & n );
 
-    void operator()( const LogEvent * e, const ClothoObject * obj );
+    void operator()( const LogEvent * e, ClothoObject * obj );
     void dump( ostream & out );
 
     virtual ~LogModel();

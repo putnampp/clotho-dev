@@ -33,9 +33,12 @@
 #include "ClothoEventStub.h"
 #include "ClothoEvent.h"
 #include "../IndividualObject.h"
+#include "../EnvironmentObject.h"
 
 //DECLARE_CLOTHO_EVENT( DeathEvent )
-class DeathEvent : virtual public ClothoEvent< Individual > {
+class DeathEvent : public ClothoEvent,
+    public ModelHandler< Individual >,
+    public ModelHandler< Environment > {
 public:
     DeathEvent( const VTime & tSend, const VTime &tRecv,
                  SimulationObject * sender, 
@@ -55,6 +58,7 @@ public:
     virtual bool eventCompare( const Event * e );
 
     virtual void updateModels( Individual * ) const;
+    virtual void updateModels( Environment * ) const;
 
     virtual ~DeathEvent();
 };

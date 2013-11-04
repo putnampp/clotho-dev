@@ -78,14 +78,14 @@ void PopulationModel::configure( const YAML::Node & n ) {
     }
 }
 
-void PopulationModel::operator()( const BirthEvent * e, const Individual * ind ) {
-    cout << "Increasing population" << endl;
+void PopulationModel::operator()( const BirthEvent * e, Individual * ind ) {
+//    cout << "Increasing population" << endl;
     if( ++m_living >= m_pop_size ) {
         // trigger termination?
     }
 }
 
-void PopulationModel::operator()( const DeathEvent * e, const Individual * ind ) {
+void PopulationModel::operator()( const DeathEvent * e, Individual * ind ) {
     --m_living;
     ++m_lived;
 }

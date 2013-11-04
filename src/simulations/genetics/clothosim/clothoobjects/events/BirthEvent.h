@@ -34,8 +34,12 @@
 #include "ClothoEventStub.h"
 #include "ClothoEvent.h"
 #include "../IndividualObject.h"
+#include "../EnvironmentObject.h"
 
-class BirthEvent : virtual public ClothoEvent< Individual > {
+class BirthEvent : 
+    public ClothoEvent,
+    virtual public ModelHandler< Environment >,
+    virtual public ModelHandler< Individual > {
 public:
     BirthEvent( const VTime & tSend, const VTime &tRecv,
                  SimulationObject * sender, 
@@ -77,6 +81,7 @@ public:
     virtual bool eventCompare( const Event * e );
 
     virtual void updateModels( Individual * ) const;
+    virtual void updateModels( Environment * ) const;
 
     sex_t getSex() const;
     const VTime & getBirthTime() const;

@@ -54,6 +54,11 @@ public:
     SimulationObject * createObjectFrom( const YAML::Node & n ) {
         return new OBJ( n );
     }
+
+    void createObjectFrom( const YAML::Node & n, shared_ptr< vector< SimulationObject * > > objs ) {
+        SimulationObject * so = new OBJ( n );
+        objs->push_back( so );
+    }
 private:
     const string m_name;
 };

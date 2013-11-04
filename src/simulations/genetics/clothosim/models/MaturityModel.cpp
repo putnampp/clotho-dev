@@ -47,27 +47,27 @@ const string DISTRIBUTION_K = "distribution";
 const string MEAN_K = "mean";
 const string STDEV_K = "stdev";
 
+using boost::static_pointer_cast;
+
 DEFINE_REGISTERED_CLOTHO_MODEL( MaturityModel )
 
 template <>
-ClothoModel * ClothoModelCreator< MaturityModel >::createModel() {
+void ClothoModelCreator< MaturityModel >::createModel() {
     shared_ptr< MaturityModel> pm( new MaturityModel() );
-    shared_ptr<ClothoModelCoordinator> coord = ClothoModelCoordinator::getInstance();
 
-    coord->addEventHandler( evt_BirthEvent.getDataType(), pm );
+    //coord->addEventHandler( evt_BirthEvent.getDataType(), pm );
+    ClothoModelCoordinator< Individual, BirthEvent >::getInstance()->addEventHandler(
+            static_pointer_cast< ClothoModel< Individual, BirthEvent > >( pm )  );
 
-    return &*pm;
 }
 
 template<>
-ClothoModel * ClothoModelCreator< MaturityModel >::createModelFrom( const YAML::Node & n ) {
+void ClothoModelCreator< MaturityModel >::createModelFrom( const YAML::Node & n ) {
     shared_ptr< MaturityModel > pm( new MaturityModel() );
     pm->configure( n );
-    shared_ptr<ClothoModelCoordinator> coord = ClothoModelCoordinator::getInstance();
 
-    coord->addEventHandler( evt_BirthEvent.getDataType(), pm );
-
-    return &*pm;
+    ClothoModelCoordinator< Individual, BirthEvent >::getInstance()->addEventHandler(
+            static_pointer_cast< ClothoModel< Individual, BirthEvent > >( pm )  );
 }
 
 MaturityModel::MaturityModel() : m_rng( gsl_rng_alloc( gsl_rng_taus ) ) {
@@ -100,19 +100,7 @@ void MaturityModel::configure( const YAML::Node & n ) {
         }
     }
 }
-/*
-void MaturityModel::handle( const Event * evt ) {
-    const string name = evt->getDataType();
-
-    if( name == evt_BirthEvent.getDataType() ) {
-        const BirthEvent * bEvt = dynamic_cast< const BirthEvent * >( evt );
-        handle( bEvt );
-    }
-}
-
-void MaturityModel::handle( const BirthEvent * evt ) {
-*/
-void MaturityModel::operator()(const BirthEvent * evt, const Individual * ind ) {
+void MaturityModel::operator()(const BirthEvent * evt, Individual * ind ) {
     if(! evt ) return;
 
     double expected_age = 0.0;
@@ -135,7 +123,6 @@ void MaturityModel::operator()(const BirthEvent * evt, const Individual * ind ) 
     IntVTime tMaturity = dynamic_cast< const IntVTime & >( evt->getBirthTime() ) + (int)expected_age;
     Event * mEvent = new MaturityEvent( evt->getBirthTime(), tMaturity, evt->getSender(), evt->getSender(), evt->getEventId() );
 
-//    ClothoModelCoordinator::getInstance()->routeEvent( mEvent );
     ind->receiveEvent( mEvent );
 }
 

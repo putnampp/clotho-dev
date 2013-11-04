@@ -27,13 +27,13 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef RANDOMINDIVIDUALOBJECT_H_
-#define RANDOMINDIVIDUALOBJECT_H_
+#ifndef RANDOMPOPULATIONOBJECT_H_
+#define RANDOMPOPULATIONOBJECT_H_
 
 #include "IndividualObject.h"
 
-class RandomIndividual : public Individual {};
+class RandomPopulation : public Individual {};
 
-DECLARE_REGISTERED_CLOTHO_OBJECT( RandomIndividual )
+DECLARE_REGISTERED_CLOTHO_OBJECT( RandomPopulation )
 
-#endif  // RANDOMINDIVIDUALOBJECT_H_
+#endif  // RANDOMPOPULATIONOBJECT_H_

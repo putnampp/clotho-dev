@@ -53,8 +53,7 @@ template <>
 void ClothoModelCreator< LifeExpectancyModel >::createModel() {
     shared_ptr< ClothoModel< Individual, BirthEvent > > pm( new LifeExpectancyModel() );
 
-    ClothoModelCoordinator< Individual, BirthEvent >::getInstance()->addEventHandler(
-            static_pointer_cast< ClothoModel< Individual, BirthEvent > >( pm )  );
+    ClothoModelCoordinator< Individual, BirthEvent >::getInstance()->addEventHandler( pm );
 
 }
 
@@ -63,8 +62,7 @@ void ClothoModelCreator< LifeExpectancyModel >::createModelFrom( const YAML::Nod
     shared_ptr< ClothoModel< Individual, BirthEvent > > pm( new LifeExpectancyModel() );
 
     pm->configure( n );
-    ClothoModelCoordinator< Individual, BirthEvent >::getInstance()->addEventHandler(
-            static_pointer_cast< ClothoModel< Individual, BirthEvent > >( pm )  );
+    ClothoModelCoordinator< Individual, BirthEvent >::getInstance()->addEventHandler( pm );
 }
 
 LifeExpectancyModel::LifeExpectancyModel() : m_rng( gsl_rng_alloc( gsl_rng_taus ) ) {
@@ -98,8 +96,8 @@ void LifeExpectancyModel::configure( const YAML::Node & n ) {
     }
 }
 
-void LifeExpectancyModel::operator()( const BirthEvent * e, const Individual * ind ) {
-    if(! e ) return;
+void LifeExpectancyModel::operator()( const BirthEvent * evt, Individual * ind ) {
+    if(! evt ) return;
 
     double expected_age = 0.0;
 

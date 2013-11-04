@@ -40,21 +40,21 @@ void Individual::handleEvent< MaturityEvent >( const MaturityEvent * e ) {
 MaturityEvent::MaturityEvent( const VTime & tSend, const VTime &tRecv,
                                 SimulationObject * sender, 
                                 SimulationObject * receiver ) :
-                 ClothoEvent<Individual>( tSend, tRecv, sender, receiver ),
+                 ClothoEvent( tSend, tRecv, sender, receiver ),
                  m_age_of_maturity( tRecv.clone() ) {}
 
 MaturityEvent::MaturityEvent( const VTime & tSend, const VTime &tRecv,
                                 SimulationObject * sender, 
                                 SimulationObject * receiver,
                                 const VTime & tMature ) :
-                ClothoEvent<Individual>( tSend, tRecv, sender, receiver ),
+                ClothoEvent( tSend, tRecv, sender, receiver ),
                 m_age_of_maturity( tMature.clone() ) {}
 
 MaturityEvent::MaturityEvent( const VTime & tSend, const VTime & tRecv,
                                 const ObjectID &sender, 
                                 const ObjectID & receiver,
                                 const unsigned int evtID ) :
-                 ClothoEvent<Individual>( tSend, tRecv, sender, receiver, evtID ),
+                 ClothoEvent( tSend, tRecv, sender, receiver, evtID ),
                  m_age_of_maturity( tRecv.clone() ) {}
 
 MaturityEvent::MaturityEvent( const VTime & tSend, const VTime & tRecv,
@@ -62,14 +62,14 @@ MaturityEvent::MaturityEvent( const VTime & tSend, const VTime & tRecv,
                                 const ObjectID & receiver,
                                 const unsigned int evtID,
                                 const VTime & tMature ) :
-                 ClothoEvent<Individual>( tSend, tRecv, sender, receiver, evtID ),
+                 ClothoEvent( tSend, tRecv, sender, receiver, evtID ),
                  m_age_of_maturity( tMature.clone() ) {}
 
 MaturityEvent::MaturityEvent( const VTime & tSend, const VTime & tRecv,
                                 const ObjectID &sender, 
                                 const ObjectID & receiver,
                                 const EventId & evtID ) :
-                 ClothoEvent<Individual>( tSend, tRecv, sender, receiver, evtID ),
+                 ClothoEvent( tSend, tRecv, sender, receiver, evtID ),
                  m_age_of_maturity( tRecv.clone() ) {}
 
 MaturityEvent::MaturityEvent( const VTime & tSend, const VTime & tRecv,
@@ -77,11 +77,11 @@ MaturityEvent::MaturityEvent( const VTime & tSend, const VTime & tRecv,
                                 const ObjectID & receiver,
                                 const EventId & evtID,
                                 const VTime & tMature ) :
-                 ClothoEvent<Individual>( tSend, tRecv, sender, receiver, evtID ),
+                 ClothoEvent( tSend, tRecv, sender, receiver, evtID ),
                  m_age_of_maturity( tMature.clone() ) {}
 
 MaturityEvent::MaturityEvent( const MaturityEvent & ce ) :
-                 ClothoEvent<Individual>( ce.getSendTime(), ce.getReceiveTime(),
+                 ClothoEvent( ce.getSendTime(), ce.getReceiveTime(),
                                 ce.getSender(), ce.getReceiver(),
                                 ce.getEventId() ),
                  m_age_of_maturity( ce.getAgeOfMaturity().clone() ) {}

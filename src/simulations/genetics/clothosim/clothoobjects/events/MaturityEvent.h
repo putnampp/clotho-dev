@@ -35,7 +35,8 @@
 #include "../IndividualObject.h"
 
 //DECLARE_CLOTHO_EVENT( MaturityEvent )
-class MaturityEvent : virtual public ClothoEvent< Individual > {
+class MaturityEvent : public ClothoEvent,
+        public ModelHandler< Individual > {
 public:
     MaturityEvent( const VTime & tSend, const VTime &tRecv,
                     SimulationObject * sender, 

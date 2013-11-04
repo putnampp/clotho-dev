@@ -103,8 +103,8 @@ void Individual::initialize() {
         abort();
     }
 
-    m_dob = dynamic_cast< IntVTime *>(getSimulationTime().clone());
-    Event * eBorn = new BirthEvent( *m_dob, *m_dob, this, this, m_sex );
+    // notify self that has been born?
+    Event * eBorn = new BirthEvent( getSimulationTime(), getSimulationTime(), this, this, m_sex );
 
     this->receiveEvent( eBorn );
 }
@@ -118,13 +118,13 @@ void Individual::executeProcess() {
     ASSERT( iso != NULL );
 
     while( !m_eol && haveMoreEvents() ) {
-        Event * e = getEvent();
-        const ClothoEvent< Individual > * evt = dynamic_cast< const ClothoEvent< Individual > * >(e);
+        const Event * e = getEvent();
+        const ModelHandler< Individual > * evt = dynamic_cast< const ModelHandler< Individual > * >(e);
         if( evt ) {
             evt->updateModels( this );
         } else {
-            const ClothoEvent< ClothoObject > * e2 = dynamic_cast< const ClothoEvent< ClothoObject * >( e );
-            e2->updateModel( this );
+            const ModelHandler< ClothoObject > * e2 = dynamic_cast< const ModelHandler< ClothoObject > * >( e );
+            e2->updateModels( this );
         }
     }
 }
