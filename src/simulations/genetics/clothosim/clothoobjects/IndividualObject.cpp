@@ -130,7 +130,7 @@ void Individual::executeProcess() {
 }
 
 State * Individual::allocateState()  {
-    return new IndividualObjectState( getSimulationTime() );
+    return new IndividualObjectState( getSimulationTime(), m_sex );
 }
 
 const string & Individual::getName() const {
@@ -146,8 +146,14 @@ void Individual::print( ostream & out ) const {
         << ", " << m_sex 
         << ", " << m_offspring
         ;
-    if( m_dob && m_eol ) {
-        out << ", " << (*m_eol - *m_dob);
+    if( m_dob ) {
+        if( m_eol ) {
+            out << ", " << (*m_eol - *m_dob);
+        } else {
+            const IntVTime & tmp = static_cast< const IntVTime &>( getSimulationTime() );
+
+            out << ", " << (tmp - *m_dob );
+        }
     }
     out << "\n";
 }

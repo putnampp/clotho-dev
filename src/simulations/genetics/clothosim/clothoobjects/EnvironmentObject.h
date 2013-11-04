@@ -57,38 +57,15 @@ public:
     template < class EVT >
     void handleEvent( const EVT * e ) {}
 
-    template < class SEL_MODEL >
-    OBJECT_ID select_individual( OBJECT_ID & ) const;
-
     void print( ostream & out ) const;
 protected:
-/*
-    typedef void (Environment::*EventHandler)( const Event * );
-
-    void initializeHandlers();
-
-    void handleBirth( const Event * evt );
-    void handleDeath( const Event * evt );
-*/
-
     vector< OBJECT_ID > m_females, m_males;
 
-/*
-    typedef unordered_map< string, EventHandler > TypedHandlers;
-    typedef TypedHandlers::iterator TypedHandlersIter;
-    TypedHandlers    m_handlers;
-*/
 private:
     string m_name;
 
     
 };
-
-template < class SEL_MODEL >
-OBJECT_ID Environment::select_individual( OBJECT_ID &  id) const {
-    // alone for another night ...
-    return id;
-}
 
 DECLARE_REGISTERED_CLOTHO_OBJECT( Environment )
 

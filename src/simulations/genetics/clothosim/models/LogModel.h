@@ -53,6 +53,7 @@ public:
 protected:
     IntVTime * m_cur_period;
     string m_log_dir;
+    unsigned int m_step;
 
     ofstream m_logger;
 };

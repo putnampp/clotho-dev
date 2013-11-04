@@ -48,7 +48,7 @@ class IndividualObjectState : public State {
 public:
     IndividualObjectState(const VTime & t, sex_t s = UNK_SEX) :
         m_dob( t.clone() ),
-        m_sex( UNK_SEX ),
+        m_sex( s ),
         m_phenotype(0.0) {
     }
 
@@ -59,7 +59,6 @@ public:
         m_dob = c->m_dob->clone();
         m_sex = c->m_sex;
 
-//        m_genotypes->insert(m_genotypes->begin(), c->m_genotypes->begin(), c->m_genotypes->end() );
         m_phenotype = c->m_phenotype;
     }
 

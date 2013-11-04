@@ -36,6 +36,7 @@
 #include "events/LogEvent.h"
 
 #include <boost/lexical_cast.hpp>
+#include "IndividualObject.h"
 
 #include <iostream>
 
@@ -52,7 +53,8 @@ Environment::~Environment() {
 void Environment::initialize() {
     // schedule first logging event?
     //
-    Event * e = new LogEvent(getSimulationTime(), getSimulationTime(), this, this );
+    const IntVTime tmp = static_cast< const IntVTime & >( getSimulationTime() ) + 1;
+    Event * e = new LogEvent(getSimulationTime(), tmp, this, this );
     this->receiveEvent( e );
 }
 
@@ -83,6 +85,17 @@ const string & Environment::getName() const {
 
 void Environment::print( ostream & out ) const {
     out << m_name << "\n";
+
+    for( vector< OBJECT_ID >::const_iterator it = m_females.begin(); it != m_females.end(); it++ ) {
+        Individual * ind = dynamic_cast< Individual * >( getObjectHandle( &(*it) ) );
+
+        ind->print( out );
+    }
+
+    for( vector< OBJECT_ID >::const_iterator it = m_males.begin(); it != m_males.end(); it++ ) {
+        Individual * ind = dynamic_cast< Individual * >( getObjectHandle( &(*it) ) );
+        ind->print( out );
+    }
 }
 
 DEFINE_REGISTERED_CLOTHO_OBJECT( Environment )

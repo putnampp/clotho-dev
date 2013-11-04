@@ -73,7 +73,8 @@ female: {
 }
 ...
 # log model
-#---
-#model: LogModel
-#logdir: log/
-#...
+---
+model: LogModel
+logdir: log/
+time_step: 100
+...

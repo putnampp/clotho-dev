@@ -40,6 +40,9 @@ using boost::static_pointer_cast;
 DEFINE_REGISTERED_CLOTHO_MODEL( LogModel )
 
 const string LOGDIR_K = "logdir";
+const string TIME_STEP_K = "time_step";
+
+#define DEFAULT_TIME_STEP 100
 
 template <>
 void ClothoModelCreator< LogModel >::createModel() {
@@ -59,7 +62,7 @@ void ClothoModelCreator< LogModel >::createModelFrom( const YAML::Node & n ) {
             static_pointer_cast< ClothoModel< ClothoObject, LogEvent > >( pm )  );
 }
 
-LogModel::LogModel() : m_cur_period(NULL), m_log_dir( "" ) {}
+LogModel::LogModel() : m_cur_period(NULL), m_log_dir( "" ), m_step( DEFAULT_TIME_STEP ) {}
 
 LogModel::~LogModel() {
     if( m_logger.is_open() )    m_logger.close();
@@ -70,6 +73,10 @@ LogModel::~LogModel() {
 void LogModel::configure( const YAML::Node & n ) {
     if( n[ LOGDIR_K ] ) {
         m_log_dir = n[ LOGDIR_K ].as< string >();
+    }
+
+    if( n[ TIME_STEP_K ] ) {
+        m_step = n[ TIME_STEP_K ].as< unsigned int >();
     }
 }
 
@@ -89,6 +96,9 @@ void LogModel::operator()( const LogEvent * e, ClothoObject * obj ) {
     if( m_logger.is_open() ) {
         obj->print( m_logger );
     }
+
+    //Event * le = new LogEvent( e->getReceiveTime(), tmpTime + m_step, obj, obj );
+    //obj->receiveEvent( le );
 }
 
 void LogModel::dump( ostream & out ) {
