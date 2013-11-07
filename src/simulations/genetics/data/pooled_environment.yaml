@@ -9,7 +9,7 @@ pool_size: 100000
 ---
 initializer: PopulationInitializer
 environment: ENV1
-pop_size: 5000
+pop_size: 50
 percent_female: 60
 max_variants:   1000
 variants: 150

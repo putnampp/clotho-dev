@@ -69,8 +69,8 @@ void LifeExpectancyModel::operator()( const ShellBirthEvent * evt, IndividualShe
 
     double expected_age = computeExpectedAge( ind->getSex() ) ;
 
-    IntVTime tDeath = *ind->getBirthTime() + (int)expected_age;
-    Event * dEvent = new ShellDeathEvent( *ind->getBirthTime(), tDeath, ind, ind );
+    IntVTime tDeath = *evt->getBirthTime() + (int)expected_age;
+    Event * dEvent = new ShellDeathEvent( evt->getReceiveTime(), tDeath, ind, ind );
 
     ind->receiveEvent( dEvent );
 }

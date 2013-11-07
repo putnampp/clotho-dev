@@ -56,8 +56,11 @@ public:
     virtual void updateModels( IndividualShell * ) const;
     virtual void updateModels( Environment2 * ) const;
 
+    IntVTime * getBirthTime() const;
+
     virtual ~ShellBirthEvent();
 protected:
+    IntVTime * m_birth;
 };
 
 DECLARE_REGISTERED_CLOTHO_EVENT( ShellBirthEvent );

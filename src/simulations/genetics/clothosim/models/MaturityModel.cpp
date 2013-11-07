@@ -69,8 +69,9 @@ void MaturityModel::operator()(const ShellBirthEvent * evt, IndividualShell * in
 
     double expected_age = computeExpectedAge( ind->getSex() );
 
-    IntVTime tMaturity = *ind->getBirthTime() + (int)expected_age;
-    Event * mEvent = new ShellMaturityEvent( *ind->getBirthTime(), tMaturity, ind, ind );
+    IntVTime tMaturity = *evt->getBirthTime() + (int)expected_age;
+    cout << "Next maturity: " << tMaturity << " (" << evt->getReceiveTime() << ")" << endl;
+    Event * mEvent = new ShellMaturityEvent( evt->getReceiveTime(), tMaturity, ind, ind );
 
     ind->receiveEvent( mEvent );
 }

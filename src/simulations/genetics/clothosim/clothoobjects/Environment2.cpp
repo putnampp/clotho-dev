@@ -44,7 +44,9 @@ using std::endl;
 
 const string POOL_SIZE_K = "pool_size";
 
-Environment2::Environment2( const char * n, int pool_size ) : m_name( n ), m_max_pool_size( pool_size ), m_pool_size(0) {}
+Environment2::Environment2( const char * n, int max_size ) : 
+    m_name( n ), m_max_pool_size( max_size ), m_pool_size(0) {
+}
 /*
 Environment2::Environment2( const YAML::Node & n) : m_name( "ENV" ), m_max_pool_size( -1 ), m_pool_size( 0 ) { 
     if( n[ POOL_SIZE_K ] ) {
@@ -85,7 +87,7 @@ Environment2::~Environment2() {
 void Environment2::initialize() {
     // schedule first logging event?
     //
-    const IntVTime tmp = static_cast< const IntVTime & >( getSimulationTime() ) + 1;
+    const IntVTime tmp = static_cast< const IntVTime & >( getSimulationTime() ) + 2;
     Event * e = new LogEvent(getSimulationTime(), tmp, this, this );
     this->receiveEvent( e );
 }
@@ -99,9 +101,9 @@ void Environment2::executeProcess(){
         const ModelHandler< Environment2 > * e = dynamic_cast< const ModelHandler< Environment2 > * >( evt );
         if( e ) {
             e->updateModels( this );
-        } else {
-            const ModelHandler< ClothoObject > * e2 = dynamic_cast< const ModelHandler< ClothoObject > * > (evt );
-
+        } 
+        const ModelHandler< ClothoObject > * e2 = dynamic_cast< const ModelHandler< ClothoObject > * > (evt );
+        if( e2 ) {
             e2->updateModels( this );
         }
     }
@@ -136,7 +138,6 @@ void Environment2::addIndividual( IndividualShell * s ) {
         m_individual_pool.push( s );
         break;
     }
-
     ++m_pool_size;
 }
 
@@ -162,11 +163,12 @@ IndividualShell * Environment2::nextAvailableIndividual() {
         // there is at least one available Individual so use it
         t = m_individual_pool.front();
         m_individual_pool.pop();
-    } else if( m_max_pool_size == -1 || m_pool_size < m_max_pool_size ) {
+        --m_pool_size;
+    } else if( m_max_pool_size == -1 || m_pool_size < m_max_pool_size) {
         // there are no available Individuals but there is no limit
         // on pool size;
         // therefore create a new one
-        t = new IndividualShell( this );
+        t = new IndividualShell( this, new IndividualProperties() );
     } // else individual pool has been maxed out; consider terminating
 
     return t;
@@ -180,9 +182,24 @@ int Environment2::getFemaleCount() const {
     return m_females.size();
 }
 
+IndividualShell * Environment2::getMaleAt( unsigned int idx ) const {
+    if( idx < m_males.size() ) {
+        return m_males[ idx ];
+    }
+    return NULL;
+}
+
+IndividualShell * Environment2::getFemaleAt( unsigned int idx ) const {
+    if( idx < m_females.size() ) {
+        return m_females[ idx ];
+    }
+    return NULL;
+}
+
 void Environment2::print( ostream & out ) const {
     out << m_name << "\n";
     out << m_individual_pool.size() << " pooled individuals\n";
+    out << m_females.size() << " females\n";
     for( vector< IndividualShell * >::const_iterator it = m_females.begin(); it != m_females.end(); it++ ) {
         (*it)->print( out );
     }

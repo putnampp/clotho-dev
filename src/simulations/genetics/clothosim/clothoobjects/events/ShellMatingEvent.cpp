@@ -30,10 +30,18 @@
 #include "ShellMatingEvent.h"
 #include "SerializedInstance.h"
 
+#include "../../ClothoModelCoordinator.h"
+
+#include <iostream>
+
+using std::cout;
+using std::endl;
+
 DEFINE_REGISTERED_CLOTHO_EVENT( ShellMatingEvent )
 
 template<>
 void Environment2::handleEvent< ShellMatingEvent >( const ShellMatingEvent * e ) {
+    cout << "environment handling mating event: " << e->getReceiveTime() << " (" << getSimulationTime() << ")" << endl;
 }
 
 ShellMatingEvent::ShellMatingEvent( const VTime & tSend, const VTime &tRecv,
@@ -78,6 +86,8 @@ IndividualShell * ShellMatingEvent::getFirstPartner() const {
 
 void ShellMatingEvent::updateModels( Environment2 * env ) const {
     env->handleEvent(this);
+
+    ClothoModelCoordinator< Environment2, ShellMatingEvent >::getInstance()->handleEvent( this, env );
 }
 
 ShellMatingEvent::~ShellMatingEvent() {

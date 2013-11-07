@@ -118,14 +118,16 @@ void Individual::executeProcess() {
     IndividualObjectState * iso = static_cast< IndividualObjectState * >(getState());
     ASSERT( iso != NULL );
 
-    while( !m_eol && haveMoreEvents() ) {
+    while( haveMoreEvents() ) {
         const Event * e = getEvent();
-        const ModelHandler< Individual > * evt = dynamic_cast< const ModelHandler< Individual > * >(e);
-        if( evt ) {
-            evt->updateModels( this );
-        } else {
-            const ModelHandler< ClothoObject > * e2 = dynamic_cast< const ModelHandler< ClothoObject > * >( e );
-            e2->updateModels( this );
+        if( !m_eol ) {
+            const ModelHandler< Individual > * evt = dynamic_cast< const ModelHandler< Individual > * >(e);
+            if( evt ) {
+                evt->updateModels( this );
+            } else {
+                const ModelHandler< ClothoObject > * e2 = dynamic_cast< const ModelHandler< ClothoObject > * >( e );
+                e2->updateModels( this );
+            }
         }
     }
 }

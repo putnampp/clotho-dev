@@ -37,17 +37,36 @@ using std::endl;
 
 DEFINE_REGISTERED_CLOTHO_EVENT( ShellDeathEvent )
 
+/*
+ *
+ * Since the Individual Shell knows what environment it is a member of
+ * it is possible to directly add itself to the environment (m_environment->addIndividual)
+ * and remove itself from the environment on death (m_environment->removeIndividual)
+ *
+ * This is instead of spawning events and sending them to the environment.
+ *
+ * By spawning events, if there are any models which are listening for
+ * such events are notified though. Although those models could just as easily
+ * be modified to listen for the IndividualShell + ShellBirthEvent, rather than
+ * Environment2 + ShellBirthEvent
+ *
+ */
+
 template<>
 void IndividualShell::handleEvent< ShellDeathEvent >( const ShellDeathEvent * e ) {
     m_prop->m_eol = dynamic_cast< IntVTime * >( e->getReceiveTime().clone() );
-    Event * de = new ShellDeathEvent( e->getSendTime(), e->getReceiveTime(), this, m_environment );
+    Event * de = new ShellDeathEvent( getSimulationTime(), getSimulationTime(), this, m_environment );
 
     m_environment->receiveEvent( de );
 }
 
 template<>
 void Environment2::handleEvent< ShellDeathEvent >( const ShellDeathEvent * e ) {
+    IndividualShell * ishell = dynamic_cast< IndividualShell * >( getObjectHandle( &e->getSender() ) );
 
+    if( ishell ) {
+        removeIndividual( ishell );
+    }
 }
 
 ShellDeathEvent::ShellDeathEvent( const VTime & tSend, const VTime &tRecv,

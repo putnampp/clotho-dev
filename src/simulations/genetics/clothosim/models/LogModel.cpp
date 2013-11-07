@@ -54,7 +54,7 @@ void LogModel::operator()( const LogEvent * e, ClothoObject * obj ) {
 
         string path = m_log_dir + m_cur_period->toString() + ".log";
 
-        m_logger.open( path.c_str() );
+        m_logger.open( path.c_str(), std::ios::app );
     }
 
     if( m_logger.is_open() ) {

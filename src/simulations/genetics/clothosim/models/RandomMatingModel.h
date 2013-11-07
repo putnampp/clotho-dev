@@ -35,6 +35,8 @@
 #include "../clothoobjects/events/ShellMaturityEvent.h"
 #include "../clothoobjects/events/ShellMatingEvent.h"
 
+#include "gsl/gsl_rng.h"
+
 class RandomMatingModel :
     virtual public ClothoModel< IndividualShell, ShellMaturityEvent >,
     virtual public ClothoModel< Environment2 , ShellMatingEvent > {
@@ -47,6 +49,7 @@ public:
 
     virtual ~RandomMatingModel();
 protected:
+    gsl_rng * m_rng;
 };
 
 #endif  // RANDOMMATINGMODEL_H_

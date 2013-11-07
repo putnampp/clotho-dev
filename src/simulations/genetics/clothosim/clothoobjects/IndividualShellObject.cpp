@@ -69,6 +69,8 @@ void IndividualShell::initialize() {
     }
 
     if( !m_prop ) {
+        // initalizing new properties
+        cout << "Initializing new properties" << endl;
         m_prop = new IndividualProperties();
     }
 
@@ -78,6 +80,7 @@ void IndividualShell::initialize() {
         if( m_prop->m_dob ) {
             eBorn = new ShellBirthEvent( getSimulationTime(), *m_prop->m_dob, this, this );
         } else {
+            cout << "Individual to be born at " << getSimulationTime() << endl;
             eBorn = new ShellBirthEvent( getSimulationTime(), getSimulationTime(), this, this );
         }
         this->receiveEvent( eBorn );
@@ -92,14 +95,17 @@ void IndividualShell::executeProcess() {
 //    IndividualShellObjectState * iso = static_cast< IndividualShellObjectState * >(getState());
 //    ASSERT( iso != NULL );
 
-    while( /*!m_eol &&*/ haveMoreEvents() ) {
+    while( haveMoreEvents() ) {
         const Event * e = getEvent();
-        const ModelHandler< IndividualShell > * evt = dynamic_cast< const ModelHandler< IndividualShell > * >(e);
-        if( evt ) {
-            evt->updateModels( this );
-        } else {
+        if( isAlive() ) {
+            const ModelHandler< IndividualShell > * evt = dynamic_cast< const ModelHandler< IndividualShell > * >(e);
+            if( evt ) {
+                evt->updateModels( this );
+            } 
             const ModelHandler< ClothoObject > * e2 = dynamic_cast< const ModelHandler< ClothoObject > * >( e );
-            e2->updateModels( this );
+            if( e2 ) {
+                e2->updateModels( this );
+            }
         }
     }
 }
@@ -111,6 +117,10 @@ State * IndividualShell::allocateState()  {
 
 const string & IndividualShell::getName() const {
     return m_name;
+}
+
+bool IndividualShell::isAlive() const {
+    return m_prop && !m_prop->m_eol;
 }
 
 sex_t IndividualShell::getSex() const {
@@ -130,8 +140,23 @@ Environment2 * IndividualShell::getEnvironment() const {
 }
 
 void IndividualShell::setProperties( IndividualProperties * prop ) {
+    //cout << "Setting Properties: " << *prop << endl;
     if( m_prop ) delete m_prop;
     m_prop = prop;
+}
+
+void IndividualShell::addOffspring() {
+    m_prop->m_offspring++;
+}
+
+unsigned int IndividualShell::getVariantCount() const {
+    return m_prop->m_genos.size();
+}
+
+allele_t IndividualShell::alleleAt( unsigned int var_idx, ploidy_t strand ) const {
+    if( var_idx < m_prop->m_genos.size() )
+        return m_prop->m_genos[ var_idx ][ strand ];
+    return (allele_t)0;
 }
 
 void IndividualShell::print( ostream & out ) const {

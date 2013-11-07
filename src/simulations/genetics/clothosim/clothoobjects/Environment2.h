@@ -44,7 +44,7 @@ using std::queue;
 
 class Environment2 : public ClothoObject {
 public:
-    Environment2( const char * n, int pool_size = -1);
+    Environment2( const char * n, int max_size = -1);
 
     virtual ~Environment2();
 
@@ -65,6 +65,9 @@ public:
 
     int getMaleCount() const;
     int getFemaleCount() const;
+
+    IndividualShell * getMaleAt( unsigned int idx ) const;
+    IndividualShell * getFemaleAt( unsigned int idx ) const;
 
     void print( ostream & out ) const;
 protected:

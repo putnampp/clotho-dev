@@ -40,9 +40,9 @@ DEFINE_REGISTERED_CLOTHO_EVENT( ShellBirthEvent )
 
 template<>
 void IndividualShell::handleEvent< ShellBirthEvent >( const ShellBirthEvent * e ) {
-    m_prop->m_dob = dynamic_cast< IntVTime * >(getSimulationTime().clone());
+    m_prop->m_dob = dynamic_cast< IntVTime * >(e->getBirthTime()->clone());
 
-    Event * evt = new ShellBirthEvent( getSimulationTime(), getSimulationTime(), this, m_environment );
+    Event * evt = new ShellBirthEvent( getSimulationTime(), *e->getBirthTime(), this, m_environment );
 
     m_environment->receiveEvent( evt );
 }
@@ -59,13 +59,15 @@ void Environment2::handleEvent< ShellBirthEvent >( const ShellBirthEvent * e ) {
 ShellBirthEvent::ShellBirthEvent( const VTime & tSend, const VTime &tRecv,
                  SimulationObject * sender, 
                  SimulationObject * receiver ) :
-        ClothoEvent( tSend, tRecv, sender, receiver ) {}
+        ClothoEvent( tSend, tRecv, sender, receiver ),
+        m_birth( dynamic_cast< IntVTime * >( tRecv.clone())) {}
 
 ShellBirthEvent::ShellBirthEvent( const VTime & tSend, const VTime &tRecv,
                  ObjectID & sender, 
                  ObjectID & receiver,
                  unsigned int evtID ) :
-        ClothoEvent( tSend, tRecv, sender, receiver, evtID ) {}
+        ClothoEvent( tSend, tRecv, sender, receiver, evtID ),
+        m_birth( dynamic_cast< IntVTime * >( tRecv.clone() )) {}
 
 bool ShellBirthEvent::eventCompare( const Event * evt ) {
     const ShellBirthEvent * e = dynamic_cast< const ShellBirthEvent * >(evt);
@@ -82,6 +84,10 @@ void ShellBirthEvent::updateModels( Environment2 * env ) const {
     env->handleEvent( this );
 
     ClothoModelCoordinator< Environment2, ShellBirthEvent >::getInstance()->handleEvent( this, env );
+}
+
+IntVTime * ShellBirthEvent::getBirthTime() const {
+    return m_birth;
 }
 
 ShellBirthEvent::~ShellBirthEvent() {}

@@ -72,10 +72,17 @@ public:
     void setEnvironment( Environment2 * env );
     void setProperties( IndividualProperties * prop);
 
+    bool    isAlive() const;
     sex_t   getSex() const;
     IntVTime * getBirthTime() const;
 
     Environment2 * getEnvironment() const;
+
+    void addOffspring();
+
+    allele_t alleleAt( unsigned int var_idx, ploidy_t strand ) const;
+    unsigned int getVariantCount() const;
+
 
 private:
     string  m_name;
