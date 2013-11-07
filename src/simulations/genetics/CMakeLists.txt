@@ -44,4 +44,4 @@ LIST( APPEND SRCS YamlConfig.cpp)
 
 ADD_EXECUTABLE(WarpedClotho ${SRCS} )
 
-TARGET_LINK_LIBRARIES(WarpedClotho ${Boost_LIBRARIES} warped jsoncpp ${YAML_LIB} ${GSL_LIBRARIES} cobjmanager cobjcommon udobjects cmodels )
+TARGET_LINK_LIBRARIES(WarpedClotho ${Boost_LIBRARIES} warped jsoncpp ${YAML_LIB} ${GSL_LIBRARIES} cobjmanager cobjcommon cmodels )

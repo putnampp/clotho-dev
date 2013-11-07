@@ -33,6 +33,7 @@ const string SEX_K = "sex";
 const string MALE_K = "male";
 const string FEMALE_K = "female";
 const string UNKSEX_K = "?";
+const string UNASSIGNED_K = "unassigned";
 
 ostream & operator<<( ostream & out, const Sex s ) {
     switch( s ) {

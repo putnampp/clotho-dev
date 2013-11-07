@@ -33,44 +33,64 @@
 #include "common.h"
 
 #include "SimulationObject.h"
-#include "yaml-cpp/yaml.h"
 
-#include <map>
+#include <unordered_map>
 #include <vector>
 
-using std::map;
+using std::unordered_map;
 using std::vector;
 
-extern const string OBJECT_K;
+static const string OBJECT_K = "object";
 
-struct SimObjectCreator {
+struct object_creator {
     virtual const string & name() = 0;
     virtual SimulationObject * createObject() = 0;
-
-    virtual SimulationObject * createObjectFrom( const YAML::Node & n ) = 0;
-    virtual void createObjectFrom( const YAML::Node &, shared_ptr< vector< SimulationObject * > > ) = 0;
 };
 
+template < class P >
+struct SimObjectCreator : virtual public object_creator {
+    virtual void createObjectFrom( const P &, shared_ptr< vector< SimulationObject * > > ) = 0;
+};
+
+template < class PARAMS >
 class ClothoObjectManager {
 public:
-    typedef map< const string, SimObjectCreator * > SimObjects;
-    typedef SimObjects::iterator  iterator;
+    typedef SimObjectCreator< PARAMS > object_creator_t;
+    typedef std::unordered_map< string, object_creator_t * > ManagedObjects;
+    typedef typename ManagedObjects::iterator  miterator;
 
-    static shared_ptr< ClothoObjectManager > getInstance();
+    static shared_ptr< ClothoObjectManager< PARAMS > > getInstance() {
+        static shared_ptr< ClothoObjectManager< PARAMS > > inst( new ClothoObjectManager<PARAMS>() );
+        return inst;
+    }
 
-    void registerObject( SimObjectCreator * soc );
+    void registerObject( object_creator_t * soc ) {
+        m_creators[ soc->name() ] = soc;
+    }
 
-    SimulationObject * createObject( const string & name );
+    SimulationObject * createObject( const string & name ) {
+        miterator it = m_creators.find( name );
+        if( it == m_creators.end() )
+            return NULL;
 
-    SimulationObject * createObjectFrom( const YAML::Node & yaml );
+        return it->second->createObject();
+    }
 
-    void createObjectFrom( const YAML::Node & yaml, shared_ptr< vector< SimulationObject * > > objs );
+    void createObjectFrom( const string & name, const PARAMS & p, shared_ptr< vector< SimulationObject * > > objs ) {
+        miterator it = m_creators.find( name );
+        if( it == m_creators.end() )
+            return;
 
-    virtual ~ClothoObjectManager();
+        it->second->createObjectFrom( p, objs );
+    }
+
+    virtual ~ClothoObjectManager() {
+        m_creators.clear();
+    }
 protected:
-    ClothoObjectManager();
+    ClothoObjectManager() {}
 
-    SimObjects m_creators;
+    ManagedObjects m_creators;
 };
 
 #endif  // CLOTHOOBJECTMANAGER_H_

@@ -33,19 +33,29 @@
 #include "VTime.h"
 #include <ostream>
 
+#include "Genotype.h"
+
 using std::ostream;
 
-enum Sex { FEMALE, MALE, UNK_SEX };
+enum Sex { FEMALE, MALE, UNK_SEX, UNASSIGNED };
 typedef Sex     sex_t;
 
 extern const string SEX_K;
 extern const string MALE_K;
 extern const string FEMALE_K;
 extern const string UNKSEX_K;
+extern const string UNASSIGNED_K;
 
 typedef size_t  variant_index_t;
 typedef VTime   age_t;
 
+typedef Genotype< 2 > genotype_t;
+
 ostream & operator<<( ostream & out, const Sex s );
+
+inline ostream & operator<<( ostream & out, const genotype_t & g ) {
+    g.print( out );
+    return out;
+}
 
 #endif  // CLOTHOOBJECTCOMMONTYPES_H_

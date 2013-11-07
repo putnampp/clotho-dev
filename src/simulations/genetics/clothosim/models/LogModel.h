@@ -31,7 +31,6 @@
 #define LOGMODEL_H_
 
 #include "../ClothoModel.h"
-#include "../ClothoModelCreator.h"
 
 #include "../clothoobjects/events/LogEvent.h"
 #include "IntVTime.h"
@@ -42,9 +41,7 @@ using std::ofstream;
 class LogModel : 
     virtual public ClothoModel< ClothoObject, LogEvent > {
 public:
-    LogModel();
-
-    void configure( const YAML::Node & n );
+    LogModel( const string & dirpath, int step);
 
     void operator()( const LogEvent * e, ClothoObject * obj );
     void dump( ostream & out );
@@ -53,11 +50,9 @@ public:
 protected:
     IntVTime * m_cur_period;
     string m_log_dir;
-    unsigned int m_step;
+    int m_step;
 
     ofstream m_logger;
 };
-
-DECLARE_REGISTERED_CLOTHO_MODEL( LogModel )
 
 #endif  // LOGMODEL_H_

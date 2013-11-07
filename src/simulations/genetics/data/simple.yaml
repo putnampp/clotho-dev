@@ -1,18 +1,6 @@
 # simulation environment configuration
 ---
 object: Environment
-lifeexpectancy: { 
-    male: {
-        distribution: gaussian,
-        mean: 80,
-        stdev: 8
-    },
-    female: {
-        distribution: gaussian,
-        mean: 82,
-        stdev: 8
-    }
-}
 ...
 # variants of interest
 ---

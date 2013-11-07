@@ -31,26 +31,15 @@
 #define CLOTHOMODEL_H_
 
 #include "common.h"
-//#include "Event.h"
-#include "clothoobjects/events/ClothoEvent.h"
-#include "yaml-cpp/yaml.h"
-
 #include <ostream>
-
-#include <type_traits>
-
-using std::ostream;
-using std::enable_if;
-using std::is_base_of;
 
 extern const string ANY_EVENTS;
 
-template < class OBJ, class EVT = ModelHandler< OBJ > >
-struct ClothoModel {
-    virtual void configure( const YAML::Node & n ) = 0;
-    
-    virtual void operator()( const EVT * , OBJ * ) = 0;
+using std::ostream;
 
+template < class OBJ, class EVT >
+struct ClothoModel {
+    virtual void operator()( const EVT * , OBJ * ) = 0;
     virtual void dump( ostream & ) = 0;
 
     virtual ~ClothoModel() {}

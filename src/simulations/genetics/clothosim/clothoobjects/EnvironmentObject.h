@@ -42,7 +42,7 @@ using std::unordered_map;
 DECLARE_CLOTHO_OBJECT( Environment ) {
 public:
     Environment();
-    Environment( const YAML::Node & n);
+//    Environment( const YAML::Node & n);
 
     virtual ~Environment();
 
@@ -67,6 +67,6 @@ private:
     
 };
 
-DECLARE_REGISTERED_CLOTHO_OBJECT( Environment )
+//DECLARE_REGISTERED_CLOTHO_OBJECT( Environment )
 
 #endif  // ENVIRONMENTOBJECT_H_

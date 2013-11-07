@@ -28,8 +28,8 @@
  ******************************************************************************/
 
 #include "ClothoObjectManager.h"
+#include "yaml-cpp/yaml.h"
 
-const string OBJECT_K = "object";
 
 ClothoObjectManager::ClothoObjectManager(){}
 
@@ -51,27 +51,16 @@ SimulationObject * ClothoObjectManager::createObject( const string & name ) {
     return it->second->createObject();
 }
 
-SimulationObject * ClothoObjectManager::createObjectFrom( const YAML::Node & n ) {
-    SimulationObject * so = NULL;
-    if( n[ OBJECT_K ] ) {
-        string name = n[ OBJECT_K ].as<string>();
-
-        iterator it = m_creators.find( name );
-
-        if( it != m_creators.end() )
-            so = it->second->createObjectFrom(n);
-    }
-    return so;
-}
-
-void ClothoObjectManager::createObjectFrom( const YAML::Node & n, shared_ptr< vector< SimulationObject * > > objs ) {
+void ClothoObjectManager::createObjectFrom< YAML::Node >( const YAML::Node & n, shared_ptr< vector< SimulationObject * > > objs ) {
     if( n[ OBJECT_K ] ) {
         string name = n[ OBJECT_K ].as<string>();
 
         iterator it = m_creators.find( name );
 
         if( it != m_creators.end() ) {
-            it->second->createObjectFrom(n, objs);
+            creatable< YAML::Node > * c = dynamic_cast< createable< YAML::Node > * >( (it->second));
+            if( c )
+                c->createObjectFrom(n, objs);
         }
     }
 }

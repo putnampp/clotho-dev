@@ -34,13 +34,11 @@
 #include "ClothoObject.h"
 #include "ClothoObjectManager.h"
 
-#include "yaml-cpp/yaml.h"
-
-template < class OBJ >
-class ClothoObjectCreator : public SimObjectCreator {
+template < class OBJ, class PARAMS >
+class ClothoObjectCreator : public SimObjectCreator< PARAMS > {
 public:
     ClothoObjectCreator( const char * name ) : m_name(name) {
-        ClothoObjectManager::getInstance()->registerObject( this );
+        ClothoObjectManager< PARAMS >::getInstance()->registerObject( this );
     }
 
     const string & name() {
@@ -51,14 +49,11 @@ public:
         return new OBJ();
     }
 
-    SimulationObject * createObjectFrom( const YAML::Node & n ) {
-        return new OBJ( n );
-    }
-
-    void createObjectFrom( const YAML::Node & n, shared_ptr< vector< SimulationObject * > > objs ) {
-        SimulationObject * so = new OBJ( n );
+    void createObjectFrom( const PARAMS & n, shared_ptr< vector< SimulationObject * > > objs ) {
+        SimulationObject * so = new OBJ( );
         objs->push_back( so );
     }
+    virtual ~ClothoObjectCreator() {}
 private:
     const string m_name;
 };
@@ -66,11 +61,10 @@ private:
 #define DECLARE_CLOTHO_OBJECT( name )                            \
     class name : public ClothoObject
 
-#define DECLARE_REGISTERED_CLOTHO_OBJECT( name )                 \
-    extern ClothoObjectCreator< name > objc_##name;
+#define DECLARE_REGISTERED_CLOTHO_OBJECT( name, params )                 \
+    extern ClothoObjectCreator< name, params > objc_##name;
 
-#define DEFINE_REGISTERED_CLOTHO_OBJECT( name )                \
-    ClothoObjectCreator< name > objc_##name( #name );
-    
+#define DEFINE_REGISTERED_CLOTHO_OBJECT( name, params )                \
+    ClothoObjectCreator< name, params > objc_##name( #name );
 
 #endif  // CLOTHOOBJECTCREATOR_H_

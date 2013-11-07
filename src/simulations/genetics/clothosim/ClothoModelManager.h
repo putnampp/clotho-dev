@@ -36,37 +36,50 @@
 
 //#include "ClothoModelCoordinator.h"
 
-#include <map>
+#include <unordered_map>
 #include <vector>
 
-using std::map;
+using std::unordered_map;
 using std::vector;
 
-extern const string MODEL_K;
+static const string MODEL_K = "model";
 
-struct SimModelCreator {
+struct model_creator {
     virtual const string & name() = 0;
-
-    virtual void createModel() = 0;
-    virtual void createModelFrom( const YAML::Node & n ) = 0;
 };
 
+template < class PARAMS >
+struct SimModelCreator : virtual public model_creator {
+    virtual void createModelFrom( const PARAMS & n ) = 0;
+};
+
+template < class PARAMS >
 class ClothoModelManager {
 public:
-    typedef map< const string, SimModelCreator * > SimModels;
-    typedef SimModels::iterator  iterator;
+    typedef SimModelCreator< PARAMS > model_creator_t;
+    typedef unordered_map< string, model_creator_t * > SimModels;
+    typedef typename SimModels::iterator  iterator;
 
-    static shared_ptr< ClothoModelManager > getInstance();
+    static shared_ptr< ClothoModelManager< PARAMS > > getInstance() {
+        static shared_ptr< ClothoModelManager< PARAMS > > inst( new ClothoModelManager< PARAMS >() );
+        return inst;
+    }
 
-    void registerModel( SimModelCreator * soc );
+    void registerModel( model_creator_t * soc ) {
+        m_creators[ soc->name() ] = soc;
+    }
 
-    void createModel( const string & name );
+    void createModelFrom( const string & name, const PARAMS & p ) {
+        iterator f = m_creators.find( name );
 
-    void createModelFrom( const YAML::Node & yaml );
+        if( f != m_creators.end() ) {
+            f->second->createModelFrom( p );
+        }
+    }
 
-    virtual ~ClothoModelManager();
+    virtual ~ClothoModelManager() { m_creators.clear(); }
 protected:
-    ClothoModelManager();
+    ClothoModelManager() {}
 
     SimModels m_creators;
 };

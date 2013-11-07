@@ -34,14 +34,10 @@
 
 #include "common.h"
 #include "common_types.h"
-#include "Genotype.h"
 #include <vector>
 
 using std::vector;
 
-//enum Genotype { HOMOZYGOUS_REF, HETEROZYGOUS, HOMOZYGOUS_ALT };
-
-typedef Genotype< 2 > genotype_t;
 typedef double  phenotype_t;
 
 class IndividualObjectState : public State {

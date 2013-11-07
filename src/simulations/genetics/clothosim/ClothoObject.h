@@ -51,8 +51,9 @@ public:
     virtual ~ClothoObject();
 protected:
     ClothoObject();
-    objectid_t        m_id;
+    const objectid_t        m_id;
 
+private:
     static objectid_t next_id;
 }; 
 

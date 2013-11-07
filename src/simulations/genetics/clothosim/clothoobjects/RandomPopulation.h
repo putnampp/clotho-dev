@@ -30,10 +30,11 @@
 #ifndef RANDOMPOPULATIONOBJECT_H_
 #define RANDOMPOPULATIONOBJECT_H_
 
-#include "IndividualObject.h"
+#include "../ClothoObjectCreator.h"
+#include "yaml-cpp/yaml.h"
 
-class RandomPopulation : public Individual {};
+struct RandomPopulation { };
 
-DECLARE_REGISTERED_CLOTHO_OBJECT( RandomPopulation )
+DECLARE_REGISTERED_CLOTHO_OBJECT( RandomPopulation, YAML::Node )
 
 #endif  // RANDOMPOPULATIONOBJECT_H_

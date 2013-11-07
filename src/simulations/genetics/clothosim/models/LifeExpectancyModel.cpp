@@ -29,11 +29,11 @@
 
 #include "../clothoobjects/common_types.h"
 #include "LifeExpectancyModel.h"
-#include "../ClothoModelCoordinator.h"
 
 #include <iostream>
 
 #include "../clothoobjects/events/DeathEvent.h"
+#include "../clothoobjects/events/ShellDeathEvent.h"
 #include "gsl/gsl_randist.h"
 
 #include <time.h>
@@ -43,29 +43,8 @@
 using std::cout;
 using std::endl;
 
-const string DISTRIBUTION_K = "distribution";
-const string MEAN_K = "mean";
-const string STDEV_K = "stdev";
-
-DEFINE_REGISTERED_CLOTHO_MODEL( LifeExpectancyModel )
-
-template <>
-void ClothoModelCreator< LifeExpectancyModel >::createModel() {
-    shared_ptr< ClothoModel< Individual, BirthEvent > > pm( new LifeExpectancyModel() );
-
-    ClothoModelCoordinator< Individual, BirthEvent >::getInstance()->addEventHandler( pm );
-
-}
-
-template<>
-void ClothoModelCreator< LifeExpectancyModel >::createModelFrom( const YAML::Node & n ) {
-    shared_ptr< ClothoModel< Individual, BirthEvent > > pm( new LifeExpectancyModel() );
-
-    pm->configure( n );
-    ClothoModelCoordinator< Individual, BirthEvent >::getInstance()->addEventHandler( pm );
-}
-
-LifeExpectancyModel::LifeExpectancyModel() : m_rng( gsl_rng_alloc( gsl_rng_taus ) ) {
+LifeExpectancyModel::LifeExpectancyModel( distribution_params & female, distribution_params & male, distribution_params & unk ) :
+    m_rng( gsl_rng_alloc( gsl_rng_taus ) ), m_female( female ), m_male( male ), m_unk(unk) {
     long seed = time(NULL);
     gsl_rng_set( m_rng, seed );
 }
@@ -74,52 +53,45 @@ LifeExpectancyModel::~LifeExpectancyModel() {
     gsl_rng_free( m_rng );
 }
 
-void LifeExpectancyModel::configure( const YAML::Node & n ) {
-    if( n[ MALE_K ] ) {
-        YAML::Node tmp = n[MALE_K];
-        if( tmp[ MEAN_K ] ) {
-            m_male_mean = tmp[MEAN_K].as< double >();
-        }
-        if( tmp[ STDEV_K ] ) {
-            m_male_sigma = tmp[STDEV_K].as< double >();
-        }
-    }
-
-    if( n[ FEMALE_K ] ) {
-        YAML::Node tmp = n[FEMALE_K];
-        if( tmp[ MEAN_K ] ) {
-            m_female_mean = tmp[MEAN_K].as< double >();
-        }
-        if( tmp[ STDEV_K ] ) {
-            m_female_sigma = tmp[STDEV_K].as< double >();
-        }
-    }
-}
-
 void LifeExpectancyModel::operator()( const BirthEvent * evt, Individual * ind ) {
     if(! evt ) return;
 
-    double expected_age = 0.0;
-
-    switch( evt->getSex() ) {
-    case FEMALE:
-        expected_age = gsl_ran_gaussian( m_rng, m_female_sigma );
-        expected_age += m_female_mean;
-        break;
-    case MALE:
-        expected_age = gsl_ran_gaussian( m_rng, m_male_sigma );
-        expected_age += m_male_mean;
-        break;
-    default:
-        expected_age = gsl_ran_gaussian( m_rng, m_unk_sigma );
-        expected_age += m_unk_mean;
-        break;
-    };
+    double expected_age = computeExpectedAge( ind->getSex() ) ;
 
     IntVTime tDeath = dynamic_cast< const IntVTime & >( evt->getBirthTime() ) + (int)expected_age;
-    Event * dEvent = new DeathEvent( evt->getBirthTime(), tDeath, evt->getSender(), evt->getSender(), evt->getEventId() );
+    Event * dEvent = new DeathEvent( evt->getBirthTime(), tDeath, ind, ind );
 
     ind->receiveEvent( dEvent );
+}
+
+void LifeExpectancyModel::operator()( const ShellBirthEvent * evt, IndividualShell * ind ) {
+    if(! evt ) return;
+
+    double expected_age = computeExpectedAge( ind->getSex() ) ;
+
+    IntVTime tDeath = *ind->getBirthTime() + (int)expected_age;
+    Event * dEvent = new ShellDeathEvent( *ind->getBirthTime(), tDeath, ind, ind );
+
+    ind->receiveEvent( dEvent );
+}
+
+double LifeExpectancyModel::computeExpectedAge( sex_t s ) {
+    double expected_age = 0.0;
+    switch( s ) {
+    case FEMALE:
+        expected_age = gsl_ran_gaussian( m_rng, m_female.sigma );
+        expected_age += m_female.mean;
+        break;
+    case MALE:
+        expected_age = gsl_ran_gaussian( m_rng, m_male.sigma );
+        expected_age += m_male.mean;
+        break;
+    default:
+        expected_age = gsl_ran_gaussian( m_rng, m_unk.sigma );
+        expected_age += m_unk.mean;
+        break;
+    };
+    return expected_age;
 }
 
 void LifeExpectancyModel::dump( ostream & out ) {

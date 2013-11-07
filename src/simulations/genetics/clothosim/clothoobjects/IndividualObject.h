@@ -39,23 +39,21 @@
 
 #include "events/ClothoEvent.h"
 
-#include "../ClothoObjectCreator.h"
+#include "../ClothoObject.h"
 #include "IndividualObjectState.h"
 #include "IntVTime.h"
 
 using std::vector;
 
-DECLARE_CLOTHO_OBJECT( Individual ) {
+class Individual : public ClothoObject {
 public:
     Individual( );
-    Individual( const YAML::Node & n );
 
     Individual( sex_t s, const vector< genotype_t > & genos);
 
-    ~Individual();
+    virtual ~Individual();
 
     void initialize();
-    void reinitialize( const State * state );
     void finalize();
 
     void executeProcess();
@@ -86,6 +84,6 @@ private:
     ClothoObject *  m_environment;
 };
 
-DECLARE_REGISTERED_CLOTHO_OBJECT( Individual )
+//DECLARE_REGISTERED_CLOTHO_OBJECT( Individual )
 
 #endif  // INDIVIDUALOBJECT_H_

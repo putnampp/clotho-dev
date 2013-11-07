@@ -45,7 +45,7 @@ using std::endl;
 
 Environment::Environment( ) : m_name( "ENV" ) {}
 
-Environment::Environment( const YAML::Node & n) : m_name( "ENV" ) { }
+//Environment::Environment( const YAML::Node & n) : m_name( "ENV" ) { }
 
 Environment::~Environment() {
 }
@@ -98,4 +98,4 @@ void Environment::print( ostream & out ) const {
     }
 }
 
-DEFINE_REGISTERED_CLOTHO_OBJECT( Environment )
+//DEFINE_REGISTERED_CLOTHO_OBJECT( Environment )

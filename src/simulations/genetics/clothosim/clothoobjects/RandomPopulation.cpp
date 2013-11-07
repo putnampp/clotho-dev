@@ -28,9 +28,7 @@
  ******************************************************************************/
 
 #include "RandomPopulation.h"
-#include "IndividualObjectState.h"
-
-#include "events/clotho_events.h"
+#include "IndividualObject.h"
 
 #include <gsl/gsl_rng.h>
 
@@ -50,10 +48,10 @@ const string PERCENT_FEMALE_K = "percent_female";
 #define DEFAULT_POP_SIZE 10
 
 template<>
-class ClothoObjectCreator< RandomPopulation > : public SimObjectCreator {
+class ClothoObjectCreator< RandomPopulation, YAML::Node > : public SimObjectCreator< YAML::Node > {
 public:
     ClothoObjectCreator( const char * name ) : m_name( name ), m_T(), m_rng(NULL) {
-        ClothoObjectManager::getInstance()->registerObject( this );
+        ClothoObjectManager< YAML::Node >::getInstance()->registerObject( this );
 
         gsl_rng_env_setup();
         m_T = gsl_rng_default;
@@ -71,29 +69,9 @@ public:
         return new Individual();
     }
 
-    SimulationObject * createObjectFrom( const YAML::Node & n) {
-        unsigned int max_variants = DEFAULT_MAX_VARIANTS;
-        if( n[ MAX_VARIANTS_K ] ) {
-            max_variants = n[ MAX_VARIANTS_K ].as< unsigned int >();
-        }
-        unsigned int variants = DEFAULT_ANC_VARIANTS;
-        if( n[ VARIANTS_K ] ) {
-            variants = n[ VARIANTS_K ].as< unsigned int > ();
-        }
-        unsigned int rnd = gsl_rng_get( m_rng );
-
-        sex_t s = (( rnd & 0x00000001 )? MALE : FEMALE );
-        rnd >>= 1;
-
-        vector< genotype_t > genotypes;
-        genotypes.reserve( max_variants );
-
-        generateGenotypes( genotypes, variants );
-
-        return new Individual( s, genotypes );
-    }
-
     void createObjectFrom( const YAML::Node & n, shared_ptr< vector< SimulationObject * > > objs ) {
+        if( !objs ) return;
+
         unsigned int max_variants = DEFAULT_MAX_VARIANTS;
         if( n[ MAX_VARIANTS_K ] ) {
             max_variants = n[ MAX_VARIANTS_K ].as< unsigned int >();
@@ -174,4 +152,4 @@ protected:
     gsl_rng * m_rng;
 };
 
-DEFINE_REGISTERED_CLOTHO_OBJECT( RandomPopulation )
+DEFINE_REGISTERED_CLOTHO_OBJECT( RandomPopulation, YAML::Node )

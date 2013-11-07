@@ -1,0 +1,60 @@
+# simulation environment configuration
+---
+object: PopulatedEnvironment
+name: ENV1
+pool_size: 100000
+...
+
+# founder population
+---
+initializer: PopulationInitializer
+environment: ENV1
+pop_size: 5000
+percent_female: 60
+max_variants:   1000
+variants: 150
+...
+
+# population model
+---
+model: PopulationModel
+popsize: 10
+...
+# life expectancy model
+---
+model: LifeExpectancyModel
+male: {
+    distribution: gaussian,
+    mean: 80,
+    stdev: 8
+}
+female: {
+    distribution: gaussian,
+    mean: 82,
+    stdev: 8
+}
+...
+# maturity model
+---
+model: MaturityModel
+male: {
+    distribution: gaussian,
+    mean: 14,
+    stdev: 1
+}
+female: {
+    distribution: gaussian,
+    mean: 13,
+    stdev: 1
+}
+...
+# log model
+---
+model: LogModel
+logdir: log/
+time_step: 100
+...
+# random mating model
+---
+model: RandomMatingModel
+...

@@ -29,11 +29,11 @@
 
 #include "../clothoobjects/common_types.h"
 #include "MaturityModel.h"
-#include "../ClothoModelCoordinator.h"
 
 #include <iostream>
 
 #include "../clothoobjects/events/MaturityEvent.h"
+#include "../clothoobjects/events/ShellMaturityEvent.h"
 #include "gsl/gsl_randist.h"
 
 #include <time.h>
@@ -43,34 +43,8 @@
 using std::cout;
 using std::endl;
 
-const string DISTRIBUTION_K = "distribution";
-const string MEAN_K = "mean";
-const string STDEV_K = "stdev";
-
-using boost::static_pointer_cast;
-
-DEFINE_REGISTERED_CLOTHO_MODEL( MaturityModel )
-
-template <>
-void ClothoModelCreator< MaturityModel >::createModel() {
-    shared_ptr< MaturityModel> pm( new MaturityModel() );
-
-    //coord->addEventHandler( evt_BirthEvent.getDataType(), pm );
-    ClothoModelCoordinator< Individual, BirthEvent >::getInstance()->addEventHandler(
-            static_pointer_cast< ClothoModel< Individual, BirthEvent > >( pm )  );
-
-}
-
-template<>
-void ClothoModelCreator< MaturityModel >::createModelFrom( const YAML::Node & n ) {
-    shared_ptr< MaturityModel > pm( new MaturityModel() );
-    pm->configure( n );
-
-    ClothoModelCoordinator< Individual, BirthEvent >::getInstance()->addEventHandler(
-            static_pointer_cast< ClothoModel< Individual, BirthEvent > >( pm )  );
-}
-
-MaturityModel::MaturityModel() : m_rng( gsl_rng_alloc( gsl_rng_taus ) ) {
+MaturityModel::MaturityModel( distribution_params & female, distribution_params & male, distribution_params & unk) :
+     m_rng( gsl_rng_alloc( gsl_rng_taus ) ), m_female(female), m_male(male), m_unk(unk) {
     long seed = time(NULL);
     gsl_rng_set( m_rng, seed );
 }
@@ -79,51 +53,47 @@ MaturityModel::~MaturityModel() {
     gsl_rng_free( m_rng );
 }
 
-void MaturityModel::configure( const YAML::Node & n ) {
-    if( n[ MALE_K ] ) {
-        YAML::Node tmp = n[MALE_K];
-        if( tmp[ MEAN_K ] ) {
-            m_male_mean = tmp[MEAN_K].as< double >();
-        }
-        if( tmp[ STDEV_K ] ) {
-            m_male_sigma = tmp[STDEV_K].as< double >();
-        }
-    }
-
-    if( n[ FEMALE_K ] ) {
-        YAML::Node tmp = n[FEMALE_K];
-        if( tmp[ MEAN_K ] ) {
-            m_female_mean = tmp[MEAN_K].as< double >();
-        }
-        if( tmp[ STDEV_K ] ) {
-            m_female_sigma = tmp[STDEV_K].as< double >();
-        }
-    }
-}
 void MaturityModel::operator()(const BirthEvent * evt, Individual * ind ) {
     if(! evt ) return;
 
+    double expected_age = computeExpectedAge( evt->getSex() );
+
+    IntVTime tMaturity = dynamic_cast< const IntVTime & >( evt->getBirthTime() ) + (int)expected_age;
+    Event * mEvent = new MaturityEvent( evt->getBirthTime(), tMaturity, ind, ind );
+
+    ind->receiveEvent( mEvent );
+}
+
+void MaturityModel::operator()(const ShellBirthEvent * evt, IndividualShell * ind ) {
+    if(! evt ) return;
+
+    double expected_age = computeExpectedAge( ind->getSex() );
+
+    IntVTime tMaturity = *ind->getBirthTime() + (int)expected_age;
+    Event * mEvent = new ShellMaturityEvent( *ind->getBirthTime(), tMaturity, ind, ind );
+
+    ind->receiveEvent( mEvent );
+}
+
+double MaturityModel::computeExpectedAge( sex_t s ) {
     double expected_age = 0.0;
 
-    switch( evt->getSex() ) {
+    switch( s ) {
     case FEMALE:
-        expected_age = gsl_ran_gaussian( m_rng, m_female_sigma );
-        expected_age += m_female_mean;
+        expected_age = gsl_ran_gaussian( m_rng, m_female.sigma );
+        expected_age += m_female.mean;
         break;
     case MALE:
-        expected_age = gsl_ran_gaussian( m_rng, m_male_sigma );
-        expected_age += m_male_mean;
+        expected_age = gsl_ran_gaussian( m_rng, m_male.sigma );
+        expected_age += m_male.mean;
         break;
     default:
-        expected_age = gsl_ran_gaussian( m_rng, m_unk_sigma );
-        expected_age += m_unk_mean;
+        expected_age = gsl_ran_gaussian( m_rng, m_unk.sigma );
+        expected_age += m_unk.mean;
         break;
     };
 
-    IntVTime tMaturity = dynamic_cast< const IntVTime & >( evt->getBirthTime() ) + (int)expected_age;
-    Event * mEvent = new MaturityEvent( evt->getBirthTime(), tMaturity, evt->getSender(), evt->getSender(), evt->getEventId() );
-
-    ind->receiveEvent( mEvent );
+    return expected_age;
 }
 
 void MaturityModel::dump( ostream & out ) {

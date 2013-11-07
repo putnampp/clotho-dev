@@ -31,32 +31,29 @@
 #define LIFEEXPECTANCYMODEL_H_
 
 #include "../ClothoModel.h"
-#include "../ClothoModelCreator.h"
+
+#include "DistributionParam.h"
 
 #include "../clothoobjects/events/BirthEvent.h"
+#include "../clothoobjects/events/ShellBirthEvent.h"
 
 #include "gsl/gsl_rng.h"
 
-//DECLARE_CLOTHO_MODEL( LifeExpectancyModel ) {
 class LifeExpectancyModel :
-    virtual public ClothoModel< Individual, BirthEvent > {
+    virtual public ClothoModel< Individual, BirthEvent >,
+    virtual public ClothoModel< IndividualShell, ShellBirthEvent > {
 public:
-    LifeExpectancyModel();
-
-    void configure( const YAML::Node & n );
+    LifeExpectancyModel( distribution_params & female, distribution_params & male, distribution_params & unk );
 
     void operator()( const BirthEvent * e, Individual * ind );
-
+    void operator()( const ShellBirthEvent * e, IndividualShell * ind );
     void dump( ostream & out );
 
     virtual ~LifeExpectancyModel();
 protected:
+    double computeExpectedAge( sex_t s );
     gsl_rng * m_rng;
-    double  m_female_mean, m_female_sigma;
-    double  m_male_mean, m_male_sigma;
-    double  m_unk_mean, m_unk_sigma;
+    distribution_params m_female, m_male, m_unk;
 };
-
-DECLARE_REGISTERED_CLOTHO_MODEL( LifeExpectancyModel )
 
 #endif  // LIFEEXPECTANCYMODEL_H_

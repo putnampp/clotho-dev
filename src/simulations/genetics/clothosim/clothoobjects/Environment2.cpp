@@ -1,0 +1,197 @@
+/*******************************************************************************
+ * Copyright (c) 2013, Patrick P. Putnam (putnampp@gmail.com)
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met: 
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer. 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution. 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * The views and conclusions contained in the software and documentation are those
+ * of the authors and should not be interpreted as representing official policies,
+ * either expressed or implied, of the FreeBSD Project.
+ ******************************************************************************/
+
+#include "Environment2.h"
+//#include "Environment2ObjectState.h"
+
+#include "IntVTime.h"
+
+#include "events/ClothoEvent.h"
+#include "events/LogEvent.h"
+
+#include <boost/lexical_cast.hpp>
+
+#include <iostream>
+
+using std::cout;
+using std::endl;
+
+const string POOL_SIZE_K = "pool_size";
+
+Environment2::Environment2( const char * n, int pool_size ) : m_name( n ), m_max_pool_size( pool_size ), m_pool_size(0) {}
+/*
+Environment2::Environment2( const YAML::Node & n) : m_name( "ENV" ), m_max_pool_size( -1 ), m_pool_size( 0 ) { 
+    if( n[ POOL_SIZE_K ] ) {
+        m_max_pool_size = n[ POOL_SIZE_K ].as< int >();
+    }
+
+    // pre-populate the pool if necessary
+    if( m_max_pool_size <= -1 ) assert(false);  // Warped does not support dynamic SimulationObject allocation
+}
+*/
+
+Environment2::~Environment2() {
+/*
+ * Because IndividualShells are SimulationObjects
+ * their clean up may be handled by the simulation manager
+ * may be sufficient to just clear the vectors and queue
+    for( vector< IndividualShell * >::iterator it = m_females.begin(); it != m_females.end(); ) {
+        IndividualShell * shell = (*it++);
+        delete shell;
+    }
+    for( vector< IndividualShell * >::iterator it = m_males.begin(); it != m_males.end(); ) {
+        IndividualShell * shell = (*it++);
+        delete shell;
+    }
+    for( vector< IndividualShell * >::iterator it = m_unk.begin(); it != m_unk.end(); it ) {
+        IndividualShell * shell = (*it++);
+        delete shell;
+    }
+
+    while(! m_individual_pool.empty()) {
+        IndividualShell * shell = m_individual_pool.front();
+        m_individual_pool.pop();
+        delete shell;
+    }
+*/
+}
+
+void Environment2::initialize() {
+    // schedule first logging event?
+    //
+    const IntVTime tmp = static_cast< const IntVTime & >( getSimulationTime() ) + 1;
+    Event * e = new LogEvent(getSimulationTime(), tmp, this, this );
+    this->receiveEvent( e );
+}
+
+void Environment2::finalize() {}
+
+void Environment2::executeProcess(){
+    while( haveMoreEvents() ) {
+        const Event * evt = getEvent();
+
+        const ModelHandler< Environment2 > * e = dynamic_cast< const ModelHandler< Environment2 > * >( evt );
+        if( e ) {
+            e->updateModels( this );
+        } else {
+            const ModelHandler< ClothoObject > * e2 = dynamic_cast< const ModelHandler< ClothoObject > * > (evt );
+
+            e2->updateModels( this );
+        }
+    }
+}
+
+State * Environment2::allocateState() {
+    //return new Environment2ObjectState();
+    return NULL;
+}
+
+const string & Environment2::getName() const {
+    return m_name;
+}
+
+void Environment2::addIndividual( IndividualShell * s ) {
+    if( m_max_pool_size > -1 ) {
+        // bounded pool
+        if( m_pool_size >= m_max_pool_size ) return;
+    }
+
+    switch( s->getSex() ) {
+    case FEMALE:
+        m_females.push_back(s);
+        break;
+    case MALE:
+        m_males.push_back( s );
+        break;
+    case UNK_SEX:
+        m_unk.push_back( s );
+        break;
+    default:
+        m_individual_pool.push( s );
+        break;
+    }
+
+    ++m_pool_size;
+}
+
+void Environment2::removeIndividual( IndividualShell * s ) {
+    switch( s->getSex() ) {
+    case FEMALE:
+        break;
+    case MALE:
+        break;
+    case UNK_SEX:
+        break;
+    default:
+        break;
+    }
+
+    m_individual_pool.push( s );
+}
+
+IndividualShell * Environment2::nextAvailableIndividual() {
+    IndividualShell * t = NULL;
+
+    if( !m_individual_pool.empty() ) {
+        // there is at least one available Individual so use it
+        t = m_individual_pool.front();
+        m_individual_pool.pop();
+    } else if( m_max_pool_size == -1 || m_pool_size < m_max_pool_size ) {
+        // there are no available Individuals but there is no limit
+        // on pool size;
+        // therefore create a new one
+        t = new IndividualShell( this );
+    } // else individual pool has been maxed out; consider terminating
+
+    return t;
+}
+
+int Environment2::getMaleCount() const {
+    return m_males.size();
+}
+
+int Environment2::getFemaleCount() const {
+    return m_females.size();
+}
+
+void Environment2::print( ostream & out ) const {
+    out << m_name << "\n";
+    out << m_individual_pool.size() << " pooled individuals\n";
+    for( vector< IndividualShell * >::const_iterator it = m_females.begin(); it != m_females.end(); it++ ) {
+        (*it)->print( out );
+    }
+
+    for( vector< IndividualShell * >::const_iterator it = m_males.begin(); it != m_males.end(); it++ ) {
+        (*it)->print( out );
+    }
+
+    for( vector< IndividualShell * >::const_iterator it = m_unk.begin(); it != m_unk.end(); it++ ) {
+        (*it)->print( out );
+    }
+}

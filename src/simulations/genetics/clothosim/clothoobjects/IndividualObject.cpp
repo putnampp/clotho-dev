@@ -44,7 +44,7 @@ using std::endl;
 const string IND_K = "IND";
 const string NAME_K = "name";
 
-DEFINE_REGISTERED_CLOTHO_OBJECT( Individual )
+//DEFINE_REGISTERED_CLOTHO_OBJECT( Individual )
 
 Individual::Individual() : 
     m_name( IND_K  +  boost::lexical_cast<string>( m_id ) ),
@@ -54,6 +54,7 @@ Individual::Individual() :
     m_eol( NULL ) {
 }
 
+/*
 Individual::Individual( const YAML::Node & n ) {
     if( n[ NAME_K ] ) {
         m_name = n[ NAME_K ].as< string >();
@@ -81,7 +82,7 @@ Individual::Individual( const YAML::Node & n ) {
     m_dob = NULL;
     m_eol = NULL;
 }
-
+*/
 Individual::Individual( sex_t s, const vector< genotype_t > & genos ) :
     m_name( "IND"  +  boost::lexical_cast<string>(m_id)),
     m_sex( s ),

@@ -36,36 +36,31 @@
 
 #include "yaml-cpp/yaml.h"
 
-template < class OBJ >
-class ClothoModelCreator : public SimModelCreator {
+template < class OBJ, class PARAMS >
+class ClothoModelCreator : public SimModelCreator< PARAMS > {
 public:
     ClothoModelCreator( const char * name ) : m_name(name) {
-        ClothoModelManager::getInstance()->registerModel( this );
+        ClothoModelManager< PARAMS >::getInstance()->registerModel( this );
     }
 
     const string & name() {
         return m_name;
     }
 
-    void createModel() {
-       // return new OBJ();
-    }
-
-    void createModelFrom( const YAML::Node & n ) {
+    void createModelFrom( const PARAMS & n ) {
         //return new OBJ( n );
     }
+
+    virtual ~ClothoModelCreator() {}
 private:
     const string m_name;
 };
 
-#define DECLARE_CLOTHO_MODEL( name )                            \
-    class name : public ClothoModel
+#define DECLARE_REGISTERED_CLOTHO_MODEL( name, params )                 \
+    extern ClothoModelCreator< name, params > cmc_##name;
 
-#define DECLARE_REGISTERED_CLOTHO_MODEL( name )                 \
-    extern ClothoModelCreator< name > cmc_##name;
-
-#define DEFINE_REGISTERED_CLOTHO_MODEL( name )                \
-    ClothoModelCreator< name > cmc_##name( #name );
+#define DEFINE_REGISTERED_CLOTHO_MODEL( name, params )                \
+    ClothoModelCreator< name, params > cmc_##name( #name );
     
 
 #endif  // CLOTHOMODELCREATOR_H_

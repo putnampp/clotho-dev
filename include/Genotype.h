@@ -36,8 +36,10 @@
 #include "Locus.h"
 
 #include <vector>
+#include <ostream>
 
 using std::vector;
+using std::ostream;
 
 enum GenotypeFlag { HOMOZYGOUS  = 1,
                      DOMINANT   = 2 };
@@ -76,7 +78,16 @@ public:
     bool     isFlag( GenotypeFlag f ) const { return ((m_flags & f ) > 0); }
 
     allele_t & operator[]( ploidy_t p ) { assert( p < PLOIDY ); return m_geno[ p ]; }
-    
+
+    void print( ostream & out ) const {
+        if( !PLOIDY ) return;
+
+        ploidy_t p = 0;
+        out << (int) m_geno[ p++ ];
+        while( p < P ) {
+            out << ":" << (int) m_geno[p++];
+        }
+    }
     virtual ~Genotype() {}
 protected:
     flag_t      m_flags; 

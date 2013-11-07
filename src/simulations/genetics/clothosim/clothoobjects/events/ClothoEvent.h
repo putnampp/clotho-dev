@@ -51,7 +51,7 @@ public:
 protected:
     ClothoEvent( const VTime & tSend, const VTime &tRecv,
                  SimulationObject * sender, 
-                 SimulationObject * receiver ) :
+                 SimulationObject * receiver ) : 
                     DefaultEvent( tSend, tRecv, sender, receiver ) {}
 
     ClothoEvent( const VTime & tSend, const VTime & tRecv,

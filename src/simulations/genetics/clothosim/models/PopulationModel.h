@@ -31,19 +31,15 @@
 #define POPULATIONMODEL_H_
 
 #include "../ClothoModel.h"
-#include "../ClothoModelCreator.h"
 
 #include "../clothoobjects/events/BirthEvent.h"
 #include "../clothoobjects/events/DeathEvent.h"
 
-//DECLARE_CLOTHO_MODEL( PopulationModel ) {
 class PopulationModel : 
     virtual public ClothoModel< Individual, BirthEvent >, 
     virtual public ClothoModel< Individual, DeathEvent > {
 public:
-    PopulationModel();
-
-    void configure( const YAML::Node & n );
+    PopulationModel( int pop_size );
 
     void operator()( const BirthEvent * e, Individual * ind );
     void operator()( const DeathEvent * e, Individual * ind );
@@ -51,9 +47,8 @@ public:
 
     virtual ~PopulationModel();
 protected:
-    unsigned int m_living, m_lived, m_pop_size;
+    unsigned int m_living, m_lived;
+    int m_pop_size;
 };
-
-DECLARE_REGISTERED_CLOTHO_MODEL( PopulationModel )
 
 #endif  // POPULATIONMODEL_H_

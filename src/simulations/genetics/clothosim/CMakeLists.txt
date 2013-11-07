@@ -30,24 +30,30 @@ INCLUDE_DIRECTORIES( ${Warped_INCLUDE_DIRS} )
 LINK_DIRECTORIES( ${Warped_LIBRARIES} )
 
 LIST( APPEND OBJECT_MNGR_SRC ClothoObject.cpp )
-LIST( APPEND OBJECT_MNGR_SRC ClothoObjectManager.cpp )
 LIST( APPEND OBJECT_MNGR_SRC ClothoModel.cpp )
-LIST( APPEND OBJECT_MNGR_SRC ClothoModelManager.cpp )
-#LIST( APPEND OBJECT_MNGR_SRC ClothoModelCoordinator.cpp )
+#LIST( APPEND OBJECT_MNGR_SRC ClothoModelManager.cpp )
 
 LIST( APPEND SIM_SRC clothoobjects/common_types.cpp )
 
-#LIST( APPEND SIM_SRC clothoobjects/events/ClothoEvent.cpp )
 LIST( APPEND SIM_SRC clothoobjects/events/DeathEvent.cpp )
+LIST( APPEND SIM_SRC clothoobjects/events/ShellDeathEvent.cpp )
 LIST( APPEND SIM_SRC clothoobjects/events/BirthEvent.cpp )
+LIST( APPEND SIM_SRC clothoobjects/events/ShellBirthEvent.cpp )
 LIST( APPEND SIM_SRC clothoobjects/events/LogEvent.cpp )
 LIST( APPEND SIM_SRC clothoobjects/events/MaturityEvent.cpp )
+LIST( APPEND SIM_SRC clothoobjects/events/ShellMaturityEvent.cpp )
+LIST( APPEND SIM_SRC clothoobjects/events/ShellMatingEvent.cpp )
 
 LIST( APPEND SIM_SRC clothoobjects/EnvironmentObject.cpp )
+LIST( APPEND SIM_SRC clothoobjects/Environment2.cpp )
 LIST( APPEND SIM_SRC clothoobjects/EnvironmentObjectState.cpp )
 LIST( APPEND SIM_SRC clothoobjects/IndividualObject.cpp )
 LIST( APPEND SIM_SRC clothoobjects/RandomPopulation.cpp )
 LIST( APPEND SIM_SRC clothoobjects/IndividualObjectState.cpp )
+LIST( APPEND SIM_SRC clothoobjects/IndividualShellObject.cpp )
+LIST( APPEND SIM_SRC clothoobjects/IndividualProperties.cpp )
+LIST( APPEND SIM_SRC clothoobjects/PopulatedEnvironment.cpp )
+LIST( APPEND SIM_SRC clothoobjects/PopulationInitializer.cpp )
 
 ADD_LIBRARY(cobjmanager SHARED ${OBJECT_MNGR_SRC} )
 
@@ -55,18 +61,24 @@ ADD_LIBRARY(cobjcommon SHARED ${SIM_SRC})
 
 ADD_DEPENDENCIES( cobjcommon cobjmanager )
 
-LIST( APPEND USER_SRC user_defined_object/UDObject.cpp )
+#LIST( APPEND USER_SRC user_defined_object/UDObject.cpp )
 
-ADD_LIBRARY(udobjects SHARED ${USER_SRC} )
+#ADD_LIBRARY(udobjects SHARED ${USER_SRC} )
 
-ADD_DEPENDENCIES( udobjects cobjmanager )
+#ADD_DEPENDENCIES( udobjects cobjmanager )
 
 #LIST( APPEND MODEL_SRC models/SelectionModel.cpp )
 #LIST( APPEND MODEL_SRC models/RandomSelectionModel.cpp )
 LIST( APPEND MODEL_SRC models/PopulationModel.cpp )
+LIST( APPEND MODEL_SRC models/PopulationModelCreator.cpp )
 LIST( APPEND MODEL_SRC models/LifeExpectancyModel.cpp )
+LIST( APPEND MODEL_SRC models/LifeExpectancyModelCreator.cpp )
 LIST( APPEND MODEL_SRC models/MaturityModel.cpp )
+LIST( APPEND MODEL_SRC models/MaturityModelCreator.cpp )
 LIST( APPEND MODEL_SRC models/LogModel.cpp )
+LIST( APPEND MODEL_SRC models/LogModelCreator.cpp )
+LIST( APPEND MODEL_SRC models/RandomMatingModel.cpp )
+LIST( APPEND MODEL_SRC models/RandomMatingModelCreator.cpp )
 
 
 ADD_LIBRARY(cmodels SHARED ${MODEL_SRC} )
