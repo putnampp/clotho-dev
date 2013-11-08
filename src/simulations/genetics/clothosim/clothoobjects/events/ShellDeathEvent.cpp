@@ -30,6 +30,8 @@
 #include "ShellDeathEvent.h"
 #include "SerializedInstance.h"
 
+#include "../../ClothoModelCoordinator.h"
+
 #include <iostream>
 
 using std::cout;
@@ -55,7 +57,7 @@ DEFINE_REGISTERED_CLOTHO_EVENT( ShellDeathEvent )
 template<>
 void IndividualShell::handleEvent< ShellDeathEvent >( const ShellDeathEvent * e ) {
     m_prop->m_eol = dynamic_cast< IntVTime * >( e->getReceiveTime().clone() );
-    Event * de = new ShellDeathEvent( getSimulationTime(), getSimulationTime(), this, m_environment );
+    Event * de = new ShellDeathEvent( e->getSendTime() , e->getReceiveTime(), this, m_environment );
 
     m_environment->receiveEvent( de );
 }
@@ -66,6 +68,10 @@ void Environment2::handleEvent< ShellDeathEvent >( const ShellDeathEvent * e ) {
 
     if( ishell ) {
         removeIndividual( ishell );
+        if( m_logger.is_open() ) {
+            m_logger << "(" << getSimulationTime() << ")-";
+            ishell->print( m_logger );
+        }
     }
 }
 
@@ -99,10 +105,14 @@ bool ShellDeathEvent::eventCompare( const Event * evt ) {
 
 void ShellDeathEvent::updateModels( IndividualShell * ind ) const {
     ind->handleEvent( this );
+
+    ClothoModelCoordinator< IndividualShell, ShellDeathEvent >::getInstance()->handleEvent(this, ind );
 }
 
 void ShellDeathEvent::updateModels( Environment2 * env ) const {
     env->handleEvent( this );
+
+    ClothoModelCoordinator< Environment2, ShellDeathEvent >::getInstance()->handleEvent(this, env );
 }
 
 ShellDeathEvent::~ShellDeathEvent() {}

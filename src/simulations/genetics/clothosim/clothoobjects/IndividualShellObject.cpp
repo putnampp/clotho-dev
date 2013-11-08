@@ -70,19 +70,13 @@ void IndividualShell::initialize() {
 
     if( !m_prop ) {
         // initalizing new properties
-        cout << "Initializing new properties" << endl;
+//        cout << "Initializing new properties" << endl;
         m_prop = new IndividualProperties();
     }
 
     // notify self that has been born?
     if( m_prop->m_sex != UNASSIGNED ) {
-        Event * eBorn = NULL;
-        if( m_prop->m_dob ) {
-            eBorn = new ShellBirthEvent( getSimulationTime(), *m_prop->m_dob, this, this );
-        } else {
-            cout << "Individual to be born at " << getSimulationTime() << endl;
-            eBorn = new ShellBirthEvent( getSimulationTime(), getSimulationTime(), this, this );
-        }
+        Event * eBorn = new ShellBirthEvent( getSimulationTime(), getSimulationTime(), this, this );
         this->receiveEvent( eBorn );
     }
 }
@@ -143,6 +137,10 @@ void IndividualShell::setProperties( IndividualProperties * prop ) {
     //cout << "Setting Properties: " << *prop << endl;
     if( m_prop ) delete m_prop;
     m_prop = prop;
+}
+
+IndividualProperties * IndividualShell::getProperties() {
+    return m_prop;
 }
 
 void IndividualShell::addOffspring() {

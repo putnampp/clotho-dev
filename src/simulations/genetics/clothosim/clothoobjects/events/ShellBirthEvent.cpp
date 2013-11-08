@@ -53,6 +53,10 @@ void Environment2::handleEvent< ShellBirthEvent >( const ShellBirthEvent * e ) {
 
     if( ishell ) {
         addIndividual( ishell );
+        if( m_logger.is_open() ) {
+            m_logger << "(" << getSimulationTime() << ")-";
+            ishell->print( m_logger );
+        }
     }
 }
 
@@ -60,7 +64,7 @@ ShellBirthEvent::ShellBirthEvent( const VTime & tSend, const VTime &tRecv,
                                   SimulationObject * sender,
                                   SimulationObject * receiver ) :
     ClothoEvent( tSend, tRecv, sender, receiver ),
-    m_birth( dynamic_cast< IntVTime * >( tRecv.clone())) {}
+    m_birth( dynamic_cast< IntVTime * >( tRecv.clone() )) {}
 
 ShellBirthEvent::ShellBirthEvent( const VTime & tSend, const VTime &tRecv,
                                   ObjectID & sender,

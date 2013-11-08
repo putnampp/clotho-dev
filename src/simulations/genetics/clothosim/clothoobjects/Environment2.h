@@ -33,18 +33,23 @@
 #include "warped.h"
 #include "common_types.h"
 
+#include <fstream>
+
 #include "IndividualShellObject.h"
 
 #include <vector>
+#include <list>
 #include <queue>
 #include <unordered_map>
 
 using std::unordered_map;
+using std::list;
 using std::queue;
+using std::ofstream;
 
 class Environment2 : public ClothoObject {
 public:
-    Environment2( const char * n, int max_size = -1);
+    Environment2( const char * n, int max_size, const string & l);
 
     virtual ~Environment2();
 
@@ -71,13 +76,16 @@ public:
 
     void print( ostream & out ) const;
 protected:
-    vector< IndividualShell * > m_females, m_males, m_unk;
+    list< IndividualShell * > m_females, m_males, m_unk;
     queue< IndividualShell * > m_individual_pool;
 
 private:
     string m_name;
     int m_max_pool_size;
     int m_pool_size;
+    string m_logdir;
+
+    ofstream m_logger;
 };
 
 #endif  // ENVIRONMENT2OBJECT_H_

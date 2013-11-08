@@ -53,8 +53,10 @@ const string PERCENT_FEMALE_K = "percent_female";
 */
 const string NAME_K = "name";
 const string POOL_SIZE_K = "pool_size";
+const string LOG_DIR_K = "logdir";
 //const string INIT_POP_K = "initial_population";
 
+#define DEFAULT_POP_SIZE -1
 const string DEFAULT_NAME = "ENV";
 
 template<>
@@ -69,11 +71,12 @@ public:
     }
 
     SimulationObject * createObject() {
-        return new Environment2(DEFAULT_NAME.c_str());
+        string log = "";
+        return new Environment2(DEFAULT_NAME.c_str(), DEFAULT_POP_SIZE, log);
     }
 
     void createObjectFrom( const YAML::Node & n, shared_ptr< vector< SimulationObject * > > objs ) {
-        int pool_size = -1;
+        int pool_size = DEFAULT_POP_SIZE;
         if( n[ POOL_SIZE_K ] ) {
             pool_size = n[ POOL_SIZE_K ].as< int > ();
         }
@@ -82,7 +85,13 @@ public:
         if( n[ NAME_K ] ) {
             name = n[ NAME_K ].as< string >();
         }
-        Environment2 * env = new Environment2( name.c_str(), pool_size );
+
+        string logdir = "";
+        if( n[ LOG_DIR_K ] ) {
+            logdir = n[ LOG_DIR_K ].as<string>();
+        }
+
+        Environment2 * env = new Environment2( name.c_str(), pool_size, logdir );
 
         int allocated = 0;
         while( ++allocated <= pool_size ) {

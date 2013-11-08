@@ -71,6 +71,7 @@ public:
 
     void setEnvironment( Environment2 * env );
     void setProperties( IndividualProperties * prop);
+    IndividualProperties * getProperties();
 
     bool    isAlive() const;
     sex_t   getSex() const;

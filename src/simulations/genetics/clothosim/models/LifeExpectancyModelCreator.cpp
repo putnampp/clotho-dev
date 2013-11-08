@@ -35,6 +35,8 @@ const string DISTRIBUTION_K = "distribution";
 const string MEAN_K = "mean";
 const string STDEV_K = "stdev";
 
+using boost::static_pointer_cast;
+
 template <>
 void ClothoModelCreator< LifeExpectancyModel, YAML::Node >::createModelFrom( const YAML::Node & n ) {
     distribution_params male;
@@ -69,8 +71,13 @@ void ClothoModelCreator< LifeExpectancyModel, YAML::Node >::createModelFrom( con
             unk.sigma = tmp[STDEV_K].as< double >();
         }
     }
-    shared_ptr< ClothoModel< Individual, BirthEvent > > pm( new LifeExpectancyModel( female, male, unk) );
-    ClothoModelCoordinator< Individual, BirthEvent >::getInstance()->addEventHandler( pm );
+    shared_ptr< LifeExpectancyModel > pm( new LifeExpectancyModel( female, male, unk) );
+
+    ClothoModelCoordinator< Individual, BirthEvent >::getInstance()->addEventHandler(
+        static_pointer_cast< ClothoModel< Individual, BirthEvent> >(pm) );
+
+    ClothoModelCoordinator< IndividualShell, ShellBirthEvent >::getInstance()->addEventHandler(
+        static_pointer_cast< ClothoModel< IndividualShell, ShellBirthEvent > >(pm) );
 }
 
 DEFINE_REGISTERED_CLOTHO_MODEL( LifeExpectancyModel, YAML::Node )

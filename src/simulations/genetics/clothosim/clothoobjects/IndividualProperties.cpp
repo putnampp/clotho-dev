@@ -29,12 +29,23 @@
 
 #include "IndividualProperties.h"
 
+long IndividualProperties::next_id = 1;
+
 ostream & operator<<( ostream & out, const IndividualProperties & ip ) {
-    out << ip.m_sex;
+    out << ip.m_id 
+        << ", " << ip.m_sex
+        << ", " << ip.m_parent0
+        << ", " << ip.m_parent1;
     if( ip.m_dob ) {
         out << ", " << *ip.m_dob;
     } else {
         out << ", -1";
+    }
+
+    if( ip.m_eol ) {
+        out << ", " << (*ip.m_eol - *ip.m_dob);
+    } else {
+        out << ", ?";
     }
 
     out << ", " << ip.m_offspring;

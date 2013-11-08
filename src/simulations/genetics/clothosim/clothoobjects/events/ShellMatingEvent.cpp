@@ -41,7 +41,7 @@ DEFINE_REGISTERED_CLOTHO_EVENT( ShellMatingEvent )
 
 template<>
 void Environment2::handleEvent< ShellMatingEvent >( const ShellMatingEvent * e ) {
-    cout << "environment handling mating event: " << e->getReceiveTime() << " (" << getSimulationTime() << ")" << endl;
+//    cout << "environment handling mating event: " << e->getReceiveTime() << " (" << getSimulationTime() << ")" << endl;
 }
 
 ShellMatingEvent::ShellMatingEvent( const VTime & tSend, const VTime &tRecv,

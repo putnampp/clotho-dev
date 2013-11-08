@@ -34,6 +34,8 @@
 
 #include <cmath>
 
+#include "../clothoobjects/events/ShellBirthEvent.h"
+
 using std::cout;
 using std::endl;
 
@@ -48,9 +50,10 @@ void RandomMatingModel::operator()( const ShellMaturityEvent * e, IndividualShel
         //
         IntVTime date = dynamic_cast< const IntVTime & >( e->getReceiveTime() );
         IntVTime age = date - *ind->getBirthTime();
+
         unsigned int nOffspring = ind->getOffspringCount();
 
-        cout << "female ready to mate at age " << age << " (" << e->getReceiveTime() << ")"  << endl;
+//        cout << "female ready to mate at age " << age << ", " << nOffspring << " (" << e->getReceiveTime() << ")"  << endl;
 
         // given age will she mate againt and produce offspring?
         if( readyToMate( age, nOffspring ) ) {
@@ -70,7 +73,7 @@ void RandomMatingModel::operator()( const ShellMaturityEvent * e, IndividualShel
 }
 
 void RandomMatingModel::operator()( const ShellMatingEvent * e, Environment2 * env ) {
-    cout << "initiating random mating (" << e->getReceiveTime() << ")" << endl;
+//    cout << "initiating random mating (" << e->getReceiveTime() << ")" << endl;
     int nMales = env->getMaleCount();
 
     // get a random male by index
@@ -79,11 +82,18 @@ void RandomMatingModel::operator()( const ShellMatingEvent * e, Environment2 * e
     IndividualShell * female = e->getFirstPartner();
     IndividualShell * male = env->getMaleAt( rMale );
 
+    /*
+        cout << "Mating:\n\t";
+        female->print(cout);
+        cout << "\t";
+        male->print( cout );
+    */
     if( female && female->isAlive() ) {
         if( male && male->isAlive() ) {
             IndividualShell * offspring = env->nextAvailableIndividual();
 
             if( offspring ) {
+                //cout << "Offspring" << endl;
                 vector< genotype_t > genos;
 
                 generateOffspringGenotype( female, male, genos );
@@ -92,14 +102,18 @@ void RandomMatingModel::operator()( const ShellMatingEvent * e, Environment2 * e
                 sex_t s = ((rnd & 1 ) ? MALE : FEMALE);
                 rnd >>= 1;
 
-                IndividualProperties * ip = new IndividualProperties( s, genos );
+                IndividualProperties * ip = new IndividualProperties( female->getProperties(), male->getProperties(), s, genos );
                 ip->m_dob = dynamic_cast< IntVTime * > (e->getReceiveTime().clone() );
 
                 offspring->setProperties( ip );
-                offspring->initialize();
-
+                /*                cout << "Offspring:\t";
+                                offspring->print( cout );
+                */
                 female->addOffspring();
                 male->addOffspring();
+
+                Event * eBorn = new ShellBirthEvent( e->getReceiveTime(), *ip->m_dob, offspring, offspring );
+                offspring->receiveEvent( eBorn );
 
                 IntVTime mTime = dynamic_cast< const IntVTime & >(e->getReceiveTime() ) + 1;
                 Event * mE = new ShellMaturityEvent( e->getReceiveTime(), mTime, female, female );
@@ -180,15 +194,7 @@ void RandomMatingModel::generateOffspringGenotype( IndividualShell * female, Ind
 }
 
 bool RandomMatingModel::readyToMate( IntVTime & age, unsigned int offspring ) {
-    if( age >= 45 ) {
-        return false;
-    } else if( age >= 35 && age < 45 && offspring <= 1 ) {
-        return true;
-    } else if( age >= 21 && offspring <= 1 ) {
-        return true;
-    }
-
-    return false;
+    return (age < 45 && age >= 21 && offspring <= 3 );
 }
 
 RandomMatingModel::~RandomMatingModel() {

@@ -44,8 +44,8 @@ using std::endl;
 
 const string POOL_SIZE_K = "pool_size";
 
-Environment2::Environment2( const char * n, int max_size ) :
-    m_name( n ), m_max_pool_size( max_size ), m_pool_size(0) {
+Environment2::Environment2( const char * n, int max_size, const string & log ) :
+    m_name( n ), m_max_pool_size( max_size ), m_pool_size(0), m_logdir(log) {
 }
 /*
 Environment2::Environment2( const YAML::Node & n) : m_name( "ENV" ), m_max_pool_size( -1 ), m_pool_size( 0 ) {
@@ -82,17 +82,46 @@ Environment2::~Environment2() {
             delete shell;
         }
     */
+
+    if( m_logger.is_open() ) m_logger.close();
 }
 
 void Environment2::initialize() {
     // schedule first logging event?
     //
-    const IntVTime tmp = static_cast< const IntVTime & >( getSimulationTime() ) + 2;
-    Event * e = new LogEvent(getSimulationTime(), tmp, this, this );
-    this->receiveEvent( e );
+//    const IntVTime tmp = static_cast< const IntVTime & >( getSimulationTime() ) + 2;
+//    Event * e = new LogEvent(getSimulationTime(), tmp, this, this );
+//    this->receiveEvent( e );
+//
+    if( !m_logdir.empty() ) {
+        string log_file = m_logdir + "something.log";
+        m_logger.open( log_file );
+        if( !m_logger.is_open() )
+            abort();
+
+        m_logger << "Environment initialized at " << getSimulationTime() << "\n";
+    }
 }
 
-void Environment2::finalize() {}
+void Environment2::finalize() {
+    if( m_logger.is_open() ) {
+        m_logger << "Environment finalized at " << getSimulationTime() << "\n";
+
+        m_logger.flush();
+        m_logger.close();
+    }
+
+    if( !m_logdir.empty() ) {
+        string path = m_logdir + "final_environment.log";
+        m_logger.open( path );
+
+        if( m_logger.is_open() ) {
+            print( m_logger );
+            m_logger.flush();
+            m_logger.close();
+        }
+    }
+}
 
 void Environment2::executeProcess() {
     while( haveMoreEvents() ) {
@@ -142,15 +171,34 @@ void Environment2::addIndividual( IndividualShell * s ) {
 }
 
 void Environment2::removeIndividual( IndividualShell * s ) {
+    list< IndividualShell * > & l = m_unk;
+
     switch( s->getSex() ) {
     case FEMALE:
+        l = m_females;
         break;
     case MALE:
+        l = m_males;
         break;
     case UNK_SEX:
+        l = m_unk;
         break;
     default:
-        break;
+        return;
+    }
+
+    list< IndividualShell * >::iterator to_remove = l.begin();
+    while( to_remove != l.end() ) {
+        if( (*to_remove) == s ) {
+            break;
+        }
+        to_remove++;
+    }
+    if( to_remove != l.end() ) {
+        //cout << "Removing individual" << endl;
+        l.erase( to_remove );
+    } else {
+        cout << "Individual not found " << endl;
     }
 
     m_individual_pool.push( s );
@@ -184,14 +232,22 @@ int Environment2::getFemaleCount() const {
 
 IndividualShell * Environment2::getMaleAt( unsigned int idx ) const {
     if( idx < m_males.size() ) {
-        return m_males[ idx ];
+        list< IndividualShell * >::const_iterator it = m_males.begin();
+        unsigned int i = 0;
+        while( i++ < idx ) { it++; }
+
+        return *it;
     }
     return NULL;
 }
 
 IndividualShell * Environment2::getFemaleAt( unsigned int idx ) const {
     if( idx < m_females.size() ) {
-        return m_females[ idx ];
+        list< IndividualShell * >::const_iterator it = m_females.begin();
+        unsigned int i = 0;
+        while( i++ < idx ) { it++; }
+
+        return *it;
     }
     return NULL;
 }
@@ -200,15 +256,17 @@ void Environment2::print( ostream & out ) const {
     out << m_name << "\n";
     out << m_individual_pool.size() << " pooled individuals\n";
     out << m_females.size() << " females\n";
-    for( vector< IndividualShell * >::const_iterator it = m_females.begin(); it != m_females.end(); it++ ) {
+    for( list< IndividualShell * >::const_iterator it = m_females.begin(); it != m_females.end(); it++ ) {
         (*it)->print( out );
     }
 
-    for( vector< IndividualShell * >::const_iterator it = m_males.begin(); it != m_males.end(); it++ ) {
+    out << m_males.size() << " males\n";
+    for( list< IndividualShell * >::const_iterator it = m_males.begin(); it != m_males.end(); it++ ) {
         (*it)->print( out );
     }
 
-    for( vector< IndividualShell * >::const_iterator it = m_unk.begin(); it != m_unk.end(); it++ ) {
+    out << m_unk.size() << " unknown\n";
+    for( list< IndividualShell * >::const_iterator it = m_unk.begin(); it != m_unk.end(); it++ ) {
         (*it)->print( out );
     }
 }
