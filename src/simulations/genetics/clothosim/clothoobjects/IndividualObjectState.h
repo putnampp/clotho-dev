@@ -3,13 +3,13 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
+ * modification, are permitted provided that the following conditions are met:
  *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
+ *    and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -62,10 +62,16 @@ public:
         return sizeof(IndividualObjectState);
     }
 
-    sex_t   getSex() const { return m_sex; }
-    void    setSex( sex_t s) { m_sex = s; }
+    sex_t   getSex() const {
+        return m_sex;
+    }
+    void    setSex( sex_t s) {
+        m_sex = s;
+    }
 
-    const age_t &   getDOB() const { return *m_dob; }
+    const age_t &   getDOB() const {
+        return *m_dob;
+    }
     void            setDOB( const VTime & t ) {
         m_dob = t.clone();
     }
@@ -74,7 +80,9 @@ public:
 //        return m_genotypes->at( idx );
 //    }
 
-    phenotype_t getPhenotype() const { return m_phenotype; }
+    phenotype_t getPhenotype() const {
+        return m_phenotype;
+    }
 
     virtual ~IndividualObjectState() {
         delete m_dob;

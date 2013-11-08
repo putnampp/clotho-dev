@@ -3,13 +3,13 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
+ * modification, are permitted provided that the following conditions are met:
  *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
+ *    and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -98,28 +98,28 @@ public:
 
     virtual ~ClothoObjectCreator() {}
 protected:
-/*
-    int initializePopulation( const YAML::Node & n, Environment2 * env, shared_ptr< vector< SimulationObject * > > objs ) {
-        shared_ptr< vector< SimulationObject * > > pop_objs( new vector< SimulationObject *>() );
+    /*
+        int initializePopulation( const YAML::Node & n, Environment2 * env, shared_ptr< vector< SimulationObject * > > objs ) {
+            shared_ptr< vector< SimulationObject * > > pop_objs( new vector< SimulationObject *>() );
 
-        int allocated = 0;
-        if( n[ OBJECT_K ] ) {
-            string name = n[ OBJECT_K ].as<string>();
-            ClothoObjectManager< YAML::Node >::getInstance()->createObjectFrom( name, n[INIT_POP_K], pop_objs );
+            int allocated = 0;
+            if( n[ OBJECT_K ] ) {
+                string name = n[ OBJECT_K ].as<string>();
+                ClothoObjectManager< YAML::Node >::getInstance()->createObjectFrom( name, n[INIT_POP_K], pop_objs );
 
-            for( vector< SimulationObject * >::iterator it = pop_objs->begin(); it != pop_objs->end(); it++ ) {
-                IndividualShell * ishell = dynamic_cast< IndividualShell * >( *it );
-                if( ishell ) {
-                    env->addIndividual( ishell );
-                    objs->push_back( ishell );
-                    ++allocated;
+                for( vector< SimulationObject * >::iterator it = pop_objs->begin(); it != pop_objs->end(); it++ ) {
+                    IndividualShell * ishell = dynamic_cast< IndividualShell * >( *it );
+                    if( ishell ) {
+                        env->addIndividual( ishell );
+                        objs->push_back( ishell );
+                        ++allocated;
+                    }
                 }
             }
+            return allocated;
         }
-        return allocated;
-    }
-*/
-    
+    */
+
     const string m_name;
 };
 

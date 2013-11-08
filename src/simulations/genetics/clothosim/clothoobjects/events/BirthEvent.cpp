@@ -3,13 +3,13 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
+ * modification, are permitted provided that the following conditions are met:
  *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
+ *    and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -60,66 +60,66 @@ void Environment::handleEvent< BirthEvent >( const BirthEvent * bEvt ) {
 }
 
 BirthEvent::BirthEvent( const VTime & tSend, const VTime &tRecv,
-                 SimulationObject * sender, 
-                 SimulationObject * receiver,
-                sex_t s ) :
-                ClothoEvent( tSend, tRecv, sender, receiver ),
-                m_birth( tSend.clone() ),
-                m_sex( s ) {}
+                        SimulationObject * sender,
+                        SimulationObject * receiver,
+                        sex_t s ) :
+    ClothoEvent( tSend, tRecv, sender, receiver ),
+    m_birth( tSend.clone() ),
+    m_sex( s ) {}
 
 BirthEvent::BirthEvent( const VTime & tSend, const VTime &tRecv,
-                 SimulationObject * sender, 
-                 SimulationObject * receiver,
-                 sex_t sex,
-                 const VTime & tBirth) :
-                 ClothoEvent( tSend, tRecv, sender, receiver ),
-                 m_birth( tBirth.clone() ),
-                 m_sex( sex ) {}
+                        SimulationObject * sender,
+                        SimulationObject * receiver,
+                        sex_t sex,
+                        const VTime & tBirth) :
+    ClothoEvent( tSend, tRecv, sender, receiver ),
+    m_birth( tBirth.clone() ),
+    m_sex( sex ) {}
 
 BirthEvent::BirthEvent( const VTime & tSend, const VTime & tRecv,
-                 const ObjectID &sender, 
-                 const ObjectID & receiver,
-                 const unsigned int evtID,
-                 sex_t sex ) :
-                 ClothoEvent( tSend, tRecv, sender, receiver, evtID ),
-                 m_birth( tSend.clone() ),
-                 m_sex( sex ) {}
+                        const ObjectID &sender,
+                        const ObjectID & receiver,
+                        const unsigned int evtID,
+                        sex_t sex ) :
+    ClothoEvent( tSend, tRecv, sender, receiver, evtID ),
+    m_birth( tSend.clone() ),
+    m_sex( sex ) {}
 
 BirthEvent::BirthEvent( const VTime & tSend, const VTime &tRecv,
-                 const ObjectID &sender, 
-                 const ObjectID & receiver,
-                 const unsigned int evtID,
-                 sex_t sex,
-                 const VTime & tBirth ) :
-                 ClothoEvent( tSend, tRecv, sender, receiver, evtID ),
-                 m_birth( tBirth.clone() ),
-                 m_sex( sex ) {}
+                        const ObjectID &sender,
+                        const ObjectID & receiver,
+                        const unsigned int evtID,
+                        sex_t sex,
+                        const VTime & tBirth ) :
+    ClothoEvent( tSend, tRecv, sender, receiver, evtID ),
+    m_birth( tBirth.clone() ),
+    m_sex( sex ) {}
 
 BirthEvent::BirthEvent( const VTime & tSend, const VTime & tRecv,
-                 const ObjectID &sender, 
-                 const ObjectID & receiver,
-                 const EventId & evtID,
-                 sex_t sex ) :
-                 ClothoEvent( tSend, tRecv, sender, receiver, evtID ),
-                 m_birth( tSend.clone() ),
-                 m_sex( sex ) {}
+                        const ObjectID &sender,
+                        const ObjectID & receiver,
+                        const EventId & evtID,
+                        sex_t sex ) :
+    ClothoEvent( tSend, tRecv, sender, receiver, evtID ),
+    m_birth( tSend.clone() ),
+    m_sex( sex ) {}
 
 BirthEvent::BirthEvent( const VTime & tSend, const VTime &tRecv,
-                 const ObjectID &sender, 
-                 const ObjectID & receiver,
-                 const EventId & evtID,
-                 sex_t sex,
-                 const VTime & tBirth ) :
-                 ClothoEvent( tSend, tRecv, sender, receiver, evtID ),
-                 m_birth( tBirth.clone() ),
-                 m_sex( sex ) {}
+                        const ObjectID &sender,
+                        const ObjectID & receiver,
+                        const EventId & evtID,
+                        sex_t sex,
+                        const VTime & tBirth ) :
+    ClothoEvent( tSend, tRecv, sender, receiver, evtID ),
+    m_birth( tBirth.clone() ),
+    m_sex( sex ) {}
 
 BirthEvent::BirthEvent( const BirthEvent & ce ) :
-                 ClothoEvent( ce.getSendTime(), ce.getReceiveTime(),
-                                ce.getSender(), ce.getReceiver(),
-                                ce.getEventId() ),
-                 m_birth( ce.getBirthTime().clone() ),
-                 m_sex( ce.m_sex) {}
+    ClothoEvent( ce.getSendTime(), ce.getReceiveTime(),
+                 ce.getSender(), ce.getReceiver(),
+                 ce.getEventId() ),
+    m_birth( ce.getBirthTime().clone() ),
+    m_sex( ce.m_sex) {}
 
 sex_t BirthEvent::getSex() const {
     return m_sex;

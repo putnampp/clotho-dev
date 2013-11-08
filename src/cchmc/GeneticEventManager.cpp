@@ -3,13 +3,13 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
+ * modification, are permitted provided that the following conditions are met:
  *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
+ *    and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -47,7 +47,8 @@
 
 enum EncodingFormat { efSUBSTITUTION1 = 0, efSUBSTITUTION2 = 1, efSUBSTITUTION3 = 2, efSUBSTITUTION4 = 3,
                       efINSERT1 = 4, efINSERT2 = 5, efINSERT3 = 6, efINSERT4 = 7,
-                      efDELETION = 8, efINDEX = 15 };
+                      efDELETION = 8, efINDEX = 15
+                    };
 
 inline ge_id_t encodeImmediate( const GeneticEvent * ge, EncodingFormat ef ) {
     assert( (ge->getStart() & POS_OVERFLOW) == 0);
@@ -63,12 +64,12 @@ inline ge_id_t encodeImmediate( const GeneticEvent * ge, EncodingFormat ef ) {
         ge->allele( p, all );
         id.bytes[offset++] = all;
     }
-    return id;  
+    return id;
 }
 
 inline ge_id_t encodeDeletion(pos_t start, pos_t end ) {
     assert( (start & POS_OVERFLOW) == 0 );
-    
+
     ge_id_t id;
     id.format_pos = start;
     id.data = end;
@@ -80,7 +81,7 @@ inline ge_id_t encodeIndex( index_t idx ) {
 
     ge_id_t id;
     id.id = addFormat( idx, efINDEX );
-    
+
     return id;
 }
 

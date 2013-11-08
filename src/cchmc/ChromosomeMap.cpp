@@ -3,13 +3,13 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
+ * modification, are permitted provided that the following conditions are met:
  *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
+ *    and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -37,7 +37,7 @@ size_t ChromosomeMap::size() const {
 
 chromid_t   ChromosomeMap::find( const string & name, bool bCreateMissing ) {
     chromid_t id = UNKNOWN_CHROM;
-    
+
     Chromosomes::iterator it = m_chroms.find(name);
 
     if( it != m_chroms.end() ) {
@@ -77,8 +77,12 @@ ChromosomePtr ChromosomeMap::find( chromid_t id ) {
     return p;
 }
 
-ChromosomeMap::ChromosomesIter ChromosomeMap::begin() const { return m_chroms.begin(); }
-ChromosomeMap::ChromosomesIter ChromosomeMap::end() const { return m_chroms.end(); }
+ChromosomeMap::ChromosomesIter ChromosomeMap::begin() const {
+    return m_chroms.begin();
+}
+ChromosomeMap::ChromosomesIter ChromosomeMap::end() const {
+    return m_chroms.end();
+}
 
 ChromosomeMap::~ChromosomeMap() {
     m_chroms.clear();

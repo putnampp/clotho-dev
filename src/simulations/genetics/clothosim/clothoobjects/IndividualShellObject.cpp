@@ -3,13 +3,13 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
+ * modification, are permitted provided that the following conditions are met:
  *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
+ *    and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -101,7 +101,7 @@ void IndividualShell::executeProcess() {
             const ModelHandler< IndividualShell > * evt = dynamic_cast< const ModelHandler< IndividualShell > * >(e);
             if( evt ) {
                 evt->updateModels( this );
-            } 
+            }
             const ModelHandler< ClothoObject > * e2 = dynamic_cast< const ModelHandler< ClothoObject > * >( e );
             if( e2 ) {
                 e2->updateModels( this );
@@ -147,6 +147,10 @@ void IndividualShell::setProperties( IndividualProperties * prop ) {
 
 void IndividualShell::addOffspring() {
     m_prop->m_offspring++;
+}
+
+unsigned int IndividualShell::getOffspringCount() const {
+    return m_prop->m_offspring;
 }
 
 unsigned int IndividualShell::getVariantCount() const {

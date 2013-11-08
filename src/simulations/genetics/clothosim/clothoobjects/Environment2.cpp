@@ -3,13 +3,13 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
+ * modification, are permitted provided that the following conditions are met:
  *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
+ *    and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -44,11 +44,11 @@ using std::endl;
 
 const string POOL_SIZE_K = "pool_size";
 
-Environment2::Environment2( const char * n, int max_size ) : 
+Environment2::Environment2( const char * n, int max_size ) :
     m_name( n ), m_max_pool_size( max_size ), m_pool_size(0) {
 }
 /*
-Environment2::Environment2( const YAML::Node & n) : m_name( "ENV" ), m_max_pool_size( -1 ), m_pool_size( 0 ) { 
+Environment2::Environment2( const YAML::Node & n) : m_name( "ENV" ), m_max_pool_size( -1 ), m_pool_size( 0 ) {
     if( n[ POOL_SIZE_K ] ) {
         m_max_pool_size = n[ POOL_SIZE_K ].as< int >();
     }
@@ -59,29 +59,29 @@ Environment2::Environment2( const YAML::Node & n) : m_name( "ENV" ), m_max_pool_
 */
 
 Environment2::~Environment2() {
-/*
- * Because IndividualShells are SimulationObjects
- * their clean up may be handled by the simulation manager
- * may be sufficient to just clear the vectors and queue
-    for( vector< IndividualShell * >::iterator it = m_females.begin(); it != m_females.end(); ) {
-        IndividualShell * shell = (*it++);
-        delete shell;
-    }
-    for( vector< IndividualShell * >::iterator it = m_males.begin(); it != m_males.end(); ) {
-        IndividualShell * shell = (*it++);
-        delete shell;
-    }
-    for( vector< IndividualShell * >::iterator it = m_unk.begin(); it != m_unk.end(); it ) {
-        IndividualShell * shell = (*it++);
-        delete shell;
-    }
+    /*
+     * Because IndividualShells are SimulationObjects
+     * their clean up may be handled by the simulation manager
+     * may be sufficient to just clear the vectors and queue
+        for( vector< IndividualShell * >::iterator it = m_females.begin(); it != m_females.end(); ) {
+            IndividualShell * shell = (*it++);
+            delete shell;
+        }
+        for( vector< IndividualShell * >::iterator it = m_males.begin(); it != m_males.end(); ) {
+            IndividualShell * shell = (*it++);
+            delete shell;
+        }
+        for( vector< IndividualShell * >::iterator it = m_unk.begin(); it != m_unk.end(); it ) {
+            IndividualShell * shell = (*it++);
+            delete shell;
+        }
 
-    while(! m_individual_pool.empty()) {
-        IndividualShell * shell = m_individual_pool.front();
-        m_individual_pool.pop();
-        delete shell;
-    }
-*/
+        while(! m_individual_pool.empty()) {
+            IndividualShell * shell = m_individual_pool.front();
+            m_individual_pool.pop();
+            delete shell;
+        }
+    */
 }
 
 void Environment2::initialize() {
@@ -94,14 +94,14 @@ void Environment2::initialize() {
 
 void Environment2::finalize() {}
 
-void Environment2::executeProcess(){
+void Environment2::executeProcess() {
     while( haveMoreEvents() ) {
         const Event * evt = getEvent();
 
         const ModelHandler< Environment2 > * e = dynamic_cast< const ModelHandler< Environment2 > * >( evt );
         if( e ) {
             e->updateModels( this );
-        } 
+        }
         const ModelHandler< ClothoObject > * e2 = dynamic_cast< const ModelHandler< ClothoObject > * > (evt );
         if( e2 ) {
             e2->updateModels( this );

@@ -3,13 +3,13 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
+ * modification, are permitted provided that the following conditions are met:
  *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
+ *    and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -53,26 +53,26 @@ void Environment::handleEvent< DeathEvent >( const DeathEvent * e ) {
 }
 
 DeathEvent::DeathEvent( const VTime & tSend, const VTime &tRecv,
-                 SimulationObject * sender, 
-                 SimulationObject * receiver ) :
-                 ClothoEvent( tSend, tRecv, sender, receiver ) {}
+                        SimulationObject * sender,
+                        SimulationObject * receiver ) :
+    ClothoEvent( tSend, tRecv, sender, receiver ) {}
 
 DeathEvent::DeathEvent( const VTime & tSend, const VTime & tRecv,
-                 const ObjectID &sender, 
-                 const ObjectID & receiver,
-                 const unsigned int evtID ) :
-                 ClothoEvent( tSend, tRecv, sender, receiver, evtID ) {}
+                        const ObjectID &sender,
+                        const ObjectID & receiver,
+                        const unsigned int evtID ) :
+    ClothoEvent( tSend, tRecv, sender, receiver, evtID ) {}
 
 DeathEvent::DeathEvent( const VTime & tSend, const VTime & tRecv,
-                 const ObjectID &sender, 
-                 const ObjectID & receiver,
-                 const EventId & evtID ) :
-                 ClothoEvent( tSend, tRecv, sender, receiver, evtID ) {}
+                        const ObjectID &sender,
+                        const ObjectID & receiver,
+                        const EventId & evtID ) :
+    ClothoEvent( tSend, tRecv, sender, receiver, evtID ) {}
 
 DeathEvent::DeathEvent( const DeathEvent & ce ) :
-                 ClothoEvent( ce.getSendTime(), ce.getReceiveTime(),
-                                ce.getSender(), ce.getReceiver(),
-                                ce.getEventId() ) {}
+    ClothoEvent( ce.getSendTime(), ce.getReceiveTime(),
+                 ce.getSender(), ce.getReceiver(),
+                 ce.getEventId() ) {}
 
 
 bool DeathEvent::eventCompare( const Event * evt ) {

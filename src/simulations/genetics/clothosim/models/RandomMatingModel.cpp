@@ -3,13 +3,13 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
+ * modification, are permitted provided that the following conditions are met:
  *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
+ *    and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -32,10 +32,12 @@
 
 #include <time.h>
 
+#include <cmath>
+
 using std::cout;
 using std::endl;
 
-RandomMatingModel::RandomMatingModel() : m_rng( gsl_rng_alloc( gsl_rng_taus ) ){
+RandomMatingModel::RandomMatingModel() : m_rng( gsl_rng_alloc( gsl_rng_taus ) ) {
     long seed = time(NULL);
     gsl_rng_set( m_rng, seed );
 }
@@ -44,104 +46,149 @@ void RandomMatingModel::operator()( const ShellMaturityEvent * e, IndividualShel
     if( ind->getSex() == FEMALE ) {
         // females notifies environment when ready to mate
         //
-        cout << "female reached age of maturity (" << e->getReceiveTime() << ")"  << endl;
-        Environment2 * env = ind->getEnvironment();
-        IntVTime when = dynamic_cast< const IntVTime & >( e->getReceiveTime() ) + 5;
-        Event * evt = new ShellMatingEvent( e->getReceiveTime(), when, ind, env, ind );
+        IntVTime date = dynamic_cast< const IntVTime & >( e->getReceiveTime() );
+        IntVTime age = date - *ind->getBirthTime();
+        unsigned int nOffspring = ind->getOffspringCount();
 
-        env->receiveEvent( evt );
+        cout << "female ready to mate at age " << age << " (" << e->getReceiveTime() << ")"  << endl;
+
+        // given age will she mate againt and produce offspring?
+        if( readyToMate( age, nOffspring ) ) {
+            Environment2 * env = ind->getEnvironment();
+            Event * evt = new ShellMatingEvent( e->getReceiveTime(), date, ind, env, ind );
+            env->receiveEvent( evt );
+        } else if( age < 45 ) {
+            // wait a bit and try again
+            unsigned int rnd = gsl_rng_get( m_rng );
+
+            IntVTime delay = date + (rnd % 3 ); // try again some time with in the next 3 years
+            Event * evt = new ShellMaturityEvent( e->getReceiveTime(), delay, ind, ind );
+            ind->receiveEvent( evt );
+        }
+
     }
 }
 
 void RandomMatingModel::operator()( const ShellMatingEvent * e, Environment2 * env ) {
     cout << "initiating random mating (" << e->getReceiveTime() << ")" << endl;
     int nMales = env->getMaleCount();
-   
-    // get a random male by index 
+
+    // get a random male by index
     unsigned int rMale = gsl_rng_get( m_rng ) % nMales;
 
     IndividualShell * female = e->getFirstPartner();
     IndividualShell * male = env->getMaleAt( rMale );
 
-    if( female && female->isAlive() && male && male->isAlive() ) {
-        IndividualShell * offspring = env->nextAvailableIndividual();
+    if( female && female->isAlive() ) {
+        if( male && male->isAlive() ) {
+            IndividualShell * offspring = env->nextAvailableIndividual();
 
-        if( offspring ) {
-            unsigned int max_genos = female->getVariantCount();
-            unsigned int rnd = gsl_rng_get( m_rng );
+            if( offspring ) {
+                vector< genotype_t > genos;
 
-            vector< genotype_t > genos;
-            genos.reserve( max_genos );
+                generateOffspringGenotype( female, male, genos );
 
-            vector< allele_t > alleles;
-            alleles.reserve( genotype_t::PLOIDY );
-
-            assert( genotype_t::PLOIDY == 2 );
-            int j = 1, max_j = (sizeof( unsigned int ) << 3);   // max_j = 4 * 8 = 32
-            for( unsigned int i = 0; i < max_genos; ++i ) {
-                alleles.clear();
-                if( j >= max_j ) {
-                    rnd = gsl_rng_get( m_rng );
-                    j = 1;
-                }
-
-                // routine only works if ploidy == 2
-                alleles.push_back( female->alleleAt( i, (rnd & 1)) );
-                rnd >>= 1;
-                alleles.push_back( male->alleleAt( i, (rnd & 1)) );
+                unsigned int rnd = gsl_rng_get( m_rng );
+                sex_t s = ((rnd & 1 ) ? MALE : FEMALE);
                 rnd >>= 1;
 
-                j += 2;
+                IndividualProperties * ip = new IndividualProperties( s, genos );
+                ip->m_dob = dynamic_cast< IntVTime * > (e->getReceiveTime().clone() );
 
-                genotype_t g(alleles);
-                genos.push_back(g);
-                /* // more general outline. Note that it assumes a parent allele
-                   // can serve as the variant source multiple times.
-                max_j = floor(log( 2^32, genotypes_t::PLOIDY ));
-                unsigned int from_male = genotypes_t::PLOIDY / 2;
-                rnd /= genotypes_t::PLOIDY;
-                for( unsigned int k = 0; k < from_male; ++k ) {
-                    if( j >= max_j) {
-                        rnd = gsl_rng_get( m_rng );
-                        j = 1;
-                    }
-                    next_allele = rnd % genotype_t::PLOIDY;
-                    rnd /= genotype_t::PLOIDY;
-                    alleles.push_back( male->alleleAt( i, next_allele ) );
-                    ++j;
-                }
-                for( ; from_male < genotype_t::PLOIDY; ++from_male ) {
-                    if( j >= max_j) {
-                        rnd = gsl_rng_get( m_rng );
-                        j = 1;
-                    }
-                    next_allele = rnd % genotype_t::PLOIDY;
-                    rnd /= genotype_t::PLOIDY;
-                    alleles.push_back( female->alleleAt( i, next_allele ) );
-                    ++j;
-                }
-                */
+                offspring->setProperties( ip );
+                offspring->initialize();
+
+                female->addOffspring();
+                male->addOffspring();
+
+                IntVTime mTime = dynamic_cast< const IntVTime & >(e->getReceiveTime() ) + 1;
+                Event * mE = new ShellMaturityEvent( e->getReceiveTime(), mTime, female, female );
+
+                female->receiveEvent( mE );
+
+                genos.clear();
             }
-
-            if( j >= max_j ) {
-                rnd = gsl_rng_get( m_rng );
-            }
-            sex_t s = ((rnd & 1 ) ? MALE : FEMALE);
-            
-            IndividualProperties * ip = new IndividualProperties( s, genos );
-            ip->m_dob = dynamic_cast< IntVTime * > (e->getReceiveTime().clone() );
-
-            offspring->setProperties( ip );
-            offspring->initialize();
-
-            female->addOffspring();
-            male->addOffspring();
         }
     }
 }
 
 void RandomMatingModel::dump( ostream & out ) {
 
+}
+
+void RandomMatingModel::generateOffspringGenotype( IndividualShell * female, IndividualShell * male, vector< genotype_t > & genos ) {
+    unsigned int max_genos = female->getVariantCount();
+
+    genos.reserve( max_genos );
+
+    vector< allele_t > alleles(genotype_t::PLOIDY, (allele_t)0 );
+
+    if( genotype_t::PLOIDY == 2 ) {
+        unsigned int rnd = gsl_rng_get( m_rng );
+        int j = 1, max_j = (sizeof( unsigned int ) << 3);   // max_j = 4 * 8 = 32
+        for( unsigned int i = 0; i < max_genos; ++i ) {
+            if( j >= max_j ) {
+                rnd = gsl_rng_get( m_rng );
+                j = 1;
+            }
+
+            // routine only works if ploidy == 2
+            alleles[0] = female->alleleAt( i, (rnd & 1));
+            rnd >>= 1;
+            alleles[1] = male->alleleAt( i, (rnd & 1));
+            rnd >>= 1;
+
+            j += 2;
+
+            genotype_t g(alleles);
+            genos.push_back(g);
+        }
+    } else {
+        // more general outline. Note that it assumes a parent allele
+        // can serve as the variant source multiple times.
+        const unsigned int MAX = 0xFFFFFFFF;
+        unsigned int rnd = gsl_rng_get( m_rng );
+        unsigned int j = 1, max_j = floor(log( (double) MAX ) / log( (double)genotype_t::PLOIDY) );
+        unsigned int from_male = genotype_t::PLOIDY / 2;
+        ploidy_t next_chromosome;
+
+        for( unsigned int i = 0; i < max_genos; ++i ) {
+            for( unsigned int k = 0; k < from_male; ++k ) {
+                if( j >= max_j) {
+                    rnd = gsl_rng_get( m_rng );
+                    j = 1;
+                }
+                next_chromosome = rnd % genotype_t::PLOIDY;
+                rnd /= genotype_t::PLOIDY;
+                alleles[ k ] = male->alleleAt( i, next_chromosome );
+                ++j;
+            }
+            for( unsigned int k = from_male; k < genotype_t::PLOIDY; ++k ) {
+                if( j >= max_j) {
+                    rnd = gsl_rng_get( m_rng );
+                    j = 1;
+                }
+                next_chromosome = rnd % genotype_t::PLOIDY;
+                rnd /= genotype_t::PLOIDY;
+                alleles[k] = female->alleleAt( i, next_chromosome );
+                ++j;
+            }
+            genotype_t g( alleles );
+            genos.push_back(g);
+        }
+    }
+}
+
+bool RandomMatingModel::readyToMate( IntVTime & age, unsigned int offspring ) {
+    if( age >= 45 ) {
+        return false;
+    } else if( age >= 35 && age < 45 && offspring <= 1 ) {
+        return true;
+    } else if( age >= 21 && offspring <= 1 ) {
+        return true;
+    }
+
+    return false;
 }
 
 RandomMatingModel::~RandomMatingModel() {

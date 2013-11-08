@@ -3,13 +3,13 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
+ * modification, are permitted provided that the following conditions are met:
  *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
+ *    and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -102,15 +102,18 @@ bool GenomeFactory::addChromosomeSite( chromid_t c, pos_t pos, bool bByIndex ) {
 
 ChromosomePtr GenomeFactory::getChromosomeByID( chromid_t c ) const {
     ChromosomeIter it = m_chroms.find( c );
-    return ((it == m_chroms.end() ) ? 
-                NULL_CHROMOSOME : it->second);
+    return ((it == m_chroms.end() ) ?
+            NULL_CHROMOSOME : it->second);
 }
 
 ChromosomePtr GenomeFactory::getChromosomeByIndex( size_t idx ) const {
     ChromosomePtr p = NULL_CHROMOSOME;
     if( idx < m_chroms.size() ) {
         ChromosomeIter it = m_chroms.begin();
-        while ( idx > 0 && it != m_chroms.end() ) { it++; --idx; }
+        while ( idx > 0 && it != m_chroms.end() ) {
+            it++;
+            --idx;
+        }
         p = it->second;
     }
     return p;

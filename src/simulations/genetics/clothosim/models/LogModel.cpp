@@ -3,13 +3,13 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
+ * modification, are permitted provided that the following conditions are met:
  *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
+ *    and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -35,7 +35,7 @@
 using std::cout;
 using std::endl;
 
-LogModel::LogModel( const string & dirpath, int step) : 
+LogModel::LogModel( const string & dirpath, int step) :
     m_cur_period(NULL), m_log_dir( dirpath ), m_step( step ) {}
 
 LogModel::~LogModel() {
@@ -47,7 +47,7 @@ LogModel::~LogModel() {
 void LogModel::operator()( const LogEvent * e, ClothoObject * obj ) {
     const IntVTime & tmpTime = static_cast< const IntVTime &>( e->getReceiveTime() );
     if( m_cur_period == NULL ||
-        *m_cur_period != tmpTime ) {
+            *m_cur_period != tmpTime ) {
         m_cur_period = dynamic_cast< IntVTime * >( tmpTime.clone() );
 
         if( m_logger.is_open() )    m_logger.close();
