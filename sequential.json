@@ -2,7 +2,6 @@
 "DEBUG" : true,
 "Simulation" : "Sequential",
 "EventList":  {
-    "Type" : "SplayTree",
-    "Organization" : "Decentralized"
+    "Type" : "SplayTree"
 }
 }

@@ -40,24 +40,29 @@ DEFINE_REGISTERED_CLOTHO_EVENT( ShellBirthEvent )
 
 template<>
 void IndividualShell::handleEvent< ShellBirthEvent >( const ShellBirthEvent * e ) {
-    m_prop->m_dob = dynamic_cast< IntVTime * >(e->getBirthTime()->clone());
+//    cout << "Born" << endl;
+    if( m_prop )
+        m_prop->m_dob = dynamic_cast< IntVTime * >(e->getBirthTime()->clone());
 
-    Event * evt = new ShellBirthEvent( getSimulationTime(), *e->getBirthTime(), this, m_environment );
+    m_environment->addIndividual( this );
 
-    m_environment->receiveEvent( evt );
+//    Event * evt = new ShellBirthEvent( getSimulationTime(), *e->getBirthTime(), this, m_environment );
+//    m_environment->receiveEvent( evt );
 }
 
 template<>
 void Environment2::handleEvent< ShellBirthEvent >( const ShellBirthEvent * e ) {
-    IndividualShell * ishell = dynamic_cast< IndividualShell * >( getObjectHandle( &e->getSender() ) );
+//    IndividualShell * ishell = dynamic_cast< IndividualShell * >( getObjectHandle( &e->getSender() ) );
 
-    if( ishell ) {
-        addIndividual( ishell );
+//    if( ishell ) {
+//        addIndividual( ishell );
+/*
         if( m_logger.is_open() ) {
             m_logger << "(" << getSimulationTime() << ")-";
             ishell->print( m_logger );
         }
-    }
+*/
+//    }
 }
 
 ShellBirthEvent::ShellBirthEvent( const VTime & tSend, const VTime &tRecv,

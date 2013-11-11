@@ -34,18 +34,31 @@
 #include <cstdlib>
 
 using std::cerr;
+using std::cout;
 using std::endl;
+
+#include "IntVTime.h"
 
 int main( int argc, char ** argv ) {
 
-    if( argc != 3 ) {
-        cerr << "Expected Usage: WarpedClotho <warped_config_file> <clotho_config_file>" << endl;
+    if( argc != 3 && argc != 4 ) {
+        cerr << "Expected Usage: WarpedClotho <warped_config_file> <clotho_config_file> (simulateUntil)" << endl;
         return EXIT_FAILURE;
     }
 
     string warped_config( argv[1] );
     string clotho_config( argv[2] );
+    string sim_until("");
+    if( argc == 4 ) {
+        sim_until = argv[3];
+    }
 
-    WarpedMain wm( new ClothoApplication(clotho_config), warped_config);
+    ClothoApplication * ca = new ClothoApplication( clotho_config );
+
+    const VTime & t = ca->getTime( sim_until );
+
+    cout << t << endl;
+    
+    WarpedMain wm( ca, warped_config, sim_until);
     return wm.main( argc, argv );
 }

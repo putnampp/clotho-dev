@@ -76,6 +76,8 @@ void RandomMatingModel::operator()( const ShellMatingEvent * e, Environment2 * e
 //    cout << "initiating random mating (" << e->getReceiveTime() << ")" << endl;
     int nMales = env->getMaleCount();
 
+    //cout << "(" << e->getReceiveTime() << ")-Male count: " << nMales << "\n";
+
     // get a random male by index
     unsigned int rMale = gsl_rng_get( m_rng ) % nMales;
 

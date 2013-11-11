@@ -6,9 +6,9 @@
  * modification, are permitted provided that the following conditions are met:
  *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer.
+ *    vector of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
+ *    this vector of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -38,7 +38,9 @@
 #include <boost/lexical_cast.hpp>
 
 #include <iostream>
+#include <utility>
 
+using std::swap;
 using std::cout;
 using std::endl;
 
@@ -148,6 +150,8 @@ const string & Environment2::getName() const {
 }
 
 void Environment2::addIndividual( IndividualShell * s ) {
+    if( !s ) return;
+
     if( m_max_pool_size > -1 ) {
         // bounded pool
         if( m_pool_size >= m_max_pool_size ) return;
@@ -155,9 +159,13 @@ void Environment2::addIndividual( IndividualShell * s ) {
 
     switch( s->getSex() ) {
     case FEMALE:
+//    cout << "Adding Individual: ";
+//    s->print(cout);
         m_females.push_back(s);
         break;
     case MALE:
+//    cout << "Adding Individual: ";
+//    s->print(cout);
         m_males.push_back( s );
         break;
     case UNK_SEX:
@@ -171,37 +179,73 @@ void Environment2::addIndividual( IndividualShell * s ) {
 }
 
 void Environment2::removeIndividual( IndividualShell * s ) {
-    list< IndividualShell * > & l = m_unk;
+    if( !s ) return;
+
+    vector< IndividualShell * > * l =  &m_unk;
 
     switch( s->getSex() ) {
     case FEMALE:
-        l = m_females;
+        l = &m_females;
         break;
     case MALE:
-        l = m_males;
+        l = &m_males;
         break;
     case UNK_SEX:
-        l = m_unk;
+        l = &m_unk;
         break;
     default:
+        cout << "ERRRORORORROR\n";
         return;
     }
 
-    list< IndividualShell * >::iterator to_remove = l.begin();
-    while( to_remove != l.end() ) {
-        if( (*to_remove) == s ) {
+//    cout << "list size: " << l->size() << "\n";
+    bool bFound = false;
+    size_t pos = 0;
+    while( pos < l->size() ) {
+        if( (*l)[pos] == s ) {
+            bFound = true;
+            if( pos < l->size() - 1 ) {
+/*
+                cout << "Swapping:\n\t";
+                (*l)[pos]->print(cout);
+                cout << "\t";
+                l->back()->print(cout);
+*/               
+                swap( (*l)[pos], l->back() );
+/*
+                cout << "Swapped:\n\t";
+                (*l)[pos]->print(cout);
+                cout << "\t";
+                l->back()->print(cout);
+*/
+            }
+
+            if( l->back() != s ) {
+                cout << "Individual not at back" << endl;
+            }
+            l->pop_back();
+/*
+            cout << "New back: ";
+            l->back()->print(cout );
+            cout << "(" << getSimulationTime() << ")-Removed: ";
+            s->print( cout );
+
+            cout << "new list size: " << l->size() << "\n";
+*/
             break;
         }
-        to_remove++;
+        ++pos;
     }
-    if( to_remove != l.end() ) {
-        //cout << "Removing individual" << endl;
-        l.erase( to_remove );
-    } else {
-        cout << "Individual not found " << endl;
+
+    if(! bFound ) {
+        cout << "Individual not found" << endl;
     }
 
     m_individual_pool.push( s );
+    if( m_logger.is_open() ) {
+        m_logger << "(" << getSimulationTime() << ")-";
+        s->print( m_logger );
+    }
 }
 
 IndividualShell * Environment2::nextAvailableIndividual() {
@@ -212,11 +256,12 @@ IndividualShell * Environment2::nextAvailableIndividual() {
         t = m_individual_pool.front();
         m_individual_pool.pop();
         --m_pool_size;
-    } else if( m_max_pool_size == -1 || m_pool_size < m_max_pool_size) {
+/*    } else if( m_max_pool_size == -1 || m_pool_size < m_max_pool_size) {
         // there are no available Individuals but there is no limit
         // on pool size;
         // therefore create a new one
-        t = new IndividualShell( this, new IndividualProperties() );
+        cout << "Generating a new individual" << endl;
+        t = new IndividualShell( this, new IndividualProperties() );*/
     } // else individual pool has been maxed out; consider terminating
 
     return t;
@@ -232,22 +277,14 @@ int Environment2::getFemaleCount() const {
 
 IndividualShell * Environment2::getMaleAt( unsigned int idx ) const {
     if( idx < m_males.size() ) {
-        list< IndividualShell * >::const_iterator it = m_males.begin();
-        unsigned int i = 0;
-        while( i++ < idx ) { it++; }
-
-        return *it;
+        return m_males[idx];
     }
     return NULL;
 }
 
 IndividualShell * Environment2::getFemaleAt( unsigned int idx ) const {
     if( idx < m_females.size() ) {
-        list< IndividualShell * >::const_iterator it = m_females.begin();
-        unsigned int i = 0;
-        while( i++ < idx ) { it++; }
-
-        return *it;
+        return m_females[idx];
     }
     return NULL;
 }
@@ -256,17 +293,17 @@ void Environment2::print( ostream & out ) const {
     out << m_name << "\n";
     out << m_individual_pool.size() << " pooled individuals\n";
     out << m_females.size() << " females\n";
-    for( list< IndividualShell * >::const_iterator it = m_females.begin(); it != m_females.end(); it++ ) {
+    for( vector< IndividualShell * >::const_iterator it = m_females.begin(); it != m_females.end(); it++ ) {
         (*it)->print( out );
     }
 
     out << m_males.size() << " males\n";
-    for( list< IndividualShell * >::const_iterator it = m_males.begin(); it != m_males.end(); it++ ) {
+    for( vector< IndividualShell * >::const_iterator it = m_males.begin(); it != m_males.end(); it++ ) {
         (*it)->print( out );
     }
 
     out << m_unk.size() << " unknown\n";
-    for( list< IndividualShell * >::const_iterator it = m_unk.begin(); it != m_unk.end(); it++ ) {
+    for( vector< IndividualShell * >::const_iterator it = m_unk.begin(); it != m_unk.end(); it++ ) {
         (*it)->print( out );
     }
 }

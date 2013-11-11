@@ -42,7 +42,8 @@ DEFINE_REGISTERED_CLOTHO_EVENT( ShellMaturityEvent )
 template<>
 void IndividualShell::handleEvent< ShellMaturityEvent >( const ShellMaturityEvent * e ) {
 //    cout << "Individual reached maturity at " << e->getReceiveTime() << " (" << getSimulationTime() << ")" << endl;
-    m_prop->m_isMature = true;
+    if( m_prop )
+        m_prop->m_isMature = true;
 }
 
 ShellMaturityEvent::ShellMaturityEvent( const VTime & tSend, const VTime &tRecv,

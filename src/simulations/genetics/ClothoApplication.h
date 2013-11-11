@@ -33,12 +33,11 @@
 #include "common.h"
 #include "Application.h"
 #include "SimulationConfiguration.h"
+#include "IntVTime.h"
 
 class ClothoApplication : public Application {
 public:
     ClothoApplication( const string & config );
-    //virtual int initialize( vector< string > & args );
-//    virtual void configure( SimulationConfiguration & config );
     virtual int finalize( );
 
     virtual const PartitionInfo * getPartitionInfo( unsigned int nPE );
@@ -51,8 +50,12 @@ public:
     virtual const VTime & getPositiveInfinity();
     virtual const VTime & getZero();
     virtual const VTime & getTime( string & );
+
+    virtual ~ClothoApplication();
 protected:
     string  m_config;
+
+    IntVTime * m_time;
 };
 
 #endif  // CLOTHOAPPLICATION_H_

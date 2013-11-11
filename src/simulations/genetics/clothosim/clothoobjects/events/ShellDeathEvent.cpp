@@ -50,21 +50,35 @@ DEFINE_REGISTERED_CLOTHO_EVENT( ShellDeathEvent )
  * By spawning events, if there are any models which are listening for
  * such events are notified though. Although those models could just as easily
  * be modified to listen for the IndividualShell + ShellBirthEvent, rather than
- * Environment2 + ShellBirthEvent
+ * Environment2 + ShellBirthEvent. However, this creates a race condition as
+ * an Individual may be dead, but the environment has not be notified of the 
+ * death. Therefore, a mating event may occur which requests the individual from
+ * the environment. But because the individual is dead, the mating fails
  *
  */
 
 template<>
 void IndividualShell::handleEvent< ShellDeathEvent >( const ShellDeathEvent * e ) {
-    m_prop->m_eol = dynamic_cast< IntVTime * >( e->getReceiveTime().clone() );
-    Event * de = new ShellDeathEvent( e->getSendTime() , e->getReceiveTime(), this, m_environment );
+//    cout << "Died" << endl;
+    if( m_prop )
+        m_prop->m_eol = dynamic_cast< IntVTime * >( e->getReceiveTime().clone() );
+/*    Event * de = new ShellDeathEvent( e->getSendTime() , e->getReceiveTime(), this, m_environment );
 
     m_environment->receiveEvent( de );
+*/
+    //cout << "(" << getSimulationTime() << ")-" << e->getReceiveTime();
+    m_environment->removeIndividual( this );
+
+/*    if( m_logger.is_open() ) {
+        m_logger << "(" << getSimulationTime() << ")-";
+        ishell->print( m_logger );
+    }
+*/    
 }
 
 template<>
 void Environment2::handleEvent< ShellDeathEvent >( const ShellDeathEvent * e ) {
-    IndividualShell * ishell = dynamic_cast< IndividualShell * >( getObjectHandle( &e->getSender() ) );
+/*    IndividualShell * ishell = dynamic_cast< IndividualShell * >( getObjectHandle( &e->getSender() ) );
 
     if( ishell ) {
         removeIndividual( ishell );
@@ -73,6 +87,7 @@ void Environment2::handleEvent< ShellDeathEvent >( const ShellDeathEvent * e ) {
             ishell->print( m_logger );
         }
     }
+*/
 }
 
 ShellDeathEvent::ShellDeathEvent( const VTime & tSend, const VTime &tRecv,

@@ -50,6 +50,7 @@ ostream & operator<<( ostream & out, const IndividualProperties & ip ) {
 
     out << ", " << ip.m_offspring;
 
+/*
     if( !ip.m_genos.empty() ) {
         out << ", [";
 
@@ -60,5 +61,6 @@ ostream & operator<<( ostream & out, const IndividualProperties & ip ) {
         }
         out << "]";
     }
+*/
     return out;
 }

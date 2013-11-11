@@ -43,7 +43,6 @@
 #include <unordered_map>
 
 using std::unordered_map;
-using std::list;
 using std::queue;
 using std::ofstream;
 
@@ -76,7 +75,7 @@ public:
 
     void print( ostream & out ) const;
 protected:
-    list< IndividualShell * > m_females, m_males, m_unk;
+    vector< IndividualShell * > m_females, m_males, m_unk;
     queue< IndividualShell * > m_individual_pool;
 
 private:

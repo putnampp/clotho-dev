@@ -29,7 +29,6 @@
 
 #include "ClothoApplication.h"
 #include "ClothoPartitioner.h"
-#include "IntVTime.h"
 #include "YamlConfig.h"
 
 #include <iostream>
@@ -37,30 +36,9 @@ using std::cerr;
 using std::cout;
 using std::endl;
 
-ClothoApplication::ClothoApplication( const string & config ) : m_config( config ) {}
+#include <boost/lexical_cast.hpp>
 
-/*
- int ClothoApplication::initialize( vector< string > & args ) {
-    if( m_config.empty() ) {
-        cerr << "Please specify a configuration file" << endl;
-        abort();
-    }
-    return 0;
-}
-*/
-
-/*
-void ClothoApplication::configure( SimulationConfiguration & config ) {
-    cout << "configure called" << endl;
-    m_config = config.as_string( {"sim"} );
-    if( m_config.empty() ) {
-        cerr << "Please specify a configuration file" << endl;
-        abort();
-    }
-
-    cout << m_config << endl;
-}
-*/
+ClothoApplication::ClothoApplication( const string & config ) : m_config( config ), m_time(NULL){}
 
 int ClothoApplication::finalize( ) {
     return 0;
@@ -101,19 +79,14 @@ const VTime & ClothoApplication::getZero() {
     return IntVTime::getIntVTimeZero();
 }
 
-const VTime & ClothoApplication::getTime( string & ) {
-    return IntVTime::getIntVTimeZero();
+const VTime & ClothoApplication::getTime( string & t) {
+    if( !m_time ) {
+        int time = boost::lexical_cast<int>( t );
+        m_time = new IntVTime( time );
+    }
+    return *m_time;
 }
 
-/*
-ArgumentParser & ClothoApplication::getArgumentParser() {
-    // ArgRecord is a nested class of ArgumentParser
-    static ArgumentParser::ArgRecord args[] = {
-    { "-sim", "Simulation configuration file", &m_config, ArgumentParser::STRING, false },
-    {"","",0 }
-    };
-
-    static ArgumentParser * ap = new ArgumentParser( args );
-    return *ap;
+ClothoApplication::~ClothoApplication() {
+    if( m_time ) delete m_time;
 }
-*/
