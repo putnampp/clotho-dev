@@ -32,8 +32,8 @@
 
 #include "IntVTime.h"
 
-#include "events/ClothoEvent.h"
-#include "events/LogEvent.h"
+#include "events/ShellBirthEvent.h"
+#include "events/ShellDeathEvent.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -49,16 +49,6 @@ const string POOL_SIZE_K = "pool_size";
 Environment2::Environment2( const char * n, int max_size, const string & log ) :
     m_name( n ), m_max_pool_size( max_size ), m_pool_size(0), m_logdir(log) {
 }
-/*
-Environment2::Environment2( const YAML::Node & n) : m_name( "ENV" ), m_max_pool_size( -1 ), m_pool_size( 0 ) {
-    if( n[ POOL_SIZE_K ] ) {
-        m_max_pool_size = n[ POOL_SIZE_K ].as< int >();
-    }
-
-    // pre-populate the pool if necessary
-    if( m_max_pool_size <= -1 ) assert(false);  // Warped does not support dynamic SimulationObject allocation
-}
-*/
 
 Environment2::~Environment2() {
     /*
@@ -89,12 +79,6 @@ Environment2::~Environment2() {
 }
 
 void Environment2::initialize() {
-    // schedule first logging event?
-    //
-//    const IntVTime tmp = static_cast< const IntVTime & >( getSimulationTime() ) + 2;
-//    Event * e = new LogEvent(getSimulationTime(), tmp, this, this );
-//    this->receiveEvent( e );
-//
     if( !m_logdir.empty() ) {
         string log_file = m_logdir + "something.log";
         m_logger.open( log_file );
@@ -156,16 +140,13 @@ void Environment2::addIndividual( IndividualShell * s ) {
         // bounded pool
         if( m_pool_size >= m_max_pool_size ) return;
     }
+    ++m_pool_size;
 
     switch( s->getSex() ) {
     case FEMALE:
-//    cout << "Adding Individual: ";
-//    s->print(cout);
         m_females.push_back(s);
         break;
     case MALE:
-//    cout << "Adding Individual: ";
-//    s->print(cout);
         m_males.push_back( s );
         break;
     case UNK_SEX:
@@ -173,9 +154,11 @@ void Environment2::addIndividual( IndividualShell * s ) {
         break;
     default:
         m_individual_pool.push( s );
-        break;
+        return;
     }
-    ++m_pool_size;
+
+    Event * evt = new ShellBirthEvent( getSimulationTime(), getSimulationTime(), s, this );
+    this->receiveEvent( evt );
 }
 
 void Environment2::removeIndividual( IndividualShell * s ) {
@@ -198,40 +181,19 @@ void Environment2::removeIndividual( IndividualShell * s ) {
         return;
     }
 
-//    cout << "list size: " << l->size() << "\n";
     bool bFound = false;
     size_t pos = 0;
     while( pos < l->size() ) {
         if( (*l)[pos] == s ) {
             bFound = true;
             if( pos < l->size() - 1 ) {
-/*
-                cout << "Swapping:\n\t";
-                (*l)[pos]->print(cout);
-                cout << "\t";
-                l->back()->print(cout);
-*/               
                 swap( (*l)[pos], l->back() );
-/*
-                cout << "Swapped:\n\t";
-                (*l)[pos]->print(cout);
-                cout << "\t";
-                l->back()->print(cout);
-*/
             }
 
             if( l->back() != s ) {
                 cout << "Individual not at back" << endl;
             }
             l->pop_back();
-/*
-            cout << "New back: ";
-            l->back()->print(cout );
-            cout << "(" << getSimulationTime() << ")-Removed: ";
-            s->print( cout );
-
-            cout << "new list size: " << l->size() << "\n";
-*/
             break;
         }
         ++pos;
@@ -242,10 +204,9 @@ void Environment2::removeIndividual( IndividualShell * s ) {
     }
 
     m_individual_pool.push( s );
-    if( m_logger.is_open() ) {
-        m_logger << "(" << getSimulationTime() << ")-";
-        s->print( m_logger );
-    }
+
+    Event * e = new ShellDeathEvent( getSimulationTime(), getSimulationTime(), s, this );
+    this->receiveEvent(e);
 }
 
 IndividualShell * Environment2::nextAvailableIndividual() {

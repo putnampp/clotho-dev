@@ -53,8 +53,6 @@ void RandomMatingModel::operator()( const ShellMaturityEvent * e, IndividualShel
 
         unsigned int nOffspring = ind->getOffspringCount();
 
-//        cout << "female ready to mate at age " << age << ", " << nOffspring << " (" << e->getReceiveTime() << ")"  << endl;
-
         // given age will she mate againt and produce offspring?
         if( readyToMate( age, nOffspring ) ) {
             Environment2 * env = ind->getEnvironment();
@@ -73,10 +71,7 @@ void RandomMatingModel::operator()( const ShellMaturityEvent * e, IndividualShel
 }
 
 void RandomMatingModel::operator()( const ShellMatingEvent * e, Environment2 * env ) {
-//    cout << "initiating random mating (" << e->getReceiveTime() << ")" << endl;
     int nMales = env->getMaleCount();
-
-    //cout << "(" << e->getReceiveTime() << ")-Male count: " << nMales << "\n";
 
     // get a random male by index
     unsigned int rMale = gsl_rng_get( m_rng ) % nMales;
@@ -84,18 +79,11 @@ void RandomMatingModel::operator()( const ShellMatingEvent * e, Environment2 * e
     IndividualShell * female = e->getFirstPartner();
     IndividualShell * male = env->getMaleAt( rMale );
 
-    /*
-        cout << "Mating:\n\t";
-        female->print(cout);
-        cout << "\t";
-        male->print( cout );
-    */
     if( female && female->isAlive() ) {
         if( male && male->isAlive() ) {
             IndividualShell * offspring = env->nextAvailableIndividual();
 
             if( offspring ) {
-                //cout << "Offspring" << endl;
                 vector< genotype_t > genos;
 
                 generateOffspringGenotype( female, male, genos );
@@ -108,9 +96,6 @@ void RandomMatingModel::operator()( const ShellMatingEvent * e, Environment2 * e
                 ip->m_dob = dynamic_cast< IntVTime * > (e->getReceiveTime().clone() );
 
                 offspring->setProperties( ip );
-                /*                cout << "Offspring:\t";
-                                offspring->print( cout );
-                */
                 female->addOffspring();
                 male->addOffspring();
 

@@ -59,35 +59,14 @@ DEFINE_REGISTERED_CLOTHO_EVENT( ShellDeathEvent )
 
 template<>
 void IndividualShell::handleEvent< ShellDeathEvent >( const ShellDeathEvent * e ) {
-//    cout << "Died" << endl;
     if( m_prop )
         m_prop->m_eol = dynamic_cast< IntVTime * >( e->getReceiveTime().clone() );
-/*    Event * de = new ShellDeathEvent( e->getSendTime() , e->getReceiveTime(), this, m_environment );
-
-    m_environment->receiveEvent( de );
-*/
-    //cout << "(" << getSimulationTime() << ")-" << e->getReceiveTime();
     m_environment->removeIndividual( this );
 
-/*    if( m_logger.is_open() ) {
-        m_logger << "(" << getSimulationTime() << ")-";
-        ishell->print( m_logger );
-    }
-*/    
 }
 
 template<>
 void Environment2::handleEvent< ShellDeathEvent >( const ShellDeathEvent * e ) {
-/*    IndividualShell * ishell = dynamic_cast< IndividualShell * >( getObjectHandle( &e->getSender() ) );
-
-    if( ishell ) {
-        removeIndividual( ishell );
-        if( m_logger.is_open() ) {
-            m_logger << "(" << getSimulationTime() << ")-";
-            ishell->print( m_logger );
-        }
-    }
-*/
 }
 
 ShellDeathEvent::ShellDeathEvent( const VTime & tSend, const VTime &tRecv,
