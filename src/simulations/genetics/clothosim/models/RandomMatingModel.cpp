@@ -33,11 +33,13 @@
 #include <time.h>
 
 #include <cmath>
+#include <algorithm>
 
 #include "../clothoobjects/events/ShellBirthEvent.h"
 
 using std::cout;
 using std::endl;
+using std::random_shuffle;
 
 RandomMatingModel::RandomMatingModel() : m_rng( gsl_rng_alloc( gsl_rng_taus ) ) {
     long seed = time(NULL);
@@ -118,16 +120,17 @@ void RandomMatingModel::dump( ostream & out ) {
 }
 
 void RandomMatingModel::generateOffspringGenotype( IndividualShell * female, IndividualShell * male, vector< genotype_t > & genos ) {
-    unsigned int max_genos = female->getVariantCount();
+    unsigned int nLoci = female->getEnvironmentLociCount();
 
-    genos.reserve( max_genos );
+    genos.reserve( nLoci );
 
-    vector< allele_t > alleles(genotype_t::PLOIDY, (allele_t)0 );
+    vector< allele_t > alleles(genotype_t::PLOIDY, (allele_t)ANCESTRAL_ALLELE );
 
     if( genotype_t::PLOIDY == 2 ) {
         unsigned int rnd = gsl_rng_get( m_rng );
         int j = 1, max_j = (sizeof( unsigned int ) << 3);   // max_j = 4 * 8 = 32
-        for( unsigned int i = 0; i < max_genos; ++i ) {
+        for( unsigned int i = 0; i < nLoci; ++i ) {
+
             if( j >= max_j ) {
                 rnd = gsl_rng_get( m_rng );
                 j = 1;
@@ -147,32 +150,26 @@ void RandomMatingModel::generateOffspringGenotype( IndividualShell * female, Ind
     } else {
         // more general outline. Note that it assumes a parent allele
         // can serve as the variant source multiple times.
-        const unsigned int MAX = 0xFFFFFFFF;
-        unsigned int rnd = gsl_rng_get( m_rng );
-        unsigned int j = 1, max_j = floor(log( (double) MAX ) / log( (double)genotype_t::PLOIDY) );
         unsigned int from_male = genotype_t::PLOIDY / 2;
-        ploidy_t next_chromosome;
 
-        for( unsigned int i = 0; i < max_genos; ++i ) {
+        vector< ploidy_t > males;
+        vector< ploidy_t > females;
+
+        for( ploidy_t i = 0; i < genotype_t::PLOIDY; ++i ) {
+            males.push_back( i );
+            females.push_back( i );
+        }
+
+        for( unsigned int i = 0; i < nLoci; ++i ) {
+            // shuffle the chromosomes for each locus?
+            // treat each locus as being independent of one another
+            random_shuffle( males.begin(), males.end() );
+            random_shuffle( females.begin(), females.end() );
             for( unsigned int k = 0; k < from_male; ++k ) {
-                if( j >= max_j) {
-                    rnd = gsl_rng_get( m_rng );
-                    j = 1;
-                }
-                next_chromosome = rnd % genotype_t::PLOIDY;
-                rnd /= genotype_t::PLOIDY;
-                alleles[ k ] = male->alleleAt( i, next_chromosome );
-                ++j;
+                alleles[ k ] = male->alleleAt( i, males[k] );
             }
             for( unsigned int k = from_male; k < genotype_t::PLOIDY; ++k ) {
-                if( j >= max_j) {
-                    rnd = gsl_rng_get( m_rng );
-                    j = 1;
-                }
-                next_chromosome = rnd % genotype_t::PLOIDY;
-                rnd /= genotype_t::PLOIDY;
-                alleles[k] = female->alleleAt( i, next_chromosome );
-                ++j;
+                alleles[k] = female->alleleAt( i, females[k - from_male] );
             }
             genotype_t g( alleles );
             genos.push_back(g);

@@ -33,7 +33,7 @@
 #include "VTime.h"
 #include <ostream>
 
-#include "Genotype.h"
+#include "AlleleTuple.h"
 
 using std::ostream;
 
@@ -49,7 +49,7 @@ extern const string UNASSIGNED_K;
 typedef size_t  variant_index_t;
 typedef VTime   age_t;
 
-typedef Genotype< 2 > genotype_t;
+typedef AlleleTuple<2> genotype_t;
 
 ostream & operator<<( ostream & out, const Sex s );
 

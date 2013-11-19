@@ -3,13 +3,13 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * modification, are permitted provided that the following conditions are met: 
  *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer.
+ *    list of conditions and the following disclaimer. 
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
+ *    and/or other materials provided with the distribution. 
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -27,34 +27,23 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef YAMLCONFIG_H_
-#define YAMLCONFIG_H_
+#ifndef MULTILOCUSGENOTYPE_H_
+#define MULTILOCUSGENOTYPE_H_
 
 #include "common.h"
-#include "warped.h"
-#include "SimulationObject.h"
+#include "AlleleTuple.h"
 
-#include "yaml-cpp/yaml.h"
+#include "locus_genotyper.h"
 
-#include <vector>
-
-using std::vector;
-
-class YamlConfig {
+class MultilocusGenotyper {
 public:
-    YamlConfig( const string & file );
-
-    shared_ptr< vector< SimulationObject * > > getSimulationObjects();
-
-    virtual ~YamlConfig();
+    virtual bool   addIndexedGenotyper( size_t idx, LocusGenotyper * lg ) = 0;
+    virtual size_t getLociCount() const = 0;
+    /*
+     * compute the genotype an indexed set of allele_tuples
+     */
+    virtual double genotype( const AlleleGroup * t ) const = 0;
 protected:
-    void parseObjectDocument( const YAML::Node & n, vector< SimulationObject * > & objs );
-
-    void cleanUp();
-
-private:
-    string m_config;
-
-    shared_ptr< vector< SimulationObject * > > m_objs;
+    MultilocusGenotyper() {}
 };
-#endif  // YAMLCONFIG_H_
+#endif  // MULTILOCUSGENOTYPE_H_

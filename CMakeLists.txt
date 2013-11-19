@@ -132,4 +132,4 @@ set(CMAKE_CXX_FLAGS "-g -fPIC -Wall -O3 -std=c++0x" )
 LINK_DIRECTORIES( ${PROJECT_BINARY_DIR}/bin )
 
 add_subdirectory( src )
-add_subdirectory( unittest )
+#add_subdirectory( unittest )

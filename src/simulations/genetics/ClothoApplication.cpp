@@ -38,7 +38,10 @@ using std::endl;
 
 #include <boost/lexical_cast.hpp>
 
-ClothoApplication::ClothoApplication( const string & config ) : m_config( config ), m_time(NULL){}
+ClothoApplication::ClothoApplication( const string & config ) : m_config( config ), 
+        m_time(NULL), 
+        m_part( new ClothoPartitioner() ),
+        m_yaml( new YamlConfig( m_config ) ){}
 
 int ClothoApplication::finalize( ) {
     return 0;
@@ -50,13 +53,13 @@ const PartitionInfo * ClothoApplication::getPartitionInfo( unsigned int nPE ) {
         abort();
     }
 
-    ClothoPartitioner *part = new ClothoPartitioner();
+//    ClothoPartitioner *part = new ClothoPartitioner();
 
-    shared_ptr< YamlConfig > config( new YamlConfig( m_config ) );
+//    shared_ptr< YamlConfig > config( new YamlConfig( m_config ) );
 
-    shared_ptr< vector< SimulationObject * > > objs = config->getSimulationObjects();
+    shared_ptr< vector< SimulationObject * > > objs = m_yaml->getSimulationObjects();
 
-    const PartitionInfo * ret = part->partition( &*objs, nPE );
+    const PartitionInfo * ret = m_part->partition( &*objs, nPE );
 
     return ret;
 }
@@ -89,4 +92,7 @@ const VTime & ClothoApplication::getTime( string & t) {
 
 ClothoApplication::~ClothoApplication() {
     if( m_time ) delete m_time;
+
+    delete m_part;
+    delete m_yaml;
 }

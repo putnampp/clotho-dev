@@ -30,74 +30,7 @@
 #ifndef GENOTYPE_H_
 #define GENOTYPE_H_
 
-#include "common.h"
-#include "ploidy.h"
-#include "Allele.h"
-#include "Locus.h"
-
-#include <vector>
-#include <ostream>
-
-using std::vector;
-using std::ostream;
-
-enum GenotypeFlag { HOMOZYGOUS  = 1,
-                     DOMINANT   = 2 };
-
-typedef unsigned short flag_t;
-
-class genotype {
-public:
-    virtual ploidy_t    ploidy() const = 0;
-    virtual flag_t      getFlags() const = 0;
-    virtual void        setFlag( GenotypeFlag f, bool bVal ) = 0;
-    virtual bool        isFlag( GenotypeFlag f ) const = 0;
-
-    virtual allele_t & operator[]( ploidy_t p ) = 0;
-
-    virtual ~genotype() {}
-protected:
-    genotype(){}
-};
-
-template < ploidy_t P >
-struct Genotype : public genotype {
-public:
-    static const ploidy_t PLOIDY = P;
-    Genotype( const vector< allele_t > & alleles) : m_flags(0) {
-        vector< allele_t >::const_iterator it = alleles.begin();
-        ploidy_t p = 0;
-        while( it != alleles.end() && p < PLOIDY ) {
-            m_geno[ p++ ] = (*it++);
-        }
-    }
-
-    ploidy_t ploidy() const {   return PLOIDY; }
-    flag_t   getFlags() const { return m_flags; }
-    void     setFlag( GenotypeFlag f, bool bVal = true ) { m_flags = ((bVal) ? (m_flags | f) : (m_flags & (~f))); }
-    bool     isFlag( GenotypeFlag f ) const { return ((m_flags & f ) > 0); }
-
-    allele_t & operator[]( ploidy_t p ) { assert( p < PLOIDY ); return m_geno[ p ]; }
-
-    void print( ostream & out ) const {
-        if( !PLOIDY ) return;
-
-        ploidy_t p = 0;
-        out << (int) m_geno[ p++ ];
-        while( p < P ) {
-            out << ":" << (int) m_geno[p++];
-        }
-    }
-    virtual ~Genotype() {}
-protected:
-    flag_t      m_flags; 
-    allele_t    m_geno[ PLOIDY ];
-};
-
-struct Genotypeable {
-    virtual bool isHomozygous( const LocusPtr l ) = 0;
-    virtual bool isDominant( const LocusPtr l ) = 0;
-    virtual const genotype & operator[]( const LocusPtr l ) = 0;
-};
+#include "locus_genotyper.h"
+#include "multilocus_genotyper.h"
 
 #endif  // GENOTYPE_H_

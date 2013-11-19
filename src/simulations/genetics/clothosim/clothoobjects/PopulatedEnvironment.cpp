@@ -97,9 +97,9 @@ public:
         while( ++allocated <= pool_size ) {
             IndividualShell * ishell = new IndividualShell( env, new IndividualProperties() );
 
+            objs->push_back( ishell );
             if( ishell ) {
                 env->addIndividual( ishell );
-                objs->push_back( ishell );
             }
         }
         objs->push_back( env );

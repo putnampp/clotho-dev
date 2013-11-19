@@ -42,7 +42,7 @@ using std::make_pair;
 
 #define DEFAULT_CHROMOSOME_LEN 100
 
-typedef unsigned int chromid_t;
+//typedef unsigned int chromid_t;
 #define UNKNOWN_CHROM -1
 
 class ChromosomeMap;

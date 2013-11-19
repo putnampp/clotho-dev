@@ -137,7 +137,9 @@ protected:
                     rnd = gsl_rng_get( m_rng );
                     j = 1;
                 }
-                alleles.push_back( (allele_t) (rnd & 0x00000001));
+
+                // all alleles are non-deleted
+                alleles.push_back( (allele_t) (ANCESTRAL_ALLELE + (rnd & 0x00000001)));
                 rnd >>= 1;
             }
 

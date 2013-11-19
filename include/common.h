@@ -47,4 +47,6 @@ typedef unsigned int    pos_t;
 using boost::shared_ptr;
 using boost::scoped_ptr;
 
+typedef unsigned char   chromid_t;
+
 #endif  // COMMON_H_

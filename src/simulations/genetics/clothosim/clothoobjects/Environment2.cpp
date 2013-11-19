@@ -28,7 +28,6 @@
  ******************************************************************************/
 
 #include "Environment2.h"
-//#include "Environment2ObjectState.h"
 
 #include "IntVTime.h"
 
@@ -47,14 +46,19 @@ using std::endl;
 const string POOL_SIZE_K = "pool_size";
 
 Environment2::Environment2( const char * n, int max_size, const string & log ) :
-    m_name( n ), m_max_pool_size( max_size ), m_pool_size(0), m_logdir(log) {
+    m_genetic_map( new GeneticMap() ),
+    m_name( n ),
+    m_max_pool_size( max_size ), 
+    m_pool_size(0), 
+    m_logdir(log) {
 }
 
 Environment2::~Environment2() {
     /*
-     * Because IndividualShells are SimulationObjects
-     * their clean up may be handled by the simulation manager
-     * may be sufficient to just clear the vectors and queue
+     * SequentialSimulationManager does not perform cleanup of 
+     * SimulationObjects.
+     * Task is assumed to be taken care of by mechanism which
+     * created the object. In this case YamlConfig object.
         for( vector< IndividualShell * >::iterator it = m_females.begin(); it != m_females.end(); ) {
             IndividualShell * shell = (*it++);
             delete shell;
@@ -63,7 +67,7 @@ Environment2::~Environment2() {
             IndividualShell * shell = (*it++);
             delete shell;
         }
-        for( vector< IndividualShell * >::iterator it = m_unk.begin(); it != m_unk.end(); it ) {
+        for( vector< IndividualShell * >::iterator it = m_unk.begin(); it != m_unk.end(); ) {
             IndividualShell * shell = (*it++);
             delete shell;
         }
@@ -74,6 +78,12 @@ Environment2::~Environment2() {
             delete shell;
         }
     */
+
+    m_females.clear();
+    m_males.clear();
+    m_unk.clear();
+
+    while( !m_individual_pool.empty() ) { m_individual_pool.pop(); }
 
     if( m_logger.is_open() ) m_logger.close();
 }
@@ -121,6 +131,8 @@ void Environment2::executeProcess() {
         if( e2 ) {
             e2->updateModels( this );
         }
+
+        //delete evt;
     }
 }
 
@@ -234,6 +246,14 @@ int Environment2::getMaleCount() const {
 
 int Environment2::getFemaleCount() const {
     return m_females.size();
+}
+
+size_t Environment2::getLociCount() const {
+    return m_genetic_map->getLociCount();
+}
+
+shared_ptr< GeneticMap > Environment2::getGeneticMap() {
+    return m_genetic_map;
 }
 
 IndividualShell * Environment2::getMaleAt( unsigned int idx ) const {

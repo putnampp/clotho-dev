@@ -31,12 +31,31 @@
 #define LOCUS_H_
 
 #include "common.h"
-#include "Chromosome.h"
-#include "Mutate.h"
+#include "Allele.h"
+//#include "Mutate.h"
+//#include "Genotype.h"
 
 #include <vector>
+#include <unordered_map>
 
 using std::vector;
+using std::unordered_map;
+
+class locus_id {
+public:
+    static unsigned long createID( chromid_t c, pos_t s, pos_t e );
+    locus_id( chromid_t c, pos_t s, pos_t e );
+
+    chromid_t  getChromosome() const;
+    pos_t       getStart() const;
+    pos_t       getEnd() const;
+
+    bool operator==( const locus_id & rhs ) const;
+
+    virtual ~locus_id();
+protected:
+    unsigned long m_id;
+};
 
 /**
  * Implementation specific definition of a locus structure
@@ -49,15 +68,37 @@ using std::vector;
  *  - properties (name, alleles, ... )
  *
  */
-struct Locus {
-    string      name;
-    pos_t      start, end;
-    size_t      alt_count;
-    mutrate_t   mutation_rate;
-    shared_ptr< allele_t [] > alleles;
-    allele_t    dominant_allele;
-    chromid_t   chrom;
-    ploidy_t    ploid;
+class Locus /*: 
+    virtual public locus_genotyper, 
+    virtual public allelic_effect*/ {
+public:
+    Locus( chromid_t c, pos_t s, pos_t e, allele_t nAlleles );
+
+    const locus_id & getID()    const;
+    chromid_t   getChromosome() const;
+    pos_t       getStart()      const;
+    pos_t       getEnd()        const;
+
+    allele_t    getMaxAlleles() const;
+
+//    virtual bool addAlternateAllele( allele_t all );
+//    virtual bool addAlternateAllele( allele_t all, double all_eff );
+
+    virtual bool isKnownAllele( allele_t all ) const;
+
+/*    virtual double operator()( const allele_t all ) const;
+
+    virtual double genotype( const allele_tuple * at ) const;
+    virtual double genotype( const allele_tuple * at, const allelic_effect * ae ) const;
+*/
+
+    bool operator==( const Locus & rhs ) const;
+
+    virtual ~Locus();
+protected:
+    locus_id    m_id;
+    allele_t    m_nAlleles;
+//    shared_ptr< unordered_map< allele_t, double > > alt_alleles;
 };
 
 typedef shared_ptr< Locus > LocusPtr;

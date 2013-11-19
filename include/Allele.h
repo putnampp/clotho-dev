@@ -52,4 +52,7 @@ typedef unsigned long   allele_t;
 
 #endif
 
+#define DELETED_ALLELE 0
+#define ANCESTRAL_ALLELE 1
+
 #endif  // ALLELE_H_

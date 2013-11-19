@@ -3,13 +3,13 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * modification, are permitted provided that the following conditions are met: 
  *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer.
+ *    list of conditions and the following disclaimer. 
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
+ *    and/or other materials provided with the distribution. 
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -26,35 +26,46 @@
  * of the authors and should not be interpreted as representing official policies,
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
+#ifndef DEFAULTTRAIT_H_
+#define DEFAULTTRAIT_H_
 
-#ifndef YAMLCONFIG_H_
-#define YAMLCONFIG_H_
+#include "Trait.h"
 
-#include "common.h"
-#include "warped.h"
-#include "SimulationObject.h"
+#include <map>
 
-#include "yaml-cpp/yaml.h"
+using std::map;
 
-#include <vector>
-
-using std::vector;
-
-class YamlConfig {
+/*******************************************************************************
+ * A DefaultTrait is some observed characteristic of an individual.
+ *
+ * A set of DefaultTraits is used to define a Phenotype.
+ *
+ * There are two types of traits: categorical or quantitative.
+ *
+ * Quantitative traits are represented by a measured value or quantity. For 
+ * example, height is considered to be a quantitative value.
+ *
+ * Qualitative traits fall into a general set of values. For example, eye color
+ * is a categorical trait, and is limited to a set of colors.
+ *
+ ******************************************************************************/
+class DefaultTrait :
+    public Trait
+{
 public:
-    YamlConfig( const string & file );
+    DefaultTrait( const string & name );
 
-    shared_ptr< vector< SimulationObject * > > getSimulationObjects();
+    virtual bool addIndexedGenotyper( size_t idx, LocusGenotyper * lg );
+    virtual size_t getLociCount() const;
 
-    virtual ~YamlConfig();
+    virtual double genotype( const AlleleGroup * ag ) const;
+    virtual double phenotype( const AlleleGroup * ag, const environmental * env ) const;
+
+    virtual ~DefaultTrait();
 protected:
-    void parseObjectDocument( const YAML::Node & n, vector< SimulationObject * > & objs );
-
-    void cleanUp();
-
-private:
-    string m_config;
-
-    shared_ptr< vector< SimulationObject * > > m_objs;
+    string  m_name;
+    typedef map< size_t, LocusGenotyper * >  LocusGenotypers;
+    shared_ptr< LocusGenotypers > m_loci;
 };
-#endif  // YAMLCONFIG_H_
+
+#endif  // DEFAULTTRAIT_H_

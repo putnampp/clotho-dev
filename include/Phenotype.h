@@ -31,14 +31,14 @@
 #define PHENOTYPE_H_
 
 #include "common.h"
-#include "Trait.h"
+#include "Locus.h"
+#include "Environmental.h"
 
-struct Phenotype {
-    double  value;
-};
+struct phenotyper {
+    virtual double phenotype( const AlleleGroup * la, const environmental * env ) const = 0;
 
-struct Phenotypeable {
-    virtual void phenotype( iTrait *, Phenotype * ) = 0;
+    /// considering:
+    // virtual double phenotype( const AlleleGroup * la, const MultilocusGenotyper * mg, const environmental * env ) const = 0;
 };
 
 #endif  // PHENOTYPE_H_

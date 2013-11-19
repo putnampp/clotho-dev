@@ -6,6 +6,54 @@ pool_size: 100000
 logdir: log/
 ...
 
+#GeneticMap initializer
+---
+initializer: GeneticMapInitializer
+environment: ENV1
+mutation_rate: &mutation_rate 0.0001
+allelic_effect: &uniform_allelic {
+    allele_value: {
+        type:   random, # random/matrix
+        distribution: uniform,
+        range: [-1.0, 1.0]
+    },
+    mut_freq: {
+        type:   random, # random/matrix
+        distribution:   uniform,
+        range:  [0.0, 1.0]
+    }
+}
+dominance_effect: &normal_dominance {
+    type: random, # random/matrix
+    allelic_effect: *uniform_allelic,
+    distribution: normal,
+    mean: 0.2,
+    variance: 0.2
+}
+traits:
+    - &tr1 trait1 
+    - &tr2 trait2
+    - &tr3 trait3
+    - &tr4 trait4
+    - &tr5 trait5
+loci:
+    - &loc1 {
+        locus: [ 1, 100, 101, 5], # chromid, start, end, number of alleles
+        genotyper: *normal_dominance,
+        traits: []
+      }
+    - &loc2 {
+        locus: [ 1, 1001, 1002, 4 ],
+        genotyper: *normal_dominance,
+        traits:[ ]
+      }
+    - &loc3 {
+        locus: [ 1, 10001, 10002, 4],
+        genotyper: *normal_dominance,
+        traits: [ ]
+      }
+...
+
 # founder population
 ---
 initializer: PopulationInitializer
@@ -15,7 +63,6 @@ percent_female: 60
 max_variants:   1000
 variants: 150
 ...
-
 # population model
 ---
 model: PopulationModel

@@ -51,11 +51,12 @@ using std::endl;
 const string COUNT_K = "count";
 
 YamlConfig::YamlConfig( const string & file ) :
-    m_config( file )
+    m_config( file ),
+    m_objs( new vector< SimulationObject * >() )
 {}
 
 shared_ptr< vector< SimulationObject * > > YamlConfig::getSimulationObjects() {
-    shared_ptr< vector< SimulationObject * > > objs( new vector< SimulationObject * >() );
+    //shared_ptr< vector< SimulationObject * > > objs( new vector< SimulationObject * >() );
 
     vector< YAML::Node > docs = YAML::LoadAllFromFile( m_config );
 
@@ -67,18 +68,31 @@ shared_ptr< vector< SimulationObject * > > YamlConfig::getSimulationObjects() {
             cout << (*it) << "\n" << endl;
             string name = (*it)[ OBJECT_K ].as< string >();
 
-            ClothoObjectManager< YAML::Node >::getInstance()->createObjectFrom(name, (*it), objs );
-            cout << "SimulationObjects created: " << objs->size() << "( " << objs->capacity() << " )" << endl;
+            ClothoObjectManager< YAML::Node >::getInstance()->createObjectFrom(name, (*it), m_objs );
+            cout << "SimulationObjects created: " << m_objs->size() << "( " << m_objs->capacity() << " )" << endl;
         } else if( (*it)[ MODEL_K ] ) {
             string name = (*it)[ MODEL_K ].as< string >();
             ClothoModelManager< YAML::Node >::getInstance()->createModelFrom( name, (*it) );
         } else if( (*it)[ INITIALIZER_K ] ) {
             string name = (*it)[ INITIALIZER_K ].as< string >();
-            ClothoInitializerManager< YAML::Node >::getInstance()->initialize( name, (*it), objs );
+            ClothoInitializerManager< YAML::Node >::getInstance()->initialize( name, (*it), m_objs );
         }
     }
 
-    return objs;
+    return m_objs;
 }
 
-YamlConfig::~YamlConfig() {}
+void YamlConfig::cleanUp() {
+    while(! m_objs->empty() ) {
+        SimulationObject * to_delete = m_objs->back();
+        m_objs->pop_back();
+
+        delete to_delete;
+    }
+}
+
+YamlConfig::~YamlConfig() {
+    cleanUp();
+
+    m_objs.reset();
+}

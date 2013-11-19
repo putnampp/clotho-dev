@@ -54,6 +54,7 @@ LIST( APPEND SIM_SRC clothoobjects/IndividualShellObject.cpp )
 LIST( APPEND SIM_SRC clothoobjects/IndividualProperties.cpp )
 LIST( APPEND SIM_SRC clothoobjects/PopulatedEnvironment.cpp )
 LIST( APPEND SIM_SRC clothoobjects/PopulationInitializer.cpp )
+LIST( APPEND SIM_SRC clothoobjects/GeneticMapInitializer.cpp )
 
 ADD_LIBRARY(cobjmanager SHARED ${OBJECT_MNGR_SRC} )
 

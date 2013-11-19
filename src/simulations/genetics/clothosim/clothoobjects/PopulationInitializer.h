@@ -27,8 +27,8 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef RANDOMPOPULATIONOBJECT_H_
-#define RANDOMPOPULATIONOBJECT_H_
+#ifndef POPULATIONINITIALIZER_H_
+#define POPULATIONINITIALIZER_H_
 
 #include "../ClothoInitializerCreator.h"
 #include "yaml-cpp/yaml.h"
@@ -37,5 +37,5 @@ struct PopulationInitializer { };
 
 DECLARE_REGISTERED_INITIALIZER( PopulationInitializer, YAML::Node )
 
-#endif  // RANDOMPOPULATIONOBJECT_H_
+#endif  // POPULATIONINITIALIZER_H_
 

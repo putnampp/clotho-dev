@@ -3,13 +3,13 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * modification, are permitted provided that the following conditions are met: 
  *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer.
+ *    list of conditions and the following disclaimer. 
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
+ *    and/or other materials provided with the distribution. 
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -27,34 +27,22 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef YAMLCONFIG_H_
-#define YAMLCONFIG_H_
+#ifndef LOCUSGENOTYPE_H_
+#define LOCUSGENOTYPE_H_
 
 #include "common.h"
-#include "warped.h"
-#include "SimulationObject.h"
+#include "AlleleTuple.h"
+#include "AllelicEffect.h"
 
-#include "yaml-cpp/yaml.h"
-
-#include <vector>
-
-using std::vector;
-
-class YamlConfig {
+class LocusGenotyper {
 public:
-    YamlConfig( const string & file );
+    virtual double genotype( const allele_tuple * at ) const = 0;
+    virtual LocusPtr getLocus() const { return m_effect->getLocus(); }
 
-    shared_ptr< vector< SimulationObject * > > getSimulationObjects();
-
-    virtual ~YamlConfig();
+    virtual ~LocusGenotyper() { }
 protected:
-    void parseObjectDocument( const YAML::Node & n, vector< SimulationObject * > & objs );
-
-    void cleanUp();
-
-private:
-    string m_config;
-
-    shared_ptr< vector< SimulationObject * > > m_objs;
+    LocusGenotyper( AllelicEffect * ae ) : m_effect( ae ) {}
+    AllelicEffect * m_effect;
 };
-#endif  // YAMLCONFIG_H_
+
+#endif  // LOCUSGENOTYPE_H_

@@ -36,6 +36,7 @@
 #include <fstream>
 
 #include "IndividualShellObject.h"
+#include "GeneticMap.h"
 
 #include <vector>
 #include <list>
@@ -70,6 +71,10 @@ public:
     int getMaleCount() const;
     int getFemaleCount() const;
 
+    size_t getLociCount() const;
+
+    shared_ptr< GeneticMap > getGeneticMap();
+
     IndividualShell * getMaleAt( unsigned int idx ) const;
     IndividualShell * getFemaleAt( unsigned int idx ) const;
 
@@ -77,6 +82,7 @@ public:
 protected:
     vector< IndividualShell * > m_females, m_males, m_unk;
     queue< IndividualShell * > m_individual_pool;
+    shared_ptr< GeneticMap >    m_genetic_map;
 
 private:
     string m_name;

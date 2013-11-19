@@ -27,68 +27,15 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef INDIVIDUALPROPERTIES_H_
-#define INDIVIDUALPROPERTIES_H_
+#ifndef GENETICMAPINITIALIZER_H_
+#define GENETICMAPINITIALIZER_H_
 
-#include "common_types.h"
-#include "IntVTime.h"
+#include "../ClothoInitializerCreator.h"
+#include "yaml-cpp/yaml.h"
 
-#include <ostream>
-#include <vector>
+struct GeneticMapInitializer { };
 
-using std::ostream;
-using std::vector;
+DECLARE_REGISTERED_INITIALIZER( GeneticMapInitializer, YAML::Node )
 
-class IndividualProperties {
-public:
-    long    m_id;
-    long    m_parent0, m_parent1;
-    IntVTime * m_dob, * m_eol;
-    bool m_isMature;
-    unsigned int m_offspring;
-    sex_t   m_sex;
-    vector< genotype_t > m_genos;
+#endif  // GENETICMAPINITIALIZER_H_
 
-    IndividualProperties() : 
-        m_id(-1),
-        m_parent0(-1),
-        m_parent1(-1),
-        m_dob(NULL), 
-        m_eol( NULL ), 
-        m_isMature(false), 
-        m_offspring(0), 
-        m_sex( UNASSIGNED ) {}
-
-    IndividualProperties( sex_t s, vector< genotype_t > & genos ) :
-        m_id( next_id++),
-        m_parent0(-1),
-        m_parent1(-1),
-        m_dob(NULL), 
-        m_eol(NULL), 
-        m_offspring(0), 
-        m_sex(s), 
-        m_genos(genos.begin(), genos.end()) {}
-    IndividualProperties( IndividualProperties * p0, IndividualProperties * p1,
-                         sex_t s, vector< genotype_t > & genos ) :
-        m_id( next_id++),
-        m_parent0( p0->m_id ),
-        m_parent1( p1->m_id ),
-        m_dob(NULL), 
-        m_eol(NULL), 
-        m_offspring(0), 
-        m_sex(s), 
-        m_genos(genos.begin(), genos.end()) {}
-
-    virtual ~IndividualProperties()  {
-        if( m_dob ) delete m_dob;
-        if( m_eol ) delete m_eol;
-
-        m_genos.clear();
-    }
-private:
-    static long next_id;
-};
-
-ostream & operator<<( ostream &, const IndividualProperties & ip );
-
-#endif  // INDIVIDUALPROPERTIES_H_

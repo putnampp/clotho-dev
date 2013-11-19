@@ -31,9 +31,13 @@
 #define GENETICMAP_H_
 
 #include "common.h"
-#include "Configurable.h"
-#include "ChromosomeMap.h"
 #include "Locus.h"
+#include "Trait.h"
+#include "Environmental.h"
+
+#include "Genotype.h"
+
+#include <map>
 
 /**
  *
@@ -44,22 +48,48 @@
  * traits need not necessarily contain the same set of Loci.
  *
  */
-
-class GeneticMap : public Configurable {
+class GeneticMap {
 public:
-    static GeneticMap * getInstance() {
-        static GeneticMap * instance = new GeneticMap();
-        return instance;
-    }
-
-    virtual void configure( std::istream & config );
-
-    virtual void add( const shared_ptr< Locus > l );
-    virtual void add( const shared_ptr< Trait > p );
-
-    virtual ~GeneticMap() {}
-protected:
+    typedef size_t  locus_index_t;
+    typedef size_t  trait_index_t;
+    
     GeneticMap();
+
+    locus_index_t getLocusIndex( LocusPtr lp ) const;
+    trait_index_t getTraitIndex( TraitPtr tp) const;
+
+    /// plan to deprecate in favor of addGenotyper
+//    locus_index_t addLocus( LocusPtr lp );
+
+    /// assumes only one method of computing genotype per locus
+    locus_index_t addGenotyper( LocusGenotyper * lg, bool bShouldUpdate = false);
+
+    /// multilocus genotyper responsible for weighting each genotype
+    /// relative to the current set of loci
+    trait_index_t addTrait( TraitPtr tp, bool bShouldUpdate = false );
+
+    bool addTraitLocus( TraitPtr tp, LocusGenotyper * lg );
+
+    virtual double computeGenotype( locus_index_t locus, const AlleleGroup * la ) const;
+
+    virtual double computePhenotype( TraitPtr t, const AlleleGroup * ag, const environmental * env ) const;
+    virtual double computePhenotype( trait_index_t trait, const AlleleGroup * ag, const environmental * env ) const;
+
+    size_t getLociCount() const;
+    size_t getTraitCount() const;
+
+    AlleleGroup * createLociAlleles() const;
+    virtual ~GeneticMap();
+
+protected:
+    shared_ptr< Loci >              m_loci;
+
+    shared_ptr< vector< LocusGenotyper * > > m_genotypers;
+    
+    typedef unordered_map< string, trait_index_t > TraitMap;
+    shared_ptr< TraitMap >            m_trait_map;
+
+    shared_ptr< Traits >  m_traits;
 };
 
 #endif  // GENETICMAP_H_

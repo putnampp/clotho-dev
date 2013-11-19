@@ -3,13 +3,13 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * modification, are permitted provided that the following conditions are met: 
  *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer.
+ *    list of conditions and the following disclaimer. 
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
+ *    and/or other materials provided with the distribution. 
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -26,35 +26,50 @@
  * of the authors and should not be interpreted as representing official policies,
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
+#include "DefaultTrait.h"
 
-#ifndef YAMLCONFIG_H_
-#define YAMLCONFIG_H_
+DefaultTrait::DefaultTrait( const string & name ) : 
+    Trait( name ), 
+    m_loci( new LocusGenotypers() ) 
+{}
 
-#include "common.h"
-#include "warped.h"
-#include "SimulationObject.h"
+DefaultTrait::~DefaultTrait() {
+    m_loci->clear();
+    m_loci.reset();
+}
 
-#include "yaml-cpp/yaml.h"
+bool DefaultTrait::addIndexedGenotyper( size_t locus_idx, LocusGenotyper * lg ) {
+    (*m_loci)[ locus_idx ] = lg;
+    return true;
+}
 
-#include <vector>
+size_t  DefaultTrait::getLociCount() const {
+    return m_loci->size();
+}
 
-using std::vector;
+/*
+ *
+ *  \sum_{i \in DefaultTraitLoci} genotype( Loci_{i} )
+ *  \sum_{i} G_{i}
+ *
+ */
+double DefaultTrait::genotype( const AlleleGroup * ag ) const {
+    double res = 0.0;
+    for( LocusGenotypers::const_iterator it = m_loci->begin(); it != m_loci->end(); it++ ) {
+        if( it->first < ag->size() ) {
+            res = it->second->genotype( ag->at( it->first ) );
+        }
+    }
+    return res;
+}
 
-class YamlConfig {
-public:
-    YamlConfig( const string & file );
+/*
+ * P = G + E
+ */
+double DefaultTrait::phenotype( const AlleleGroup * ag, const environmental * env ) const {
+    double res = env->environment_factor();
 
-    shared_ptr< vector< SimulationObject * > > getSimulationObjects();
+    res += genotype( ag );
 
-    virtual ~YamlConfig();
-protected:
-    void parseObjectDocument( const YAML::Node & n, vector< SimulationObject * > & objs );
-
-    void cleanUp();
-
-private:
-    string m_config;
-
-    shared_ptr< vector< SimulationObject * > > m_objs;
-};
-#endif  // YAMLCONFIG_H_
+    return res;
+}

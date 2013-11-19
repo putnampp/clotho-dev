@@ -34,6 +34,8 @@
 #include "Application.h"
 #include "SimulationConfiguration.h"
 #include "IntVTime.h"
+#include "ClothoPartitioner.h"
+#include "YamlConfig.h"
 
 class ClothoApplication : public Application {
 public:
@@ -56,6 +58,9 @@ protected:
     string  m_config;
 
     IntVTime * m_time;
+
+    ClothoPartitioner * m_part;
+    YamlConfig        * m_yaml;
 };
 
 #endif  // CLOTHOAPPLICATION_H_

@@ -46,17 +46,18 @@ const string IND_K = "IND";
 const string NAME_K = "name";
 
 IndividualShell::IndividualShell() : ClothoObject(),
-    m_name( IND_K  +  boost::lexical_cast<string>( m_id ) ),
+    m_name( IND_K  ),
     m_prop( NULL ),
     m_environment( NULL ) {
+    m_name.append( boost::lexical_cast< string >(m_id ));
 }
 
 IndividualShell::IndividualShell( Environment2 * env, IndividualProperties * p ) :
     ClothoObject(),
-    m_name( IND_K + boost::lexical_cast<string>( m_id ) ),
+    m_name( IND_K ),
     m_prop( p ),
     m_environment( env ) {
-
+    m_name.append( boost::lexical_cast< string >( m_id ) );
 }
 
 IndividualShell::~IndividualShell() {
@@ -101,6 +102,8 @@ void IndividualShell::executeProcess() {
                 e2->updateModels( this );
             }
         }
+
+//        delete e;
     }
 }
 
@@ -151,6 +154,10 @@ unsigned int IndividualShell::getOffspringCount() const {
     return m_prop->m_offspring;
 }
 
+unsigned int IndividualShell::getEnvironmentLociCount() const {
+    return m_environment->getLociCount();
+}
+
 unsigned int IndividualShell::getVariantCount() const {
     return m_prop->m_genos.size();
 }
@@ -158,7 +165,7 @@ unsigned int IndividualShell::getVariantCount() const {
 allele_t IndividualShell::alleleAt( unsigned int var_idx, ploidy_t strand ) const {
     if( var_idx < m_prop->m_genos.size() )
         return m_prop->m_genos[ var_idx ][ strand ];
-    return (allele_t)0;
+    return (allele_t)ANCESTRAL_ALLELE;
 }
 
 void IndividualShell::print( ostream & out ) const {

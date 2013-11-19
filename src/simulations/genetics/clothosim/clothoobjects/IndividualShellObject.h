@@ -85,6 +85,8 @@ public:
     allele_t alleleAt( unsigned int var_idx, ploidy_t strand ) const;
     unsigned int getVariantCount() const;
 
+    unsigned int getEnvironmentLociCount() const;
+
 
 private:
     string  m_name;

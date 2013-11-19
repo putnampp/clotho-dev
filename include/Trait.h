@@ -30,113 +30,37 @@
 #define TRAIT_H_
 
 #include "common.h"
-#include "ploidy.h"
-#include "Configurable.h"
-#include "Mutate.h"
-#include "Inheritance.h"
-#include "Locus.h"
 
-#include <cassert>
+#include "Genotype.h"
+#include "Phenotype.h"
 
-using std::istream;
+#include <functional>
 
-struct iTrait {
-
-/**
- *  return the ploidy of the trait
- */
-    virtual ploidy_t    ploidy()    const = 0;
-
-/**
- *  return the number of loci associated with the trait
- */
-    virtual size_t    loci()      const = 0;
-
-    virtual LocusIterator   begin() const = 0;
-    virtual LocusIterator   end()   const = 0;
-};
-
-/*******************************************************************************
- * A Trait is some observed characteristic of an individual.
- *
- * A set of Traits is used to define a Phenotype.
- *
- * There are two types of traits: categorical or quantitative.
- *
- * Quantitative traits are represented by a measured value or quantity. For 
- * example, height is considered to be a quantitative value.
- *
- * Qualitative traits fall into a general set of values. For example, eye color
- * is a categorical trait, and is limited to a set of colors.
- *
- ******************************************************************************/
-template < ploidy_t P = DIPLOID >
-class Trait : public iTrait, 
-    public Configurable 
-{
+class Trait : 
+    virtual public MultilocusGenotyper,
+    virtual public phenotyper {
 public:
-    Trait( const string & name, const string & desc );
 
-    string getName() const;
-    string getDescription() const;
+    const string & getName() const { return m_name; }
 
-    virtual void configure( istream & config );
+    virtual bool addIndexedGenotyper( size_t idx, LocusGenotyper * lg ) = 0;
+    virtual size_t getLociCount() const = 0;
 
-    virtual void add( const LocusPtr l );
+    virtual double genotype( const AlleleGroup * ag ) const = 0;
+    virtual double phenotype( const AlleleGroup * ag, const environmental * env ) const = 0;
 
-    virtual ploidy_t    ploidy() const;
-    virtual size_t      loci() const;
+    virtual bool operator==( const Trait & rhs ) const {    return m_name == rhs.m_name; }
 
-    virtual LocusIterator   begin() const;
-    virtual LocusIterator   end()   const;
+    virtual ~Trait() {}
+protected:
+    Trait( const char * n ) : m_name(n) {}
 
-    virtual ~Trait() {    }
-private:
-    static const ploidy_t PLOIDY = P;
+    Trait( const string & n ) : m_name( n ) {}
 
-    Loci    m_loci;
-    string  m_name;
-    string  m_desc;
+    string m_name;
 };
 
-/**
- *
- * Implementation
- *
- */
-
-#define TRAIT_DECL( t, f ) template < ploidy_t P > t Trait<P>::f
-
-TRAIT_DECL( string, getName )() const {
-    return m_name;
-}
-
-TRAIT_DECL( string, getDescription )() const {
-    return m_desc;
-}
-
-TRAIT_DECL( void, configure)( istream & config ) {
-
-}
-
-TRAIT_DECL( void, add )( const LocusPtr locus ) {
-
-}
-
-TRAIT_DECL( ploidy_t, ploidy)() const {
-    return PLOIDY;
-}
-
-TRAIT_DECL( size_t, loci)() const {
-    return m_loci.size();
-}
-
-TRAIT_DECL( LocusIterator, begin )() const {
-    return m_loci.begin();
-}
-
-TRAIT_DECL( LocusIterator, end )() const {
-    return m_loci.end();
-}
+typedef shared_ptr< Trait > TraitPtr;
+typedef vector< TraitPtr > Traits;
 
 #endif  // TRAIT_H_

@@ -26,69 +26,78 @@
  * of the authors and should not be interpreted as representing official policies,
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
+#ifndef ALLELETUPLE_H_
+#define ALLELETUPLE_H_
 
-#ifndef INDIVIDUALPROPERTIES_H_
-#define INDIVIDUALPROPERTIES_H_
+#include "ploidy.h"
+#include "Allele.h"
 
-#include "common_types.h"
-#include "IntVTime.h"
-
-#include <ostream>
 #include <vector>
+#include <ostream>
+#include <cstring>
 
-using std::ostream;
 using std::vector;
+using std::ostream;
+using std::memcpy;
 
-class IndividualProperties {
-public:
-    long    m_id;
-    long    m_parent0, m_parent1;
-    IntVTime * m_dob, * m_eol;
-    bool m_isMature;
-    unsigned int m_offspring;
-    sex_t   m_sex;
-    vector< genotype_t > m_genos;
+struct allele_tuple {
+    virtual ploidy_t ploidy() const = 0;
 
-    IndividualProperties() : 
-        m_id(-1),
-        m_parent0(-1),
-        m_parent1(-1),
-        m_dob(NULL), 
-        m_eol( NULL ), 
-        m_isMature(false), 
-        m_offspring(0), 
-        m_sex( UNASSIGNED ) {}
+    virtual allele_t & operator[]( ploidy_t p ) = 0;
+    virtual allele_t operator[]( ploidy_t p ) const = 0;
 
-    IndividualProperties( sex_t s, vector< genotype_t > & genos ) :
-        m_id( next_id++),
-        m_parent0(-1),
-        m_parent1(-1),
-        m_dob(NULL), 
-        m_eol(NULL), 
-        m_offspring(0), 
-        m_sex(s), 
-        m_genos(genos.begin(), genos.end()) {}
-    IndividualProperties( IndividualProperties * p0, IndividualProperties * p1,
-                         sex_t s, vector< genotype_t > & genos ) :
-        m_id( next_id++),
-        m_parent0( p0->m_id ),
-        m_parent1( p1->m_id ),
-        m_dob(NULL), 
-        m_eol(NULL), 
-        m_offspring(0), 
-        m_sex(s), 
-        m_genos(genos.begin(), genos.end()) {}
-
-    virtual ~IndividualProperties()  {
-        if( m_dob ) delete m_dob;
-        if( m_eol ) delete m_eol;
-
-        m_genos.clear();
-    }
-private:
-    static long next_id;
+    virtual void print( ostream & out ) const = 0; 
 };
 
-ostream & operator<<( ostream &, const IndividualProperties & ip );
+template < ploidy_t P >
+struct AlleleTuple : public allele_tuple {
+public:
+    static const ploidy_t PLOIDY = P;
+    AlleleTuple( const vector< allele_t > & alleles) {
+        vector< allele_t >::const_iterator it = alleles.begin();
+        ploidy_t p = 0;
+        while( it != alleles.end() && p < PLOIDY ) {
+            m_alleles[ p++ ] = (*it++);
+        }
+    }
 
-#endif  // INDIVIDUALPROPERTIES_H_
+    AlleleTuple( const AlleleTuple< P > & alleles ) {
+        memcpy( m_alleles, alleles.m_alleles, sizeof(allele_t) * P);
+    }
+
+    ploidy_t ploidy() const {   return PLOIDY; }
+
+    allele_t & operator[]( ploidy_t p ) {
+        assert( p < PLOIDY ); return m_alleles[ p ]; 
+    }
+
+    allele_t operator[]( ploidy_t p ) const {
+        assert( p < PLOIDY );
+        return m_alleles[ p ];
+    }
+
+    void print( ostream & out ) const {
+        if( !PLOIDY ) return;
+
+        ploidy_t p = 0;
+        out << (int) m_alleles[ p++ ];
+        while( p < P ) {
+            out << ":" << (int) m_alleles[p++];
+        }
+    }
+    virtual ~AlleleTuple() {}
+protected:
+    allele_t    m_alleles[ PLOIDY ];
+};
+
+/*
+struct allelic_tuple_weight : public allelic_effect {
+    
+    /// map the allele_tuple to an allelic effect tuple (vector)
+    virtual shared_ptr< double [] > operator()( const allele_tuple * alleles ) = 0;
+
+};
+*/
+typedef vector< allele_tuple * >                AlleleGroup;
+
+#endif  // ALLELETUPLE_H_
