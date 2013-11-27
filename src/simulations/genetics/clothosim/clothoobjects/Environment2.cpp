@@ -240,6 +240,10 @@ IndividualShell * Environment2::nextAvailableIndividual() {
     return t;
 }
 
+bool Environment2::hasAvailableIndividuals() const {
+    return !m_individual_pool.empty();
+}
+
 int Environment2::getMaleCount() const {
     return m_males.size();
 }

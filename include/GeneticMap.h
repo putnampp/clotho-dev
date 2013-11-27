@@ -52,14 +52,11 @@ class GeneticMap {
 public:
     typedef size_t  locus_index_t;
     typedef size_t  trait_index_t;
-    
+
     GeneticMap();
 
     locus_index_t getLocusIndex( LocusPtr lp ) const;
     trait_index_t getTraitIndex( TraitPtr tp) const;
-
-    /// plan to deprecate in favor of addGenotyper
-//    locus_index_t addLocus( LocusPtr lp );
 
     /// assumes only one method of computing genotype per locus
     locus_index_t addGenotyper( LocusGenotyper * lg, bool bShouldUpdate = false);
@@ -70,15 +67,16 @@ public:
 
     bool addTraitLocus( TraitPtr tp, LocusGenotyper * lg );
 
-    virtual double computeGenotype( locus_index_t locus, const AlleleGroup * la ) const;
+    virtual double computeGenotype( locus_index_t locus, const AlleleGroupPtr la ) const;
 
-    virtual double computePhenotype( TraitPtr t, const AlleleGroup * ag, const environmental * env ) const;
-    virtual double computePhenotype( trait_index_t trait, const AlleleGroup * ag, const environmental * env ) const;
+    virtual double computePhenotype( TraitPtr t, const AlleleGroupPtr ag, const environmental * env ) const;
+    virtual double computePhenotype( trait_index_t trait, const AlleleGroupPtr ag, const environmental * env ) const;
 
     size_t getLociCount() const;
     size_t getTraitCount() const;
 
-    AlleleGroup * createLociAlleles() const;
+    AlleleGroupPtr createLociAlleles() const;
+
     virtual ~GeneticMap();
 
 protected:

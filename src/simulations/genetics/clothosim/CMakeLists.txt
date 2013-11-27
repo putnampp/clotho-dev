@@ -80,7 +80,12 @@ LIST( APPEND MODEL_SRC models/LogModel.cpp )
 LIST( APPEND MODEL_SRC models/LogModelCreator.cpp )
 LIST( APPEND MODEL_SRC models/RandomMatingModel.cpp )
 LIST( APPEND MODEL_SRC models/RandomMatingModelCreator.cpp )
-
+LIST( APPEND MODEL_SRC models/ConstantLifeExpectancyModel.cpp )
+LIST( APPEND MODEL_SRC models/ConstantLifeExpectancyModelCreator.cpp )
+LIST( APPEND MODEL_SRC models/ConstantMaturityModel.cpp )
+LIST( APPEND MODEL_SRC models/ConstantMaturityModelCreator.cpp )
+LIST( APPEND MODEL_SRC models/ConstantPopulationRandomMatingModel.cpp)
+LIST( APPEND MODEL_SRC models/ConstantPopulationRandomMatingModelCreator.cpp)
 
 ADD_LIBRARY(cmodels SHARED ${MODEL_SRC} )
 

@@ -31,6 +31,7 @@
 
 GeneticMap::GeneticMap() :
     m_loci( new Loci() ),
+    m_genotypers( new vector< LocusGenotyper * >() ),
     m_trait_map( new TraitMap() ),
     m_traits( new Traits() )
 {}
@@ -132,7 +133,7 @@ bool GeneticMap::addTraitLocus( TraitPtr tp, LocusGenotyper * lg ) {
     return m_traits->at( tidx )->addIndexedGenotyper( lidx, lg );
 }
 
-double GeneticMap::computeGenotype( locus_index_t l, const AlleleGroup * ag ) const {
+double GeneticMap::computeGenotype( locus_index_t l, const AlleleGroupPtr ag ) const {
     if( l < m_genotypers->size() && l < ag->size() ) {
         return m_genotypers->at(l)->genotype(ag->at(l));
     }
@@ -140,7 +141,7 @@ double GeneticMap::computeGenotype( locus_index_t l, const AlleleGroup * ag ) co
     return 0.0;
 }
 
-double GeneticMap::computePhenotype( TraitPtr t, const AlleleGroup * ag, const environmental * env ) const {
+double GeneticMap::computePhenotype( TraitPtr t, const AlleleGroupPtr ag, const environmental * env ) const {
     TraitMap::iterator it = m_trait_map->find( t->getName() );
 
     if( it == m_trait_map->end()) {
@@ -150,7 +151,7 @@ double GeneticMap::computePhenotype( TraitPtr t, const AlleleGroup * ag, const e
     return computePhenotype( it->second, ag, env );
 }
 
-double GeneticMap::computePhenotype( trait_index_t t, const AlleleGroup * ag, const environmental * env ) const {
+double GeneticMap::computePhenotype( trait_index_t t, const AlleleGroupPtr ag, const environmental * env ) const {
     if( t >= m_traits->size() ) return 0.0;
 
     if( !m_traits->at( t ) ) {
@@ -160,8 +161,8 @@ double GeneticMap::computePhenotype( trait_index_t t, const AlleleGroup * ag, co
     return m_traits->at( t )->phenotype( ag, env);
 }
 
-AlleleGroup * GeneticMap::createLociAlleles() const {
-    AlleleGroup * la = new AlleleGroup();
+AlleleGroupPtr GeneticMap::createLociAlleles() const {
+    AlleleGroupPtr la( new AlleleGroup() );
     la->reserve( m_loci->size() );
     return la;
 }

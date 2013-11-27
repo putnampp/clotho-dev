@@ -2,7 +2,7 @@
 ---
 object: PopulatedEnvironment
 name: ENV1
-pool_size: 100000
+pool_size: 20000
 logdir: log/
 ...
 
@@ -38,16 +38,13 @@ traits:
     - &tr5 trait5
 loci:
     - &loc1 {
-        locus: [ 1, 100, 101, 5], # chromid, start, end, number of alleles
-        genotyper: *normal_dominance
+        locus: [ 1, 100, 101, 5] # chromid, start, end, number of alleles
       }
     - &loc2 {
-        locus: [ 1, 1001, 1002, 4 ],
-        genotyper: *normal_dominance
+        locus: [ 1, 1001, 1002, 4 ]
       }
     - &loc3 {
-        locus: [ 1, 10001, 10002, 4],
-        genotyper: *normal_dominance
+        locus: [ 1, 10001, 10002, 4]
       }
 ...
 
@@ -55,51 +52,22 @@ loci:
 ---
 initializer: PopulationInitializer
 environment: ENV1
-pop_size: 5
-percent_female: 60
-max_variants:   1000
-variants: 150
-...
-# population model
----
-model: PopulationModel
-popsize: 10
+pop_size: 10000
+percent_female: 55 
 ...
 # life expectancy model
 ---
-model: LifeExpectancyModel
-male: {
-    distribution: gaussian,
-    mean: 80,
-    stdev: 8
-}
-female: {
-    distribution: gaussian,
-    mean: 82,
-    stdev: 8
-}
+model: ConstantLifeExpectancyModel
+age: 2
 ...
 # maturity model
 ---
-model: MaturityModel
-male: {
-    distribution: gaussian,
-    mean: 14,
-    stdev: 1
-}
-female: {
-    distribution: gaussian,
-    mean: 13,
-    stdev: 1
-}
-...
-# log model
----
-model: LogModel
-logdir: log/
-time_step: 100
+model: ConstantMaturityModel
+age: 1
 ...
 # random mating model
 ---
-model: RandomMatingModel
+model: ConstantPopulationRandomMatingModel
+max_offspring: 4
+birth_delay: 1
 ...

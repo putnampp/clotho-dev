@@ -36,7 +36,7 @@
 
 class LocusGenotyper {
 public:
-    virtual double genotype( const allele_tuple * at ) const = 0;
+    virtual double genotype( const allele_tuple & at ) const = 0;
     virtual LocusPtr getLocus() const { return m_effect->getLocus(); }
 
     virtual ~LocusGenotyper() { }

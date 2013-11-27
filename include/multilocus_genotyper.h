@@ -42,7 +42,9 @@ public:
     /*
      * compute the genotype an indexed set of allele_tuples
      */
-    virtual double genotype( const AlleleGroup * t ) const = 0;
+    virtual double genotype( const AlleleGroupPtr t ) const = 0;
+
+    virtual ~MultilocusGenotyper() {}
 protected:
     MultilocusGenotyper() {}
 };

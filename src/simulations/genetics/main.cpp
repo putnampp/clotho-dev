@@ -48,17 +48,15 @@ int main( int argc, char ** argv ) {
 
     string warped_config( argv[1] );
     string clotho_config( argv[2] );
+
+    ClothoApplication * ca = new ClothoApplication( clotho_config );
     string sim_until("");
     if( argc == 4 ) {
         sim_until = argv[3];
+        const VTime & t = ca->getTime( sim_until );
+        cout << t << endl;
     }
 
-    ClothoApplication * ca = new ClothoApplication( clotho_config );
-
-    const VTime & t = ca->getTime( sim_until );
-
-    cout << t << endl;
-    
     WarpedMain wm( ca, warped_config, sim_until);
     return wm.main( argc, argv );
 }

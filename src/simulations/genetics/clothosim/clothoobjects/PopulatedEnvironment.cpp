@@ -95,7 +95,7 @@ public:
 
         int allocated = 0;
         while( ++allocated <= pool_size ) {
-            IndividualShell * ishell = new IndividualShell( env, new IndividualProperties() );
+            IndividualShell * ishell = new IndividualShell( env, new IndividualProperties(env->getGeneticMap()->createLociAlleles()) );
 
             objs->push_back( ishell );
             if( ishell ) {

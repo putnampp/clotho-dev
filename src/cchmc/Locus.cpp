@@ -47,6 +47,10 @@ unsigned long locus_id::createID( chromid_t c, pos_t s, pos_t e ) {
     return id;
 }
 
+unsigned long locus_id::getKey() const {
+    return m_id;
+}
+
 chromid_t  locus_id::getChromosome() const {
     return (chromid_t) (m_id >> 56);
 }

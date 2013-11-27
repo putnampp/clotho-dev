@@ -65,6 +65,8 @@ public:
     void removeIndividual( IndividualShell * s );
     IndividualShell * nextAvailableIndividual();
 
+    bool hasAvailableIndividuals() const;
+
     template < class EVT >
     void handleEvent( const EVT * e ) {}
 

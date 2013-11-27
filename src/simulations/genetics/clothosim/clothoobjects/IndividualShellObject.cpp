@@ -72,7 +72,7 @@ void IndividualShell::initialize() {
     if( !m_prop ) {
         // initalizing new properties
 //        cout << "Initializing new properties" << endl;
-        m_prop = new IndividualProperties();
+        m_prop = new IndividualProperties( m_environment->getGeneticMap()->createLociAlleles());
     }
 
     // notify self that has been born?
@@ -159,12 +159,12 @@ unsigned int IndividualShell::getEnvironmentLociCount() const {
 }
 
 unsigned int IndividualShell::getVariantCount() const {
-    return m_prop->m_genos.size();
+    return m_prop->m_genos->size();
 }
 
 allele_t IndividualShell::alleleAt( unsigned int var_idx, ploidy_t strand ) const {
-    if( var_idx < m_prop->m_genos.size() )
-        return m_prop->m_genos[ var_idx ][ strand ];
+    if( var_idx < m_prop->m_genos->size() )
+        return m_prop->m_genos->at( var_idx )[ strand ];
     return (allele_t)ANCESTRAL_ALLELE;
 }
 

@@ -76,15 +76,17 @@ public:
         } else {
             abort();
         }
-
+/*
         unsigned int max_variants = DEFAULT_MAX_VARIANTS;
         if( n[ MAX_VARIANTS_K ] ) {
             max_variants = n[ MAX_VARIANTS_K ].as< unsigned int >();
         }
+
         unsigned int variants = DEFAULT_ANC_VARIANTS;
         if( n[ VARIANTS_K ] ) {
             variants = n[ VARIANTS_K ].as< unsigned int > ();
         }
+*/
         unsigned int pop_size = DEFAULT_POP_SIZE;
         if( n[ POP_SIZE_K ] ) {
             pop_size = n[ POP_SIZE_K ].as< unsigned int >();
@@ -115,30 +117,19 @@ public:
 
         if( !env )  abort();    // could not find the environment
 
-        vector< genotype_t > genotypes;
-        genotypes.reserve( max_variants );
-
         for( unsigned int i = 0; i < female_count; i++ ) {
-            genotypes.clear();
-            generateGenotypes( genotypes, variants );
-
             IndividualShell * ishell = env->nextAvailableIndividual();
             if( ishell ) {
-                // configure female with genotypes
-                IndividualProperties * ip = new IndividualProperties( FEMALE, genotypes );
-                ishell->setProperties( ip );
+                generateGenotypes( ishell->getProperties()->m_genos, env->getGeneticMap()->getLociCount() );
+                ishell->getProperties()->m_sex = FEMALE;
             }
         }
 
         for( unsigned int i = female_count; i < pop_size; i++ ) {
-            genotypes.clear();
-            generateGenotypes( genotypes, variants );
-
             IndividualShell * ishell = env->nextAvailableIndividual();
             if( ishell ) {
-                // configure male with genotypes
-                IndividualProperties * ip = new IndividualProperties( MALE, genotypes );
-                ishell->setProperties( ip );
+                generateGenotypes( ishell->getProperties()->m_genos, env->getGeneticMap()->getLociCount() );
+                ishell->getProperties()->m_sex = MALE;
             }
         }
     }
@@ -148,27 +139,23 @@ public:
     }
 protected:
 
-    void generateGenotypes( vector< genotype_t > & genotypes, unsigned int count ) {
+    void generateGenotypes( AlleleGroupPtr genotypes, unsigned int count ) {
         const unsigned int MAX_J = (sizeof( unsigned int ) << 2);
         unsigned int rnd = gsl_rng_get( m_rng );
         unsigned int j = 1;
-        vector< allele_t > alleles;
-        alleles.reserve( genotype_t::PLOIDY );
         for( unsigned int i = 0; i < count; ++i ) {
-            alleles.clear();
-            for( ploidy_t p = 0; p < genotype_t::PLOIDY; ++p ) {
+            genotype_t g;
+            for( ploidy_t p = 0; p < g.max_size(); ++p ) {
                 if( j++ >= MAX_J ) {
                     rnd = gsl_rng_get( m_rng );
                     j = 1;
                 }
-                alleles.push_back( (allele_t) (rnd & 0x00000001));
+                g[p] = (allele_t) (rnd & 0x00000001);
                 rnd >>= 1;
             }
 
-            genotype_t g( alleles );
-            genotypes.push_back( g );
+            genotypes->push_back( g );
         }
-
     }
 
     const string m_name;

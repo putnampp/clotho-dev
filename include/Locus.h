@@ -37,6 +37,7 @@
 
 #include <vector>
 #include <unordered_map>
+#include <functional>
 
 using std::vector;
 using std::unordered_map;
@@ -46,6 +47,7 @@ public:
     static unsigned long createID( chromid_t c, pos_t s, pos_t e );
     locus_id( chromid_t c, pos_t s, pos_t e );
 
+    unsigned long getKey() const;
     chromid_t  getChromosome() const;
     pos_t       getStart() const;
     pos_t       getEnd() const;
@@ -68,9 +70,7 @@ protected:
  *  - properties (name, alleles, ... )
  *
  */
-class Locus /*: 
-    virtual public locus_genotyper, 
-    virtual public allelic_effect*/ {
+class Locus {
 public:
     Locus( chromid_t c, pos_t s, pos_t e, allele_t nAlleles );
 
@@ -81,16 +81,7 @@ public:
 
     allele_t    getMaxAlleles() const;
 
-//    virtual bool addAlternateAllele( allele_t all );
-//    virtual bool addAlternateAllele( allele_t all, double all_eff );
-
     virtual bool isKnownAllele( allele_t all ) const;
-
-/*    virtual double operator()( const allele_t all ) const;
-
-    virtual double genotype( const allele_tuple * at ) const;
-    virtual double genotype( const allele_tuple * at, const allelic_effect * ae ) const;
-*/
 
     bool operator==( const Locus & rhs ) const;
 
@@ -98,11 +89,30 @@ public:
 protected:
     locus_id    m_id;
     allele_t    m_nAlleles;
-//    shared_ptr< unordered_map< allele_t, double > > alt_alleles;
 };
 
 typedef shared_ptr< Locus > LocusPtr;
 typedef vector< LocusPtr > Loci;
 typedef Loci::iterator  LocusIterator;
+
+namespace std {
+
+template <>
+struct hash< boost::shared_ptr< Locus > > {
+    std::hash< unsigned long > hasher;
+    size_t operator()( const boost::shared_ptr< Locus > & lp ) const {
+        return hasher( lp->getID().getKey() );
+    }
+};
+
+template <>
+struct equal_to< boost::shared_ptr< Locus > > {
+    bool operator()( const boost::shared_ptr< Locus > & lhs, const boost::shared_ptr< Locus > & rhs ) const {
+        return ( lhs == rhs || *lhs == *rhs);
+    }
+};
+}
+
+typedef std::unordered_map< LocusPtr, size_t >  LocusIndexMap;
 
 #endif  // LOCUS_H_

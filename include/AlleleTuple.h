@@ -29,18 +29,22 @@
 #ifndef ALLELETUPLE_H_
 #define ALLELETUPLE_H_
 
+#include "common.h"
 #include "ploidy.h"
 #include "Allele.h"
 
 #include <vector>
-#include <ostream>
-#include <cstring>
 
 using std::vector;
+
+#ifdef NOCPP11
+
+#include <ostream>
+#include <cstring>
 using std::ostream;
 using std::memcpy;
 
-struct allele_tuple {
+struct ituple {
     virtual ploidy_t ploidy() const = 0;
 
     virtual allele_t & operator[]( ploidy_t p ) = 0;
@@ -50,7 +54,7 @@ struct allele_tuple {
 };
 
 template < ploidy_t P >
-struct AlleleTuple : public allele_tuple {
+struct AlleleTuple : public ituple {
 public:
     static const ploidy_t PLOIDY = P;
     AlleleTuple( const vector< allele_t > & alleles) {
@@ -90,14 +94,44 @@ protected:
     allele_t    m_alleles[ PLOIDY ];
 };
 
-/*
-struct allelic_tuple_weight : public allelic_effect {
-    
-    /// map the allele_tuple to an allelic effect tuple (vector)
-    virtual shared_ptr< double [] > operator()( const allele_tuple * alleles ) = 0;
+typedef ituple *    allele_tuple;
+typedef vector< allele_tuple >                AlleleGroup;
 
+inline ostream & operator<<( ostream & out, const ituple * g ) {
+    g->print( out );
+    return out;
+}
+
+#else   // using cpp0x
+
+#include <ostream>
+#include <array>
+using std::array;
+using std::ostream;
+
+template < ploidy_t P >
+struct allele_copy {
+    typedef array< allele_t, P > allele_copy_t;
+    static const ploidy_t PLOIDY = P;
 };
-*/
-typedef vector< allele_tuple * >                AlleleGroup;
+
+typedef allele_copy< 2 >::allele_copy_t allele_tuple;
+
+typedef vector< allele_tuple >  AlleleGroup;
+
+inline ostream & operator<<( ostream & out, const allele_tuple & at ) {
+    if( at.max_size() > 0 ) {
+        size_t i = 0;
+        out << (int)at[i++];
+        while( i < at.max_size() ) {
+            out << ":" << (int)at[i++];
+        }
+    }
+    return out;
+}
+
+#endif
+
+typedef shared_ptr< AlleleGroup > AlleleGroupPtr;
 
 #endif  // ALLELETUPLE_H_

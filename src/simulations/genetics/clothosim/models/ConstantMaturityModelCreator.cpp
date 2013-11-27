@@ -3,13 +3,13 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
+ * modification, are permitted provided that the following conditions are met:
  *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
+ *    and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -27,21 +27,27 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#include "DefaultLocusGenotyper.h"
-#include "DefaultAllelicEffect.h"
+#include "ConstantMaturityModelCreator.h"
+#include "../ClothoModelCoordinator.h"
+#include "../clothoobjects/common_types.h"
 
-DefaultLocusGenotyper::DefaultLocusGenotyper( LocusPtr lp ) :
-    LocusGenotyper( new DefaultAllelicEffect( lp ) ) {}
+using boost::static_pointer_cast;
 
-DefaultLocusGenotyper::DefaultLocusGenotyper( AllelicEffect * ae ) :
-    LocusGenotyper( ae ) {}
+const string AGE_K = "age";
 
-double DefaultLocusGenotyper::genotype( const allele_tuple & at ) const {
-    double res = 0.0;
-
-    for( ploidy_t p = 0; p < at.max_size(); ++p ) {
-        res += (*m_effect)(at[p]);
+template<>
+void ClothoModelCreator< ConstantMaturityModel, YAML::Node >::createModelFrom( const YAML::Node & n ) {
+    int age = 1;
+    if( n[ AGE_K ] ) {
+        age = n[AGE_K].as< int >();
     }
 
-    return res;
+    shared_ptr< ConstantMaturityModel > pm( new ConstantMaturityModel(age) );
+
+    ClothoModelCoordinator< Individual, BirthEvent >::getInstance()->addEventHandler(
+        static_pointer_cast< ClothoModel< Individual, BirthEvent > >( pm )  );
+    ClothoModelCoordinator< IndividualShell, ShellBirthEvent >::getInstance()->addEventHandler(
+        static_pointer_cast< ClothoModel< IndividualShell, ShellBirthEvent > >( pm )  );
 }
+
+DEFINE_REGISTERED_CLOTHO_MODEL( ConstantMaturityModel, YAML::Node )

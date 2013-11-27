@@ -95,7 +95,7 @@ public:
             female_count = (pop_size * percent) / 100;
         }
 
-        vector< genotype_t > genotypes;
+        AlleleGroup genotypes;
         genotypes.reserve( max_variants );
 
         if( objs->empty() || (objs->capacity() - objs->size()) < pop_size ) {
@@ -124,26 +124,24 @@ public:
     }
 protected:
 
-    void generateGenotypes( vector< genotype_t > & genotypes, unsigned int count ) {
+    void generateGenotypes( AlleleGroup & genotypes, unsigned int count ) {
         const unsigned int MAX_J = (sizeof( unsigned int ) << 2);
         unsigned int rnd = gsl_rng_get( m_rng );
         unsigned int j = 1;
-        vector< allele_t > alleles;
-        alleles.reserve( genotype_t::PLOIDY );
+
         for( unsigned int i = 0; i < count; ++i ) {
-            alleles.clear();
-            for( ploidy_t p = 0; p < genotype_t::PLOIDY; ++p ) {
+            genotype_t g;
+            for( ploidy_t p = 0; p < g.max_size(); ++p ) {
                 if( j++ >= MAX_J ) {
                     rnd = gsl_rng_get( m_rng );
                     j = 1;
                 }
 
                 // all alleles are non-deleted
-                alleles.push_back( (allele_t) (ANCESTRAL_ALLELE + (rnd & 0x00000001)));
+                g[p] = (allele_t) (ANCESTRAL_ALLELE + (rnd & 0x00000001));
                 rnd >>= 1;
             }
 
-            genotype_t g( alleles );
             genotypes.push_back( g );
         }
 

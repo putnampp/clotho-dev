@@ -47,9 +47,9 @@ public:
     bool m_isMature;
     unsigned int m_offspring;
     sex_t   m_sex;
-    vector< genotype_t > m_genos;
+    AlleleGroupPtr m_genos;
 
-    IndividualProperties() : 
+    IndividualProperties( AlleleGroupPtr g) : 
         m_id(-1),
         m_parent0(-1),
         m_parent1(-1),
@@ -57,33 +57,37 @@ public:
         m_eol( NULL ), 
         m_isMature(false), 
         m_offspring(0), 
-        m_sex( UNASSIGNED ) {}
+        m_sex( UNASSIGNED ),
+        m_genos(g) {}
 
-    IndividualProperties( sex_t s, vector< genotype_t > & genos ) :
+    IndividualProperties( sex_t s, AlleleGroupPtr genos ) :
         m_id( next_id++),
         m_parent0(-1),
         m_parent1(-1),
         m_dob(NULL), 
         m_eol(NULL), 
+        m_isMature(false), 
         m_offspring(0), 
         m_sex(s), 
-        m_genos(genos.begin(), genos.end()) {}
+        m_genos(genos) {}
+
     IndividualProperties( IndividualProperties * p0, IndividualProperties * p1,
-                         sex_t s, vector< genotype_t > & genos ) :
+                         sex_t s, AlleleGroupPtr genos ) :
         m_id( next_id++),
         m_parent0( p0->m_id ),
         m_parent1( p1->m_id ),
         m_dob(NULL), 
         m_eol(NULL), 
+        m_isMature(false), 
         m_offspring(0), 
         m_sex(s), 
-        m_genos(genos.begin(), genos.end()) {}
+        m_genos(genos) {}
 
     virtual ~IndividualProperties()  {
         if( m_dob ) delete m_dob;
         if( m_eol ) delete m_eol;
 
-        m_genos.clear();
+        m_genos.reset();
     }
 private:
     static long next_id;

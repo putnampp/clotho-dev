@@ -35,7 +35,7 @@
 #include "Environmental.h"
 
 struct phenotyper {
-    virtual double phenotype( const AlleleGroup * la, const environmental * env ) const = 0;
+    virtual double phenotype( const AlleleGroupPtr la, const environmental * env ) const = 0;
 
     /// considering:
     // virtual double phenotype( const AlleleGroup * la, const MultilocusGenotyper * mg, const environmental * env ) const = 0;

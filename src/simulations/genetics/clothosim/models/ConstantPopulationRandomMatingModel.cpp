@@ -27,7 +27,7 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#include "RandomMatingModel.h"
+#include "ConstantPopulationRandomMatingModel.h"
 #include <iostream>
 
 #include <time.h>
@@ -41,42 +41,47 @@ using std::cout;
 using std::endl;
 using std::random_shuffle;
 
-RandomMatingModel::RandomMatingModel() : m_rng( gsl_rng_alloc( gsl_rng_taus ) ) {
+ConstantPopulationRandomMatingModel::ConstantPopulationRandomMatingModel( unsigned int max_offspring, unsigned int birth_delay ) : 
+    m_rng( gsl_rng_alloc( gsl_rng_taus ) ),
+    m_max_offspring( max_offspring ),
+    m_birth_delay( birth_delay ),
+    m_rand_val(0),
+    m_offset(0) {
     long seed = time(NULL);
     gsl_rng_set( m_rng, seed );
 }
 
-void RandomMatingModel::operator()( const ShellMaturityEvent * e, IndividualShell * ind ) {
+void ConstantPopulationRandomMatingModel::operator()( const ShellMaturityEvent * e, IndividualShell * ind ) {
     if( ind->getSex() == FEMALE ) {
         // females notifies environment when ready to mate
         //
         IntVTime date = dynamic_cast< const IntVTime & >( e->getReceiveTime() );
-        IntVTime age = date - *ind->getBirthTime();
 
-        unsigned int nOffspring = ind->getOffspringCount();
+        Environment2 * env = ind->getEnvironment();
 
-        // given age will she mate again and produce offspring?
-        if( readyToMate( age, nOffspring ) ) {
-            Environment2 * env = ind->getEnvironment();
-
+        if( env->hasAvailableIndividuals() ) {
+            // given number of offspring will she mate again and produce offspring?
             Event * evt = new ShellMatingEvent( e->getReceiveTime(), date, ind, env, ind );
             env->receiveEvent( evt );
-        } else if( age < 45 ) {
-            // wait a bit and try again
-            unsigned int rnd = gsl_rng_get( m_rng );
-
-            IntVTime delay = date + (rnd % 3 ); // try again some time with in the next 3 years
-            Event * evt = new ShellMaturityEvent( e->getReceiveTime(), delay, ind, ind );
-            ind->receiveEvent( evt );
         }
     }
 }
 
-void RandomMatingModel::operator()( const ShellMatingEvent * e, Environment2 * env ) {
+void ConstantPopulationRandomMatingModel::operator()( const ShellMatingEvent * e, Environment2 * env ) {
+    if( !env->hasAvailableIndividuals() ) {
+        cout << "pool empty" << endl;
+        return;
+    }
+
     int nMales = env->getMaleCount();
 
     // get a random male by index
     unsigned int rMale = gsl_rng_get( m_rng ) % nMales;
+
+    if( m_offset == 0 ) {
+        m_rand_val = gsl_rng_get( m_rng );
+        m_offset = 4;
+    }
 
     IndividualShell * female = e->getFirstPartner();
     IndividualShell * male = env->getMaleAt( rMale );
@@ -95,29 +100,41 @@ void RandomMatingModel::operator()( const ShellMatingEvent * e, Environment2 * e
                 rnd >>= 1;
 
                 IndividualProperties * ip = new IndividualProperties( female->getProperties(), male->getProperties(), s, genos );
-                ip->m_dob = dynamic_cast< IntVTime * > (e->getReceiveTime().clone() );
+                IntVTime t = *dynamic_cast< IntVTime * > (e->getReceiveTime().clone() ) + m_birth_delay;
+
+                ip->m_dob = dynamic_cast< IntVTime * >( t.clone() );
 
                 offspring->setProperties( ip );
+
+                //cout << "\t";
+                //offspring->print( cout );
+                //cout << endl;
+
                 female->addOffspring();
                 male->addOffspring();
 
                 Event * eBorn = new ShellBirthEvent( e->getReceiveTime(), *ip->m_dob, offspring, offspring );
                 offspring->receiveEvent( eBorn );
 
-                IntVTime mTime = dynamic_cast< const IntVTime & >(e->getReceiveTime() ) + 1;
-                Event * mE = new ShellMaturityEvent( e->getReceiveTime(), mTime, female, female );
+                if( female->getOffspringCount() < m_max_offspring ) {
+                    IntVTime mTime = dynamic_cast< const IntVTime & >(e->getReceiveTime() );
+                    Event * mE = new ShellMaturityEvent( e->getReceiveTime(), mTime, female, female );
 
-                female->receiveEvent( mE );
+                    female->receiveEvent( mE );
+                }
+
+                m_rand_val >>= 4;
+                --m_offset;
             }
         }
     }
 }
 
-void RandomMatingModel::dump( ostream & out ) {
+void ConstantPopulationRandomMatingModel::dump( ostream & out ) {
 
 }
 
-void RandomMatingModel::generateOffspringGenotype( IndividualShell * female, IndividualShell * male, AlleleGroupPtr genos ) {
+void ConstantPopulationRandomMatingModel::generateOffspringGenotype( IndividualShell * female, IndividualShell * male, AlleleGroupPtr genos ) {
     unsigned int nLoci = female->getEnvironmentLociCount();
 
     //vector< allele_t > alleles(genotype_t::PLOIDY, (allele_t)ANCESTRAL_ALLELE );
@@ -174,10 +191,6 @@ void RandomMatingModel::generateOffspringGenotype( IndividualShell * female, Ind
     }
 }
 
-bool RandomMatingModel::readyToMate( IntVTime & age, unsigned int offspring ) {
-    return (age < 45 && age >= 21 && offspring <= 3 );
-}
-
-RandomMatingModel::~RandomMatingModel() {
+ConstantPopulationRandomMatingModel::~ConstantPopulationRandomMatingModel() {
     gsl_rng_free( m_rng );
 }

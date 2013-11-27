@@ -3,13 +3,13 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
+ * modification, are permitted provided that the following conditions are met:
  *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
+ *    and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -27,21 +27,36 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#include "DefaultLocusGenotyper.h"
-#include "DefaultAllelicEffect.h"
+#ifndef CONSTANTPOPULATIONRANDOMMATINGMODEL_H_
+#define CONSTANTPOPULATIONRANDOMMATINGMODEL_H_
 
-DefaultLocusGenotyper::DefaultLocusGenotyper( LocusPtr lp ) :
-    LocusGenotyper( new DefaultAllelicEffect( lp ) ) {}
+#include "../ClothoModel.h"
 
-DefaultLocusGenotyper::DefaultLocusGenotyper( AllelicEffect * ae ) :
-    LocusGenotyper( ae ) {}
+#include "../clothoobjects/events/ShellMaturityEvent.h"
+#include "../clothoobjects/events/ShellMatingEvent.h"
 
-double DefaultLocusGenotyper::genotype( const allele_tuple & at ) const {
-    double res = 0.0;
+#include "gsl/gsl_rng.h"
 
-    for( ploidy_t p = 0; p < at.max_size(); ++p ) {
-        res += (*m_effect)(at[p]);
-    }
+class ConstantPopulationRandomMatingModel :
+    virtual public ClothoModel< IndividualShell, ShellMaturityEvent >,
+        virtual public ClothoModel< Environment2 , ShellMatingEvent > {
+public:
+    ConstantPopulationRandomMatingModel (unsigned int max_offspring, unsigned int birth_delay);
 
-    return res;
-}
+    void operator()( const ShellMaturityEvent * e, IndividualShell * ind );
+    void operator()( const ShellMatingEvent * e, Environment2 * env );
+    void dump( ostream & out );
+
+    virtual ~ConstantPopulationRandomMatingModel();
+protected:
+    void generateOffspringGenotype( IndividualShell * female, IndividualShell * male, AlleleGroupPtr genos );
+
+    gsl_rng * m_rng;
+    unsigned int m_max_offspring;
+    unsigned int m_birth_delay;
+
+private:
+    unsigned int m_rand_val, m_offset;
+};
+
+#endif  // CONSTANTPOPULATIONRANDOMMATINGMODEL_H_

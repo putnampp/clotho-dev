@@ -35,6 +35,7 @@
 #include "Phenotype.h"
 
 #include <functional>
+#include <unordered_map>
 
 class Trait : 
     virtual public MultilocusGenotyper,
@@ -46,15 +47,14 @@ public:
     virtual bool addIndexedGenotyper( size_t idx, LocusGenotyper * lg ) = 0;
     virtual size_t getLociCount() const = 0;
 
-    virtual double genotype( const AlleleGroup * ag ) const = 0;
-    virtual double phenotype( const AlleleGroup * ag, const environmental * env ) const = 0;
+    virtual double genotype( const AlleleGroupPtr ag ) const = 0;
+    virtual double phenotype( const AlleleGroupPtr ag, const environmental * env ) const = 0;
 
     virtual bool operator==( const Trait & rhs ) const {    return m_name == rhs.m_name; }
 
     virtual ~Trait() {}
 protected:
     Trait( const char * n ) : m_name(n) {}
-
     Trait( const string & n ) : m_name( n ) {}
 
     string m_name;
@@ -62,5 +62,26 @@ protected:
 
 typedef shared_ptr< Trait > TraitPtr;
 typedef vector< TraitPtr > Traits;
+
+namespace std {
+
+template <>
+struct hash< boost::shared_ptr< Trait > > {
+    size_t operator()( const boost::shared_ptr< Trait > & t ) const {
+        return hasher( t->getName() );
+    }
+    std::hash< std::string > hasher;
+};
+
+template<>
+struct equal_to< boost::shared_ptr< Trait > > {
+    bool operator()( const boost::shared_ptr< Trait > & lhs, const boost::shared_ptr<Trait> & rhs ) const {
+        return (lhs == rhs || *lhs == *rhs);
+    }
+};
+
+}
+
+typedef unordered_map< TraitPtr, size_t > TraitIndexMap;
 
 #endif  // TRAIT_H_

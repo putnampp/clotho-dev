@@ -84,11 +84,11 @@ public:
         if( !env )  abort();    // could not find the environment
 
         if( n[ TRAITS_K ] ) {
-            buildTraits( n[TRAITS_K] );
+            buildTraits( n[TRAITS_K], env );
         }
 
         if( n[ LOCI_K ] ) {
-            buildLoci( n[LOCI_K] );
+            buildLoci( n[LOCI_K], env );
         }
 
     }
@@ -107,19 +107,20 @@ public:
         }
     }
 protected:
-    void buildTraits( const YAML::Node & n ) {
+    void buildTraits( const YAML::Node & n, Environment2 * env ) {
         if( n.IsSequence() ) {
             for( YAML::Node::const_iterator it = n.begin(); it != n.end(); it++ ) {
                 if( it->IsScalar() ) {
                     string name = it->as<string>();
                     TraitPtr t( new DefaultTrait(name) );
                     m_traits.push_back( t );
+                    env->getGeneticMap()->addTrait( t );
                 }
             }
         }
     }
 
-    void buildLoci( const YAML::Node & n ) {
+    void buildLoci( const YAML::Node & n, Environment2 * env ) {
         if( n.IsSequence() ) {
             cout << "Sequence Node" << endl;
             for( YAML::Node::const_iterator it = n.begin(); it != n.end(); it++ ) {
@@ -135,9 +136,9 @@ protected:
                     }
 
                     m_loci.push_back( lg ); // Initializer performs cleanup
+                    env->getGeneticMap()->addGenotyper( lg );
                 }
             }
-        } else if( n.IsSequence() ) {
         }
     }
 

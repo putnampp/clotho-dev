@@ -50,7 +50,7 @@ public:
     virtual ~RandomMatingModel();
 protected:
 
-    void generateOffspringGenotype( IndividualShell * female, IndividualShell * male, vector< genotype_t > & genos );
+    void generateOffspringGenotype( IndividualShell * female, IndividualShell * male, AlleleGroupPtr genos );
     bool readyToMate( IntVTime & age, unsigned int offspring );
 
     gsl_rng * m_rng;

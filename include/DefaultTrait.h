@@ -58,8 +58,8 @@ public:
     virtual bool addIndexedGenotyper( size_t idx, LocusGenotyper * lg );
     virtual size_t getLociCount() const;
 
-    virtual double genotype( const AlleleGroup * ag ) const;
-    virtual double phenotype( const AlleleGroup * ag, const environmental * env ) const;
+    virtual double genotype( const AlleleGroupPtr ag ) const;
+    virtual double phenotype( const AlleleGroupPtr ag, const environmental * env ) const;
 
     virtual ~DefaultTrait();
 protected:

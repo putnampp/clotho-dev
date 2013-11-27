@@ -50,12 +50,12 @@ ostream & operator<<( ostream & out, const IndividualProperties & ip ) {
 
     out << ", " << ip.m_offspring;
 
-    if( !ip.m_genos.empty() ) {
+    if( !ip.m_genos->empty() ) {
         out << ", [";
 
-        vector< genotype_t >::const_iterator it = ip.m_genos.begin();
+        AlleleGroup::const_iterator it = ip.m_genos->begin();
         out << "{" << (*it++) << "}";
-        while( it != ip.m_genos.end() ) {
+        while( it != ip.m_genos->end() ) {
             out << ",{" << (*it++) << "}";
         }
         out << "]";

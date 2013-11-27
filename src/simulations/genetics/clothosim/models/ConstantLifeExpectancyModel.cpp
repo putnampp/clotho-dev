@@ -3,13 +3,13 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
+ * modification, are permitted provided that the following conditions are met:
  *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
+ *    and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -27,21 +27,45 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#include "DefaultLocusGenotyper.h"
-#include "DefaultAllelicEffect.h"
+#include "../clothoobjects/common_types.h"
+#include "ConstantLifeExpectancyModel.h"
 
-DefaultLocusGenotyper::DefaultLocusGenotyper( LocusPtr lp ) :
-    LocusGenotyper( new DefaultAllelicEffect( lp ) ) {}
+#include <iostream>
 
-DefaultLocusGenotyper::DefaultLocusGenotyper( AllelicEffect * ae ) :
-    LocusGenotyper( ae ) {}
+#include "../clothoobjects/events/DeathEvent.h"
+#include "../clothoobjects/events/ShellDeathEvent.h"
+#include "gsl/gsl_randist.h"
 
-double DefaultLocusGenotyper::genotype( const allele_tuple & at ) const {
-    double res = 0.0;
+#include <time.h>
 
-    for( ploidy_t p = 0; p < at.max_size(); ++p ) {
-        res += (*m_effect)(at[p]);
-    }
+#include "IntVTime.h"
 
-    return res;
+using std::cout;
+using std::endl;
+
+ConstantLifeExpectancyModel::ConstantLifeExpectancyModel( int age ) :
+    m_age(age) { }
+
+ConstantLifeExpectancyModel::~ConstantLifeExpectancyModel() { }
+
+void ConstantLifeExpectancyModel::operator()( const BirthEvent * evt, Individual * ind ) {
+    if(! evt ) return;
+
+    IntVTime tDeath = dynamic_cast< const IntVTime & >( evt->getBirthTime() ) + (int)m_age;
+    Event * dEvent = new DeathEvent( evt->getBirthTime(), tDeath, ind, ind );
+
+    ind->receiveEvent( dEvent );
+}
+
+void ConstantLifeExpectancyModel::operator()( const ShellBirthEvent * evt, IndividualShell * ind ) {
+    if(! evt ) return;
+
+    IntVTime tDeath = *evt->getBirthTime() + (int)m_age;
+    Event * dEvent = new ShellDeathEvent( *evt->getBirthTime(), tDeath, ind, ind );
+
+    ind->receiveEvent( dEvent );
+}
+
+void ConstantLifeExpectancyModel::dump( ostream & out ) {
+
 }

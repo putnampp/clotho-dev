@@ -53,7 +53,7 @@ size_t  DefaultTrait::getLociCount() const {
  *  \sum_{i} G_{i}
  *
  */
-double DefaultTrait::genotype( const AlleleGroup * ag ) const {
+double DefaultTrait::genotype( const AlleleGroupPtr ag ) const {
     double res = 0.0;
     for( LocusGenotypers::const_iterator it = m_loci->begin(); it != m_loci->end(); it++ ) {
         if( it->first < ag->size() ) {
@@ -66,7 +66,7 @@ double DefaultTrait::genotype( const AlleleGroup * ag ) const {
 /*
  * P = G + E
  */
-double DefaultTrait::phenotype( const AlleleGroup * ag, const environmental * env ) const {
+double DefaultTrait::phenotype( const AlleleGroupPtr ag, const environmental * env ) const {
     double res = env->environment_factor();
 
     res += genotype( ag );
