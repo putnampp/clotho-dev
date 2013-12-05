@@ -26,7 +26,7 @@
 # of the authors and should not be interpreted as representing official policies,
 # either expressed or implied, of the FreeBSD Project.
 ################################################################################
-INCLUDE_DIRECTORIES( ${Warped_INCLUDE_DIRS} )
+INCLUDE_DIRECTORIES( ${Warped_INCLUDE_DIRS} distribution )
 LINK_DIRECTORIES( ${Warped_LIBRARIES} )
 
 LIST( APPEND OBJECT_MNGR_SRC ClothoObject.cpp )
@@ -68,15 +68,15 @@ ADD_DEPENDENCIES( cobjcommon cobjmanager )
 
 #ADD_DEPENDENCIES( udobjects cobjmanager )
 
-LIST( APPEND DIST_SRC models/Distribution.cpp)
-LIST( APPEND DIST_SRC models/NormalDistribution.cpp)
-LIST( APPEND DIST_SRC models/NormalDistributionCreator.cpp)
-LIST( APPEND DIST_SRC models/ConstantDistribution.cpp)
-LIST( APPEND DIST_SRC models/ConstantDistributionCreator.cpp)
-LIST( APPEND DIST_SRC models/UniformDistribution.cpp)
-LIST( APPEND DIST_SRC models/UniformDistributionCreator.cpp)
-LIST( APPEND DIST_SRC models/PoissonDistribution.cpp)
-LIST( APPEND DIST_SRC models/PoissonDistributionCreator.cpp )
+LIST( APPEND DIST_SRC distribution/Distribution.cpp)
+LIST( APPEND DIST_SRC distribution/NormalDistribution.cpp)
+LIST( APPEND DIST_SRC distribution/NormalDistributionCreator.cpp)
+LIST( APPEND DIST_SRC distribution/ConstantDistribution.cpp)
+LIST( APPEND DIST_SRC distribution/ConstantDistributionCreator.cpp)
+LIST( APPEND DIST_SRC distribution/UniformDistribution.cpp)
+LIST( APPEND DIST_SRC distribution/UniformDistributionCreator.cpp)
+LIST( APPEND DIST_SRC distribution/PoissonDistribution.cpp)
+LIST( APPEND DIST_SRC distribution/PoissonDistributionCreator.cpp )
 
 ADD_LIBRARY(cdistributions SHARED ${DIST_SRC} )
 
