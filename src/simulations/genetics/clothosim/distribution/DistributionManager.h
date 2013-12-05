@@ -83,7 +83,7 @@ public:
     }
 protected:
     DistributionManager() :
-        m_rng( gsl_rng_alloc( gsl_rng_taus ) ) {
+        m_rng( gsl_rng_alloc( gsl_rng_mt19937 ) ) {
         long seed = time(NULL);
         gsl_rng_set( m_rng, seed );
     }

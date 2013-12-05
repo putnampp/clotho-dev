@@ -50,12 +50,12 @@ const string PERCENT_FEMALE_K = "percent_female";
 template<>
 class ClothoObjectCreator< RandomPopulation, YAML::Node > : public SimObjectCreator< YAML::Node > {
 public:
-    ClothoObjectCreator( const char * name ) : m_name( name ), m_T(), m_rng(NULL) {
+    ClothoObjectCreator( const char * name ) : m_name( name )/*, m_T()*/, m_rng(gsl_rng_alloc(gsl_rng_mt19937)) {
         ClothoObjectManager< YAML::Node >::getInstance()->registerObject( this );
 
-        gsl_rng_env_setup();
-        m_T = gsl_rng_default;
-        m_rng = gsl_rng_alloc( m_T );
+//        gsl_rng_env_setup();
+//        m_T = gsl_rng_default;
+//        m_rng = gsl_rng_alloc( m_T );
 
         long seed = time(NULL);
         gsl_rng_set( m_rng, seed );
@@ -141,7 +141,7 @@ protected:
     }
 
     const string m_name;
-    const gsl_rng_type * m_T;
+//    const gsl_rng_type * m_T;
     gsl_rng * m_rng;
 };
 

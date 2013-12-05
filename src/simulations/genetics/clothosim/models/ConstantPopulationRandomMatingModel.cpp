@@ -56,7 +56,7 @@ ConstantPopulationRandomMatingModel::ConstantPopulationRandomMatingModel( unsign
 */
 
 ConstantPopulationRandomMatingModel::ConstantPopulationRandomMatingModel( shared_ptr< iDistribution > offspring, shared_ptr< iDistribution> birth_delay ) :
-    m_rng( gsl_rng_alloc( gsl_rng_taus ) ),
+    m_rng( gsl_rng_alloc( gsl_rng_mt19937 ) ),
     m_offspring_dist( offspring ),
     m_birth_delay( birth_delay ) 
 {
