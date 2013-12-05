@@ -34,23 +34,27 @@
 
 #include "../clothoobjects/events/MaturityEvent.h"
 #include "../clothoobjects/events/ShellMaturityEvent.h"
-#include "gsl/gsl_randist.h"
+//#include "gsl/gsl_randist.h"
 
-#include <time.h>
+//#include <time.h>
 
 #include "IntVTime.h"
 
 using std::cout;
 using std::endl;
 
-MaturityModel::MaturityModel( distribution_params & female, distribution_params & male, distribution_params & unk) :
-    m_rng( gsl_rng_alloc( gsl_rng_taus ) ), m_female(female), m_male(male), m_unk(unk) {
-    long seed = time(NULL);
-    gsl_rng_set( m_rng, seed );
+//MaturityModel::MaturityModel( distribution_params & female, distribution_params & male, distribution_params & unk) :
+//    m_rng( gsl_rng_alloc( gsl_rng_taus ) ), 
+MaturityModel::MaturityModel( shared_ptr< iDistribution > female, shared_ptr< iDistribution > male, shared_ptr< iDistribution > unk):
+    m_female(female), 
+    m_male(male), 
+    m_unk(unk) {
+//    long seed = time(NULL);
+//    gsl_rng_set( m_rng, seed );
 }
 
 MaturityModel::~MaturityModel() {
-    gsl_rng_free( m_rng );
+//    gsl_rng_free( m_rng );
 }
 
 void MaturityModel::operator()(const BirthEvent * evt, Individual * ind ) {
@@ -77,7 +81,7 @@ void MaturityModel::operator()(const ShellBirthEvent * evt, IndividualShell * in
 
 double MaturityModel::computeExpectedAge( sex_t s ) {
     double expected_age = 0.0;
-
+/*
     switch( s ) {
     case FEMALE:
         expected_age = gsl_ran_gaussian( m_rng, m_female.sigma );
@@ -92,6 +96,18 @@ double MaturityModel::computeExpectedAge( sex_t s ) {
         expected_age += m_unk.mean;
         break;
     };
+*/
+    switch( s ) {
+    case FEMALE:
+        expected_age = m_female->nextVariate();
+        break;
+    case MALE:
+        expected_age = m_male->nextVariate();
+        break;
+    default:
+        expected_age = m_unk->nextVariate();
+        break;
+    }
 
     return expected_age;
 }

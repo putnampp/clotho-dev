@@ -34,8 +34,6 @@
 #include "ClothoModel.h"
 #include "ClothoModelManager.h"
 
-#include "yaml-cpp/yaml.h"
-
 template < class OBJ, class PARAMS >
 class ClothoModelCreator : public SimModelCreator< PARAMS > {
 public:

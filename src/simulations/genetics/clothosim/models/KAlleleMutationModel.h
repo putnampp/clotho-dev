@@ -27,35 +27,34 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef LIFEEXPECTANCYMODEL_H_
-#define LIFEEXPECTANCYMODEL_H_
+#ifndef KALLELEMUTATIONMODEL_H_
+#define KALLELEMUTATIONMODEL_H_
 
-#include "../ClothoModel.h"
-
-#include "Distribution.h"
-
+#include "../ClothoModelCreator.h"
 #include "../clothoobjects/events/BirthEvent.h"
 #include "../clothoobjects/events/ShellBirthEvent.h"
 
-//#include "gsl/gsl_rng.h"
+#include "PoissonDistribution.h"
+#include "UniformDistribution.h"
 
-class LifeExpectancyModel :
+class KAlleleMutationModel :
     virtual public ClothoModel< Individual, BirthEvent >,
-        virtual public ClothoModel< IndividualShell, ShellBirthEvent > {
+    virtual public ClothoModel< IndividualShell, ShellBirthEvent > {
 public:
-//    LifeExpectancyModel( distribution_params & female, distribution_params & male, distribution_params & unk );
-    LifeExpectancyModel( shared_ptr< iDistribution > female, shared_ptr< iDistribution > male, shared_ptr< iDistribution > unk );
+    KAlleleMutationModel( double rate );
 
-    void operator()( const BirthEvent * e, Individual * ind );
-    void operator()( const ShellBirthEvent * e, IndividualShell * ind );
+    void operator()( const BirthEvent *, Individual * ind );
+    void operator()( const ShellBirthEvent *, IndividualShell * ind );
+
     void dump( ostream & out );
 
-    virtual ~LifeExpectancyModel();
+    virtual ~KAlleleMutationModel();
 protected:
-    double computeExpectedAge( sex_t s );
-//    gsl_rng * m_rng;
-//    distribution_params m_female, m_male, m_unk;
-    shared_ptr< iDistribution > m_female, m_male, m_unk;
+    double m_rate;
+    gsl_rng * m_rng;
+
+    PoissonDistribution m_poisson;
+    UniformDistribution m_uniform;
 };
 
-#endif  // LIFEEXPECTANCYMODEL_H_
+#endif  // KALLELEMUTATIONMODEL_H_

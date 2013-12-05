@@ -31,11 +31,47 @@
 
 long IndividualProperties::next_id = 1;
 
+void IndividualProperties::updateGenotypes( AlleleGroupPtr agp ) {
+    size_t idx = 0;
+    for( AlleleGroup::iterator it = agp->begin(); it != agp->end(); it++, ++idx ) {
+        if( idx < m_genos->size() ) {
+            (*m_genos)[idx] = *it;
+        } else {
+            m_genos->push_back( *it );
+        }
+    }
+}
+
+void IndividualProperties::setMother( const IndividualProperties * mother ) {
+    m_mother = mother->m_id;
+}
+
+void IndividualProperties::setFather( const IndividualProperties * father ) {
+    m_father = father->m_id;
+}
+
+void IndividualProperties::reset() {
+    if( m_dob ) {
+        delete m_dob;
+        m_dob = NULL;
+    }
+
+    if( m_eol ) {
+        delete m_eol;
+        m_eol = NULL;
+    }
+
+    m_mother = 0;
+    m_father = 0;
+    m_isMature = false;
+    m_offspring = 0;
+}
+
 ostream & operator<<( ostream & out, const IndividualProperties & ip ) {
     out << ip.m_id 
         << ", " << ip.m_sex
-        << ", " << ip.m_parent0
-        << ", " << ip.m_parent1;
+        << ", " << ip.m_mother
+        << ", " << ip.m_father;
     if( ip.m_dob ) {
         out << ", " << *ip.m_dob;
     } else {
@@ -53,7 +89,7 @@ ostream & operator<<( ostream & out, const IndividualProperties & ip ) {
     if( !ip.m_genos->empty() ) {
         out << ", [";
 
-        AlleleGroup::const_iterator it = ip.m_genos->begin();
+        AlleleGroup::iterator it = ip.m_genos->begin();
         out << "{" << (*it++) << "}";
         while( it != ip.m_genos->end() ) {
             out << ",{" << (*it++) << "}";

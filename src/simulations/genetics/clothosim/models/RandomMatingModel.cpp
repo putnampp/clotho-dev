@@ -44,6 +44,7 @@ using std::random_shuffle;
 RandomMatingModel::RandomMatingModel() : m_rng( gsl_rng_alloc( gsl_rng_taus ) ) {
     long seed = time(NULL);
     gsl_rng_set( m_rng, seed );
+    m_uniform.setRandomNumberGenerator( m_rng );
 }
 
 void RandomMatingModel::operator()( const ShellMaturityEvent * e, IndividualShell * ind ) {
@@ -76,7 +77,7 @@ void RandomMatingModel::operator()( const ShellMatingEvent * e, Environment2 * e
     int nMales = env->getMaleCount();
 
     // get a random male by index
-    unsigned int rMale = gsl_rng_get( m_rng ) % nMales;
+    unsigned int rMale = m_uniform.nextVariate( nMales );
 
     IndividualShell * female = e->getFirstPartner();
     IndividualShell * male = env->getMaleAt( rMale );
@@ -86,18 +87,16 @@ void RandomMatingModel::operator()( const ShellMatingEvent * e, Environment2 * e
             IndividualShell * offspring = env->nextAvailableIndividual();
 
             if( offspring ) {
-                AlleleGroupPtr genos = env->getGeneticMap()->createLociAlleles();
+                IndividualProperties * ip = offspring->getProperties();
+                ip->reset();
+                
+                generateOffspringGenotype( female, male, ip->m_genos );
 
-                generateOffspringGenotype( female, male, genos );
 
-                unsigned int rnd = gsl_rng_get( m_rng );
-                sex_t s = ((rnd & 1 ) ? MALE : FEMALE);
-                rnd >>= 1;
-
-                IndividualProperties * ip = new IndividualProperties( female->getProperties(), male->getProperties(), s, genos );
+                //IndividualProperties * ip = new IndividualProperties( female->getProperties(), male->getProperties(), s, genos );
                 ip->m_dob = dynamic_cast< IntVTime * > (e->getReceiveTime().clone() );
+                ip->m_sex = ((m_uniform.nextBoolean()) ? MALE : FEMALE);
 
-                offspring->setProperties( ip );
                 female->addOffspring();
                 male->addOffspring();
 
@@ -120,38 +119,32 @@ void RandomMatingModel::dump( ostream & out ) {
 void RandomMatingModel::generateOffspringGenotype( IndividualShell * female, IndividualShell * male, AlleleGroupPtr genos ) {
     unsigned int nLoci = female->getEnvironmentLociCount();
 
-    //vector< allele_t > alleles(genotype_t::PLOIDY, (allele_t)ANCESTRAL_ALLELE );
-    genotype_t tmp_alleles;
+    resizeAlleleGroup( genos, nLoci );
 
-    if( tmp_alleles.max_size() == 2 ) {
-        unsigned int rnd = gsl_rng_get( m_rng );
-        int j = 1, max_j = (sizeof( unsigned int ) << 3);   // max_j = 4 * 8 = 32
-        for( unsigned int i = 0; i < nLoci; ++i ) {
-            genotype_t alleles;
-            if( j >= max_j ) {
-                rnd = gsl_rng_get( m_rng );
-                j = 1;
-            }
+    AlleleGroupPtr female_alleles = female->getProperties()->m_genos;
+    AlleleGroupPtr male_alleles = male->getProperties()->m_genos;
 
+    assert( female_alleles->size() == nLoci && male_alleles->size() == nLoci );
+
+    if( ALLELE_COPIES == 2 ) {
+        unsigned int i = 0; 
+        while( i < nLoci ) {
             // routine only works if ploidy == 2
-            alleles[0] = female->alleleAt( i, (rnd & 1));
-            rnd >>= 1;
-            alleles[1] = male->alleleAt( i, (rnd & 1));
-            rnd >>= 1;
+            (*genos)[i][0] = (*female_alleles)[ i ][ (m_uniform.nextBoolean() ? 1 : 0) ];
+            (*genos)[i][1] = (*male_alleles)[ i ][ (m_uniform.nextBoolean() ? 1 : 0 )];
 
-            j += 2;
-
-            genos->push_back(alleles);
+            ++i;
         }
+
     } else {
         // more general outline. Note that it assumes a parent allele
         // can serve as the variant source multiple times.
-        unsigned int from_male = tmp_alleles.max_size() / 2;
+        unsigned int from_male = ALLELE_COPIES / 2;
 
         vector< ploidy_t > males;
         vector< ploidy_t > females;
 
-        for( ploidy_t i = 0; i < tmp_alleles.max_size(); ++i ) {
+        for( ploidy_t i = 0; i < ALLELE_COPIES; ++i ) {
             males.push_back( i );
             females.push_back( i );
         }
@@ -161,15 +154,14 @@ void RandomMatingModel::generateOffspringGenotype( IndividualShell * female, Ind
             // treat each locus as being independent of one another
             random_shuffle( males.begin(), males.end() );
             random_shuffle( females.begin(), females.end() );
-            genotype_t alleles;
+
             unsigned int k = 0;
             for( ; k < from_male; ++k ) {
-                alleles[ k ] = male->alleleAt( i, males[k] );
+                (*genos)[i][ k ] = (*male_alleles)[ i ][ males[k] ];
             }
-            for( ; k < tmp_alleles.max_size(); ++k ) {
-                alleles[ k ] = female->alleleAt( i, females[k - from_male] );
+            for( ; k < ALLELE_COPIES; ++k ) {
+                (*genos)[i][ k ] = (*female_alleles)[ i ][ females[k - from_male] ];
             }
-            genos->push_back(alleles);
         }
     }
 }

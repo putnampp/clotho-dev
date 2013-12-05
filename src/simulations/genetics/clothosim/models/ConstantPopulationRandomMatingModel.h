@@ -31,17 +31,21 @@
 #define CONSTANTPOPULATIONRANDOMMATINGMODEL_H_
 
 #include "../ClothoModel.h"
+#include "Distribution.h"
 
 #include "../clothoobjects/events/ShellMaturityEvent.h"
 #include "../clothoobjects/events/ShellMatingEvent.h"
 
 #include "gsl/gsl_rng.h"
 
+#include "UniformDistribution.h"
+
 class ConstantPopulationRandomMatingModel :
     virtual public ClothoModel< IndividualShell, ShellMaturityEvent >,
         virtual public ClothoModel< Environment2 , ShellMatingEvent > {
 public:
-    ConstantPopulationRandomMatingModel (unsigned int max_offspring, unsigned int birth_delay);
+//    ConstantPopulationRandomMatingModel (unsigned int max_offspring, unsigned int birth_delay);
+    ConstantPopulationRandomMatingModel( shared_ptr< iDistribution > offspring, shared_ptr< iDistribution > birth_delay );
 
     void operator()( const ShellMaturityEvent * e, IndividualShell * ind );
     void operator()( const ShellMatingEvent * e, Environment2 * env );
@@ -52,8 +56,12 @@ protected:
     void generateOffspringGenotype( IndividualShell * female, IndividualShell * male, AlleleGroupPtr genos );
 
     gsl_rng * m_rng;
-    unsigned int m_max_offspring;
-    unsigned int m_birth_delay;
+//    unsigned int m_birth_delay;
+//    distribution_params m_offspring_dist;
+    shared_ptr< iDistribution >     m_offspring_dist;
+    shared_ptr< iDistribution >     m_birth_delay;
+
+    UniformDistribution     m_uniform;
 
 private:
     unsigned int m_rand_val, m_offset;

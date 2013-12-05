@@ -68,6 +68,18 @@ ADD_DEPENDENCIES( cobjcommon cobjmanager )
 
 #ADD_DEPENDENCIES( udobjects cobjmanager )
 
+LIST( APPEND DIST_SRC models/Distribution.cpp)
+LIST( APPEND DIST_SRC models/NormalDistribution.cpp)
+LIST( APPEND DIST_SRC models/NormalDistributionCreator.cpp)
+LIST( APPEND DIST_SRC models/ConstantDistribution.cpp)
+LIST( APPEND DIST_SRC models/ConstantDistributionCreator.cpp)
+LIST( APPEND DIST_SRC models/UniformDistribution.cpp)
+LIST( APPEND DIST_SRC models/UniformDistributionCreator.cpp)
+LIST( APPEND DIST_SRC models/PoissonDistribution.cpp)
+LIST( APPEND DIST_SRC models/PoissonDistributionCreator.cpp )
+
+ADD_LIBRARY(cdistributions SHARED ${DIST_SRC} )
+
 #LIST( APPEND MODEL_SRC models/SelectionModel.cpp )
 #LIST( APPEND MODEL_SRC models/RandomSelectionModel.cpp )
 LIST( APPEND MODEL_SRC models/PopulationModel.cpp )
@@ -86,7 +98,9 @@ LIST( APPEND MODEL_SRC models/ConstantMaturityModel.cpp )
 LIST( APPEND MODEL_SRC models/ConstantMaturityModelCreator.cpp )
 LIST( APPEND MODEL_SRC models/ConstantPopulationRandomMatingModel.cpp)
 LIST( APPEND MODEL_SRC models/ConstantPopulationRandomMatingModelCreator.cpp)
+LIST( APPEND MODEL_SRC models/KAlleleMutationModel.cpp)
+LIST( APPEND MODEL_SRC models/KAlleleMutationModelCreator.cpp)
 
 ADD_LIBRARY(cmodels SHARED ${MODEL_SRC} )
 
-ADD_DEPENDENCIES(cmodels cobjcommon)
+ADD_DEPENDENCIES(cmodels cobjcommon cdistributions)

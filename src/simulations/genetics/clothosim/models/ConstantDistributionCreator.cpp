@@ -27,35 +27,26 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef LIFEEXPECTANCYMODEL_H_
-#define LIFEEXPECTANCYMODEL_H_
+#include "ConstantDistributionCreator.h"
 
-#include "../ClothoModel.h"
+const string VALUE_K = "value";
 
-#include "Distribution.h"
+using boost::static_pointer_cast;
 
-#include "../clothoobjects/events/BirthEvent.h"
-#include "../clothoobjects/events/ShellBirthEvent.h"
+template <>
+shared_ptr< iDistribution > DistributionCreator< ConstantDistribution, YAML::Node >::createDistribution( const YAML::Node & n ) {
+    shared_ptr< iDistribution > dist;
 
-//#include "gsl/gsl_rng.h"
+    double val = 0.0;
+    if( n[ VALUE_K ] ) {
+        val = n[ VALUE_K ].as<double>();
+    }
 
-class LifeExpectancyModel :
-    virtual public ClothoModel< Individual, BirthEvent >,
-        virtual public ClothoModel< IndividualShell, ShellBirthEvent > {
-public:
-//    LifeExpectancyModel( distribution_params & female, distribution_params & male, distribution_params & unk );
-    LifeExpectancyModel( shared_ptr< iDistribution > female, shared_ptr< iDistribution > male, shared_ptr< iDistribution > unk );
+    shared_ptr< ConstantDistribution > c( new ConstantDistribution( val ) );
 
-    void operator()( const BirthEvent * e, Individual * ind );
-    void operator()( const ShellBirthEvent * e, IndividualShell * ind );
-    void dump( ostream & out );
+    dist = static_pointer_cast< iDistribution >( c );
 
-    virtual ~LifeExpectancyModel();
-protected:
-    double computeExpectedAge( sex_t s );
-//    gsl_rng * m_rng;
-//    distribution_params m_female, m_male, m_unk;
-    shared_ptr< iDistribution > m_female, m_male, m_unk;
-};
+    return dist;
+}
 
-#endif  // LIFEEXPECTANCYMODEL_H_
+DEFINE_REGISTERED_DISTRIBUTION( ConstantDistribution, YAML::Node )

@@ -26,36 +26,14 @@
  * of the authors and should not be interpreted as representing official policies,
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
+#ifndef UNIFORMDISTRIBUTIONCREATOR_H_
+#define UNIFORMDISTRIBUTIONCREATOR_H_
 
-#ifndef LIFEEXPECTANCYMODEL_H_
-#define LIFEEXPECTANCYMODEL_H_
+#include "DistributionCreator.h"
+#include "UniformDistribution.h"
+#include "yaml-cpp/yaml.h"
 
-#include "../ClothoModel.h"
+DECLARE_REGISTERED_DISTRIBUTION( UniformDistribution, YAML::Node )
 
-#include "Distribution.h"
+#endif  // UNIFORMDISTRIBUTIONCREATOR_H_
 
-#include "../clothoobjects/events/BirthEvent.h"
-#include "../clothoobjects/events/ShellBirthEvent.h"
-
-//#include "gsl/gsl_rng.h"
-
-class LifeExpectancyModel :
-    virtual public ClothoModel< Individual, BirthEvent >,
-        virtual public ClothoModel< IndividualShell, ShellBirthEvent > {
-public:
-//    LifeExpectancyModel( distribution_params & female, distribution_params & male, distribution_params & unk );
-    LifeExpectancyModel( shared_ptr< iDistribution > female, shared_ptr< iDistribution > male, shared_ptr< iDistribution > unk );
-
-    void operator()( const BirthEvent * e, Individual * ind );
-    void operator()( const ShellBirthEvent * e, IndividualShell * ind );
-    void dump( ostream & out );
-
-    virtual ~LifeExpectancyModel();
-protected:
-    double computeExpectedAge( sex_t s );
-//    gsl_rng * m_rng;
-//    distribution_params m_female, m_male, m_unk;
-    shared_ptr< iDistribution > m_female, m_male, m_unk;
-};
-
-#endif  // LIFEEXPECTANCYMODEL_H_

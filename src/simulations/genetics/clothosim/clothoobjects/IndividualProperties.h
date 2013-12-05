@@ -42,7 +42,7 @@ using std::vector;
 class IndividualProperties {
 public:
     long    m_id;
-    long    m_parent0, m_parent1;
+    long    m_mother, m_father;
     IntVTime * m_dob, * m_eol;
     bool m_isMature;
     unsigned int m_offspring;
@@ -51,43 +51,48 @@ public:
 
     IndividualProperties( AlleleGroupPtr g) : 
         m_id(-1),
-        m_parent0(-1),
-        m_parent1(-1),
+        m_mother(-1),
+        m_father(-1),
         m_dob(NULL), 
         m_eol( NULL ), 
         m_isMature(false), 
         m_offspring(0), 
         m_sex( UNASSIGNED ),
-        m_genos(g) {}
+        m_genos(cloneAlleleGroup( g ) ) {}
 
     IndividualProperties( sex_t s, AlleleGroupPtr genos ) :
         m_id( next_id++),
-        m_parent0(-1),
-        m_parent1(-1),
+        m_mother(-1),
+        m_father(-1),
         m_dob(NULL), 
         m_eol(NULL), 
         m_isMature(false), 
         m_offspring(0), 
         m_sex(s), 
-        m_genos(genos) {}
+        m_genos(cloneAlleleGroup( genos) ) {}
 
-    IndividualProperties( IndividualProperties * p0, IndividualProperties * p1,
+    IndividualProperties( IndividualProperties * mother, IndividualProperties * father,
                          sex_t s, AlleleGroupPtr genos ) :
         m_id( next_id++),
-        m_parent0( p0->m_id ),
-        m_parent1( p1->m_id ),
+        m_mother( mother->m_id ),
+        m_father( father->m_id ),
         m_dob(NULL), 
         m_eol(NULL), 
         m_isMature(false), 
         m_offspring(0), 
         m_sex(s), 
-        m_genos(genos) {}
+        m_genos( cloneAlleleGroup( genos )) {}
+
+    void setMother( const IndividualProperties * m );
+    void setFather( const IndividualProperties * f );
+    void updateGenotypes( AlleleGroupPtr agp );
+    void reset();
 
     virtual ~IndividualProperties()  {
         if( m_dob ) delete m_dob;
         if( m_eol ) delete m_eol;
 
-        m_genos.reset();
+        if( m_genos ) delete m_genos;
     }
 private:
     static long next_id;

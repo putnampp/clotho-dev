@@ -40,6 +40,7 @@ DEFINE_REGISTERED_CLOTHO_EVENT( ShellBirthEvent )
 
 template<>
 void IndividualShell::handleEvent< ShellBirthEvent >( const ShellBirthEvent * e ) {
+    //cout << getSimulationTime() << ":" << e->getSendTime() << " -> " << e->getReceiveTime() << " (" << *e->getBirthTime() << ")" << endl;
     if( m_prop )
         m_prop->m_dob = dynamic_cast< IntVTime * >(e->getBirthTime()->clone());
 

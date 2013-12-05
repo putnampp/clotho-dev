@@ -95,7 +95,7 @@ public:
 
         int allocated = 0;
         while( ++allocated <= pool_size ) {
-            IndividualShell * ishell = new IndividualShell( env, new IndividualProperties(env->getGeneticMap()->createLociAlleles()) );
+            IndividualShell * ishell = new IndividualShell( env );
 
             objs->push_back( ishell );
             if( ishell ) {
@@ -103,6 +103,8 @@ public:
             }
         }
         objs->push_back( env );
+
+        cout << "Done creating PopulatedEnvironment" << endl;
     }
 
     virtual ~ClothoObjectCreator() {}

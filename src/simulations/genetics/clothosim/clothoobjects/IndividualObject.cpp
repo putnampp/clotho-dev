@@ -83,7 +83,7 @@ Individual::Individual( const YAML::Node & n ) {
     m_eol = NULL;
 }
 */
-Individual::Individual( sex_t s, const vector< genotype_t > & genos ) :
+Individual::Individual( sex_t s, const AlleleGroupPtr genos ) :
     m_name( "IND"  +  boost::lexical_cast<string>(m_id)),
     m_sex( s ),
     m_offspring(0),

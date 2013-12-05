@@ -27,35 +27,32 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef LIFEEXPECTANCYMODEL_H_
-#define LIFEEXPECTANCYMODEL_H_
+#include "NormalDistributionCreator.h"
 
-#include "../ClothoModel.h"
+const string SIGMA_K = "sigma";
+const string MEAN_K = "mean";
 
-#include "Distribution.h"
+using boost::static_pointer_cast;
 
-#include "../clothoobjects/events/BirthEvent.h"
-#include "../clothoobjects/events/ShellBirthEvent.h"
+template<>
+shared_ptr< iDistribution > DistributionCreator< NormalDistribution, YAML::Node >::createDistribution( const YAML::Node & n ) {
+    shared_ptr< iDistribution > dist;
 
-//#include "gsl/gsl_rng.h"
+    double sigma = 1.0;
+    if( n[ SIGMA_K ] ) {
+        sigma = n[SIGMA_K].as< double >();
+    }
 
-class LifeExpectancyModel :
-    virtual public ClothoModel< Individual, BirthEvent >,
-        virtual public ClothoModel< IndividualShell, ShellBirthEvent > {
-public:
-//    LifeExpectancyModel( distribution_params & female, distribution_params & male, distribution_params & unk );
-    LifeExpectancyModel( shared_ptr< iDistribution > female, shared_ptr< iDistribution > male, shared_ptr< iDistribution > unk );
+    double mean = 0.0;
+    if( n[MEAN_K] ) {
+        mean = n[MEAN_K].as< double > ();
+    }
 
-    void operator()( const BirthEvent * e, Individual * ind );
-    void operator()( const ShellBirthEvent * e, IndividualShell * ind );
-    void dump( ostream & out );
+    shared_ptr< NormalDistribution > norm( new NormalDistribution( sigma, mean ) );
 
-    virtual ~LifeExpectancyModel();
-protected:
-    double computeExpectedAge( sex_t s );
-//    gsl_rng * m_rng;
-//    distribution_params m_female, m_male, m_unk;
-    shared_ptr< iDistribution > m_female, m_male, m_unk;
-};
+    dist =  static_pointer_cast< iDistribution >(norm);
 
-#endif  // LIFEEXPECTANCYMODEL_H_
+    return dist;
+}
+
+DEFINE_REGISTERED_DISTRIBUTION( NormalDistribution, YAML::Node )

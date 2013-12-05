@@ -27,35 +27,33 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef LIFEEXPECTANCYMODEL_H_
-#define LIFEEXPECTANCYMODEL_H_
-
-#include "../ClothoModel.h"
+#ifndef POISSONDISTRIBUTION_H_
+#define POISSONDISTRIBUTION_H_
 
 #include "Distribution.h"
+#include <gsl/gsl_randist.h>
 
-#include "../clothoobjects/events/BirthEvent.h"
-#include "../clothoobjects/events/ShellBirthEvent.h"
-
-//#include "gsl/gsl_rng.h"
-
-class LifeExpectancyModel :
-    virtual public ClothoModel< Individual, BirthEvent >,
-        virtual public ClothoModel< IndividualShell, ShellBirthEvent > {
+class PoissonDistribution : public iDistribution {
 public:
-//    LifeExpectancyModel( distribution_params & female, distribution_params & male, distribution_params & unk );
-    LifeExpectancyModel( shared_ptr< iDistribution > female, shared_ptr< iDistribution > male, shared_ptr< iDistribution > unk );
+    PoissonDistribution( double mean );
 
-    void operator()( const BirthEvent * e, Individual * ind );
-    void operator()( const ShellBirthEvent * e, IndividualShell * ind );
-    void dump( ostream & out );
+    void setRandomNumberGenerator( gsl_rng * rng );
+    double nextVariate();
 
-    virtual ~LifeExpectancyModel();
-protected:
-    double computeExpectedAge( sex_t s );
-//    gsl_rng * m_rng;
-//    distribution_params m_female, m_male, m_unk;
-    shared_ptr< iDistribution > m_female, m_male, m_unk;
+    inline unsigned int nextVariate( double mean ) {
+        if( !m_rng ) return 0;
+        return gsl_ran_poisson( m_rng, mean );
+    }
+
+    inline unsigned int nextVariate( const gsl_rng * rng, double mean ) {
+        return gsl_ran_poisson( rng, mean );
+    }
+
+    virtual ~PoissonDistribution();
+
+private:
+    gsl_rng * m_rng;
+    double m_mu;
 };
 
-#endif  // LIFEEXPECTANCYMODEL_H_
+#endif  // POISSONDISTRIBUTION_H_

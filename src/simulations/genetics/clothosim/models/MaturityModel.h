@@ -31,18 +31,18 @@
 #define MATURITYMODEL_H_
 
 #include "../ClothoModelCreator.h"
-#include "DistributionParam.h"
+#include "Distribution.h"
 
 #include "../clothoobjects/events/BirthEvent.h"
 #include "../clothoobjects/events/ShellBirthEvent.h"
 
-#include "gsl/gsl_rng.h"
+//#include "gsl/gsl_rng.h"
 
 class MaturityModel :
     virtual public ClothoModel< Individual, BirthEvent >,
         virtual public ClothoModel< IndividualShell, ShellBirthEvent > {
 public:
-    MaturityModel( distribution_params & female, distribution_params & male, distribution_params & unk);
+    MaturityModel( shared_ptr< iDistribution > female, shared_ptr< iDistribution > male, shared_ptr< iDistribution > unk);
 
     void operator()( const BirthEvent *, Individual * ind );
     void operator()( const ShellBirthEvent *, IndividualShell * ind );
@@ -52,8 +52,8 @@ public:
     virtual ~MaturityModel();
 protected:
     double computeExpectedAge( sex_t s );
-    gsl_rng * m_rng;
-    distribution_params  m_female, m_male, m_unk;
+//    gsl_rng * m_rng;
+    shared_ptr< iDistribution >  m_female, m_male, m_unk;
 };
 
 #endif  // MATURITYMODEL_H_

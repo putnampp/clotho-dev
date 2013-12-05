@@ -118,6 +118,10 @@ size_t GeneticMap::getTraitCount() const {
     return m_traits->size();
 }
 
+size_t GeneticMap::getMaxAlleles( locus_index_t idx) const {
+    return m_loci->at(idx)->getMaxAlleles();
+}
+
 bool GeneticMap::addTraitLocus( TraitPtr tp, LocusGenotyper * lg ) {
     locus_index_t lidx = getLocusIndex( lg->getLocus() );
     trait_index_t tidx = getTraitIndex( tp );
@@ -135,7 +139,7 @@ bool GeneticMap::addTraitLocus( TraitPtr tp, LocusGenotyper * lg ) {
 
 double GeneticMap::computeGenotype( locus_index_t l, const AlleleGroupPtr ag ) const {
     if( l < m_genotypers->size() && l < ag->size() ) {
-        return m_genotypers->at(l)->genotype(ag->at(l));
+        return m_genotypers->at(l)->genotype((*ag)[l]);
     }
 
     return 0.0;
@@ -162,7 +166,6 @@ double GeneticMap::computePhenotype( trait_index_t t, const AlleleGroupPtr ag, c
 }
 
 AlleleGroupPtr GeneticMap::createLociAlleles() const {
-    AlleleGroupPtr la( new AlleleGroup() );
-    la->reserve( m_loci->size() );
+    AlleleGroupPtr la = allocateAlleleGroup( m_loci->size() );
     return la;
 }

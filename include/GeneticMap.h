@@ -75,6 +75,8 @@ public:
     size_t getLociCount() const;
     size_t getTraitCount() const;
 
+    size_t getMaxAlleles( locus_index_t idx ) const;
+
     AlleleGroupPtr createLociAlleles() const;
 
     virtual ~GeneticMap();

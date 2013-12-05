@@ -27,35 +27,56 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef LIFEEXPECTANCYMODEL_H_
-#define LIFEEXPECTANCYMODEL_H_
+#include "KAlleleMutationModel.h"
 
-#include "../ClothoModel.h"
+#include <time.h>
 
-#include "Distribution.h"
+KAlleleMutationModel::KAlleleMutationModel( double rate ) :
+    m_rate( rate ),
+    m_rng( gsl_rng_alloc(gsl_rng_taus) ),
+    m_poisson( rate )
+{
+    long seed = time(NULL);
+    gsl_rng_set( m_rng, seed );
 
-#include "../clothoobjects/events/BirthEvent.h"
-#include "../clothoobjects/events/ShellBirthEvent.h"
+    m_poisson.setRandomNumberGenerator( m_rng );
+    m_uniform.setRandomNumberGenerator( m_rng );
+}
 
-//#include "gsl/gsl_rng.h"
+KAlleleMutationModel::~KAlleleMutationModel() {
+    gsl_rng_free( m_rng );
+}
 
-class LifeExpectancyModel :
-    virtual public ClothoModel< Individual, BirthEvent >,
-        virtual public ClothoModel< IndividualShell, ShellBirthEvent > {
-public:
-//    LifeExpectancyModel( distribution_params & female, distribution_params & male, distribution_params & unk );
-    LifeExpectancyModel( shared_ptr< iDistribution > female, shared_ptr< iDistribution > male, shared_ptr< iDistribution > unk );
+void KAlleleMutationModel::operator()( const BirthEvent * be, Individual * ind ) {
 
-    void operator()( const BirthEvent * e, Individual * ind );
-    void operator()( const ShellBirthEvent * e, IndividualShell * ind );
-    void dump( ostream & out );
+}
 
-    virtual ~LifeExpectancyModel();
-protected:
-    double computeExpectedAge( sex_t s );
-//    gsl_rng * m_rng;
-//    distribution_params m_female, m_male, m_unk;
-    shared_ptr< iDistribution > m_female, m_male, m_unk;
-};
+void KAlleleMutationModel::operator()( const ShellBirthEvent * sbe, IndividualShell * is ) {
+    IndividualProperties * ip = is->getProperties();
+    AlleleGroupPtr genos = ip->m_genos;
+    if( genos->empty() ) return;
 
-#endif  // LIFEEXPECTANCYMODEL_H_
+    if( ALLELE_COPIES == 2 ) {
+        unsigned int nMut = m_poisson.nextVariate( m_rate * (genos->size() << 1) );
+        while( nMut-- > 0 ) {
+            unsigned long int locus_idx = m_uniform.nextVariate( (unsigned long int) genos->size());
+            unsigned long int maxAllele = is->getEnvironment()->getGeneticMap()->getMaxAlleles( locus_idx );
+            allele_t newAllele;
+            if( m_uniform.nextBoolean() ) {
+                do {
+                    newAllele = m_uniform.nextVariate( maxAllele );
+                } while ( newAllele == (*genos)[ locus_idx ][ 1 ] );
+                (*genos)[locus_idx][1] = newAllele;
+            } else {
+                do {
+                    newAllele = m_uniform.nextVariate( maxAllele );
+                } while( newAllele == (*genos)[ locus_idx ][ 0 ] );
+                (*genos)[locus_idx][0] = newAllele;
+            }
+        }
+    }
+}
+
+void KAlleleMutationModel::dump( ostream & out ) {
+
+}

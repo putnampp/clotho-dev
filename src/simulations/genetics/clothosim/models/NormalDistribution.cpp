@@ -27,35 +27,27 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef LIFEEXPECTANCYMODEL_H_
-#define LIFEEXPECTANCYMODEL_H_
+#include "NormalDistribution.h"
 
-#include "../ClothoModel.h"
+#include <gsl/gsl_randist.h>
 
-#include "Distribution.h"
+NormalDistribution::NormalDistribution( double sigma, double mean ) : 
+    m_rng( NULL ),
+    m_mu ( mean ),
+    m_sigma( sigma ) {
+}
 
-#include "../clothoobjects/events/BirthEvent.h"
-#include "../clothoobjects/events/ShellBirthEvent.h"
+NormalDistribution::~NormalDistribution() { }
 
-//#include "gsl/gsl_rng.h"
+void NormalDistribution::setRandomNumberGenerator( gsl_rng * rng ) {
+    m_rng = rng;
+}
 
-class LifeExpectancyModel :
-    virtual public ClothoModel< Individual, BirthEvent >,
-        virtual public ClothoModel< IndividualShell, ShellBirthEvent > {
-public:
-//    LifeExpectancyModel( distribution_params & female, distribution_params & male, distribution_params & unk );
-    LifeExpectancyModel( shared_ptr< iDistribution > female, shared_ptr< iDistribution > male, shared_ptr< iDistribution > unk );
+double NormalDistribution::nextVariate() {
+    if( !m_rng ) return 0.0;
 
-    void operator()( const BirthEvent * e, Individual * ind );
-    void operator()( const ShellBirthEvent * e, IndividualShell * ind );
-    void dump( ostream & out );
+    double var = gsl_ran_gaussian( m_rng, m_sigma );
+    var += m_mu;
 
-    virtual ~LifeExpectancyModel();
-protected:
-    double computeExpectedAge( sex_t s );
-//    gsl_rng * m_rng;
-//    distribution_params m_female, m_male, m_unk;
-    shared_ptr< iDistribution > m_female, m_male, m_unk;
-};
-
-#endif  // LIFEEXPECTANCYMODEL_H_
+    return var;
+}

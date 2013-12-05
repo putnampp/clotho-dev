@@ -27,35 +27,38 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef LIFEEXPECTANCYMODEL_H_
-#define LIFEEXPECTANCYMODEL_H_
+#ifndef DISTRIBUTIONCREATOR_H_
+#define DISTRIBUTIONCREATOR_H_
 
-#include "../ClothoModel.h"
+#include "common.h"
+#include "DistributionManager.h"
 
-#include "Distribution.h"
-
-#include "../clothoobjects/events/BirthEvent.h"
-#include "../clothoobjects/events/ShellBirthEvent.h"
-
-//#include "gsl/gsl_rng.h"
-
-class LifeExpectancyModel :
-    virtual public ClothoModel< Individual, BirthEvent >,
-        virtual public ClothoModel< IndividualShell, ShellBirthEvent > {
+template < class OBJ, class PARAMS >
+class DistributionCreator : public dist_creator< PARAMS > {
 public:
-//    LifeExpectancyModel( distribution_params & female, distribution_params & male, distribution_params & unk );
-    LifeExpectancyModel( shared_ptr< iDistribution > female, shared_ptr< iDistribution > male, shared_ptr< iDistribution > unk );
+    DistributionCreator( const char * name ) : m_name(name) {
+        DistributionManager< PARAMS >::getInstance()->registerDistribution( this );
+    }
 
-    void operator()( const BirthEvent * e, Individual * ind );
-    void operator()( const ShellBirthEvent * e, IndividualShell * ind );
-    void dump( ostream & out );
+    const string & getName() const {
+        return m_name;
+    }
 
-    virtual ~LifeExpectancyModel();
-protected:
-    double computeExpectedAge( sex_t s );
-//    gsl_rng * m_rng;
-//    distribution_params m_female, m_male, m_unk;
-    shared_ptr< iDistribution > m_female, m_male, m_unk;
+    shared_ptr< iDistribution > createDistribution( const PARAMS & n ) {
+        shared_ptr< iDistribution > dist;
+
+        return dist;
+    }
+
+    virtual ~DistributionCreator() {}
+private:
+    const string m_name;
 };
 
-#endif  // LIFEEXPECTANCYMODEL_H_
+#define DECLARE_REGISTERED_DISTRIBUTION( name, params ) \
+    extern DistributionCreator< name, params > dc_##name;
+
+#define DEFINE_REGISTERED_DISTRIBUTION( name, params ) \
+    DistributionCreator< name, params> dc_##name( #name );
+
+#endif  // DISTRIBUTIONCREATOR_H_

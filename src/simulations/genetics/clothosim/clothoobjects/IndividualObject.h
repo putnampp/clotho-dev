@@ -49,7 +49,7 @@ class Individual : public ClothoObject {
 public:
     Individual( );
 
-    Individual( sex_t s, const vector< genotype_t > & genos);
+    Individual( sex_t s, const AlleleGroupPtr genos);
 
     virtual ~Individual();
 

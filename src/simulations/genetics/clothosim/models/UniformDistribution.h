@@ -27,35 +27,63 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef LIFEEXPECTANCYMODEL_H_
-#define LIFEEXPECTANCYMODEL_H_
-
-#include "../ClothoModel.h"
+#ifndef UNIFORMDISTRIBUTION_H_
+#define UNIFORMDISTRIBUTION_H_
 
 #include "Distribution.h"
+#include <queue>
 
-#include "../clothoobjects/events/BirthEvent.h"
-#include "../clothoobjects/events/ShellBirthEvent.h"
+using std::queue;
 
-//#include "gsl/gsl_rng.h"
-
-class LifeExpectancyModel :
-    virtual public ClothoModel< Individual, BirthEvent >,
-        virtual public ClothoModel< IndividualShell, ShellBirthEvent > {
+class UniformDistribution : public iDistribution {
 public:
-//    LifeExpectancyModel( distribution_params & female, distribution_params & male, distribution_params & unk );
-    LifeExpectancyModel( shared_ptr< iDistribution > female, shared_ptr< iDistribution > male, shared_ptr< iDistribution > unk );
+    UniformDistribution( );
 
-    void operator()( const BirthEvent * e, Individual * ind );
-    void operator()( const ShellBirthEvent * e, IndividualShell * ind );
-    void dump( ostream & out );
+    void setRandomNumberGenerator( gsl_rng * rng );
+    inline double nextVariate( ) {
+        if( !m_rng ) return -1.0;
+        return gsl_rng_uniform_pos( m_rng );
+//        return (*m_variate)();
+    }
 
-    virtual ~LifeExpectancyModel();
+    inline unsigned long int nextVariate( unsigned long int max ) {
+        if( !m_rng ) return 0;
+        return gsl_rng_get( m_rng ) % max;
+//        return (*m_variate2)(max);
+    }
+
+    bool nextBoolean();
+
+    virtual ~UniformDistribution();
 protected:
-    double computeExpectedAge( sex_t s );
-//    gsl_rng * m_rng;
-//    distribution_params m_female, m_male, m_unk;
-    shared_ptr< iDistribution > m_female, m_male, m_unk;
+
+    typedef double (UniformDistribution::*variate_ptr)();
+    typedef unsigned long int (UniformDistribution::*variate2_ptr)( unsigned long int );
+
+    double variateNoRNG() {
+        return -1.0;
+    }
+
+    double variateRNG() {
+        return gsl_rng_uniform_pos( m_rng );
+    }
+
+    unsigned long int variate2NoRNG( unsigned long int max ) {
+        return 0;
+    }
+
+    unsigned long int variate2RNG( unsigned long int max ) {
+        return gsl_rng_get( m_rng ) % max;
+    }
+
+    void updateBooleanPool();
+    void updateBooleanPool2();
+
+    gsl_rng * m_rng;
+    queue< bool >   m_bools;
+
+    variate_ptr m_variate;
+    variate2_ptr m_variate2;
 };
 
-#endif  // LIFEEXPECTANCYMODEL_H_
+#endif  // UNIFORMDISTRIBUTION_H_

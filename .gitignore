@@ -1,3 +1,5 @@
 build
 notes
 *.orig
+callgrind
+log

@@ -37,51 +37,67 @@
 
 #include "../clothoobjects/events/ShellBirthEvent.h"
 
+#include "ConstantDistribution.h"
+
 using std::cout;
 using std::endl;
 using std::random_shuffle;
 
+/*
 ConstantPopulationRandomMatingModel::ConstantPopulationRandomMatingModel( unsigned int max_offspring, unsigned int birth_delay ) : 
     m_rng( gsl_rng_alloc( gsl_rng_taus ) ),
-    m_max_offspring( max_offspring ),
     m_birth_delay( birth_delay ),
+    m_offspring_dist( new ConstantDistribution(max_offspring) ),
     m_rand_val(0),
     m_offset(0) {
     long seed = time(NULL);
     gsl_rng_set( m_rng, seed );
+}
+*/
+
+ConstantPopulationRandomMatingModel::ConstantPopulationRandomMatingModel( shared_ptr< iDistribution > offspring, shared_ptr< iDistribution> birth_delay ) :
+    m_rng( gsl_rng_alloc( gsl_rng_taus ) ),
+    m_offspring_dist( offspring ),
+    m_birth_delay( birth_delay ) 
+{
+    long seed = time(NULL);
+    gsl_rng_set( m_rng, seed );
+
+    m_uniform.setRandomNumberGenerator( m_rng );
 }
 
 void ConstantPopulationRandomMatingModel::operator()( const ShellMaturityEvent * e, IndividualShell * ind ) {
     if( ind->getSex() == FEMALE ) {
         // females notifies environment when ready to mate
         //
-        IntVTime date = dynamic_cast< const IntVTime & >( e->getReceiveTime() );
+//        IntVTime date = dynamic_cast< const IntVTime & >( e->getReceiveTime() );
 
         Environment2 * env = ind->getEnvironment();
 
-        if( env->hasAvailableIndividuals() ) {
-            // given number of offspring will she mate again and produce offspring?
-            Event * evt = new ShellMatingEvent( e->getReceiveTime(), date, ind, env, ind );
-            env->receiveEvent( evt );
+        // how many children should the female have?
+        double nOff = floor( m_offspring_dist->nextVariate() );
+        
+        for( ; nOff >= 0.0; nOff -= 1.0) {
+            // generate an Mating event for each child
+            // if there are available individuals in the pool
+            if( env->hasAvailableIndividuals() ) {
+                Event * evt = new ShellMatingEvent( e->getReceiveTime(), e->getReceiveTime(), ind, env, ind );
+                env->receiveEvent( evt );
+            } else { break; }
         }
     }
 }
 
 void ConstantPopulationRandomMatingModel::operator()( const ShellMatingEvent * e, Environment2 * env ) {
     if( !env->hasAvailableIndividuals() ) {
-        cout << "pool empty" << endl;
+        //cout << "pool empty" << endl;
         return;
     }
 
     int nMales = env->getMaleCount();
 
     // get a random male by index
-    unsigned int rMale = gsl_rng_get( m_rng ) % nMales;
-
-    if( m_offset == 0 ) {
-        m_rand_val = gsl_rng_get( m_rng );
-        m_offset = 4;
-    }
+    unsigned int rMale = m_uniform.nextVariate( nMales );
 
     IndividualShell * female = e->getFirstPartner();
     IndividualShell * male = env->getMaleAt( rMale );
@@ -91,42 +107,30 @@ void ConstantPopulationRandomMatingModel::operator()( const ShellMatingEvent * e
             IndividualShell * offspring = env->nextAvailableIndividual();
 
             if( offspring ) {
-                AlleleGroupPtr genos = env->getGeneticMap()->createLociAlleles();
+                IndividualProperties * ip = offspring->getProperties();
+                ip->reset();
 
-                generateOffspringGenotype( female, male, genos );
+                generateOffspringGenotype( female, male, ip->m_genos );
 
-                unsigned int rnd = gsl_rng_get( m_rng );
-                sex_t s = ((rnd & 1 ) ? MALE : FEMALE);
-                rnd >>= 1;
+                IntVTime t = *dynamic_cast< IntVTime * > (e->getReceiveTime().clone() ) + (int) m_birth_delay->nextVariate();
 
-                IndividualProperties * ip = new IndividualProperties( female->getProperties(), male->getProperties(), s, genos );
-                IntVTime t = *dynamic_cast< IntVTime * > (e->getReceiveTime().clone() ) + m_birth_delay;
+                ip->m_dob = new IntVTime( t );
+                ip->m_sex = (m_uniform.nextBoolean() ? MALE : FEMALE );
 
-                ip->m_dob = dynamic_cast< IntVTime * >( t.clone() );
-
-                offspring->setProperties( ip );
-
-                //cout << "\t";
-                //offspring->print( cout );
-                //cout << endl;
+                ip->setMother(female->getProperties());
+                ip->setFather(male->getProperties());
 
                 female->addOffspring();
                 male->addOffspring();
 
                 Event * eBorn = new ShellBirthEvent( e->getReceiveTime(), *ip->m_dob, offspring, offspring );
                 offspring->receiveEvent( eBorn );
-
-                if( female->getOffspringCount() < m_max_offspring ) {
-                    IntVTime mTime = dynamic_cast< const IntVTime & >(e->getReceiveTime() );
-                    Event * mE = new ShellMaturityEvent( e->getReceiveTime(), mTime, female, female );
-
-                    female->receiveEvent( mE );
-                }
-
-                m_rand_val >>= 4;
-                --m_offset;
             }
+        } else {
+            cout << "Dead MALE" << endl;
         }
+    } else {
+        cout << "Dead female" << endl;
     }
 }
 
@@ -137,38 +141,54 @@ void ConstantPopulationRandomMatingModel::dump( ostream & out ) {
 void ConstantPopulationRandomMatingModel::generateOffspringGenotype( IndividualShell * female, IndividualShell * male, AlleleGroupPtr genos ) {
     unsigned int nLoci = female->getEnvironmentLociCount();
 
-    //vector< allele_t > alleles(genotype_t::PLOIDY, (allele_t)ANCESTRAL_ALLELE );
-    genotype_t tmp_alleles;
+    resizeAlleleGroup( genos, nLoci );
 
-    if( tmp_alleles.max_size() == 2 ) {
-        unsigned int rnd = gsl_rng_get( m_rng );
-        int j = 1, max_j = (sizeof( unsigned int ) << 3);   // max_j = 4 * 8 = 32
+    AlleleGroupPtr female_alleles = female->getProperties()->m_genos;
+    AlleleGroupPtr male_alleles = male->getProperties()->m_genos;
+
+    assert( male_alleles->size() == nLoci && female_alleles->size() == nLoci );
+
+    if( ALLELE_COPIES == 2 ) {
         for( unsigned int i = 0; i < nLoci; ++i ) {
-            genotype_t alleles;
-            if( j >= max_j ) {
-                rnd = gsl_rng_get( m_rng );
-                j = 1;
-            }
-
+/*
+ * Code works. However, serves as a significant bottleneck in performance
+ */
             // routine only works if ploidy == 2
-            alleles[0] = female->alleleAt( i, (rnd & 1));
-            rnd >>= 1;
-            alleles[1] = male->alleleAt( i, (rnd & 1));
-            rnd >>= 1;
-
-            j += 2;
-
-            genos->push_back(alleles);
+//            (*genos)[i][0] = (*female_alleles)[ i ][((m_uniform.nextBoolean())? 1 : 0)];
+//            (*genos)[i][1] = (*male_alleles)[ i ][((m_uniform.nextBoolean())?1:0)];
+            
+/*
+ * Alternative method. Fewer random number generations
+ */
+            unsigned int rnd = m_uniform.nextVariate( 4 );
+            switch( rnd ) {
+            case 0:
+                (*genos)[i][0] = (*female_alleles)[ i ][0];
+                (*genos)[i][1] = (*male_alleles)[ i ][0];
+                break;
+            case 1:
+                (*genos)[i][0] = (*female_alleles)[ i ][0];
+                (*genos)[i][1] = (*male_alleles)[ i ][1]; 
+                break;
+            case 2:
+                (*genos)[i][0] = (*female_alleles)[ i ][1];
+                (*genos)[i][1] = (*male_alleles)[ i ][0]; 
+                break;
+            default:
+                (*genos)[i][0] = (*female_alleles)[ i ][1];
+                (*genos)[i][1] = (*male_alleles)[ i ][1]; 
+                break;
+            }
         }
     } else {
         // more general outline. Note that it assumes a parent allele
         // can serve as the variant source multiple times.
-        unsigned int from_male = tmp_alleles.max_size() / 2;
+        unsigned int from_male = ALLELE_COPIES / 2;
 
         vector< ploidy_t > males;
         vector< ploidy_t > females;
 
-        for( ploidy_t i = 0; i < tmp_alleles.max_size(); ++i ) {
+        for( ploidy_t i = 0; i < ALLELE_COPIES; ++i ) {
             males.push_back( i );
             females.push_back( i );
         }
@@ -178,19 +198,20 @@ void ConstantPopulationRandomMatingModel::generateOffspringGenotype( IndividualS
             // treat each locus as being independent of one another
             random_shuffle( males.begin(), males.end() );
             random_shuffle( females.begin(), females.end() );
-            genotype_t alleles;
             unsigned int k = 0;
             for( ; k < from_male; ++k ) {
-                alleles[ k ] = male->alleleAt( i, males[k] );
+                (*genos)[i][ k ] = (*male_alleles)[i][ males[k] ];
             }
-            for( ; k < tmp_alleles.max_size(); ++k ) {
-                alleles[ k ] = female->alleleAt( i, females[k - from_male] );
+            for( ; k < ALLELE_COPIES; ++k ) {
+                (*genos)[i][ k ] = (*female_alleles)[ i ][ females[k - from_male] ];
             }
-            genos->push_back(alleles);
         }
     }
 }
 
 ConstantPopulationRandomMatingModel::~ConstantPopulationRandomMatingModel() {
     gsl_rng_free( m_rng );
+    if( m_offspring_dist ) {
+        m_offspring_dist.reset();
+    }
 }

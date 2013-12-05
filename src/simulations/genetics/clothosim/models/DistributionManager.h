@@ -27,35 +27,69 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef LIFEEXPECTANCYMODEL_H_
-#define LIFEEXPECTANCYMODEL_H_
+#ifndef DISTRIBUTIONMANAGER_H_
+#define DISTRIBTUIONMANAGER_H_
 
-#include "../ClothoModel.h"
+#include "common.h"
+#include <unordered_map>
+#include <time.h>
 
 #include "Distribution.h"
 
-#include "../clothoobjects/events/BirthEvent.h"
-#include "../clothoobjects/events/ShellBirthEvent.h"
+#include "gsl/gsl_rng.h"
 
-//#include "gsl/gsl_rng.h"
-
-class LifeExpectancyModel :
-    virtual public ClothoModel< Individual, BirthEvent >,
-        virtual public ClothoModel< IndividualShell, ShellBirthEvent > {
-public:
-//    LifeExpectancyModel( distribution_params & female, distribution_params & male, distribution_params & unk );
-    LifeExpectancyModel( shared_ptr< iDistribution > female, shared_ptr< iDistribution > male, shared_ptr< iDistribution > unk );
-
-    void operator()( const BirthEvent * e, Individual * ind );
-    void operator()( const ShellBirthEvent * e, IndividualShell * ind );
-    void dump( ostream & out );
-
-    virtual ~LifeExpectancyModel();
-protected:
-    double computeExpectedAge( sex_t s );
-//    gsl_rng * m_rng;
-//    distribution_params m_female, m_male, m_unk;
-    shared_ptr< iDistribution > m_female, m_male, m_unk;
+template < class PARAMS >
+struct dist_creator {
+    virtual const string & getName() const = 0;
+    virtual shared_ptr< iDistribution > createDistribution( const PARAMS & n ) = 0;
 };
 
-#endif  // LIFEEXPECTANCYMODEL_H_
+template < class PARAMS >
+class DistributionManager {
+public:
+    typedef dist_creator< PARAMS > dist_creator_t;
+    typedef dist_creator_t * dist_creator_ptr;
+    typedef std::unordered_map< string, dist_creator_ptr > Distributions;
+    typedef typename Distributions::iterator iterator;
+
+    static shared_ptr< DistributionManager< PARAMS > > getInstance() {
+        static shared_ptr< DistributionManager< PARAMS > > inst( new DistributionManager< PARAMS >() );
+        return inst;
+    }
+
+    void registerDistribution( dist_creator_ptr dist ) {
+        m_distributions[ dist->getName() ] = dist;
+    }
+
+    shared_ptr< iDistribution > createDistribution( const string & name, const PARAMS & p ) {
+        shared_ptr< iDistribution > dist;
+        iterator it = m_distributions.find( name );
+
+        if( it != m_distributions.end() ) {
+            dist = it->second->createDistribution( p );
+        }
+
+        if( dist ) {
+            dist->setRandomNumberGenerator( m_rng );
+        }
+
+        return dist;
+    }
+
+    virtual ~DistributionManager() {
+        m_distributions.clear();
+
+        gsl_rng_free( m_rng );
+    }
+protected:
+    DistributionManager() :
+        m_rng( gsl_rng_alloc( gsl_rng_taus ) ) {
+        long seed = time(NULL);
+        gsl_rng_set( m_rng, seed );
+    }
+
+    Distributions   m_distributions;
+    gsl_rng * m_rng;
+};
+
+#endif  // DISTRIBUTIONMANAGER_H_

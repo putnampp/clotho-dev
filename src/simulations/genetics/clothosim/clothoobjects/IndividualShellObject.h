@@ -49,8 +49,8 @@ using std::vector;
 
 class IndividualShell : public ClothoObject {
 public:
-    IndividualShell( );
-    IndividualShell( Environment2 * env, IndividualProperties * p = NULL );
+//    IndividualShell( );
+    IndividualShell( Environment2 * env/*, IndividualProperties * p = NULL*/ );
 
 //    IndividualShell( sex_t s, const vector< genotype_t > & genos);
 
@@ -70,7 +70,7 @@ public:
     void handleEvent( const EVT * e ) {}
 
     void setEnvironment( Environment2 * env );
-    void setProperties( IndividualProperties * prop);
+//    void setProperties( IndividualProperties * prop);
     IndividualProperties * getProperties();
 
     bool    isAlive() const;
@@ -90,8 +90,8 @@ public:
 
 private:
     string  m_name;
-    IndividualProperties * m_prop;
     Environment2 *  m_environment;
+    IndividualProperties * m_prop;
 };
 
 #endif  // INDIVIDUALSHELLOBJECT_H_

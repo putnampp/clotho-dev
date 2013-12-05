@@ -31,44 +31,62 @@
 #include "../ClothoModelCoordinator.h"
 #include "../clothoobjects/common_types.h"
 
-const string DISTRIBUTION_K = "distribution";
-const string MEAN_K = "mean";
-const string STDEV_K = "stdev";
+#include "DistributionManager.h"
+
+//const string DISTRIBUTION_K = "distribution";
+//const string MEAN_K = "mean";
+//const string STDEV_K = "stdev";
 
 using boost::static_pointer_cast;
 
 template <>
 void ClothoModelCreator< LifeExpectancyModel, YAML::Node >::createModelFrom( const YAML::Node & n ) {
-    distribution_params male;
+    shared_ptr< iDistribution > male;
     if( n[ MALE_K ] ) {
         YAML::Node tmp = n[MALE_K];
-        if( tmp[ MEAN_K ] ) {
+/*        if( tmp[ MEAN_K ] ) {
             male.mean = tmp[MEAN_K].as< double >();
         }
         if( tmp[ STDEV_K ] ) {
             male.sigma = tmp[STDEV_K].as< double >();
         }
+*/
+        if( tmp[ DISTRIBUTION_K ] ) {
+            string name = tmp[DISTRIBUTION_K].as<string>();
+            male = DistributionManager< YAML::Node >::getInstance()->createDistribution( name, tmp );
+        }
     }
 
-    distribution_params female;
+    shared_ptr< iDistribution> female;
     if( n[ FEMALE_K ] ) {
         YAML::Node tmp = n[FEMALE_K];
+/*
         if( tmp[ MEAN_K ] ) {
             female.mean = tmp[MEAN_K].as< double >();
         }
         if( tmp[ STDEV_K ] ) {
             female.sigma = tmp[STDEV_K].as< double >();
         }
+*/
+        if( tmp[ DISTRIBUTION_K ] ) {
+            string name = tmp[DISTRIBUTION_K].as<string>();
+            female = DistributionManager< YAML::Node >::getInstance()->createDistribution( name, tmp );
+        }
     }
 
-    distribution_params unk;
+    shared_ptr< iDistribution > unk;
     if( n[ UNKSEX_K ] ) {
         YAML::Node tmp = n[UNKSEX_K];
-        if( tmp[ MEAN_K ] ) {
+/*        if( tmp[ MEAN_K ] ) {
             unk.mean = tmp[MEAN_K].as< double >();
         }
         if( tmp[ STDEV_K ] ) {
             unk.sigma = tmp[STDEV_K].as< double >();
+        }
+*/
+        if( tmp[DISTRIBUTION_K] ) {
+            string name = tmp[DISTRIBUTION_K].as<string>();
+            unk = DistributionManager< YAML::Node >::getInstance()->createDistribution( name, tmp );
         }
     }
     shared_ptr< LifeExpectancyModel > pm( new LifeExpectancyModel( female, male, unk) );

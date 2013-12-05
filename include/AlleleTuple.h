@@ -37,101 +37,23 @@
 
 using std::vector;
 
-#ifdef NOCPP11
-
-#include <ostream>
-#include <cstring>
-using std::ostream;
-using std::memcpy;
-
-struct ituple {
-    virtual ploidy_t ploidy() const = 0;
-
-    virtual allele_t & operator[]( ploidy_t p ) = 0;
-    virtual allele_t operator[]( ploidy_t p ) const = 0;
-
-    virtual void print( ostream & out ) const = 0; 
-};
-
-template < ploidy_t P >
-struct AlleleTuple : public ituple {
-public:
-    static const ploidy_t PLOIDY = P;
-    AlleleTuple( const vector< allele_t > & alleles) {
-        vector< allele_t >::const_iterator it = alleles.begin();
-        ploidy_t p = 0;
-        while( it != alleles.end() && p < PLOIDY ) {
-            m_alleles[ p++ ] = (*it++);
-        }
-    }
-
-    AlleleTuple( const AlleleTuple< P > & alleles ) {
-        memcpy( m_alleles, alleles.m_alleles, sizeof(allele_t) * P);
-    }
-
-    ploidy_t ploidy() const {   return PLOIDY; }
-
-    allele_t & operator[]( ploidy_t p ) {
-        assert( p < PLOIDY ); return m_alleles[ p ]; 
-    }
-
-    allele_t operator[]( ploidy_t p ) const {
-        assert( p < PLOIDY );
-        return m_alleles[ p ];
-    }
-
-    void print( ostream & out ) const {
-        if( !PLOIDY ) return;
-
-        ploidy_t p = 0;
-        out << (int) m_alleles[ p++ ];
-        while( p < P ) {
-            out << ":" << (int) m_alleles[p++];
-        }
-    }
-    virtual ~AlleleTuple() {}
-protected:
-    allele_t    m_alleles[ PLOIDY ];
-};
-
-typedef ituple *    allele_tuple;
-typedef vector< allele_tuple >                AlleleGroup;
-
-inline ostream & operator<<( ostream & out, const ituple * g ) {
-    g->print( out );
-    return out;
-}
-
-#else   // using cpp0x
-
 #include <ostream>
 #include <array>
 using std::array;
 using std::ostream;
 
-template < ploidy_t P >
-struct allele_copy {
-    typedef array< allele_t, P > allele_copy_t;
-    static const ploidy_t PLOIDY = P;
-};
+#define ALLELE_COPIES 2
+typedef array< allele_t, ALLELE_COPIES > allele_tuple;
+typedef vector< allele_tuple > AlleleGroup;
 
-typedef allele_copy< 2 >::allele_copy_t allele_tuple;
+typedef AlleleGroup * AlleleGroupPtr;
 
-typedef vector< allele_tuple >  AlleleGroup;
+ostream & operator<<( ostream & out, const array< allele_t, 2 >  & at );
 
-inline ostream & operator<<( ostream & out, const allele_tuple & at ) {
-    if( at.max_size() > 0 ) {
-        size_t i = 0;
-        out << (int)at[i++];
-        while( i < at.max_size() ) {
-            out << ":" << (int)at[i++];
-        }
-    }
-    return out;
-}
+AlleleGroupPtr allocateAlleleGroup( size_t size );
 
-#endif
+void resizeAlleleGroup( AlleleGroupPtr agp, size_t size );
 
-typedef shared_ptr< AlleleGroup > AlleleGroupPtr;
+AlleleGroupPtr cloneAlleleGroup( AlleleGroupPtr agp );
 
 #endif  // ALLELETUPLE_H_

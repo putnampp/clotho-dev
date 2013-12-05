@@ -27,35 +27,23 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#ifndef LIFEEXPECTANCYMODEL_H_
-#define LIFEEXPECTANCYMODEL_H_
+#include "PoissonDistribution.h"
 
-#include "../ClothoModel.h"
+PoissonDistribution::PoissonDistribution( double mean ) : 
+    m_rng( NULL ),
+    m_mu ( mean )
+{
+}
 
-#include "Distribution.h"
+PoissonDistribution::~PoissonDistribution() { }
 
-#include "../clothoobjects/events/BirthEvent.h"
-#include "../clothoobjects/events/ShellBirthEvent.h"
+void PoissonDistribution::setRandomNumberGenerator( gsl_rng * rng ) {
+    m_rng = rng;
+}
 
-//#include "gsl/gsl_rng.h"
+double PoissonDistribution::nextVariate() {
+    if( !m_rng ) return 0.0;
 
-class LifeExpectancyModel :
-    virtual public ClothoModel< Individual, BirthEvent >,
-        virtual public ClothoModel< IndividualShell, ShellBirthEvent > {
-public:
-//    LifeExpectancyModel( distribution_params & female, distribution_params & male, distribution_params & unk );
-    LifeExpectancyModel( shared_ptr< iDistribution > female, shared_ptr< iDistribution > male, shared_ptr< iDistribution > unk );
-
-    void operator()( const BirthEvent * e, Individual * ind );
-    void operator()( const ShellBirthEvent * e, IndividualShell * ind );
-    void dump( ostream & out );
-
-    virtual ~LifeExpectancyModel();
-protected:
-    double computeExpectedAge( sex_t s );
-//    gsl_rng * m_rng;
-//    distribution_params m_female, m_male, m_unk;
-    shared_ptr< iDistribution > m_female, m_male, m_unk;
-};
-
-#endif  // LIFEEXPECTANCYMODEL_H_
+    double var = gsl_ran_poisson( m_rng, m_mu );
+    return var;
+}

@@ -140,21 +140,20 @@ public:
 protected:
 
     void generateGenotypes( AlleleGroupPtr genotypes, unsigned int count ) {
+        resizeAlleleGroup( genotypes, count);
+
         const unsigned int MAX_J = (sizeof( unsigned int ) << 2);
         unsigned int rnd = gsl_rng_get( m_rng );
         unsigned int j = 1;
         for( unsigned int i = 0; i < count; ++i ) {
-            genotype_t g;
-            for( ploidy_t p = 0; p < g.max_size(); ++p ) {
+            for( ploidy_t p = 0; p < ALLELE_COPIES; ++p ) {
                 if( j++ >= MAX_J ) {
                     rnd = gsl_rng_get( m_rng );
                     j = 1;
                 }
-                g[p] = (allele_t) (rnd & 0x00000001);
+                (*genotypes)[i][p] = (allele_t) (rnd & 0x00000001);
                 rnd >>= 1;
             }
-
-            genotypes->push_back( g );
         }
     }
 

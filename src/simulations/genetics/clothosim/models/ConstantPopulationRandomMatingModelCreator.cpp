@@ -31,24 +31,41 @@
 #include "../ClothoModelCoordinator.h"
 #include "../clothoobjects/common_types.h"
 
+#include "DistributionManager.h"
+
 using boost::static_pointer_cast;
 
-const string MAX_OFFSPRING_K = "max_offspring";
+const string OFFSPRING_K = "offspring";
 const string BIRTH_DELAY_K = "birth_delay";
 
 template<>
 void ClothoModelCreator< ConstantPopulationRandomMatingModel, YAML::Node >::createModelFrom( const YAML::Node & n ) {
-    int offspring = 1;
-    if( n[ MAX_OFFSPRING_K ] ) {
-        offspring = n[ MAX_OFFSPRING_K ].as< int >();
+    shared_ptr< iDistribution > offspring_dist;
+    if( n[ OFFSPRING_K ] ) {
+        YAML::Node tmp = n[OFFSPRING_K];
+        if( tmp[ DISTRIBUTION_K ] ) {
+            string name = tmp[DISTRIBUTION_K].as<string>();
+            offspring_dist = DistributionManager< YAML::Node>::getInstance()->createDistribution(name, tmp );
+        }
+    }
+    if( !offspring_dist ) {
+        std::cout << "Unable to create offspring distribution" << std::endl;
     }
 
-    int birth_delay = 0;
+    shared_ptr< iDistribution > birth_dist;
     if( n[ BIRTH_DELAY_K ] ) {
-        birth_delay = n[BIRTH_DELAY_K].as< int >();
+        YAML::Node tmp = n[BIRTH_DELAY_K];
+        if( tmp[ DISTRIBUTION_K ] ) {
+            string name = tmp[DISTRIBUTION_K].as<string>();
+            birth_dist = DistributionManager< YAML::Node>::getInstance()->createDistribution(name, tmp );
+        }
     }
 
-    shared_ptr< ConstantPopulationRandomMatingModel > pm( new ConstantPopulationRandomMatingModel(offspring, birth_delay) );
+    if( !birth_dist ) {
+        std::cout << "Unable to create birth distribution" << std::endl;
+    }
+
+    shared_ptr< ConstantPopulationRandomMatingModel > pm( new ConstantPopulationRandomMatingModel(offspring_dist, birth_dist) );
 
     ClothoModelCoordinator< IndividualShell, ShellMaturityEvent >::getInstance()->addEventHandler(
         static_pointer_cast< ClothoModel< IndividualShell, ShellMaturityEvent > >( pm )  );

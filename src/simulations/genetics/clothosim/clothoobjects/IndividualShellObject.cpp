@@ -45,34 +45,31 @@ using std::endl;
 const string IND_K = "IND";
 const string NAME_K = "name";
 
+/*
 IndividualShell::IndividualShell() : ClothoObject(),
     m_name( IND_K  ),
     m_prop( NULL ),
     m_environment( NULL ) {
     m_name.append( boost::lexical_cast< string >(m_id ));
 }
+*/
 
-IndividualShell::IndividualShell( Environment2 * env, IndividualProperties * p ) :
+IndividualShell::IndividualShell( Environment2 * env /*, IndividualProperties * p*/ ) :
     ClothoObject(),
     m_name( IND_K ),
-    m_prop( p ),
-    m_environment( env ) {
+    m_environment( env ),
+    m_prop( new IndividualProperties( m_environment->getGeneticMap()->createLociAlleles() ) ) {
     m_name.append( boost::lexical_cast< string >( m_id ) );
 }
 
 IndividualShell::~IndividualShell() {
-    setProperties( NULL );
+//    setProperties( NULL );
+    delete m_prop;
 }
 
 void IndividualShell::initialize() {
     if( !m_environment ) {
         abort();    // Environment should be specified, before object is initialized
-    }
-
-    if( !m_prop ) {
-        // initalizing new properties
-//        cout << "Initializing new properties" << endl;
-        m_prop = new IndividualProperties( m_environment->getGeneticMap()->createLociAlleles());
     }
 
     // notify self that has been born?
@@ -102,8 +99,6 @@ void IndividualShell::executeProcess() {
                 e2->updateModels( this );
             }
         }
-
-//        delete e;
     }
 }
 
@@ -136,11 +131,13 @@ Environment2 * IndividualShell::getEnvironment() const {
     return m_environment;
 }
 
+/*
 void IndividualShell::setProperties( IndividualProperties * prop ) {
     //cout << "Setting Properties: " << *prop << endl;
     if( m_prop ) delete m_prop;
     m_prop = prop;
 }
+*/
 
 IndividualProperties * IndividualShell::getProperties() {
     return m_prop;
@@ -162,9 +159,9 @@ unsigned int IndividualShell::getVariantCount() const {
     return m_prop->m_genos->size();
 }
 
-allele_t IndividualShell::alleleAt( unsigned int var_idx, ploidy_t strand ) const {
+allele_t IndividualShell::alleleAt( unsigned int var_idx, ploidy_t copy ) const {
     if( var_idx < m_prop->m_genos->size() )
-        return m_prop->m_genos->at( var_idx )[ strand ];
+        return m_prop->m_genos->at( var_idx )[ copy ];
     return (allele_t)ANCESTRAL_ALLELE;
 }
 

@@ -37,6 +37,8 @@
 
 #include "gsl/gsl_rng.h"
 
+#include "UniformDistribution.h"
+
 class RandomMatingModel :
     virtual public ClothoModel< IndividualShell, ShellMaturityEvent >,
         virtual public ClothoModel< Environment2 , ShellMatingEvent > {
@@ -54,6 +56,7 @@ protected:
     bool readyToMate( IntVTime & age, unsigned int offspring );
 
     gsl_rng * m_rng;
+    UniformDistribution m_uniform;
 };
 
 #endif  // RANDOMMATINGMODEL_H_
