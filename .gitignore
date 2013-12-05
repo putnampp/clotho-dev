@@ -3,3 +3,5 @@ notes
 *.orig
 callgrind
 log
+results
+
