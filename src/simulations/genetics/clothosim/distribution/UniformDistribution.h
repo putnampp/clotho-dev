@@ -52,6 +52,9 @@ public:
 //        return (*m_variate2)(max);
     }
 
+/*
+ * Making this inline actually decreases performance
+ */
     bool nextBoolean();
 
     virtual ~UniformDistribution();
