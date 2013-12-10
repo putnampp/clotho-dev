@@ -38,7 +38,8 @@
 
 #include "gsl/gsl_rng.h"
 
-#include "UniformDistribution.h"
+#include "random.h"
+//#include "UniformDistribution.h"
 
 class ConstantPopulationRandomMatingModel :
     virtual public ClothoModel< IndividualShell, ShellMaturityEvent >,
@@ -55,13 +56,15 @@ public:
 protected:
     void generateOffspringGenotype( IndividualShell * female, IndividualShell * male, AlleleGroupPtr genos );
 
-    gsl_rng * m_rng;
+//    gsl_rng * m_rng;
 //    unsigned int m_birth_delay;
 //    distribution_params m_offspring_dist;
     shared_ptr< iDistribution >     m_offspring_dist;
     shared_ptr< iDistribution >     m_birth_delay;
 
-    UniformDistribution     m_uniform;
+//    UniformDistribution     m_uniform;
+//
+    RAND m_rng;
 
 private:
     unsigned int m_rand_val, m_offset;

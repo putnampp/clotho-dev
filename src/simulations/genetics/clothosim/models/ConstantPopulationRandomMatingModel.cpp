@@ -56,14 +56,15 @@ ConstantPopulationRandomMatingModel::ConstantPopulationRandomMatingModel( unsign
 */
 
 ConstantPopulationRandomMatingModel::ConstantPopulationRandomMatingModel( shared_ptr< iDistribution > offspring, shared_ptr< iDistribution> birth_delay ) :
-    m_rng( gsl_rng_alloc( gsl_rng_mt19937 ) ),
+    //m_rng( gsl_rng_alloc( gsl_rng_mt19937 ) ),
     m_offspring_dist( offspring ),
-    m_birth_delay( birth_delay ) 
+    m_birth_delay( birth_delay )
 {
-    long seed = time(NULL);
-    gsl_rng_set( m_rng, seed );
+//    long seed = time(NULL);
+//    gsl_rng_set( m_rng, seed );
 
-    m_uniform.setRandomNumberGenerator( m_rng );
+//    m_uniform.setRandomNumberGenerator( m_rng );
+    m_rng.set_seed_time();
 }
 
 void ConstantPopulationRandomMatingModel::operator()( const ShellMaturityEvent * e, IndividualShell * ind ) {
@@ -94,13 +95,14 @@ void ConstantPopulationRandomMatingModel::operator()( const ShellMatingEvent * e
         return;
     }
 
-    int nMales = env->getMaleCount();
+//    int nMales = env->getMaleCount();
 
     // get a random male by index
-    unsigned int rMale = m_uniform.nextVariate( nMales );
+//    unsigned int rMale = m_uniform.nextVariate( nMales );
+//    unsigned int rMale = m_rng.Uniform( env->getMaleCount() );
 
     IndividualShell * female = e->getFirstPartner();
-    IndividualShell * male = env->getMaleAt( rMale );
+    IndividualShell * male = env->getMaleAt( m_rng.Uniform( env->getMaleCount() ) );
 
     if( female && female->isAlive() ) {
         if( male && male->isAlive() ) {
@@ -115,7 +117,8 @@ void ConstantPopulationRandomMatingModel::operator()( const ShellMatingEvent * e
                 IntVTime t = *dynamic_cast< IntVTime * > (e->getReceiveTime().clone() ) + (int) m_birth_delay->nextVariate();
 
                 ip->m_dob = new IntVTime( t );
-                ip->m_sex = (m_uniform.nextBoolean() ? MALE : FEMALE );
+//                ip->m_sex = (m_uniform.nextBoolean() ? MALE : FEMALE );
+                ip->m_sex = (m_rng.Bool() ? MALE : FEMALE );
 
                 ip->setMother(female->getProperties());
                 ip->setFather(male->getProperties());
@@ -154,13 +157,14 @@ void ConstantPopulationRandomMatingModel::generateOffspringGenotype( IndividualS
  * Code works. However, serves as a significant bottleneck in performance
  */
             // routine only works if ploidy == 2
-//            (*genos)[i][0] = (*female_alleles)[ i ][((m_uniform.nextBoolean())? 1 : 0)];
-//            (*genos)[i][1] = (*male_alleles)[ i ][((m_uniform.nextBoolean())?1:0)];
+//            (*genos)[i][0] = (*female_alleles)[ i ][m_rng.Bool()];
+//            (*genos)[i][1] = (*male_alleles)[ i ][m_rng.Bool()];
             
 /*
  * Alternative method. Fewer random number generations
  */
-            unsigned int rnd = m_uniform.nextVariate( 4 );
+/*
+            unsigned int rnd = m_rng.Uniform( 4 );
             switch( rnd ) {
             case 0:
                 (*genos)[i][0] = (*female_alleles)[ i ][0];
@@ -178,8 +182,30 @@ void ConstantPopulationRandomMatingModel::generateOffspringGenotype( IndividualS
                 (*genos)[i][0] = (*female_alleles)[ i ][1];
                 (*genos)[i][1] = (*male_alleles)[ i ][1]; 
                 break;
+            }   // end switch
+*/
+
+            double rnd = m_rng.Uniform();
+/*
+            if( rnd < 0.5 ) {
+                if( rnd < 0.25 ) {
+                    (*genos)[i][0] = (*female_alleles)[ i ][0];
+                    (*genos)[i][1] = (*male_alleles)[ i ][0];
+                } else {
+                    (*genos)[i][0] = (*female_alleles)[ i ][0];
+                    (*genos)[i][1] = (*male_alleles)[ i ][1]; 
+                }
+            } else if( rnd < 0.75 ) {
+                (*genos)[i][0] = (*female_alleles)[ i ][1];
+                (*genos)[i][1] = (*male_alleles)[ i ][0]; 
+            } else {
+                (*genos)[i][0] = (*female_alleles)[ i ][1];
+                (*genos)[i][1] = (*male_alleles)[ i ][1]; 
             }
-        }
+*/
+            (*genos)[i][0] = (*female_alleles)[i][ (rnd < 0.5) ];
+            (*genos)[i][1] = (*male_alleles)[i][ ((0.25 <= rnd) && (rnd < 0.75)) ];
+        } // end loop 
     } else {
         // more general outline. Note that it assumes a parent allele
         // can serve as the variant source multiple times.
@@ -210,8 +236,8 @@ void ConstantPopulationRandomMatingModel::generateOffspringGenotype( IndividualS
 }
 
 ConstantPopulationRandomMatingModel::~ConstantPopulationRandomMatingModel() {
-    gsl_rng_free( m_rng );
-    if( m_offspring_dist ) {
-        m_offspring_dist.reset();
-    }
+    //gsl_rng_free( m_rng );
+    //if( m_offspring_dist ) {
+    //    m_offspring_dist.reset();
+    //}
 }

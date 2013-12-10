@@ -68,6 +68,7 @@ ADD_DEPENDENCIES( cobjcommon cobjmanager )
 
 #ADD_DEPENDENCIES( udobjects cobjmanager )
 
+LIST( APPEND DIST_SRC distribution/mtrand.cpp)
 LIST( APPEND DIST_SRC distribution/Distribution.cpp)
 LIST( APPEND DIST_SRC distribution/NormalDistribution.cpp)
 LIST( APPEND DIST_SRC distribution/NormalDistributionCreator.cpp)
@@ -82,6 +83,7 @@ ADD_LIBRARY(cdistributions SHARED ${DIST_SRC} )
 
 #LIST( APPEND MODEL_SRC models/SelectionModel.cpp )
 #LIST( APPEND MODEL_SRC models/RandomSelectionModel.cpp )
+LIST( APPEND MODEL_SRC distribution/mtrand.cpp)
 LIST( APPEND MODEL_SRC models/PopulationModel.cpp )
 LIST( APPEND MODEL_SRC models/PopulationModelCreator.cpp )
 LIST( APPEND MODEL_SRC models/LifeExpectancyModel.cpp )
