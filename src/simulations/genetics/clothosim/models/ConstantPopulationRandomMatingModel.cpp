@@ -163,46 +163,7 @@ void ConstantPopulationRandomMatingModel::generateOffspringGenotype( IndividualS
 /*
  * Alternative method. Fewer random number generations
  */
-/*
-            unsigned int rnd = m_rng.Uniform( 4 );
-            switch( rnd ) {
-            case 0:
-                (*genos)[i][0] = (*female_alleles)[ i ][0];
-                (*genos)[i][1] = (*male_alleles)[ i ][0];
-                break;
-            case 1:
-                (*genos)[i][0] = (*female_alleles)[ i ][0];
-                (*genos)[i][1] = (*male_alleles)[ i ][1]; 
-                break;
-            case 2:
-                (*genos)[i][0] = (*female_alleles)[ i ][1];
-                (*genos)[i][1] = (*male_alleles)[ i ][0]; 
-                break;
-            default:
-                (*genos)[i][0] = (*female_alleles)[ i ][1];
-                (*genos)[i][1] = (*male_alleles)[ i ][1]; 
-                break;
-            }   // end switch
-*/
-
             double rnd = m_rng.Uniform();
-/*
-            if( rnd < 0.5 ) {
-                if( rnd < 0.25 ) {
-                    (*genos)[i][0] = (*female_alleles)[ i ][0];
-                    (*genos)[i][1] = (*male_alleles)[ i ][0];
-                } else {
-                    (*genos)[i][0] = (*female_alleles)[ i ][0];
-                    (*genos)[i][1] = (*male_alleles)[ i ][1]; 
-                }
-            } else if( rnd < 0.75 ) {
-                (*genos)[i][0] = (*female_alleles)[ i ][1];
-                (*genos)[i][1] = (*male_alleles)[ i ][0]; 
-            } else {
-                (*genos)[i][0] = (*female_alleles)[ i ][1];
-                (*genos)[i][1] = (*male_alleles)[ i ][1]; 
-            }
-*/
             (*genos)[i][0] = (*female_alleles)[i][ (rnd < 0.5) ];
             (*genos)[i][1] = (*male_alleles)[i][ ((0.25 <= rnd) && (rnd < 0.75)) ];
         } // end loop 
