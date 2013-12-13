@@ -33,7 +33,7 @@
 
 using boost::static_pointer_cast;
 
-const string DISTRIBUTION_K = "distribution";
+//const string DISTRIBUTION_K = "distribution";
 const string MEAN_K = "mean";
 const string STDEV_K = "stdev";
 

@@ -88,7 +88,7 @@ inline unsigned long MTRand_int32::rand_int32() { // generate 32 bit random int
   if (p == n) gen_state(); // new state vector needed
 // gen_state() is split off to be non-inline, because it is only called once
 // in every 624 calls and otherwise irand() would become too big to get inlined
-  unsigned long x = state[p++];
+  register unsigned long x = state[p++];
   x ^= (x >> 11);
   x ^= (x << 7) & 0x9D2C5680UL;
   x ^= (x << 15) & 0xEFC60000UL;
@@ -103,9 +103,11 @@ public:
   MTRand(const unsigned long* seed, int size) : MTRand_int32(seed, size) {}
   ~MTRand() {}
   double operator()() {
-    return static_cast<double>(rand_int32()) * (1. / 4294967296.); } // divided by 2^32
+  //  return static_cast<double>(rand_int32()) * (1. / 4294967296.); } // divided by 2^32
+  return static_cast< double >( rand_int32()) / 4294967296.; }
 	double next() {
-    return static_cast<double>(rand_int32()) * (1. / 4294967296.); } // divided by 2^32
+  //  return static_cast<double>(rand_int32()) * (1. / 4294967296.); } // divided by 2^32
+    return static_cast<double>(rand_int32())  / 4294967296.; } // divided by 2^32
 private:
 	MTRand(const MTRand&); // copy constructor not defined
   void operator=(const MTRand&); // assignment operator not defined

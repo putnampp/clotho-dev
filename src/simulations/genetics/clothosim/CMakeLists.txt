@@ -56,11 +56,11 @@ LIST( APPEND SIM_SRC clothoobjects/PopulatedEnvironment.cpp )
 LIST( APPEND SIM_SRC clothoobjects/PopulationInitializer.cpp )
 LIST( APPEND SIM_SRC clothoobjects/GeneticMapInitializer.cpp )
 
-ADD_LIBRARY(cobjmanager SHARED ${OBJECT_MNGR_SRC} )
+#ADD_LIBRARY(cobjmanager SHARED ${OBJECT_MNGR_SRC} )
 
-ADD_LIBRARY(cobjcommon SHARED ${SIM_SRC})
+#ADD_LIBRARY(cobjcommon SHARED ${SIM_SRC})
 
-ADD_DEPENDENCIES( cobjcommon cobjmanager )
+#ADD_DEPENDENCIES( cobjcommon cobjmanager )
 
 #LIST( APPEND USER_SRC user_defined_object/UDObject.cpp )
 
@@ -79,11 +79,10 @@ LIST( APPEND DIST_SRC distribution/UniformDistributionCreator.cpp)
 LIST( APPEND DIST_SRC distribution/PoissonDistribution.cpp)
 LIST( APPEND DIST_SRC distribution/PoissonDistributionCreator.cpp )
 
-ADD_LIBRARY(cdistributions SHARED ${DIST_SRC} )
+#ADD_LIBRARY(cdistributions SHARED ${DIST_SRC} )
 
 #LIST( APPEND MODEL_SRC models/SelectionModel.cpp )
 #LIST( APPEND MODEL_SRC models/RandomSelectionModel.cpp )
-LIST( APPEND MODEL_SRC distribution/mtrand.cpp)
 LIST( APPEND MODEL_SRC models/PopulationModel.cpp )
 LIST( APPEND MODEL_SRC models/PopulationModelCreator.cpp )
 LIST( APPEND MODEL_SRC models/LifeExpectancyModel.cpp )
@@ -103,6 +102,8 @@ LIST( APPEND MODEL_SRC models/ConstantPopulationRandomMatingModelCreator.cpp)
 LIST( APPEND MODEL_SRC models/KAlleleMutationModel.cpp)
 LIST( APPEND MODEL_SRC models/KAlleleMutationModelCreator.cpp)
 
-ADD_LIBRARY(cmodels SHARED ${MODEL_SRC} )
+#ADD_LIBRARY(cmodels SHARED ${MODEL_SRC} )
 
-ADD_DEPENDENCIES(cmodels cobjcommon cdistributions)
+#ADD_DEPENDENCIES(cmodels cobjcommon cdistributions)
+
+ADD_LIBRARY(csimulation SHARED  ${SIM_SRC} ${OBJECT_MNGR_SRC} ${DIST_SRC} ${MODEL_SRC} )
