@@ -146,12 +146,15 @@ void ConstantPopulationRandomMatingModel::generateOffspringGenotype( IndividualS
 
     resizeAlleleGroup( genos, nLoci );
 
-    AlleleGroupPtr female_alleles = female->getProperties()->m_genos;
-    AlleleGroupPtr male_alleles = male->getProperties()->m_genos;
+//    AlleleGroupPtr female_alleles = female->getProperties()->m_genos;
+//    AlleleGroupPtr male_alleles = male->getProperties()->m_genos;
 
-    assert( male_alleles->size() == nLoci && female_alleles->size() == nLoci );
+//    assert( male_alleles->size() == nLoci && female_alleles->size() == nLoci );
 
     if( ALLELE_COPIES == 2 ) {
+        AlleleGroup::iterator g = genos->begin(),
+            m = male->getProperties()->m_genos->begin(),
+            f = female->getProperties()->m_genos->begin();
         for( unsigned int i = 0; i < nLoci; ++i ) {
 /*
  * Code works. However, serves as a significant bottleneck in performance
@@ -164,12 +167,17 @@ void ConstantPopulationRandomMatingModel::generateOffspringGenotype( IndividualS
  * Alternative method. Fewer random number generations
  */
             double rnd = m_rng.Uniform();
-            (*genos)[i][0] = (*female_alleles)[i][ (rnd < 0.5) ];
-            (*genos)[i][1] = (*male_alleles)[i][ ((0.25 <= rnd) && (rnd < 0.75)) ];
+//            (*genos)[i][0] = (*female_alleles)[i][ (rnd < 0.5) ];
+//            (*genos)[i][1] = (*male_alleles)[i][ ((0.25 <= rnd) && (rnd < 0.75)) ];
+            (*g)[0] = (*f++)[ (rnd < 0.5) ];
+            (*g++)[1] = (*m++)[ ((0.25 <= rnd) && (rnd < 0.75)) ];
         } // end loop 
     } else {
         // more general outline. Note that it assumes a parent allele
         // can serve as the variant source multiple times.
+        AlleleGroupPtr female_alleles = female->getProperties()->m_genos;
+        AlleleGroupPtr male_alleles = male->getProperties()->m_genos;
+
         unsigned int from_male = ALLELE_COPIES / 2;
 
         vector< ploidy_t > males;
