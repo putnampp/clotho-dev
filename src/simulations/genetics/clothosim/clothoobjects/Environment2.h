@@ -44,6 +44,7 @@
 #include <unordered_map>
 
 using std::unordered_map;
+using std::make_pair;
 using std::queue;
 using std::ofstream;
 
@@ -82,7 +83,14 @@ public:
 
     void print( ostream & out ) const;
 protected:
+    // the pools are set as vectors because we want to access
+    // the individuals by index.  Would rather iterate to find
+    // corresponding vector position upon removal (death event), 
+    // than iterator to index in 'list/map' upon selection.
+
     vector< IndividualShell * > m_females, m_males, m_unk;
+    typedef unordered_map< IndividualShell *, size_t > MappedIndividuals;
+    MappedIndividuals m_mapped_females, m_mapped_males, m_mapped_unk;
     queue< IndividualShell * > m_individual_pool;
     shared_ptr< GeneticMap >    m_genetic_map;
 

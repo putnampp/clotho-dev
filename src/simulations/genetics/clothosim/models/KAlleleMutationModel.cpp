@@ -57,22 +57,17 @@ void KAlleleMutationModel::operator()( const ShellBirthEvent * sbe, IndividualSh
     if( genos->empty() ) return;
 
     if( ALLELE_COPIES == 2 ) {
-        unsigned int nMut = m_poisson.nextVariate( m_rate * (genos->size() << 1) );
+        // Method follows implementation in quantiNemo
+        unsigned int nMut = m_poisson.nextVariate( m_rate * genos->size() * 2 );
         while( nMut-- > 0 ) {
-            unsigned long int locus_idx = m_uniform.nextVariate( (unsigned long int) genos->size());
-            unsigned long int maxAllele = is->getEnvironment()->getGeneticMap()->getMaxAlleles( locus_idx );
-            allele_t newAllele;
-            if( m_uniform.nextBoolean() ) {
-                do {
-                    newAllele = m_uniform.nextVariate( maxAllele );
-                } while ( newAllele == (*genos)[ locus_idx ][ 1 ] );
-                (*genos)[locus_idx][1] = newAllele;
-            } else {
-                do {
-                    newAllele = m_uniform.nextVariate( maxAllele );
-                } while( newAllele == (*genos)[ locus_idx ][ 0 ] );
-                (*genos)[locus_idx][0] = newAllele;
-            }
+            unsigned long int locus_idx = m_uniform.nextVariate( (unsigned long int ) genos->size() * 2);
+            unsigned long int maxAllele = is->getEnvironment()->getGeneticMap()->getMaxAlleles( locus_idx / 2 );
+            allele_t newAllele = (allele_t)0;
+            allele_t & oldAllele = (*genos)[locus_idx/2][ (locus_idx % 2) ];
+            do {
+                newAllele = m_uniform.nextVariate( maxAllele );
+            } while ( newAllele == oldAllele );
+            oldAllele = newAllele;
         }
     }
 }

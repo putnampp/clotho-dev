@@ -156,12 +156,15 @@ void Environment2::addIndividual( IndividualShell * s ) {
 
     switch( s->getSex() ) {
     case FEMALE:
+        m_mapped_females.insert( make_pair( s, m_females.size()) );
         m_females.push_back(s);
         break;
     case MALE:
+        m_mapped_males.insert( make_pair(s, m_males.size() ) );
         m_males.push_back( s );
         break;
     case UNK_SEX:
+        m_mapped_unk.insert( make_pair(s, m_unk.size()) );
         m_unk.push_back( s );
         break;
     default:
@@ -176,48 +179,80 @@ void Environment2::addIndividual( IndividualShell * s ) {
 void Environment2::removeIndividual( IndividualShell * s ) {
     if( !s ) return;
 
-    vector< IndividualShell * > * l =  &m_unk;
+//    vector< IndividualShell * > * l =  &m_unk;
+//    MappedIndividuals * m = &m_mapped_unk;
 
     switch( s->getSex() ) {
-    case FEMALE:
-        l = &m_females;
+    case FEMALE: {
+//        l = &m_females;
+//        m = &m_mapped_females;
+        MappedIndividuals::iterator i = m_mapped_females.find( s ), b = m_mapped_females.find( m_females.back() );
+
+        swap( m_females[ i->second ], m_females.back() );
+        b->second = i->second;
+
+        m_mapped_females.erase( i );
+        m_females.pop_back();
+    }
         break;
-    case MALE:
-        l = &m_males;
+    case MALE: {
+//        l = &m_males;
+//        m = &m_mapped_males;
+        MappedIndividuals::iterator i = m_mapped_males.find( s ), b = m_mapped_males.find( m_males.back() );
+
+        swap( m_males[ i->second ], m_males.back() );
+        b->second = i->second;
+
+        m_mapped_males.erase( i );
+        m_males.pop_back();
+    }
         break;
-    case UNK_SEX:
-        l = &m_unk;
+    case UNK_SEX: {
+//        l = &m_unk;
+        MappedIndividuals::iterator i = m_mapped_unk.find( s ), b = m_mapped_unk.find( m_unk.back() );
+
+        swap( m_unk[ i->second ], m_unk.back() );
+        b->second = i->second;
+
+        m_mapped_unk.erase( i );
+        m_unk.pop_back();
+    }
         break;
     default:
         cout << "ERRRORORORROR\n";
         return;
     }
-
+/*
     bool bFound = false;
-    size_t pos = 0;
-    while( pos < l->size() ) {
-        if( (*l)[pos] == s ) {
+    while( it != it_end ) {
+        if( *it == s ) {
             bFound = true;
-            if( pos < l->size() - 1 ) {
-                swap( (*l)[pos], l->back() );
-            }
+            swap( *it, l->back() );
 
-            if( l->back() != s ) {
-                cout << "Individual not at back" << endl;
-            }
             l->pop_back();
-            break;
+            break;             
         }
-        ++pos;
+        it++;
     }
-
     if(! bFound ) {
         cout << "Individual not found" << endl;
     }
+*/
+/*
+    MappedIndividuals::iterator i = m->find( s ), b = m->find( l->back() );
+
+    swap( (*l)[ i->second ], l->back() );
+    b->second = i->second;
+
+    m->erase( i );
+    l->pop_back();
+*/
 
     m_individual_pool.push( s );
 
-    Event * e = new ShellDeathEvent( getSimulationTime(), getSimulationTime(), s, this );
+    const VTime & t = getSimulationTime();
+
+    Event * e = new ShellDeathEvent( t, t, s, this );
     this->receiveEvent(e);
 }
 
