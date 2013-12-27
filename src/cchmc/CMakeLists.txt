@@ -42,6 +42,7 @@ INCLUDE_DIRECTORIES( ${${PROJECT_NAME}_INCLUDE_DIR} )
 #LIST( APPEND SRCS DeletedChromosome.cpp)
 #LIST( APPEND SRCS GeneticEventManager.cpp)
 
+LIST( APPEND CCHMC_SRCS pword_allele_masks.cpp)
 LIST( APPEND CCHMC_SRCS AlleleTuple.cpp )
 LIST( APPEND CCHMC_SRCS GeneticMap.cpp )
 LIST( APPEND CCHMC_SRCS Locus.cpp )

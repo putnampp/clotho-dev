@@ -138,8 +138,8 @@ bool GeneticMap::addTraitLocus( TraitPtr tp, LocusGenotyper * lg ) {
 }
 
 double GeneticMap::computeGenotype( locus_index_t l, const AlleleGroupPtr ag ) const {
-    if( l < m_genotypers->size() && l < ag->size() ) {
-        return m_genotypers->at(l)->genotype((*ag)[l]);
+    if( l < m_genotypers->size() && l < getLociCount() ) {
+        return m_genotypers->at(l)->genotype(ag, l);
     }
 
     return 0.0;

@@ -65,11 +65,27 @@
 #endif  // end verifications
 
 #ifndef MAX_ALLELES
-#define    MAX_ALLELES 256
+#define    MAX_ALLELES 32
 #endif  // MAX_ALLELES
 
 #if MAX_ALLELES < 0
 #error  Cannot have negative alleles
 #endif  // MAX_ALLELES
+
+#ifndef PWORD_SIZE
+#define PWORD_SIZE 64
+#endif  // define PWORD_SIZE
+
+#if PWORD_SIZE == 64
+typedef unsigned long pword_t;
+#elif PWORD_SIZE == 32
+typedef unsigned int pword_t;
+#elif PWORD_SIZE == 16
+typedef unsigned short pword_t;
+#elif PWORD_SIZE == 8
+typedef unsigned char pword_t;
+#else
+#error Unexpected processor word bit length
+#endif  // pword_t
 
 #endif  // CLOTHO_CONFIG_H_

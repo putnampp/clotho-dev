@@ -42,3 +42,8 @@ Description: The Warped_DIR variable establishes the root directory for the Warp
     Specifically, the Warped Utils (libutils.so) and the Warped (libwarped.so) files.
 Example Command: cmake -DWarped_DIR=<path> ..
     This command will update the Warped root directory
+
+Compilation Variable: PWORD_SIZE
+Description: Establishes the desired processor word size.  Allows user to use 32-bit on 64-bit machine
+Example Command: cmake -DPWORD_SIZE=64 ..
+    This command will update the Warped root directory

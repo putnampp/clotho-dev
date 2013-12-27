@@ -49,4 +49,10 @@ using boost::scoped_ptr;
 
 typedef unsigned char   chromid_t;
 
+#if BITS_PER_ALLELE > PWORD_SIZE
+#error Allele bit representation is greater than processor word size
+#endif  // allele_size v pword_size
+
+static const int ALLELES_PER_PWORD = PWORD_SIZE / BITS_PER_ALLELE;
+
 #endif  // COMMON_H_

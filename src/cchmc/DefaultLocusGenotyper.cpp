@@ -36,11 +36,11 @@ DefaultLocusGenotyper::DefaultLocusGenotyper( LocusPtr lp ) :
 DefaultLocusGenotyper::DefaultLocusGenotyper( AllelicEffect * ae ) :
     LocusGenotyper( ae ) {}
 
-double DefaultLocusGenotyper::genotype( const allele_tuple & at ) const {
+double DefaultLocusGenotyper::genotype( const AlleleGroupPtr at, size_t lIdx ) const {
     double res = 0.0;
 
-    for( ploidy_t p = 0; p < at.max_size(); ++p ) {
-        res += (*m_effect)(at[p]);
+    for( ploidy_t p = 0; p < ALLELE_COPIES; ++p ) {
+        res += (*m_effect)(at[p][lIdx]);
     }
 
     return res;

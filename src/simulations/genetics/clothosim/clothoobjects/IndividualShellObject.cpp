@@ -156,12 +156,12 @@ unsigned int IndividualShell::getEnvironmentLociCount() const {
 }
 
 unsigned int IndividualShell::getVariantCount() const {
-    return m_prop->m_genos->size();
+    return getEnvironmentLociCount();
 }
 
 allele_t IndividualShell::alleleAt( unsigned int var_idx, ploidy_t copy ) const {
-    if( var_idx < m_prop->m_genos->size() )
-        return m_prop->m_genos->at( var_idx )[ copy ];
+    if( var_idx < getEnvironmentLociCount() )
+        return m_prop->m_genos[copy][ var_idx ];
     return (allele_t)ANCESTRAL_ALLELE;
 }
 

@@ -52,18 +52,20 @@ void KAlleleMutationModel::operator()( const BirthEvent * be, Individual * ind )
 }
 
 void KAlleleMutationModel::operator()( const ShellBirthEvent * sbe, IndividualShell * is ) {
+    size_t nLoci = is->getEnvironmentLociCount() * 2;
+    if( nLoci == 0) return;
+
     IndividualProperties * ip = is->getProperties();
     AlleleGroupPtr genos = ip->m_genos;
-    if( genos->empty() ) return;
 
     if( ALLELE_COPIES == 2 ) {
         // Method follows implementation in quantiNemo
-        unsigned int nMut = m_poisson.nextVariate( m_rate * genos->size() * 2 );
+        unsigned int nMut = m_poisson.nextVariate( m_rate * nLoci );
         while( nMut-- > 0 ) {
-            unsigned long int locus_idx = m_uniform.nextVariate( (unsigned long int ) genos->size() * 2);
+            unsigned long int locus_idx = m_uniform.nextVariate( nLoci );
             unsigned long int maxAllele = is->getEnvironment()->getGeneticMap()->getMaxAlleles( locus_idx / 2 );
             allele_t newAllele = (allele_t)0;
-            allele_t & oldAllele = (*genos)[locus_idx/2][ (locus_idx % 2) ];
+            allele_t & oldAllele = genos[(locus_idx % 2)][locus_idx/2];
             do {
                 newAllele = m_uniform.nextVariate( maxAllele );
             } while ( newAllele == oldAllele );

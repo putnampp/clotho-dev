@@ -31,7 +31,6 @@
 
 #include "common.h"
 #include "ploidy.h"
-#include "Allele.h"
 
 #include <vector>
 
@@ -42,18 +41,32 @@ using std::vector;
 using std::array;
 using std::ostream;
 
-#define ALLELE_COPIES 2
-typedef array< allele_t, ALLELE_COPIES > allele_tuple;
-typedef vector< allele_tuple > AlleleGroup;
+#include <cstring>
+using std::memcpy;
 
-typedef AlleleGroup * AlleleGroupPtr;
+#define ALLELE_COPIES 2
+
+//typedef array< allele_t, ALLELE_COPIES > allele_tuple;
+//typedef vector< allele_tuple > AlleleGroup;
+//typedef allele_t * AlleleGroup;
+
+//typedef AlleleGroup * AlleleGroupPtr;
+//typedef allele_t ** AlleleGroupPtr;
+//
+
+typedef allele_t * allele_tuple;
+typedef allele_t ** AlleleGroup;
+typedef AlleleGroup AlleleGroupPtr;
 
 ostream & operator<<( ostream & out, const array< allele_t, 2 >  & at );
 
 AlleleGroupPtr allocateAlleleGroup( size_t size );
 
-void resizeAlleleGroup( AlleleGroupPtr agp, size_t size );
+void resizeAlleleGroup( AlleleGroupPtr & agp, size_t size );
+void copyAlleleGroup( AlleleGroupPtr dest, AlleleGroupPtr src);
 
 AlleleGroupPtr cloneAlleleGroup( AlleleGroupPtr agp );
+
+void deallocateAlleleGroup( AlleleGroupPtr agp );
 
 #endif  // ALLELETUPLE_H_

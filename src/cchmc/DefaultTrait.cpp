@@ -56,9 +56,7 @@ size_t  DefaultTrait::getLociCount() const {
 double DefaultTrait::genotype( const AlleleGroupPtr ag ) const {
     double res = 0.0;
     for( LocusGenotypers::const_iterator it = m_loci->begin(); it != m_loci->end(); it++ ) {
-        if( it->first < ag->size() ) {
-            res = it->second->genotype( (*ag)[ it->first ] );
-        }
+        res += it->second->genotype( ag, it->first );
     }
     return res;
 }

@@ -30,21 +30,25 @@
 #ifndef ALLELE_H_
 #define ALLELE_H_
 
-#if MAX_ALLELES <= (1 << 8)
+#if MAX_ALLELES <= 256
 
 typedef unsigned char   allele_t;
+#define BITS_PER_ALLELE 8
 
-#elif MAX_ALLELES <= (1 << 16 )
+#elif MAX_ALLELES <= 65536
 
 typedef unsigned short   allele_t;
+#define BITS_PER_ALLELE 16
 
-#elif MAX_ALLELES <= (1 << 32 )
+#elif MAX_ALLELES <= 4294967296
 
 typedef unsigned int    allele_t;
+#define BITS_PER_ALLELE 32
 
 #elif MAX_ALLELES <= 0xFFFFFFFFFFFFFFFF
 
 typedef unsigned long   allele_t;
+#define BITS_PER_ALLELE 64
 
 #else
 

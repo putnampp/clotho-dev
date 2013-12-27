@@ -124,14 +124,14 @@ void RandomMatingModel::generateOffspringGenotype( IndividualShell * female, Ind
     AlleleGroupPtr female_alleles = female->getProperties()->m_genos;
     AlleleGroupPtr male_alleles = male->getProperties()->m_genos;
 
-    assert( female_alleles->size() == nLoci && male_alleles->size() == nLoci );
+    //assert( female_alleles->size() == nLoci && male_alleles->size() == nLoci );
 
     if( ALLELE_COPIES == 2 ) {
         unsigned int i = 0; 
         while( i < nLoci ) {
             // routine only works if ploidy == 2
-            (*genos)[i][0] = (*female_alleles)[ i ][ (m_uniform.nextBoolean() ? 1 : 0) ];
-            (*genos)[i][1] = (*male_alleles)[ i ][ (m_uniform.nextBoolean() ? 1 : 0 )];
+            genos[0][i] = female_alleles[(m_uniform.nextBoolean() ? 1 : 0)][ i ];
+            genos[1][i] = male_alleles[ (m_uniform.nextBoolean() ? 1 : 0 )][ i ];
 
             ++i;
         }
@@ -157,10 +157,10 @@ void RandomMatingModel::generateOffspringGenotype( IndividualShell * female, Ind
 
             unsigned int k = 0;
             for( ; k < from_male; ++k ) {
-                (*genos)[i][ k ] = (*male_alleles)[ i ][ males[k] ];
+                genos[ k ][i] = male_alleles[ males[k] ][ i ];
             }
             for( ; k < ALLELE_COPIES; ++k ) {
-                (*genos)[i][ k ] = (*female_alleles)[ i ][ females[k - from_male] ];
+                genos[ k ][i] = female_alleles[ females[k - from_male] ][ i ];
             }
         }
     }

@@ -92,7 +92,7 @@ public:
         if( m_dob ) delete m_dob;
         if( m_eol ) delete m_eol;
 
-        if( m_genos ) delete m_genos;
+        deallocateAlleleGroup( m_genos );
     }
 private:
     static long next_id;

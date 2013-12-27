@@ -39,6 +39,7 @@
 #include "gsl/gsl_rng.h"
 
 #include "random.h"
+#include "pword_allele_masks.hpp"
 //#include "UniformDistribution.h"
 
 class ConstantPopulationRandomMatingModel :
@@ -65,6 +66,8 @@ protected:
 //    UniformDistribution     m_uniform;
 //
     RAND m_rng;
+
+    static pword_allele_mask< pword_t, allele_t, ALLELE_COPIES > m_pword_masks;
 
 private:
     unsigned int m_rand_val, m_offset;

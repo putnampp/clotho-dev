@@ -32,14 +32,16 @@
 long IndividualProperties::next_id = 1;
 
 void IndividualProperties::updateGenotypes( AlleleGroupPtr agp ) {
-    size_t idx = 0;
+    /*size_t idx = 0;
     for( AlleleGroup::iterator it = agp->begin(); it != agp->end(); it++, ++idx ) {
         if( idx < m_genos->size() ) {
             (*m_genos)[idx] = *it;
         } else {
             m_genos->push_back( *it );
         }
-    }
+    }*/
+
+    copyAlleleGroup( m_genos, agp);
 }
 
 void IndividualProperties::setMother( const IndividualProperties * mother ) {
@@ -86,14 +88,17 @@ ostream & operator<<( ostream & out, const IndividualProperties & ip ) {
 
     out << ", " << ip.m_offspring;
 
-    if( !ip.m_genos->empty() ) {
+    size_t size = (ip.m_genos[1] - ip.m_genos[0]);
+    if( size ) {
         out << ", [";
-
-        AlleleGroup::iterator it = ip.m_genos->begin();
-        out << "{" << (*it++) << "}";
-        while( it != ip.m_genos->end() ) {
-            out << ",{" << (*it++) << "}";
+       /* 
+        size_t s = 0;
+        for( ploidy_t p = 0; p < ALLELE_COPIES; ++p ) {
+            out << "{" << ip.m_genos[p][s]  << "}";
         }
+        while( s < size ) {
+            out << ",{" << (*it++) << "}";
+        }*/
         out << "]";
     }
     return out;

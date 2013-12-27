@@ -152,10 +152,10 @@ void ConstantPopulationRandomMatingModel::generateOffspringGenotype( IndividualS
 //    assert( male_alleles->size() == nLoci && female_alleles->size() == nLoci );
 
     if( ALLELE_COPIES == 2 ) {
-        AlleleGroup::iterator g = genos->begin(),
-            m = male->getProperties()->m_genos->begin(),
-            f = female->getProperties()->m_genos->begin();
-        for( unsigned int i = 0; i < nLoci; ++i ) {
+//        AlleleGroup::iterator g = genos->begin(),
+//            m = male->getProperties()->m_genos->begin(),
+//            f = female->getProperties()->m_genos->begin();
+//        for( unsigned int i = 0; i < nLoci; ++i ) {
 /*
  * Code works. However, serves as a significant bottleneck in performance
  */
@@ -166,12 +166,33 @@ void ConstantPopulationRandomMatingModel::generateOffspringGenotype( IndividualS
 /*
  * Alternative method. Fewer random number generations
  */
-            double rnd = m_rng.Uniform();
+//            double rnd = m_rng.Uniform();
 //            (*genos)[i][0] = (*female_alleles)[i][ (rnd < 0.5) ];
 //            (*genos)[i][1] = (*male_alleles)[i][ ((0.25 <= rnd) && (rnd < 0.75)) ];
-            (*g)[0] = (*f++)[ (rnd < 0.5) ];
-            (*g++)[1] = (*m++)[ ((0.25 <= rnd) && (rnd < 0.75)) ];
-        } // end loop 
+//            (*g)[0] = (*f++)[ (rnd < 0.5) ];
+//            (*g++)[1] = (*m++)[ ((0.25 <= rnd) && (rnd < 0.75)) ];
+//        } // end loop 
+//
+        pword_t * f = reinterpret_cast< pword_t * >(female->getProperties()->m_genos[0]),
+            * f1 = reinterpret_cast< pword_t * >(female->getProperties()->m_genos[1]),
+            * m = reinterpret_cast< pword_t * >(male->getProperties()->m_genos[0]),
+            * m1 = reinterpret_cast< pword_t * >(male->getProperties()->m_genos[1]),
+            * g = reinterpret_cast< pword_t * >(genos[0]),
+            * g1 = reinterpret_cast< pword_t * >(genos[1]);
+
+        size_t s = (genos[1]-genos[0]) / ALLELES_PER_PWORD;
+
+        for( size_t i = 0; i < s; ++i ) {
+
+            unsigned int rnd =(unsigned int)( m_rng.Uniform() * 65536);    // uniform random number [0, 65536)
+
+            pword_t mask = m_pword_masks[ rnd % 256 ];
+
+            (*g++) = (((*m++) & mask) | ((*m1++) & ~mask));
+
+            mask = m_pword_masks[ rnd / 256 ];
+            (*g1++) = (((*f++) & mask) | ((*f1++) & ~mask));
+        }
     } else {
         // more general outline. Note that it assumes a parent allele
         // can serve as the variant source multiple times.
@@ -195,10 +216,10 @@ void ConstantPopulationRandomMatingModel::generateOffspringGenotype( IndividualS
             random_shuffle( females.begin(), females.end() );
             unsigned int k = 0;
             for( ; k < from_male; ++k ) {
-                (*genos)[i][ k ] = (*male_alleles)[i][ males[k] ];
+                genos[k][ i ] = male_alleles[ males[k]][ i ];
             }
             for( ; k < ALLELE_COPIES; ++k ) {
-                (*genos)[i][ k ] = (*female_alleles)[ i ][ females[k - from_male] ];
+                genos[k][ i ] = female_alleles[ females[k - from_male] ][i];
             }
         }
     }

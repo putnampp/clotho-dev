@@ -117,10 +117,12 @@ public:
 
         if( !env )  abort();    // could not find the environment
 
+        unsigned int nLoci = env->getGeneticMap()->getLociCount();
+
         for( unsigned int i = 0; i < female_count; i++ ) {
             IndividualShell * ishell = env->nextAvailableIndividual();
             if( ishell ) {
-                generateGenotypes( ishell->getProperties()->m_genos, env->getGeneticMap()->getLociCount() );
+                generateGenotypes( ishell->getProperties()->m_genos, nLoci );
                 ishell->getProperties()->m_sex = FEMALE;
             }
         }
@@ -128,7 +130,7 @@ public:
         for( unsigned int i = female_count; i < pop_size; i++ ) {
             IndividualShell * ishell = env->nextAvailableIndividual();
             if( ishell ) {
-                generateGenotypes( ishell->getProperties()->m_genos, env->getGeneticMap()->getLociCount() );
+                generateGenotypes( ishell->getProperties()->m_genos, nLoci );
                 ishell->getProperties()->m_sex = MALE;
             }
         }
@@ -145,13 +147,14 @@ protected:
         const unsigned int MAX_J = (sizeof( unsigned int ) << 2);
         unsigned int rnd = gsl_rng_get( m_rng );
         unsigned int j = 1;
-        for( unsigned int i = 0; i < count; ++i ) {
-            for( ploidy_t p = 0; p < ALLELE_COPIES; ++p ) {
+        for( ploidy_t p = 0; p < ALLELE_COPIES; ++p ) {
+            allele_tuple at = genotypes[p];
+            for( unsigned int i = 0; i < count; ++i ) {
                 if( j++ >= MAX_J ) {
                     rnd = gsl_rng_get( m_rng );
                     j = 1;
                 }
-                (*genotypes)[i][p] = (allele_t) (rnd & 0x00000001);
+                at[i] = (allele_t) (rnd & 0x00000001);
                 rnd >>= 1;
             }
         }
