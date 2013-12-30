@@ -132,7 +132,7 @@ CONFIGURE_FILE( ${${PROJECT_NAME}_INCLUDE_DIR}/config.h.in ${${PROJECT_NAME}_INC
 
 CONFIGURE_FILE( ${${PROJECT_NAME}_UNITTEST_DIR}/test_main.cpp.in ${${PROJECT_NAME}_UNITTEST_DIR}/test_main.cpp )
 
-set(CMAKE_CXX_FLAGS "-g -fPIC -Wall -O3 -std=c++0x -ftree-vectorizer-verbose=2 -march=native" )
+set(CMAKE_CXX_FLAGS "-g -fPIC -Wall -O3 -std=c++0x -march=native" )
 
 LINK_DIRECTORIES( ${PROJECT_BINARY_DIR}/bin )
 
