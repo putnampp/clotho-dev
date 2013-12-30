@@ -58,7 +58,8 @@ ConstantPopulationRandomMatingModel::ConstantPopulationRandomMatingModel( unsign
 ConstantPopulationRandomMatingModel::ConstantPopulationRandomMatingModel( shared_ptr< iDistribution > offspring, shared_ptr< iDistribution> birth_delay ) :
     //m_rng( gsl_rng_alloc( gsl_rng_mt19937 ) ),
     m_offspring_dist( offspring ),
-    m_birth_delay( birth_delay )
+    m_birth_delay( birth_delay ),
+    m_masks( new pword_t[ MASK_BUFFER_SIZE ] )
 {
 //    long seed = time(NULL);
 //    gsl_rng_set( m_rng, seed );
@@ -180,18 +181,46 @@ void ConstantPopulationRandomMatingModel::generateOffspringGenotype( IndividualS
             * g = reinterpret_cast< pword_t * >(genos[0]),
             * g1 = reinterpret_cast< pword_t * >(genos[1]);
 
-        size_t s = (genos[1]-genos[0]) / ALLELES_PER_PWORD;
-
-        for( size_t i = 0; i < s; ++i ) {
+        size_t blocks = (genos[1]-genos[0]) / ALLELES_PER_PWORD;
+/*
+        for( size_t i = 0; i < blocks; ++i ) {
 
             unsigned int rnd =(unsigned int)( m_rng.Uniform() * 65536);    // uniform random number [0, 65536)
 
-            pword_t mask = m_pword_masks[ rnd % 256 ];
+            register pword_t mask = m_pword_masks[ rnd % 256 ];
 
             (*g++) = (((*m++) & mask) | ((*m1++) & ~mask));
+            //g[i] = ((m[i] & mask) | (m1[i] & ~mask));
 
             mask = m_pword_masks[ rnd / 256 ];
             (*g1++) = (((*f++) & mask) | ((*f1++) & ~mask));
+            //g1[i] = ((f[i] & mask) | (f1[i] & ~mask));
+        }
+*/
+/*
+        assert( 2 * blocks < MASK_BUFFER_SIZE );
+        for( size_t b = 0; b < blocks; b++ ) {
+            unsigned int rnd =(unsigned int)( m_rng.Uniform() * 65536);    // uniform random number [0, 65536)
+            m_masks[2 * b] = m_pword_masks[ rnd % 256];
+            m_masks[2 * b + 1] = m_pword_masks[ rnd / 256];
+        }
+//        for( size_t i = 0; i < blocks/2; i++ ) {
+        pword_t * tmp_mask = m_masks;
+        size_t i = blocks;
+        while( i-- ) {
+            (*g++) = (((*m++) & (*tmp_mask)) | ((*m1++) & ~(*tmp_mask)));
+            ++tmp_mask;
+            (*g1++) = (((*f++) & (*tmp_mask)) | ((*f1++) & ~(*tmp_mask)));
+            ++tmp_mask;
+        }
+*/        
+        size_t i = blocks;
+        while ( i-- ) {
+            unsigned int rnd = (unsigned int) (m_rng.Uniform() * 65536 );
+            register pword_t mask = m_pword_masks[ rnd % 256 ];
+            (*g++) = (((*m++) & (mask)) | ((*m1++) & ~(mask)));
+            mask = m_pword_masks[ rnd / 256 ];
+            (*g1++) = (((*f++) & (mask)) | ((*f1++) & ~(mask)));
         }
     } else {
         // more general outline. Note that it assumes a parent allele
@@ -230,4 +259,5 @@ ConstantPopulationRandomMatingModel::~ConstantPopulationRandomMatingModel() {
     //if( m_offspring_dist ) {
     //    m_offspring_dist.reset();
     //}
+    delete [] m_masks;
 }

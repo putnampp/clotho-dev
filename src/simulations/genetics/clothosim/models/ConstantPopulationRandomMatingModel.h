@@ -41,6 +41,9 @@
 #include "random.h"
 #include "pword_allele_masks.hpp"
 //#include "UniformDistribution.h"
+//
+
+const size_t MASK_BUFFER_SIZE = 10000;
 
 class ConstantPopulationRandomMatingModel :
     virtual public ClothoModel< IndividualShell, ShellMaturityEvent >,
@@ -68,6 +71,8 @@ protected:
     RAND m_rng;
 
     static pword_allele_mask< pword_t, allele_t, ALLELE_COPIES > m_pword_masks;
+
+    pword_t * m_masks;
 
 private:
     unsigned int m_rand_val, m_offset;
