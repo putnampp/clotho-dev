@@ -39,12 +39,12 @@ public:
      */
     virtual double operator()( const allele_t all ) const = 0;
 
-    virtual LocusPtr getLocus() const { return m_locus; }
+    virtual Locus::Ptr getLocus() const { return m_locus; }
 
     virtual ~AllelicEffect() { }
 protected:
-    AllelicEffect( LocusPtr lp ) : m_locus(lp) {}
-    LocusPtr    m_locus;
+    AllelicEffect( Locus::Ptr lp ) : m_locus(lp) {}
+    Locus::Ptr    m_locus;
 };
 
 #endif  // ALLELICEFFECT_H_
