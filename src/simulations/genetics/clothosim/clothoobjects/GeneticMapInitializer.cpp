@@ -95,7 +95,7 @@ public:
 
     virtual ~ClothoInitializerCreator() {
         while( !m_traits.empty() ) {
-            TraitPtr tmp = m_traits.back();
+            Trait::Ptr tmp = m_traits.back();
             m_traits.pop_back();
             tmp.reset();
         }
@@ -112,7 +112,7 @@ protected:
             for( YAML::Node::const_iterator it = n.begin(); it != n.end(); it++ ) {
                 if( it->IsScalar() ) {
                     string name = it->as<string>();
-                    TraitPtr t( new DefaultTrait(name) );
+                    Trait::Ptr t( new DefaultTrait(name) );
                     m_traits.push_back( t );
                     env->getGeneticMap()->addTrait( t );
                 }
@@ -126,7 +126,7 @@ protected:
             for( YAML::Node::const_iterator it = n.begin(); it != n.end(); it++ ) {
                 YAML::Node tmp = (*it);
                 if( tmp[ LOCUS_K ] ) {
-                    LocusPtr lp = buildLocus( tmp[LOCUS_K ] );
+                    Locus::Ptr lp = buildLocus( tmp[LOCUS_K ] );
 
                     LocusGenotyper * lg = NULL;
                     if( lp && tmp[ GENOTYPER_K ] ) {
@@ -142,10 +142,10 @@ protected:
         }
     }
 
-    LocusPtr buildLocus( const YAML::Node & n ) {
+    Locus::Ptr buildLocus( const YAML::Node & n ) {
         if( !n.IsSequence() ) {
             cout << "Expected Sequence" << endl;
-            return LocusPtr();
+            return Locus::Ptr();
         }
         YAML::Node::const_iterator it = n.begin();
         if( it == n.end() ) return NULL;
@@ -179,13 +179,13 @@ protected:
             nAlleles = it->as< allele_t >();
         }
 
-        LocusPtr lp( new Locus( id, start, end, nAlleles ) );
+        Locus::Ptr lp( new Locus( id, start, end, nAlleles ) );
 
         return lp;
     }
 
-    LocusGenotyper * buildLocusGenotyper( const YAML::Node & n, LocusPtr lp ) {
-
+    LocusGenotyper * buildLocusGenotyper( const YAML::Node & n, Locus::Ptr lp ) {
+        return NULL;
     }
 
     const string m_name;

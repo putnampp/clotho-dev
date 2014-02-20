@@ -34,7 +34,7 @@
 
 class DefaultAllelicEffect : virtual public AllelicEffect {
 public:
-    DefaultAllelicEffect( LocusPtr lp );
+    DefaultAllelicEffect( Locus::Ptr lp );
     DefaultAllelicEffect( AllelicEffect * ae );
     /*
      * computes the allelic effect of a specific allele

@@ -42,7 +42,7 @@ GeneticMap::~GeneticMap() {
 
     // delete all loci
     while( !m_loci->empty() ) {
-        LocusPtr lp = m_loci->back();
+        Locus::Ptr lp = m_loci->back();
         m_loci->pop_back();
 
         lp.reset();
@@ -52,7 +52,7 @@ GeneticMap::~GeneticMap() {
     m_traits->clear();
 }
 
-GeneticMap::locus_index_t GeneticMap::getLocusIndex( LocusPtr lp ) const {
+GeneticMap::locus_index_t GeneticMap::getLocusIndex( Locus::Ptr lp ) const {
     locus_index_t idx = 0;
     for( Loci::iterator it = m_loci->begin(); it != m_loci->end(); it++, ++idx ) {
         if( **it == *lp ) {
@@ -62,7 +62,7 @@ GeneticMap::locus_index_t GeneticMap::getLocusIndex( LocusPtr lp ) const {
     return idx;
 }
 
-GeneticMap::trait_index_t GeneticMap::getTraitIndex( TraitPtr tp ) const {
+GeneticMap::trait_index_t GeneticMap::getTraitIndex( Trait::Ptr tp ) const {
     TraitMap::iterator it = m_trait_map->find(tp->getName());
     if( it == m_trait_map->end() ) {
         return getTraitCount();
@@ -71,7 +71,7 @@ GeneticMap::trait_index_t GeneticMap::getTraitIndex( TraitPtr tp ) const {
 }
 
 /*
-GeneticMap::locus_index_t GeneticMap::addLocus( LocusPtr lp ) {
+GeneticMap::locus_index_t GeneticMap::addLocus( Locus::Ptr lp ) {
     locus_index_t idx = getLocusIndex( lp );
     if( idx == m_loci->size() ) {
         m_loci->push_back( lp );
@@ -88,6 +88,21 @@ GeneticMap::locus_index_t GeneticMap::addGenotyper( LocusGenotyper * lg, bool bS
         // locus does not exist
         m_loci->push_back( lg->getLocus() );
         m_genotypers->push_back( lg );
+
+        chrom_offset_map_t::iterator it = m_chrom_offsets.find( lg->getLocus()->getChromosome() );
+        if( it == m_chrom_offsets.end() ) {
+            pair< chrom_offset_map_t::iterator, bool > res = m_chrom_offsets.insert( make_pair( lg->getLocus()->getChromosome(), 0 ) );
+            it = res.first;
+            if( res.first != m_chrom_offsets.begin() ) {
+                res.first--;
+                it->second = res.first->second;
+            }
+        }
+
+        while( it != m_chrom_offsets.end() ) {
+            it->second++;
+            it++;
+        }
     } else if( bShouldUpdate ) {
         // replace existing genotyper
         m_genotypers->at( idx ) = lg;
@@ -96,7 +111,7 @@ GeneticMap::locus_index_t GeneticMap::addGenotyper( LocusGenotyper * lg, bool bS
     return idx;
 }
 
-GeneticMap::trait_index_t   GeneticMap::addTrait( TraitPtr t, bool bShouldUpdate ) {
+GeneticMap::trait_index_t   GeneticMap::addTrait( Trait::Ptr t, bool bShouldUpdate ) {
     TraitMap::iterator it = m_trait_map->find(t->getName());
     if( it == m_trait_map->end() ) {
         trait_index_t idx = m_traits->size();
@@ -122,7 +137,7 @@ size_t GeneticMap::getMaxAlleles( locus_index_t idx) const {
     return m_loci->at(idx)->getMaxAlleles();
 }
 
-bool GeneticMap::addTraitLocus( TraitPtr tp, LocusGenotyper * lg ) {
+bool GeneticMap::addTraitLocus( Trait::Ptr tp, LocusGenotyper * lg ) {
     locus_index_t lidx = getLocusIndex( lg->getLocus() );
     trait_index_t tidx = getTraitIndex( tp );
 
@@ -145,7 +160,7 @@ double GeneticMap::computeGenotype( locus_index_t l, const AlleleGroupPtr ag ) c
     return 0.0;
 }
 
-double GeneticMap::computePhenotype( TraitPtr t, const AlleleGroupPtr ag, const environmental * env ) const {
+double GeneticMap::computePhenotype( Trait::Ptr t, const AlleleGroupPtr ag, const environmental * env ) const {
     TraitMap::iterator it = m_trait_map->find( t->getName() );
 
     if( it == m_trait_map->end()) {
@@ -163,6 +178,36 @@ double GeneticMap::computePhenotype( trait_index_t t, const AlleleGroupPtr ag, c
     }
 
     return m_traits->at( t )->phenotype( ag, env);
+}
+
+size_t GeneticMap::loci_per_chromosome( chromid_t id ) const {
+    chrom_offset_map_t::const_iterator it = m_chrom_offsets.find( id );
+
+    if( it == m_chrom_offsets.end() ) {
+        // chromid does not exist
+        return 0;
+    }
+
+    size_t s = it->second;
+
+    if( it != m_chrom_offsets.begin() ) {
+        it--;
+        s -= it->second;
+    }
+
+    return s;
+}
+
+size_t GeneticMap::chromosome_count() const {
+    return m_chrom_offsets.size();
+}
+
+GeneticMap::chrom_offset_map_t::const_iterator GeneticMap::begin_offsets() const {
+    return m_chrom_offsets.begin();
+}
+
+GeneticMap::chrom_offset_map_t::const_iterator GeneticMap::end_offsets() const {
+    return m_chrom_offsets.end();
 }
 
 AlleleGroupPtr GeneticMap::createLociAlleles() const {

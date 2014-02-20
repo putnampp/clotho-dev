@@ -41,6 +41,7 @@ class Trait :
     virtual public MultilocusGenotyper,
     virtual public phenotyper {
 public:
+    typedef shared_ptr< Trait > Ptr;
 
     const string & getName() const { return m_name; }
 
@@ -60,28 +61,27 @@ protected:
     string m_name;
 };
 
-typedef shared_ptr< Trait > TraitPtr;
-typedef vector< TraitPtr > Traits;
+typedef vector< Trait::Ptr > Traits;
 
 namespace std {
 
 template <>
-struct hash< boost::shared_ptr< Trait > > {
-    size_t operator()( const boost::shared_ptr< Trait > & t ) const {
+struct hash< Trait::Ptr > {
+    size_t operator()( const Trait::Ptr & t ) const {
         return hasher( t->getName() );
     }
     std::hash< std::string > hasher;
 };
 
 template<>
-struct equal_to< boost::shared_ptr< Trait > > {
-    bool operator()( const boost::shared_ptr< Trait > & lhs, const boost::shared_ptr<Trait> & rhs ) const {
+struct equal_to< Trait::Ptr > {
+    bool operator()( const Trait::Ptr & lhs, const Trait::Ptr & rhs ) const {
         return (lhs == rhs || *lhs == *rhs);
     }
 };
 
 }
 
-typedef unordered_map< TraitPtr, size_t > TraitIndexMap;
+typedef unordered_map< Trait::Ptr, size_t > TraitIndexMap;
 
 #endif  // TRAIT_H_

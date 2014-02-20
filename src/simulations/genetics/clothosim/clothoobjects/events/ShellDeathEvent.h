@@ -35,21 +35,29 @@
 #include "../IndividualShellObject.h"
 #include "../Environment2.h"
 
+extern const string DEATH_EVENT_K;
+
 class ShellDeathEvent : public ClothoEvent,
     public ModelHandler< IndividualShell >,
     public ModelHandler< Environment2 > {
 public:
     ShellDeathEvent( const VTime & tSend, const VTime &tRecv,
                      SimulationObject * sender,
-                     SimulationObject * receiver );
+                     SimulationObject * receiver,
+                     IndividualShell * ind
+                     );
     ShellDeathEvent( const VTime & tSend, const VTime & tRecv,
                      const ObjectID &sender,
                      const ObjectID & receiver,
-                     const unsigned int evtID );
+                     const unsigned int evtID,
+                    IndividualShell * ind
+                     );
     ShellDeathEvent( const VTime & tSend, const VTime & tRecv,
                      const ObjectID &sender,
                      const ObjectID & receiver,
-                     const EventId & evtID );
+                     const EventId & evtID,
+                     IndividualShell * ind
+                     );
     ShellDeathEvent( const ShellDeathEvent & ce );
 
     virtual const string & getDataType() const;
@@ -59,7 +67,11 @@ public:
     virtual void updateModels( IndividualShell * ) const;
     virtual void updateModels( Environment2 * ) const;
 
+    IndividualShell * getIndividual() const;
+
     virtual ~ShellDeathEvent();
+protected:
+    IndividualShell * m_ind;
 };
 
 DECLARE_REGISTERED_CLOTHO_EVENT( ShellDeathEvent );

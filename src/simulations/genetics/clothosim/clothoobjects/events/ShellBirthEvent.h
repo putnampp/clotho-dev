@@ -42,12 +42,16 @@ class ShellBirthEvent :
 public:
     ShellBirthEvent( const VTime & tSend, const VTime &tRecv,
                      SimulationObject * sender,
-                     SimulationObject * receiver );
+                     SimulationObject * receiver,
+                     IndividualShell * ind
+                     );
 
     ShellBirthEvent( const VTime & tSend, const VTime &tRecv,
                      ObjectID & sender,
                      ObjectID & receiver,
-                     unsigned int evtID );
+                     unsigned int evtID,
+                     IndividualShell * ind
+                     );
 
     virtual const string & getDataType() const;
     virtual unsigned int getEventSize() const;
@@ -56,11 +60,13 @@ public:
     virtual void updateModels( IndividualShell * ) const;
     virtual void updateModels( Environment2 * ) const;
 
+    IndividualShell * getIndividual() const;
     IntVTime * getBirthTime() const;
 
     virtual ~ShellBirthEvent();
 protected:
     IntVTime * m_birth;
+    IndividualShell * m_ind;
 };
 
 DECLARE_REGISTERED_CLOTHO_EVENT( ShellBirthEvent );

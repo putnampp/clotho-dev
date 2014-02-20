@@ -1,0 +1,189 @@
+# simulation environment configuration
+---
+object: PopulatedEnvironment
+name: ENV1
+pool_size: 20000
+logdir: ../log/
+...
+
+#GeneticMap initializer
+---
+initializer: GeneticMapInitializer
+environment: ENV1
+mutation_rate: &mutation_rate 0.0001
+allelic_effect: &uniform_allelic {
+    allele_value: {
+        type:   random, # random/matrix
+        distribution: uniform,
+        range: [-1.0, 1.0]
+    },
+    mut_freq: {
+        type:   random, # random/matrix
+        distribution:   uniform,
+        range:  [0.0, 1.0]
+    }
+}
+dominance_effect: &normal_dominance {
+    type: random, # random/matrix
+    allelic_effect: *uniform_allelic,
+    distribution: normal,
+    mean: 0.2,
+    variance: 0.2
+}
+traits:
+    - &tr1 trait1 
+    - &tr2 trait2
+    - &tr3 trait3
+    - &tr4 trait4
+    - &tr5 trait5
+loci:
+    - {locus: [1,99021,99022, 3]}
+    - {locus: [1,99031,99032, 3]}
+    - {locus: [1,99041,99042, 3]}
+    - {locus: [1,99051,99052, 3]}
+    - {locus: [1,99061,99062, 3]}
+    - {locus: [1,99071,99072, 3]}
+    - {locus: [1,99081,99082, 3]}
+    - {locus: [1,99091,99092, 3]}
+    - {locus: [1,99101,99102, 3]}
+    - {locus: [1,99111,99112, 3]}
+    - {locus: [1,99121,99122, 3]}
+    - {locus: [1,99131,99132, 3]}
+    - {locus: [1,99141,99142, 3]}
+    - {locus: [1,99151,99152, 3]}
+    - {locus: [1,99161,99162, 3]}
+    - {locus: [1,99171,99172, 3]}
+    - {locus: [1,99181,99182, 3]}
+    - {locus: [1,99191,99192, 3]}
+    - {locus: [1,99201,99202, 3]}
+    - {locus: [1,99211,99212, 3]}
+    - {locus: [1,99221,99222, 3]}
+    - {locus: [1,99231,99232, 3]}
+    - {locus: [1,99241,99242, 3]}
+    - {locus: [1,99251,99252, 3]}
+    - {locus: [1,99261,99262, 3]}
+    - {locus: [1,99271,99272, 3]}
+    - {locus: [1,99281,99282, 3]}
+    - {locus: [1,99291,99292, 3]}
+    - {locus: [1,99301,99302, 3]}
+    - {locus: [1,99311,99312, 3]}
+    - {locus: [1,99321,99322, 3]}
+    - {locus: [1,99331,99332, 3]}
+    - {locus: [1,99341,99342, 3]}
+    - {locus: [1,99351,99352, 3]}
+    - {locus: [1,99361,99362, 3]}
+    - {locus: [1,99371,99372, 3]}
+    - {locus: [1,99381,99382, 3]}
+    - {locus: [1,99391,99392, 3]}
+    - {locus: [1,99401,99402, 3]}
+    - {locus: [1,99411,99412, 3]}
+    - {locus: [1,99421,99422, 3]}
+    - {locus: [1,99431,99432, 3]}
+    - {locus: [1,99441,99442, 3]}
+    - {locus: [1,99451,99452, 3]}
+    - {locus: [1,99461,99462, 3]}
+    - {locus: [1,99471,99472, 3]}
+    - {locus: [1,99481,99482, 3]}
+    - {locus: [1,99491,99492, 3]}
+    - {locus: [1,99501,99502, 3]}
+    - {locus: [1,99511,99512, 3]}
+    - {locus: [1,99521,99522, 3]}
+    - {locus: [1,99531,99532, 3]}
+    - {locus: [1,99541,99542, 3]}
+    - {locus: [1,99551,99552, 3]}
+    - {locus: [1,99561,99562, 3]}
+    - {locus: [1,99571,99572, 3]}
+    - {locus: [1,99581,99582, 3]}
+    - {locus: [1,99591,99592, 3]}
+    - {locus: [1,99601,99602, 3]}
+    - {locus: [1,99611,99612, 3]}
+    - {locus: [1,99621,99622, 3]}
+    - {locus: [1,99631,99632, 3]}
+    - {locus: [1,99641,99642, 3]}
+    - {locus: [1,99651,99652, 3]}
+    - {locus: [1,99661,99662, 3]}
+    - {locus: [1,99671,99672, 3]}
+    - {locus: [1,99681,99682, 3]}
+    - {locus: [1,99691,99692, 3]}
+    - {locus: [1,99701,99702, 3]}
+    - {locus: [1,99711,99712, 3]}
+    - {locus: [1,99721,99722, 3]}
+    - {locus: [1,99731,99732, 3]}
+    - {locus: [1,99741,99742, 3]}
+    - {locus: [1,99751,99752, 3]}
+    - {locus: [1,99761,99762, 3]}
+    - {locus: [1,99771,99772, 3]}
+    - {locus: [1,99781,99782, 3]}
+    - {locus: [1,99791,99792, 3]}
+    - {locus: [1,99801,99802, 3]}
+    - {locus: [1,99811,99812, 3]}
+    - {locus: [1,99821,99822, 3]}
+    - {locus: [1,99831,99832, 3]}
+    - {locus: [1,99841,99842, 3]}
+    - {locus: [1,99851,99852, 3]}
+    - {locus: [1,99861,99862, 3]}
+    - {locus: [1,99871,99872, 3]}
+    - {locus: [1,99881,99882, 3]}
+    - {locus: [1,99891,99892, 3]}
+    - {locus: [1,99901,99902, 3]}
+    - {locus: [1,99911,99912, 3]}
+    - {locus: [1,99921,99922, 3]}
+    - {locus: [1,99931,99932, 3]}
+    - {locus: [1,99941,99942, 3]}
+    - {locus: [1,99951,99952, 3]}
+    - {locus: [1,99961,99962, 3]}
+    - {locus: [1,99971,99972, 3]}
+    - {locus: [1,99981,99982, 3]}
+    - {locus: [1,99991,99992, 3]}
+    - {locus: [1,100001,100002, 3]}
+    - {locus: [1,100011,100012, 3]}
+...
+# Mutation Model
+---
+model: KAlleleMutationModel
+mutation_rate:  1e-4
+...
+# founder population
+---
+initializer: PopulationInitializer
+environment: ENV1
+pop_size: 100
+percent_female: 55 
+...
+# life expectancy model
+---
+model: LifeExpectancyModel
+male: {
+    distribution: ConstantDistribution,
+    value: 2
+}
+female: {
+    distribution: ConstantDistribution,
+    value: 2
+}
+...
+# maturity model
+---
+model: MaturityModel
+male: {
+    distribution: ConstantDistribution,
+    value: 1
+}
+female: {
+    distribution: ConstantDistribution,
+    value: 1
+}
+...
+# random mating model
+---
+model: ConstantPopulationRandomMatingModel
+offspring: {
+    distribution: NormalDistribution,
+    mean: 2,
+    sigma: 0.5 
+}
+birth_delay: {
+    distribution: ConstantDistribution,
+    value: 2
+}
+...

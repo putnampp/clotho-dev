@@ -44,25 +44,35 @@ void IndividualShell::handleEvent< ShellBirthEvent >( const ShellBirthEvent * e 
     if( m_prop )
         m_prop->m_dob = dynamic_cast< IntVTime * >(e->getBirthTime()->clone());
 
-    m_environment->addIndividual( this );
+//    m_environment->addIndividual( this );
+    Event * evt = new ShellBirthEvent( e->getReceiveTime(), e->getReceiveTime(), this, m_environment, this );
+    m_environment->receiveEvent( evt );
 }
 
 template<>
 void Environment2::handleEvent< ShellBirthEvent >( const ShellBirthEvent * e ) {
+    this->addIndividual( e->getIndividual() );
 }
 
 ShellBirthEvent::ShellBirthEvent( const VTime & tSend, const VTime &tRecv,
                                   SimulationObject * sender,
-                                  SimulationObject * receiver ) :
+                                  SimulationObject * receiver,
+                                    IndividualShell * ind ) :
     ClothoEvent( tSend, tRecv, sender, receiver ),
-    m_birth( dynamic_cast< IntVTime * >( tRecv.clone() )) {}
+    m_birth( dynamic_cast< IntVTime * >( tRecv.clone() )),
+    m_ind( ind )
+{}
 
-ShellBirthEvent::ShellBirthEvent( const VTime & tSend, const VTime &tRecv,
+ShellBirthEvent::ShellBirthEvent( const VTime & tSend, 
+                                  const VTime &tRecv,
                                   ObjectID & sender,
                                   ObjectID & receiver,
-                                  unsigned int evtID ) :
+                                  unsigned int evtID,
+                                  IndividualShell * ind ) :
     ClothoEvent( tSend, tRecv, sender, receiver, evtID ),
-    m_birth( dynamic_cast< IntVTime * >( tRecv.clone() )) {}
+    m_birth( dynamic_cast< IntVTime * >( tRecv.clone() )),
+    m_ind( ind )
+{}
 
 bool ShellBirthEvent::eventCompare( const Event * evt ) {
     const ShellBirthEvent * e = dynamic_cast< const ShellBirthEvent * >(evt);
@@ -85,6 +95,10 @@ IntVTime * ShellBirthEvent::getBirthTime() const {
     return m_birth;
 }
 
+IndividualShell *  ShellBirthEvent::getIndividual() const {
+    return m_ind;
+}
+
 ShellBirthEvent::~ShellBirthEvent() {}
 
 DEFINE_CLOTHO_EVENT_DESERIALIZATION_METHOD( ShellBirthEvent ) {
@@ -100,7 +114,7 @@ DEFINE_CLOTHO_EVENT_DESERIALIZATION_METHOD( ShellBirthEvent ) {
     ObjectID send( sSimObjID, sSimManID );
     ObjectID recv( rSimObjID, rSimManID );
 
-    ShellBirthEvent * e = new ShellBirthEvent( *tSend, *tRecv, send, recv, eventID );
+    ShellBirthEvent * e = new ShellBirthEvent( *tSend, *tRecv, send, recv, eventID, NULL );
 
     return e;
 }

@@ -45,7 +45,7 @@ struct chromosome_set {
 
     virtual bool allele( ploidy_t copy, pos_t locus, allele_t & all ) = 0;
     virtual SequencePtr sequence( ploidy_t p ) = 0;
-    virtual void    getGenotype( const LocusPtr l, genotype & g ) = 0;
+    virtual void    getGenotype( const Locus::Ptr l, genotype & g ) = 0;
 };
 
 class ChromosomeCopies : public chromosome_set {
@@ -60,7 +60,7 @@ public:
 
     virtual SequencePtr sequence( ploidy_t copy );
 
-    virtual void getGenotype( const LocusPtr l, genotype & g );
+    virtual void getGenotype( const Locus::Ptr l, genotype & g );
 
     virtual ~ChromosomeCopies();
 protected:

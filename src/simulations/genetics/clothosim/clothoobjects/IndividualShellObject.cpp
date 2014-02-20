@@ -74,7 +74,7 @@ void IndividualShell::initialize() {
 
     // notify self that has been born?
     if( m_prop->m_sex != UNASSIGNED ) {
-        Event * eBorn = new ShellBirthEvent( getSimulationTime(), getSimulationTime(), this, this );
+        Event * eBorn = new ShellBirthEvent( getSimulationTime(), getSimulationTime(), this, this, this );
         this->receiveEvent( eBorn );
     }
 }
@@ -89,6 +89,7 @@ void IndividualShell::executeProcess() {
 
     while( haveMoreEvents() ) {
         const Event * e = getEvent();
+        ASSERT( e->getReceiver() == *this->getObjectID() );
         if( isAlive() ) {
             const ModelHandler< IndividualShell > * evt = dynamic_cast< const ModelHandler< IndividualShell > * >(e);
             if( evt ) {
@@ -98,6 +99,8 @@ void IndividualShell::executeProcess() {
             if( e2 ) {
                 e2->updateModels( this );
             }
+        } else {
+            cout << *e << " AD\n";
         }
     }
 }

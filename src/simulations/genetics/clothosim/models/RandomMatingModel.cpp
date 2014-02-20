@@ -100,7 +100,7 @@ void RandomMatingModel::operator()( const ShellMatingEvent * e, Environment2 * e
                 female->addOffspring();
                 male->addOffspring();
 
-                Event * eBorn = new ShellBirthEvent( e->getReceiveTime(), *ip->m_dob, offspring, offspring );
+                Event * eBorn = new ShellBirthEvent( e->getReceiveTime(), *ip->m_dob, offspring, offspring, offspring );
                 offspring->receiveEvent( eBorn );
 
                 IntVTime mTime = dynamic_cast< const IntVTime & >(e->getReceiveTime() ) + 1;

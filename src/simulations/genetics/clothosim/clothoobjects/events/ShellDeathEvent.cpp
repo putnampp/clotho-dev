@@ -61,30 +61,45 @@ template<>
 void IndividualShell::handleEvent< ShellDeathEvent >( const ShellDeathEvent * e ) {
     if( m_prop )
         m_prop->m_eol = dynamic_cast< IntVTime * >( e->getReceiveTime().clone() );
-    m_environment->removeIndividual( this );
-
+//    m_environment->removeIndividual( this );
+//
+    Event * evt = new ShellDeathEvent( e->getReceiveTime(), e->getReceiveTime(), this, m_environment, this );
+    m_environment->receiveEvent( evt );
 }
 
 template<>
 void Environment2::handleEvent< ShellDeathEvent >( const ShellDeathEvent * e ) {
+    this->removeIndividual( e->getIndividual() );
 }
 
 ShellDeathEvent::ShellDeathEvent( const VTime & tSend, const VTime &tRecv,
                                   SimulationObject * sender,
-                                  SimulationObject * receiver ) :
-    ClothoEvent( tSend, tRecv, sender, receiver ) {}
+                                  SimulationObject * receiver,
+                                  IndividualShell * ind
+                                 ) :
+    ClothoEvent( tSend, tRecv, sender, receiver ),
+    m_ind( ind )
+{}
 
 ShellDeathEvent::ShellDeathEvent( const VTime & tSend, const VTime & tRecv,
                                   const ObjectID &sender,
                                   const ObjectID & receiver,
-                                  const unsigned int evtID ) :
-    ClothoEvent( tSend, tRecv, sender, receiver, evtID ) {}
+                                  const unsigned int evtID,
+                                    IndividualShell * ind
+                                 ) :
+    ClothoEvent( tSend, tRecv, sender, receiver, evtID ),
+    m_ind( ind )
+{}
 
 ShellDeathEvent::ShellDeathEvent( const VTime & tSend, const VTime & tRecv,
                                   const ObjectID &sender,
                                   const ObjectID & receiver,
-                                  const EventId & evtID ) :
-    ClothoEvent( tSend, tRecv, sender, receiver, evtID ) {}
+                                  const EventId & evtID,
+                                  IndividualShell * ind
+                                 ) :
+    ClothoEvent( tSend, tRecv, sender, receiver, evtID ),
+    m_ind(ind)
+{}
 
 ShellDeathEvent::ShellDeathEvent( const ShellDeathEvent & ce ) :
     ClothoEvent( ce.getSendTime(), ce.getReceiveTime(),
@@ -109,6 +124,10 @@ void ShellDeathEvent::updateModels( Environment2 * env ) const {
     ClothoModelCoordinator< Environment2, ShellDeathEvent >::getInstance()->handleEvent(this, env );
 }
 
+IndividualShell * ShellDeathEvent::getIndividual() const {
+    return m_ind;
+}
+
 ShellDeathEvent::~ShellDeathEvent() {}
 
 DEFINE_CLOTHO_EVENT_DESERIALIZATION_METHOD( ShellDeathEvent ) {
@@ -124,7 +143,7 @@ DEFINE_CLOTHO_EVENT_DESERIALIZATION_METHOD( ShellDeathEvent ) {
     ObjectID send( sSimObjID, sSimManID );
     ObjectID recv( rSimObjID, rSimManID );
 
-    ShellDeathEvent * e = new ShellDeathEvent( *tSend, *tRecv, send, recv, eventID );
+    ShellDeathEvent * e = new ShellDeathEvent( *tSend, *tRecv, send, recv, eventID, NULL );
 
     return e;
 }

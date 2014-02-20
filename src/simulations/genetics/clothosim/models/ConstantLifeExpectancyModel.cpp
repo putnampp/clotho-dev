@@ -61,7 +61,7 @@ void ConstantLifeExpectancyModel::operator()( const ShellBirthEvent * evt, Indiv
     if(! evt ) return;
 
     IntVTime tDeath = *evt->getBirthTime() + (int)m_age;
-    Event * dEvent = new ShellDeathEvent( *evt->getBirthTime(), tDeath, ind, ind );
+    Event * dEvent = new ShellDeathEvent( *evt->getBirthTime(), tDeath, ind, ind, ind );
 
     ind->receiveEvent( dEvent );
 }

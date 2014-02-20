@@ -68,7 +68,7 @@ SequencePtr ChromosomeCopies::sequence( ploidy_t copy ) {
     return m_seqs[ copy ];
 }
 
-void ChromosomeCopies::getGenotype( const LocusPtr l, genotype & g ) {
+void ChromosomeCopies::getGenotype( const Locus::Ptr l, genotype & g ) {
     pos_t   pos = l->start;
     ploidy_t p = 0;
     bool bHomo = true;

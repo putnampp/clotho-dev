@@ -72,6 +72,7 @@ protected:
  */
 class Locus {
 public:
+    typedef shared_ptr< Locus > Ptr;
     Locus( chromid_t c, pos_t s, pos_t e, allele_t nAlleles );
 
     const locus_id & getID()    const;
@@ -91,28 +92,27 @@ protected:
     allele_t    m_nAlleles;
 };
 
-typedef shared_ptr< Locus > LocusPtr;
-typedef vector< LocusPtr > Loci;
+typedef vector< Locus::Ptr > Loci;
 typedef Loci::iterator  LocusIterator;
 
 namespace std {
 
 template <>
-struct hash< boost::shared_ptr< Locus > > {
+struct hash< Locus::Ptr > {
     std::hash< unsigned long > hasher;
-    size_t operator()( const boost::shared_ptr< Locus > & lp ) const {
+    size_t operator()( const Locus::Ptr & lp ) const {
         return hasher( lp->getID().getKey() );
     }
 };
 
 template <>
-struct equal_to< boost::shared_ptr< Locus > > {
-    bool operator()( const boost::shared_ptr< Locus > & lhs, const boost::shared_ptr< Locus > & rhs ) const {
+struct equal_to< Locus::Ptr > {
+    bool operator()( const Locus::Ptr & lhs, const Locus::Ptr & rhs ) const {
         return ( lhs == rhs || *lhs == *rhs);
     }
 };
 }
 
-typedef std::unordered_map< LocusPtr, size_t >  LocusIndexMap;
+typedef std::unordered_map< Locus::Ptr, size_t >  LocusIndexMap;
 
 #endif  // LOCUS_H_

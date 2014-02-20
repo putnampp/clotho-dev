@@ -39,6 +39,10 @@
 
 #include <map>
 
+using std::map;
+using std::pair;
+using std::make_pair;
+
 /**
  *
  * A GeneticMap is intended to retain the Loci information for the current
@@ -50,26 +54,29 @@
  */
 class GeneticMap {
 public:
+    typedef shared_ptr< GeneticMap > Ptr;
     typedef size_t  locus_index_t;
     typedef size_t  trait_index_t;
 
+    typedef map< chromid_t, size_t > chrom_offset_map_t;
+
     GeneticMap();
 
-    locus_index_t getLocusIndex( LocusPtr lp ) const;
-    trait_index_t getTraitIndex( TraitPtr tp) const;
+    locus_index_t getLocusIndex( Locus::Ptr lp ) const;
+    trait_index_t getTraitIndex( Trait::Ptr tp) const;
 
     /// assumes only one method of computing genotype per locus
     locus_index_t addGenotyper( LocusGenotyper * lg, bool bShouldUpdate = false);
 
     /// multilocus genotyper responsible for weighting each genotype
     /// relative to the current set of loci
-    trait_index_t addTrait( TraitPtr tp, bool bShouldUpdate = false );
+    trait_index_t addTrait( Trait::Ptr tp, bool bShouldUpdate = false );
 
-    bool addTraitLocus( TraitPtr tp, LocusGenotyper * lg );
+    bool addTraitLocus( Trait::Ptr tp, LocusGenotyper * lg );
 
     virtual double computeGenotype( locus_index_t locus, const AlleleGroupPtr la ) const;
 
-    virtual double computePhenotype( TraitPtr t, const AlleleGroupPtr ag, const environmental * env ) const;
+    virtual double computePhenotype( Trait::Ptr t, const AlleleGroupPtr ag, const environmental * env ) const;
     virtual double computePhenotype( trait_index_t trait, const AlleleGroupPtr ag, const environmental * env ) const;
 
     size_t getLociCount() const;
@@ -79,10 +86,17 @@ public:
 
     AlleleGroupPtr createLociAlleles() const;
 
-    virtual ~GeneticMap();
+    size_t loci_per_chromosome( chromid_t id ) const;
 
+    size_t chromosome_count() const;
+    chrom_offset_map_t::const_iterator begin_offsets() const;
+    chrom_offset_map_t::const_iterator end_offsets() const;
+
+    virtual ~GeneticMap();
 protected:
     shared_ptr< Loci >              m_loci;
+
+    chrom_offset_map_t                m_chrom_offsets;
 
     shared_ptr< vector< LocusGenotyper * > > m_genotypers;
     

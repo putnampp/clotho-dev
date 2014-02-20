@@ -58,7 +58,9 @@ ConstantPopulationRandomMatingModel::ConstantPopulationRandomMatingModel( unsign
 ConstantPopulationRandomMatingModel::ConstantPopulationRandomMatingModel( shared_ptr< iDistribution > offspring, shared_ptr< iDistribution> birth_delay ) :
     //m_rng( gsl_rng_alloc( gsl_rng_mt19937 ) ),
     m_offspring_dist( offspring ),
-    m_birth_delay( birth_delay )
+    m_birth_delay( birth_delay ),
+    m_rng(),
+    m_inheritance(NULL, &m_rng )
 {
 //    long seed = time(NULL);
 //    gsl_rng_set( m_rng, seed );
@@ -104,6 +106,10 @@ void ConstantPopulationRandomMatingModel::operator()( const ShellMatingEvent * e
     IndividualShell * female = e->getFirstPartner();
     IndividualShell * male = env->getMaleAt( m_rng.Uniform( env->getMaleCount() ) );
 
+    if( !m_inheritance.hasGeneticMap() ) {
+        m_inheritance.setGeneticMap( female->getEnvironment()->getGeneticMap());
+    }
+
     if( female && female->isAlive() ) {
         if( male && male->isAlive() ) {
             IndividualShell * offspring = env->nextAvailableIndividual();
@@ -112,7 +118,9 @@ void ConstantPopulationRandomMatingModel::operator()( const ShellMatingEvent * e
                 IndividualProperties * ip = offspring->getProperties();
                 ip->reset();
 
-                generateOffspringGenotype( female, male, ip->m_genos );
+//                generateOffspringGenotype( female, male, ip->m_genos );
+                resizeAlleleGroup( ip->m_genos, female->getEnvironmentLociCount() );
+                m_inheritance.inherit( female->getProperties()->m_genos, male->getProperties()->m_genos, ip->m_genos );
 
                 IntVTime t = *dynamic_cast< IntVTime * > (e->getReceiveTime().clone() ) + (int) m_birth_delay->nextVariate();
 
@@ -126,7 +134,7 @@ void ConstantPopulationRandomMatingModel::operator()( const ShellMatingEvent * e
                 female->addOffspring();
                 male->addOffspring();
 
-                Event * eBorn = new ShellBirthEvent( e->getReceiveTime(), *ip->m_dob, offspring, offspring );
+                Event * eBorn = new ShellBirthEvent( e->getReceiveTime(), *ip->m_dob, offspring, offspring, offspring );
                 offspring->receiveEvent( eBorn );
             }
         } else {
@@ -141,17 +149,17 @@ void ConstantPopulationRandomMatingModel::dump( ostream & out ) {
 
 }
 
-void ConstantPopulationRandomMatingModel::generateOffspringGenotype( IndividualShell * female, IndividualShell * male, AlleleGroupPtr genos ) {
-    unsigned int nLoci = female->getEnvironmentLociCount();
+//void ConstantPopulationRandomMatingModel::generateOffspringGenotype( IndividualShell * female, IndividualShell * male, AlleleGroupPtr genos ) {
+//    unsigned int nLoci = female->getEnvironmentLociCount();
 
-    resizeAlleleGroup( genos, nLoci );
+//    resizeAlleleGroup( genos, nLoci );
 
 //    AlleleGroupPtr female_alleles = female->getProperties()->m_genos;
 //    AlleleGroupPtr male_alleles = male->getProperties()->m_genos;
 
 //    assert( male_alleles->size() == nLoci && female_alleles->size() == nLoci );
 
-    if( ALLELE_COPIES == 2 ) {
+//    if( ALLELE_COPIES == 2 ) {
 //        AlleleGroup::iterator g = genos->begin(),
 //            m = male->getProperties()->m_genos->begin(),
 //            f = female->getProperties()->m_genos->begin();
@@ -173,52 +181,52 @@ void ConstantPopulationRandomMatingModel::generateOffspringGenotype( IndividualS
 //            (*g++)[1] = (*m++)[ ((0.25 <= rnd) && (rnd < 0.75)) ];
 //        } // end loop 
 //
-        pword_t * f = reinterpret_cast< pword_t * >(female->getProperties()->m_genos[0]),
-            * f1 = reinterpret_cast< pword_t * >(female->getProperties()->m_genos[1]),
-            * m = reinterpret_cast< pword_t * >(male->getProperties()->m_genos[0]),
-            * m1 = reinterpret_cast< pword_t * >(male->getProperties()->m_genos[1]),
-            * g = reinterpret_cast< pword_t * >(genos[0]),
-            * g1 = reinterpret_cast< pword_t * >(genos[1]);
+//        pword_t * f = reinterpret_cast< pword_t * >(female->getProperties()->m_genos[0]),
+//            * f1 = reinterpret_cast< pword_t * >(female->getProperties()->m_genos[1]),
+//            * m = reinterpret_cast< pword_t * >(male->getProperties()->m_genos[0]),
+//            * m1 = reinterpret_cast< pword_t * >(male->getProperties()->m_genos[1]),
+//            * g = reinterpret_cast< pword_t * >(genos[0]),
+//            * g1 = reinterpret_cast< pword_t * >(genos[1]);
 
-        size_t blocks = (genos[1]-genos[0]) / ALLELES_PER_PWORD;
-        while ( blocks-- ) {
-            unsigned int rnd = (unsigned int) (m_rng.Uniform() * 65536 );
-            register pword_t mask = m_pword_masks[ rnd % 256 ];
-            (*g++) = (((*m++) & (mask)) | ((*m1++) & ~(mask)));
-            mask = m_pword_masks[ rnd / 256 ];
-            (*g1++) = (((*f++) & (mask)) | ((*f1++) & ~(mask)));
-        }
-    } else {
-        // more general outline. Note that it assumes a parent allele
-        // can serve as the variant source multiple times.
-        AlleleGroupPtr female_alleles = female->getProperties()->m_genos;
-        AlleleGroupPtr male_alleles = male->getProperties()->m_genos;
-
-        unsigned int from_male = ALLELE_COPIES / 2;
-
-        vector< ploidy_t > males;
-        vector< ploidy_t > females;
-
-        for( ploidy_t i = 0; i < ALLELE_COPIES; ++i ) {
-            males.push_back( i );
-            females.push_back( i );
-        }
-
-        for( unsigned int i = 0; i < nLoci; ++i ) {
-            // shuffle the chromosomes for each locus?
-            // treat each locus as being independent of one another
-            random_shuffle( males.begin(), males.end() );
-            random_shuffle( females.begin(), females.end() );
-            unsigned int k = 0;
-            for( ; k < from_male; ++k ) {
-                genos[k][ i ] = male_alleles[ males[k]][ i ];
-            }
-            for( ; k < ALLELE_COPIES; ++k ) {
-                genos[k][ i ] = female_alleles[ females[k - from_male] ][i];
-            }
-        }
-    }
-}
+//        size_t blocks = (genos[1]-genos[0]) / ALLELES_PER_PWORD;
+//        while ( blocks-- ) {
+//            unsigned int rnd = (unsigned int) (m_rng.Uniform() * 65536 );
+//            register pword_t mask = m_pword_masks[ rnd % 256 ];
+//            (*g++) = (((*m++) & (mask)) | ((*m1++) & ~(mask)));
+//            mask = m_pword_masks[ rnd / 256 ];
+//            (*g1++) = (((*f++) & (mask)) | ((*f1++) & ~(mask)));
+//        }
+//    } else {
+//        // more general outline. Note that it assumes a parent allele
+//        // can serve as the variant source multiple times.
+//        AlleleGroupPtr female_alleles = female->getProperties()->m_genos;
+//        AlleleGroupPtr male_alleles = male->getProperties()->m_genos;
+//
+//        unsigned int from_male = ALLELE_COPIES / 2;
+//
+//        vector< ploidy_t > males;
+//        vector< ploidy_t > females;
+//
+//        for( ploidy_t i = 0; i < ALLELE_COPIES; ++i ) {
+//            males.push_back( i );
+//            females.push_back( i );
+//        }
+//
+//        for( unsigned int i = 0; i < nLoci; ++i ) {
+//            // shuffle the chromosomes for each locus?
+//            // treat each locus as being independent of one another
+//            random_shuffle( males.begin(), males.end() );
+//            random_shuffle( females.begin(), females.end() );
+//            unsigned int k = 0;
+//            for( ; k < from_male; ++k ) {
+//                genos[k][ i ] = male_alleles[ males[k]][ i ];
+//            }
+//            for( ; k < ALLELE_COPIES; ++k ) {
+//                genos[k][ i ] = female_alleles[ females[k - from_male] ][i];
+//            }
+//        }
+//    }
+//}
 
 ConstantPopulationRandomMatingModel::~ConstantPopulationRandomMatingModel() {
     //gsl_rng_free( m_rng );

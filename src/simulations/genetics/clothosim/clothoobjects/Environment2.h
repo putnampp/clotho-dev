@@ -76,7 +76,7 @@ public:
 
     size_t getLociCount() const;
 
-    shared_ptr< GeneticMap > getGeneticMap();
+    GeneticMap::Ptr getGeneticMap();
 
     IndividualShell * getMaleAt( unsigned int idx ) const;
     IndividualShell * getFemaleAt( unsigned int idx ) const;
@@ -92,7 +92,7 @@ protected:
     typedef unordered_map< IndividualShell *, size_t > MappedIndividuals;
     MappedIndividuals m_mapped_females, m_mapped_males, m_mapped_unk;
     queue< IndividualShell * > m_individual_pool;
-    shared_ptr< GeneticMap >    m_genetic_map;
+    GeneticMap::Ptr    m_genetic_map;
 
 private:
     string m_name;

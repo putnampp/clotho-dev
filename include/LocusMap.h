@@ -38,7 +38,7 @@
 class LocusMap : public Sequence {
 public:
 
-    virtual bool add( const LocusPtr l );
+    virtual bool add( const Locus::Ptr l );
 };
 
 #endif  // LOCUSMAP_H_

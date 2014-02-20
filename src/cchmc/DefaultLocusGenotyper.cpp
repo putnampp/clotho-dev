@@ -30,7 +30,7 @@
 #include "DefaultLocusGenotyper.h"
 #include "DefaultAllelicEffect.h"
 
-DefaultLocusGenotyper::DefaultLocusGenotyper( LocusPtr lp ) :
+DefaultLocusGenotyper::DefaultLocusGenotyper( Locus::Ptr lp ) :
     LocusGenotyper( new DefaultAllelicEffect( lp ) ) {}
 
 DefaultLocusGenotyper::DefaultLocusGenotyper( AllelicEffect * ae ) :

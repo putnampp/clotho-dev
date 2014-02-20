@@ -35,7 +35,7 @@
 
 class DefaultLocusGenotyper : virtual public LocusGenotyper {
 public:
-    DefaultLocusGenotyper( LocusPtr lp );
+    DefaultLocusGenotyper( Locus::Ptr lp );
     DefaultLocusGenotyper( AllelicEffect * lp );
     virtual double genotype( const AlleleGroupPtr at, size_t idx ) const;
 };

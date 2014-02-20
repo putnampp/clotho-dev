@@ -50,7 +50,7 @@ struct individual {
     virtual chromid_t   chromosomes() const = 0;
     virtual ploidy_t    ploidy()    const = 0;
 
-    virtual allele_t    allele( const LocusPtr l ) = 0;
+    virtual allele_t    allele( const Locus::Ptr l ) = 0;
 };
 
 class IndividualCreator;
@@ -70,11 +70,11 @@ public:
     virtual SequencePtr getSequenceByID( chromid_t c, ploidy_t p );
     virtual SequencePtr getSequenceByIndex( size_t idx, ploidy_t p );
 
-    virtual allele_t allele( const LocusPtr locus );
+    virtual allele_t allele( const Locus::Ptr locus );
 
-    virtual bool isHomozygous( const LocusPtr l );
-    virtual bool isDominant( const LocusPtr l );
-    virtual const genotype & operator[]( const LocusPtr l );
+    virtual bool isHomozygous( const Locus::Ptr l );
+    virtual bool isDominant( const Locus::Ptr l );
+    virtual const genotype & operator[]( const Locus::Ptr l );
 
     virtual void phenotype( iTrait *, Phenotype * );
 

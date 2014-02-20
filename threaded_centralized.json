@@ -1,0 +1,10 @@
+{
+    "DEBUG" : true,
+    "WarpedLogDir" : "../log",
+    "Simulation" : "ThreadedCentralized",
+    "ThreadedCentralized" : {
+        "ThreadControl" : {
+            "WorkerThreadCount": 4
+        }
+    }
+}

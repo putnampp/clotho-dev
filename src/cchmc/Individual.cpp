@@ -54,22 +54,22 @@ SequencePtr Individual::getSequenceByIndex( size_t idx, ploidy_t p ) {
     return ((idx < m_nChroms) ? m_seqs[idx]->sequence(p) : NULL_SEQUENCE);
 }
 
-allele_t    Individual::allele( const LocusPtr l ) {
+allele_t    Individual::allele( const Locus::Ptr l ) {
     allele_t all = 0;
     return m_seqs[ l->chrom ]->allele( l->ploid, l->start, all );
 }
 
-const genotype & Individual::operator[]( const LocusPtr l ) {
+const genotype & Individual::operator[]( const Locus::Ptr l ) {
     m_seqs[ l->chrom ]->getGenotype( l, *m_geno );
     return *m_geno;
 }
 
-bool Individual::isHomozygous( const LocusPtr l ) {
+bool Individual::isHomozygous( const Locus::Ptr l ) {
     m_seqs[ l->chrom ]->getGenotype( l, *m_geno );
     return m_geno->isFlag( HOMOZYGOUS );
 }
 
-bool Individual::isDominant( const LocusPtr l ) {
+bool Individual::isDominant( const Locus::Ptr l ) {
     m_seqs[ l->chrom ]->getGenotype( l, *m_geno );
     return m_geno->isFlag( DOMINANT );
 }

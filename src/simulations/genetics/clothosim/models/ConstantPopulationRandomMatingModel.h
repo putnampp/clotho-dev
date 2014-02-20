@@ -39,7 +39,9 @@
 #include "gsl/gsl_rng.h"
 
 #include "random.h"
-#include "pword_allele_masks.hpp"
+//#include "QuantiNemoRandomAlleleInheritance.h"
+#include "RandomChromosomalInheritance.h"
+//#include "pword_allele_masks.hpp"
 //#include "UniformDistribution.h"
 //
 
@@ -56,7 +58,7 @@ public:
 
     virtual ~ConstantPopulationRandomMatingModel();
 protected:
-    void generateOffspringGenotype( IndividualShell * female, IndividualShell * male, AlleleGroupPtr genos );
+//    void generateOffspringGenotype( IndividualShell * female, IndividualShell * male, AlleleGroupPtr genos );
 
 //    gsl_rng * m_rng;
 //    unsigned int m_birth_delay;
@@ -68,7 +70,10 @@ protected:
 //
     RAND m_rng;
 
-    static pword_allele_mask< pword_t, allele_t, ALLELE_COPIES > m_pword_masks;
+//    RandomAlleleInheritance< RAND, ALLELE_COPIES > m_inheritance;
+    ChromosomalInheritance< RAND, ALLELE_COPIES > m_inheritance;
+
+//    static pword_allele_mask< pword_t, allele_t, ALLELE_COPIES > m_pword_masks;
 
 private:
     unsigned int m_rand_val, m_offset;

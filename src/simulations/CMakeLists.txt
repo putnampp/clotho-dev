@@ -28,6 +28,7 @@
 ################################################################################
 SET( DIRS examples )
 
+LIST( APPEND DIRS engine )
 LIST( APPEND DIRS genetics )
 
 FOREACH( D ${DIRS} )

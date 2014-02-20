@@ -122,7 +122,8 @@ void Environment2::finalize() {
 void Environment2::executeProcess() {
     while( haveMoreEvents() ) {
         const Event * evt = getEvent();
-
+        ASSERT( evt->getReceiver() == * this->getObjectID() );
+        ASSERT( evt->getReceiveTime() == getSimulationTime() );
         const ModelHandler< Environment2 > * e = dynamic_cast< const ModelHandler< Environment2 > * >( evt );
         if( e ) {
             e->updateModels( this );
@@ -172,8 +173,8 @@ void Environment2::addIndividual( IndividualShell * s ) {
         return;
     }
 
-    Event * evt = new ShellBirthEvent( getSimulationTime(), getSimulationTime(), s, this );
-    this->receiveEvent( evt );
+    //Event * evt = new ShellBirthEvent( getSimulationTime(), getSimulationTime(), s, this );
+    //this->receiveEvent( evt );
 }
 
 void Environment2::removeIndividual( IndividualShell * s ) {
@@ -250,10 +251,10 @@ void Environment2::removeIndividual( IndividualShell * s ) {
 
     m_individual_pool.push( s );
 
-    const VTime & t = getSimulationTime();
+//    const VTime & t = getSimulationTime();
 
-    Event * e = new ShellDeathEvent( t, t, s, this );
-    this->receiveEvent(e);
+//    Event * e = new ShellDeathEvent( t, t, s, this );
+//    this->receiveEvent(e);
 }
 
 IndividualShell * Environment2::nextAvailableIndividual() {
@@ -291,7 +292,7 @@ size_t Environment2::getLociCount() const {
     return m_genetic_map->getLociCount();
 }
 
-shared_ptr< GeneticMap > Environment2::getGeneticMap() {
+GeneticMap::Ptr Environment2::getGeneticMap() {
     return m_genetic_map;
 }
 

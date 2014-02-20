@@ -1,0 +1,7 @@
+{
+"DEBUG" : true,
+"Simulation" : "Sequential",
+"EventList":  {
+    "Type" : "CentralizedEventSet"
+}
+}

@@ -29,7 +29,7 @@
 
 #include "DefaultAllelicEffect.h"
 
-DefaultAllelicEffect::DefaultAllelicEffect( LocusPtr lp ) : AllelicEffect( lp ) {
+DefaultAllelicEffect::DefaultAllelicEffect( Locus::Ptr lp ) : AllelicEffect( lp ) {
 }
 
 /// if known allele, convert allele to double
