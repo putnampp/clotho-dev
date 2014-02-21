@@ -45,14 +45,6 @@ using std::endl;
 const string IND_K = "IND";
 const string NAME_K = "name";
 
-/*
-IndividualShell::IndividualShell() : ClothoObject(),
-    m_name( IND_K  ),
-    m_prop( NULL ),
-    m_environment( NULL ) {
-    m_name.append( boost::lexical_cast< string >(m_id ));
-}
-*/
 
 IndividualShell::IndividualShell( Environment2 * env /*, IndividualProperties * p*/ ) :
     ClothoObject(),
@@ -63,7 +55,6 @@ IndividualShell::IndividualShell( Environment2 * env /*, IndividualProperties * 
 }
 
 IndividualShell::~IndividualShell() {
-//    setProperties( NULL );
     delete m_prop;
 }
 

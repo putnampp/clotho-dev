@@ -29,7 +29,7 @@
 SET( DIRS examples )
 
 LIST( APPEND DIRS engine )
-LIST( APPEND DIRS genetics )
+LIST( APPEND DIRS genetics_warped )
 
 FOREACH( D ${DIRS} )
     ADD_SUBDIRECTORY( ${D} )

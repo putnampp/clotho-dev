@@ -27,72 +27,44 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#include "ClothoApplication.h"
+#ifndef CLOTHOAPPLICATION_H_
+#define CLOTHOAPPLICATION_H_
+
+#include "common.h"
+#include "Application.h"
+#include "SimulationConfiguration.h"
+#include "IntVTime.h"
 #include "ClothoPartitioner.h"
 #include "YamlConfig.h"
 
-#include <iostream>
-using std::cerr;
-using std::cout;
-using std::endl;
+#include "GeneticMap.h"
 
-#include <boost/lexical_cast.hpp>
+class ClothoApplication : public Application {
+public:
+    ClothoApplication( const string & config );
+    virtual int finalize( );
 
-ClothoApplication::ClothoApplication( const string & config ) : m_config( config ), 
-        m_time(NULL), 
-        m_part( new ClothoPartitioner() ),
-        m_yaml( new YamlConfig( m_config ) ){}
+    virtual const   PartitionInfo * getPartitionInfo( unsigned int nPE );
+    virtual int     getNumberOfSimulationObjects( int mgrID ) const;
 
-int ClothoApplication::finalize( ) {
-    return 0;
-}
+    virtual string getCommandLineParameters() const;
 
-const PartitionInfo * ClothoApplication::getPartitionInfo( unsigned int nPE ) {
-    if( m_config.empty() ) {
-        cerr << "Unspecified configuration file " << endl;
-        abort();
-    }
+    virtual void registerDeserializers();
 
-//    ClothoPartitioner *part = new ClothoPartitioner();
+    virtual const VTime & getPositiveInfinity();
+    virtual const VTime & getZero();
+    virtual const VTime & getTime( string & );
 
-//    shared_ptr< YamlConfig > config( new YamlConfig( m_config ) );
+    virtual ~ClothoApplication();
+protected:
+    string  m_config;
 
-    shared_ptr< vector< SimulationObject * > > objs = m_yaml->getSimulationObjects();
+    IntVTime * m_time;
 
-    const PartitionInfo * ret = m_part->partition( &*objs, nPE );
+    ClothoPartitioner * m_part;
+    YamlConfig        * m_yaml;
 
-    return ret;
-}
+    GeneticMap::Ptr     m_genetic_map;
+};
 
-int     ClothoApplication::getNumberOfSimulationObjects( int mgrID ) const {
-    return 0;
-}
-
-string ClothoApplication::getCommandLineParameters() const {
-    return string("");
-}
-
-void ClothoApplication::registerDeserializers() { }
-
-const VTime & ClothoApplication::getPositiveInfinity() {
-    return IntVTime::getIntVTimePositiveInfinity();
-}
-
-const VTime & ClothoApplication::getZero() {
-    return IntVTime::getIntVTimeZero();
-}
-
-const VTime & ClothoApplication::getTime( string & t) {
-    if( !m_time ) {
-        int time = boost::lexical_cast<int>( t );
-        m_time = new IntVTime( time );
-    }
-    return *m_time;
-}
-
-ClothoApplication::~ClothoApplication() {
-    if( m_time ) delete m_time;
-
-    delete m_part;
-    delete m_yaml;
-}
+#endif  // CLOTHOAPPLICATION_H_

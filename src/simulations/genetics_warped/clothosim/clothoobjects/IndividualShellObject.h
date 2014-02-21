@@ -42,6 +42,7 @@
 #include "IntVTime.h"
 #include "IndividualObjectState.h"
 #include "IndividualProperties.h"
+#include "reproduction.h"
 
 class Environment2;
 
@@ -49,10 +50,8 @@ using std::vector;
 
 class IndividualShell : public ClothoObject {
 public:
-//    IndividualShell( );
-    IndividualShell( Environment2 * env/*, IndividualProperties * p = NULL*/ );
-
-//    IndividualShell( sex_t s, const vector< genotype_t > & genos);
+    IndividualShell( Environment2 * env );
+    IndividualShell( const ObjectID & env, reproduction * repro);
 
     virtual ~IndividualShell();
 
@@ -70,7 +69,6 @@ public:
     void handleEvent( const EVT * e ) {}
 
     void setEnvironment( Environment2 * env );
-//    void setProperties( IndividualProperties * prop);
     IndividualProperties * getProperties();
 
     bool    isAlive() const;
@@ -86,7 +84,6 @@ public:
     unsigned int getVariantCount() const;
 
     unsigned int getEnvironmentLociCount() const;
-
 
 private:
     string  m_name;
