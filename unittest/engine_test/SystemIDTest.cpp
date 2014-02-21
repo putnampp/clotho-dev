@@ -32,17 +32,19 @@
 #include "system_id.h"
 
 
-BOOST_AUTO_TEST_SUITE( test_sequence )
+BOOST_AUTO_TEST_SUITE( test_system_id )
 
 BOOST_AUTO_TEST_CASE( create_id_test ) {
+    system_id::manager_id_t man_id = 0x00000001;
+    system_id::object_id_t obj_id =  0x00000020;
     system_id::system_key_t test_key = 0x0000000100000020;
 
     system_id sid( test_key );
 
-    BOOST_REQUIRE_MESSAGE( sid.getKey() == test_key, "Unexpected key mismatch of system_id::system_key");
+    BOOST_REQUIRE_MESSAGE( sid.getKey() == test_key, "Unexpected key mismatch of system_id::system_key: " << std::hex << sid.getKey() << " != " << test_key );
 
-    BOOST_REQUIRE_MESSAGE( sid.getManagerID() == 0x00000001, "ID1: Unexpected ManagerID" );
-    BOOST_REQUIRE_MESSAGE( sid.getObjectID() ==  0x00000020, "ID1: Unexpected ObjectID" );
+    BOOST_REQUIRE_MESSAGE( sid.getManagerID() == man_id, "ID1: Unexpected ManagerID - " << std::hex << sid.getManagerID() << " != " << man_id  );
+    BOOST_REQUIRE_MESSAGE( sid.getObjectID() ==  obj_id, "ID1: Unexpected ObjectID - " << std::hex << sid.getObjectID() << " != " << obj_id  );
 
     system_id::manager_id_t test_manid = 0x00003000;
     system_id::object_id_t  test_objid = 0x00000001;
@@ -63,6 +65,28 @@ BOOST_AUTO_TEST_CASE( system_id_comp_test ) {
     system_id sid2( man_id, obj_id2);
 
     BOOST_REQUIRE_MESSAGE( sid < sid2, "FAILED: " << sid << " < " << sid2 );
+}
+
+BOOST_AUTO_TEST_CASE( system_id_equal_test ) {
+    system_id::manager_id_t man_id = 0x00000010;
+    system_id::object_id_t obj_id = 0, obj_id2 = 0;
+
+    system_id sid( man_id, obj_id);
+    system_id sid2( man_id, obj_id2);
+
+    BOOST_REQUIRE_MESSAGE( sid == sid2, "FAILED: " << sid << " == " << sid2 );
+}
+
+BOOST_AUTO_TEST_CASE( system_id_assignment_test ) {
+    system_id::manager_id_t man_id = 0x00000010;
+    system_id::object_id_t obj_id = 10;
+
+    system_id sid( man_id, obj_id);
+
+    system_id sid2;
+    sid2 = sid;
+
+    BOOST_REQUIRE_MESSAGE( sid == sid2, "FAILED: " << sid << " == " << sid2 );
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -28,7 +28,7 @@
 ################################################################################
 INCLUDE_DIRECTORIES(${${PROJECT_NAME}_INCLUDE_DIR})
 
-LIST(APPEND DIRS cchmc_test )
+#LIST(APPEND DIRS cchmc_test )
 LIST(APPEND DIRS engine_test )
 
 FOREACH( D ${DIRS} )
@@ -36,4 +36,5 @@ FOREACH( D ${DIRS} )
 ENDFOREACH( D )
 
 ADD_EXECUTABLE(test_main test_main.cpp)
-TARGET_LINK_LIBRARIES( test_main ${Boost_LIBRARIES} cchmc cchmc_test engine_test)
+#TARGET_LINK_LIBRARIES( test_main ${Boost_LIBRARIES} cchmc cchmc_test engine_test)
+TARGET_LINK_LIBRARIES( test_main ${Boost_LIBRARIES} cchmc engine engine_test)

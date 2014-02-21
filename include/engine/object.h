@@ -2,7 +2,7 @@
 #define _OBJECT_H_
 
 #include "system_id.h"
-#include "event.h"
+#include "event_interface.h"
 
 struct simulation_manager;
 
@@ -27,6 +27,8 @@ struct object {
     virtual void receiveEvent( const event * evt ) = 0;
 
     virtual const vtime_t & getCurrentTime() const = 0;
+
+    virtual ~object() {}
 };
 
 #endif  // _OBJECT_H_

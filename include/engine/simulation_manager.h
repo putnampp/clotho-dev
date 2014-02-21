@@ -2,7 +2,6 @@
 #define SIMULATIONMANAGER_H_
 
 #include "system_id.h"
-
 #include "object.h"
 
 struct simulation_manager {
@@ -23,7 +22,7 @@ struct simulation_manager {
 
     virtual void routeEvent( const event * evt ) = 0;
 
-    virtual void notifyNextEvent( const system_id &, const event::vtime_t & );
+    virtual void notifyNextEvent( const system_id &, const event::vtime_t & ) = 0;
 
     virtual ~simulation_manager() {}
 };

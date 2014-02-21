@@ -5,17 +5,17 @@
 #include "application.h"
 
 #include <unordered_map>
-#include <map>
+#include <list>
 
 using std::unordered_map;
-using std::multimap;
 using std::pair;
 using std::make_pair;
+using std::list;
 
 class SequentialSimulationManager : public simulation_manager {
 public:
     typedef unordered_map< system_id, object * > object_handle_map_t;
-    typedef pair< system_id, const event::vtime_t > pair_object_timestamp;
+    typedef pair< system_id, event::vtime_t > pair_object_timestamp;
     typedef list< pair_object_timestamp > ordered_object_exe_t;
     typedef unordered_map< system_id, ordered_object_exe_t::iterator > object_next_event_map_t;
 
@@ -28,9 +28,9 @@ public:
     virtual bool  isSimulationComplete() const;
 
     virtual void registerObject( object * obj );
-    virtual void deregisterObject( object * obj );
+    virtual void unregisterObject( object * obj );
 
-    virtual void getObjectCount() const;
+    virtual size_t getObjectCount() const;
 
     virtual void initialize();
     virtual void simulate( const event::vtime_t & until );
@@ -39,6 +39,7 @@ public:
     virtual void routeEvent( const event * evt );
     virtual void notifyNextEvent( const system_id & obj, const event::vtime_t & t );
 
+    virtual ~SequentialSimulationManager();
 protected:
 
     virtual pair_object_timestamp getNextObject();
@@ -51,8 +52,8 @@ private:
     application *   m_app;
     const system_id m_id;
 
-    const event::vtime_t    m_sim_time;
-    const event::vtime_t    m_sim_until;
+    event::vtime_t    m_sim_time;
+    event::vtime_t    m_sim_until;
     bool m_sim_complete;
 
     object_handle_map_t m_objects;

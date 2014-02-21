@@ -29,10 +29,10 @@
 
 INCLUDE_DIRECTORIES( ${${PROJECT_NAME}_INCLUDE_DIR} )
 
-LIST(APPEND SRCS StatisticFactoryTest.cpp )
-LIST(APPEND SRCS ChromosomeMapTest.cpp )
-LIST(APPEND SRCS IndividualTest.cpp )
-LIST(APPEND SRCS SequenceTest.cpp )
-LIST(APPEND SRCS GenomeFactoryTest.cpp )
+#LIST(APPEND SRCS StatisticFactoryTest.cpp )
+#LIST(APPEND SRCS ChromosomeMapTest.cpp )
+#LIST(APPEND SRCS IndividualTest.cpp )
+#LIST(APPEND SRCS SequenceTest.cpp )
+#LIST(APPEND SRCS GenomeFactoryTest.cpp )
 
 ADD_LIBRARY(cchmc_test SHARED ${SRCS} )

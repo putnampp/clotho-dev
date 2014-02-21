@@ -1,5 +1,5 @@
 #include "SequentialSimulationManager.h"
-#include "cassert"
+#include <cassert>
 
 #include <algorithm>
 
@@ -15,8 +15,24 @@ system_id::object_id_t SequentialSimulationManager::m_next_object_id = 0;
 
 SequentialSimulationManager::SequentialSimulationManager( application * app, system_id::manager_id_t id ) :
     m_app(app),
-    m_id( id, m_next_object_id++ )
+    m_id( id, m_next_object_id++ ),
+    m_sim_time( SystemClock::getZero() ),
+    m_sim_until( SystemClock::getPositiveInfinity() )
 {}
+
+SequentialSimulationManager::~SequentialSimulationManager() {
+    while( !m_objects.empty() ) {
+        object * tmp = m_objects.begin()->second;
+        m_objects.erase( m_objects.begin());
+        delete tmp;
+    }
+
+    while( !m_ordered_objs.empty() ) {
+        getNextObject();
+    }
+
+    m_objects_next.clear();
+}
 
 const system_id & SequentialSimulationManager::getSystemID() const {
     return m_id;
@@ -28,7 +44,7 @@ system_id::manager_id_t SequentialSimulationManager::getManagerID() const {
 
 void SequentialSimulationManager::registerObject( object * obj ) {
     system_id obj_id( m_id.getManagerID(), m_next_object_id++ );
-    obj->setID();
+    obj->setID( obj_id );
 
     m_objects[ obj_id ] = obj;
     m_objects_next[ obj_id ] = m_ordered_objs.end();
@@ -36,7 +52,7 @@ void SequentialSimulationManager::registerObject( object * obj ) {
 
 void SequentialSimulationManager::unregisterObject( object * obj ) {
     object_handle_map_t::iterator it = m_objects.find( obj->getSystemID() );
-    ASSERT( it != m_objects.end() );
+    assert( it != m_objects.end() );
 
     m_objects.erase( it );
 }
@@ -48,7 +64,7 @@ size_t SequentialSimulationManager::getObjectCount() const {
 void SequentialSimulationManager::routeEvent( const event * evt ) {
     object_handle_map_t::iterator it = m_objects.find( evt->getReceiver() );
 
-    ASSERT( it != m_objects.end() );
+    assert( it != m_objects.end() );
 
     it->second->receiveEvent( evt );
 }
@@ -56,8 +72,7 @@ void SequentialSimulationManager::routeEvent( const event * evt ) {
 void SequentialSimulationManager::notifyNextEvent( const system_id & obj, const event::vtime_t & t ) {
     object_next_event_map_t::iterator it = m_objects_next.find( obj );
 
-    ASSERT( it != m_objects_next.end() );
-    ASSERT( (it->second == m_ordered_objs.end()) || (t < it->second->second) );
+    assert( it != m_objects_next.end() );
 
     pair_object_timestamp ot = make_pair( obj, t );
 
@@ -67,9 +82,9 @@ void SequentialSimulationManager::notifyNextEvent( const system_id & obj, const 
         it->second = m_ordered_objs.insert( pos, ot );
     } else if( it->second != pos ) {
         m_ordered_objs.erase( it->second );
-        it->second = m_ordered_objs.insert( pos, p );
+        it->second = m_ordered_objs.insert( pos, ot );
     } else if( pos->first == obj ) {
-        pos->second = t;
+        it->second->second = t;
     } else {
         assert( false );
     }
@@ -88,7 +103,9 @@ void SequentialSimulationManager::initialize() {
     m_app->initialize();
 }
 
-void SequentialSimulationManager::simulate() {
+void SequentialSimulationManager::simulate( const event::vtime_t & until ) {
+    setSimulateUntil( until );
+
     while(! m_ordered_objs.empty() ) {
         pair_object_timestamp ot = getNextObject();
 
@@ -118,4 +135,8 @@ bool SequentialSimulationManager::setSimulationTime( const event::vtime_t & t ) 
 
 void SequentialSimulationManager::setSimulateUntil( const event::vtime_t & t ) {
     m_sim_until = t;
+}
+
+const event::vtime_t & SequentialSimulationManager::getSimulationTime() const {
+    return m_sim_time;
 }

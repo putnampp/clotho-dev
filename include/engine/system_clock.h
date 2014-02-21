@@ -12,7 +12,7 @@ struct system_clock {
     static vtime_t getZero() {
         return vtime_t(0);
     }
-}
+};
 
 typedef system_clock< unsigned int > SystemClock;
 

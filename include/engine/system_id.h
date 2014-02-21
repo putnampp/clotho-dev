@@ -17,12 +17,12 @@ public:
     }
 
     inline system_id( system_key_t key ) { 
-        m_id.key = 0; 
+        m_id.key = key; 
     }
 
     inline system_id( manager_id_t man, object_id_t obj ) {
-        m_id.manager_id = man;
         m_id.object_id = obj;
+        m_id.manager_id = man;
     }
 
     inline system_id( const system_id & other ) {
@@ -46,7 +46,11 @@ public:
         return *this;
     }
 
-    inline bool operator==( const system_id & rhs ) {
+    inline bool operator<( const system_id & rhs ) const {
+        return m_id.key < rhs.m_id.key;
+    }
+
+    inline bool operator==( const system_id & rhs ) const {
         return m_id.key == rhs.m_id.key;
     }
 
@@ -55,8 +59,8 @@ private:
     union _system_id {
         system_key_t    key;
         struct {
-            manager_id_t    manager_id;
             object_id_t     object_id;
+            manager_id_t    manager_id;
         };
     };
 
@@ -64,7 +68,7 @@ private:
 };
 
 inline ostream & operator<<( ostream & out, const system_id & id ) {
-    out << "[" << id.getManagerID() << "," id.getObjecID() << "]";
+    out << "[" << id.getManagerID() << "," << id.getObjectID() << "]";
     return out;
 }
 
