@@ -26,10 +26,10 @@
 # of the authors and should not be interpreted as representing official policies,
 # either expressed or implied, of the FreeBSD Project.
 ################################################################################
-SET( DIRS examples )
 
-LIST( APPEND DIRS genetics_warped )
+INCLUDE_DIRECTORIES( ${${PROJECT_NAME}_INCLUDE_DIR} )
+INCLUDE_DIRECTORIES( ${${PROJECT_NAME}_INCLUDE_DIR}/engine )
 
-FOREACH( D ${DIRS} )
-    ADD_SUBDIRECTORY( ${D} )
-ENDFOREACH( D )
+LIST(APPEND ENGINE_SRCS SystemIDTest.cpp )
+
+ADD_LIBRARY(engine_test SHARED ${ENGINE_SRCS} )

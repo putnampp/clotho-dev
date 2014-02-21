@@ -27,7 +27,7 @@
 # either expressed or implied, of the FreeBSD Project.
 ################################################################################
 
-INCLUDE_DIRECTORIES( ${POPSIM_INCLUDE_DIR} )
+INCLUDE_DIRECTORIES( ${${PROJECT_NAME}_INCLUDE_DIR} )
 
 LIST(APPEND SRCS StatisticFactoryTest.cpp )
 LIST(APPEND SRCS ChromosomeMapTest.cpp )

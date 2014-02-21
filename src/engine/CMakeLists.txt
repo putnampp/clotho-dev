@@ -26,10 +26,9 @@
 # of the authors and should not be interpreted as representing official policies,
 # either expressed or implied, of the FreeBSD Project.
 ################################################################################
-SET( DIRS examples )
+INCLUDE_DIRECTORIES( ${${PROJECT_NAME}_INCLUDE_DIR} )
+INCLUDE_DIRECTORIES( ${${PROJECT_NAME}_INCLUDE_DIR}/engine )
 
-LIST( APPEND DIRS genetics_warped )
+LIST( APPEND ENGINE_SRCS SequentialSimulationManager.cpp)
 
-FOREACH( D ${DIRS} )
-    ADD_SUBDIRECTORY( ${D} )
-ENDFOREACH( D )
+ADD_LIBRARY(engine SHARED ${ENGINE_SRCS})
