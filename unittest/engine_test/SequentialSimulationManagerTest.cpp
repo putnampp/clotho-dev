@@ -60,6 +60,8 @@ BOOST_AUTO_TEST_CASE( register_object ) {
 
     system_id expected_ssm_id( man_id, 0 );
 
+    BOOST_REQUIRE_MESSAGE( true, "" );
+
     TestObject obj( &ssm );
 
     system_id expected_obj_id( man_id, 1 );

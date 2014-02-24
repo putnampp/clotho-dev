@@ -3,6 +3,8 @@
 
 #include "object.h"
 
+#include "simulation_manager.h"
+
 class Object : virtual public object {
 public:
     const system_id & getSystemID() const {
@@ -15,8 +17,10 @@ public:
 
     void setSimulationManager( simulation_manager * sim ) {
         if( m_sim_manager != NULL ) {
-            m_sim_manager->unregister(this);
+            m_sim_manager->unregisterObject(this);
         }
+
+        if( sim == NULL ) return;
 
         m_sim_manager = sim;
 
@@ -29,31 +33,31 @@ public:
         m_local_time = m_sim_manager->getSimulationTime();
     }
 
-    virtual void executeProcess() {
+    virtual void process() {
         const event * tmp = peekEvent();
 
         // while there are concurrent events
         while( tmp != NULL && tmp->getReceived() == m_local_time ) {
             tmp = getEvent();
 
-            handleEvent( tmp );
-            
             tmp = peekEvent();
         }
     }
 
     virtual void finalize() { }
 
-    virtual size_t pendingEventCount() = 0;
-    virtual const event * getEvent() = 0;
-    virtual const event * peekEvent() = 0;
-    virtual void receiveEvent( const event * evt ) = 0;
-
     virtual void sendEvent( const event * evt ) {
         if( evt->getReceiver() == getSystemID() ) {
             receiveEvent( evt );
         } else {
             m_sim_manager->routeEvent( evt );
+        }
+    }
+
+    virtual void receiveEvent( const event * evt ) {
+        insertEvent( evt );
+        if( peekEvent() == evt ) {
+            m_sim_manager->notifyNextEvent( getSystemID(), evt->getReceived() );
         }
     }
 
@@ -70,11 +74,12 @@ public:
     }
 
     virtual ~Object() {
-        m_sim_manager->unregisterObject( this );
+        if( m_sim_manager )
+            m_sim_manager->unregisterObject( this );
     }
 
 protected:
-    Object( ) : 
+    Object( ) :
         m_id(0),
         m_sim_manager( NULL ),
         m_local_time( SystemClock::getZero() )

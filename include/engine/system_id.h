@@ -12,22 +12,13 @@ public:
     typedef unsigned int object_id_t;
     typedef unsigned long system_key_t;
 
-    inline system_id() { 
-        m_id.key = 0; 
-    }
+    inline system_id() : m_id() { }
 
-    inline system_id( system_key_t key ) { 
-        m_id.key = key; 
-    }
+    inline system_id( system_key_t key ) : m_id(key) { }
 
-    inline system_id( manager_id_t man, object_id_t obj ) {
-        m_id.components.object_id = obj;
-        m_id.components.manager_id = man;
-    }
+    inline system_id( manager_id_t man, object_id_t obj ) : m_id( obj, man ) { }
 
-    inline system_id( const system_id & other ) {
-        m_id.key = other.m_id.key;
-    }
+    inline system_id( const system_id & other ) : m_id( other.m_id ) { }
 
     inline system_key_t getKey() const {
         return m_id.key;
@@ -62,10 +53,16 @@ public:
 private:
     union _system_id {
         system_key_t    key;
-        struct {
+        struct c {
             object_id_t     object_id;
             manager_id_t    manager_id;
+            c( object_id_t oid, manager_id_t mid ) : object_id(oid), manager_id(mid) {}
         } components;
+
+        _system_id( ) : key(0) {}
+        _system_id( system_key_t k ) : key( k ) {}
+        _system_id( object_id_t oid, manager_id_t mid) : components(oid, mid) {}
+        _system_id( const _system_id & id ) : key( id.key) {}
     };
 
     _system_id m_id;

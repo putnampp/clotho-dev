@@ -3,6 +3,10 @@
 
 #include <algorithm>
 
+#include <iostream>
+
+using std::cout;
+using std::endl;
 using std::lower_bound;
 
 struct object_timestamp_comp {
@@ -41,8 +45,8 @@ system_id::manager_id_t SequentialSimulationManager::getManagerID() const {
     return m_id.getManagerID();
 }
 
-const system_id & SequentialSimulationManager::getNextObjectID() {
-    return system_id( m_id.getManagerID(), m_next_system_id++);
+const system_id SequentialSimulationManager::getNextObjectID() {
+    return system_id( m_id.getManagerID(), m_next_object_id++);
 }
 
 void SequentialSimulationManager::registerObject( object * obj ) {
@@ -120,7 +124,7 @@ void SequentialSimulationManager::simulate( const event::vtime_t & until ) {
 
         if( setSimulationTime( ot.second ) ) break;
 
-        m_objects[ ot.first ]->executeProcess();
+        m_objects[ ot.first ]->process();
     }
 }
 

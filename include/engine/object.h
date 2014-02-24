@@ -4,9 +4,17 @@
 #include "system_id.h"
 #include "event_interface.h"
 
+#include "event_manager.h"
+#include "event_processor.h"
+#include "event_transceiver.h"
+
 struct simulation_manager;
 
-struct object {
+struct object : 
+    virtual public event_manager,
+    virtual public event_processor,
+    virtual public event_transceiver
+{
     typedef event::vtime_t  vtime_t;
     
     virtual const system_id &       getSystemID() const = 0;
@@ -16,6 +24,7 @@ struct object {
 
     virtual void setSimulationManager( simulation_manager * sim ) = 0;
 
+/*
     virtual void initialize() = 0;
     virtual void executeProcess() = 0;
     virtual void finalize() = 0;
@@ -26,6 +35,7 @@ struct object {
 
     virtual void sendEvent( const event * evt ) = 0;
     virtual void receiveEvent( const event * evt ) = 0;
+*/
 
     virtual void updateLocalTime( const vtime_t & t ) = 0;
     virtual const vtime_t & getCurrentTime() const = 0;

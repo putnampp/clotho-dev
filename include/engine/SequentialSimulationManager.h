@@ -27,7 +27,7 @@ public:
     virtual const event::vtime_t & getSimulationTime() const;
     virtual bool  isSimulationComplete() const;
 
-    virtual const system_id & getNextObjectID();
+    virtual const system_id getNextObjectID();
     virtual void registerObject( object * obj );
     virtual void unregisterObject( object * obj );
 

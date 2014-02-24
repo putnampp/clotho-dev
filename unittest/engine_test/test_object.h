@@ -31,11 +31,12 @@ public:
     virtual void setSimulationManager( simulation_manager * sim ) {
         m_sim = sim;
 
+        setID( m_sim->getNextObjectID() );
         m_sim->registerObject( this );
     }
 
     virtual void initialize() {}
-    virtual void executeProcess() {}
+    virtual void process() {}
     virtual void finalize() {}
 
     virtual size_t pendingEventCount() {
@@ -49,9 +50,13 @@ public:
         return tmp;
     }
 
-    virtual const event * peekEvent() {
+    virtual const event * peekEvent() const {
         if( m_events.empty() ) return NULL;
         return m_events.front();
+    }
+
+    virtual void insertEvent( const event * evt ) {
+        m_events.push_back( evt );    
     }
 
     virtual void sendEvent( const event * evt ) {
@@ -63,7 +68,11 @@ public:
     }
 
     virtual void receiveEvent( const event * evt ) {
-        m_events.push_back( evt );    
+        insertEvent( evt );
+    }
+
+    virtual void updateLocalTime( const vtime_t & t ) {
+        m_time = t;
     }
 
     virtual const vtime_t & getCurrentTime() const {
