@@ -21,8 +21,8 @@ public:
     }
 
     inline system_id( manager_id_t man, object_id_t obj ) {
-        m_id.object_id = obj;
-        m_id.manager_id = man;
+        m_id.components.object_id = obj;
+        m_id.components.manager_id = man;
     }
 
     inline system_id( const system_id & other ) {
@@ -34,11 +34,11 @@ public:
     }
 
     inline manager_id_t getManagerID() const {
-        return m_id.manager_id;
+        return m_id.components.manager_id;
     }
 
     inline object_id_t getObjectID() const {
-        return m_id.object_id;
+        return m_id.components.object_id;
     }
 
     inline const system_id& operator=( const system_id & rhs ) {
@@ -54,6 +54,10 @@ public:
         return m_id.key == rhs.m_id.key;
     }
 
+    inline bool operator!=( const system_id & rhs ) const {
+        return m_id.key != rhs.m_id.key;
+    }
+
     virtual ~system_id() {}
 private:
     union _system_id {
@@ -61,7 +65,7 @@ private:
         struct {
             object_id_t     object_id;
             manager_id_t    manager_id;
-        };
+        } components;
     };
 
     _system_id m_id;

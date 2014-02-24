@@ -27,10 +27,12 @@ public:
     virtual const event::vtime_t & getSimulationTime() const;
     virtual bool  isSimulationComplete() const;
 
+    virtual const system_id & getNextObjectID();
     virtual void registerObject( object * obj );
     virtual void unregisterObject( object * obj );
 
     virtual size_t getObjectCount() const;
+    virtual object * getObject( const system_id & id ) const;
 
     virtual void initialize();
     virtual void simulate( const event::vtime_t & until );
@@ -60,7 +62,7 @@ private:
     ordered_object_exe_t m_ordered_objs;
     object_next_event_map_t m_objects_next;
 
-    static system_id::object_id_t   m_next_object_id;
+    system_id::object_id_t   m_next_object_id;
 };
 
 #endif  // SEQUENTIALSIMULATIONMANAGER_H_

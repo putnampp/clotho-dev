@@ -11,13 +11,12 @@ struct object_timestamp_comp {
     }
 };
 
-system_id::object_id_t SequentialSimulationManager::m_next_object_id = 0;
-
 SequentialSimulationManager::SequentialSimulationManager( application * app, system_id::manager_id_t id ) :
     m_app(app),
-    m_id( id, m_next_object_id++ ),
+    m_id( id, 0 ),
     m_sim_time( SystemClock::getZero() ),
-    m_sim_until( SystemClock::getPositiveInfinity() )
+    m_sim_until( SystemClock::getPositiveInfinity() ),
+    m_next_object_id( 1 )
 {}
 
 SequentialSimulationManager::~SequentialSimulationManager() {
@@ -42,12 +41,15 @@ system_id::manager_id_t SequentialSimulationManager::getManagerID() const {
     return m_id.getManagerID();
 }
 
-void SequentialSimulationManager::registerObject( object * obj ) {
-    system_id obj_id( m_id.getManagerID(), m_next_object_id++ );
-    obj->setID( obj_id );
+const system_id & SequentialSimulationManager::getNextObjectID() {
+    return system_id( m_id.getManagerID(), m_next_system_id++);
+}
 
-    m_objects[ obj_id ] = obj;
-    m_objects_next[ obj_id ] = m_ordered_objs.end();
+void SequentialSimulationManager::registerObject( object * obj ) {
+    assert( obj->getSystemID() != system_id(0) );
+
+    m_objects[ obj->getSystemID() ] = obj;
+    m_objects_next[ obj->getSystemID() ] = m_ordered_objs.end();
 }
 
 void SequentialSimulationManager::unregisterObject( object * obj ) {
@@ -59,6 +61,13 @@ void SequentialSimulationManager::unregisterObject( object * obj ) {
 
 size_t SequentialSimulationManager::getObjectCount() const {
     return m_objects.size();
+}
+
+object * SequentialSimulationManager::getObject( const system_id & id ) const {
+    object_handle_map_t::const_iterator it = m_objects.find( id );
+    if( it == m_objects.end() ) return NULL;
+
+    return it->second;
 }
 
 void SequentialSimulationManager::routeEvent( const event * evt ) {

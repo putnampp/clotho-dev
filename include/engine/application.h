@@ -2,8 +2,10 @@
 #define APPLICATION_H_
 
 struct application {
-    virtual void initialize();
-    virtual void finalize();
+    virtual void initialize() = 0;
+    virtual void finalize() = 0;
+
+    virtual ~application() {}
 };
 
 #endif  // APPLICATION_H_

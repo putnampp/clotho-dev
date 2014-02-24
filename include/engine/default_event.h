@@ -2,7 +2,6 @@
 #define DEFAULT_EVENT_H_
 
 #include "event_interface.h"
-#include "orderable.h"
 
 class default_event : virtual public event {
 public:
@@ -12,7 +11,17 @@ public:
                 m_sent( tSent),
                 m_recv( tRecv),
                 m_sender( sender ),
-                m_receiver( receiver )
+                m_receiver( receiver ),
+                m_eid( eid )
+    {}
+
+    default_event( const vtime_t & tSent, const vtime_t & tRecv,
+                    const object * sender, const object * receiver,
+                    event_id_t eid ):
+                m_sent( tSent ),
+                m_recv( tRecv ),
+                m_sender( sender->getSystemID() ),
+                m_receiver( receiver->getSystemID() ),
                 m_eid( eid )
     {}
 
@@ -24,14 +33,14 @@ public:
     virtual const vtime_t &     getReceived() const { return m_recv; }
 
     virtual bool operator<( const event * rhs ) const {
-        return (m_recv < rhs->m_recv) ||
-            (m_recv == rhs->m_recv &&
-             m_eid < rhs->m_eid );
+        return (m_recv < rhs->getReceived()) ||
+            (m_recv == rhs->getReceived() &&
+             m_eid < rhs->getEventID() );
     }
 
     virtual bool operator==( const event * rhs ) const {
-        return (m_sender == rhs->m_sender 
-                && m_eid == rhs->m_eid);
+        return (m_sender == rhs->getSender()
+                && m_eid == rhs->getEventID());
     }
 
     virtual ~default_event() {}

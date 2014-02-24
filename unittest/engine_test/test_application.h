@@ -5,8 +5,12 @@
 
 class TestApplication : public application {
 public:
+    TestApplication() {}
+
     void initialize() {}
     void finalize() {}
+
+    virtual ~TestApplication() {}
 };
 
 #endif  // TEST_APPLICATION_H_

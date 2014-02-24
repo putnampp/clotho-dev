@@ -20,12 +20,14 @@ struct object {
     virtual void executeProcess() = 0;
     virtual void finalize() = 0;
 
+    virtual size_t pendingEventCount() = 0;
     virtual const event * getEvent() = 0;
     virtual const event * peekEvent() = 0;
 
     virtual void sendEvent( const event * evt ) = 0;
     virtual void receiveEvent( const event * evt ) = 0;
 
+    virtual void updateLocalTime( const vtime_t & t ) = 0;
     virtual const vtime_t & getCurrentTime() const = 0;
 
     virtual ~object() {}

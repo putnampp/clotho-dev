@@ -11,10 +11,13 @@ struct simulation_manager {
     virtual const event::vtime_t & getSimulationTime() const = 0;
     virtual bool isSimulationComplete() const = 0;
 
+    virtual const system_id & getNextObjectID() = 0;
+
     virtual void registerObject( object * obj ) = 0;
     virtual void unregisterObject( object * obj ) = 0;
 
     virtual size_t getObjectCount() const = 0;
+    virtual object * getObject( const system_id & id ) const = 0;
 
     virtual void initialize() = 0;
     virtual void simulate( const event::vtime_t & until ) = 0;
