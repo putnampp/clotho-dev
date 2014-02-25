@@ -40,8 +40,12 @@ public:
     virtual void perform_event( const event * ) {}
     virtual void finalize() {}
 
-    virtual size_t pendingEventCount() {
+    virtual size_t pendingEventCount() const {
         return m_events.size();
+    }
+
+    virtual size_t processedEventCount() const {
+        return 0;
     }
 
     virtual const event * getEvent() {

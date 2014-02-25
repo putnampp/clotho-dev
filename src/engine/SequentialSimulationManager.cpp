@@ -20,6 +20,7 @@ SequentialSimulationManager::SequentialSimulationManager( application * app, sys
     m_id( id, 0 ),
     m_sim_time( SystemClock::getZero() ),
     m_sim_until( SystemClock::getPositiveInfinity() ),
+    m_sim_complete(false),
     m_next_object_id( 1 )
 {}
 
@@ -50,6 +51,8 @@ const system_id SequentialSimulationManager::getNextObjectID() {
 }
 
 void SequentialSimulationManager::registerObject( object * obj ) {
+    if( obj == NULL ) return;
+
     assert( obj->getSystemID() != system_id(0) );
 
     m_objects[ obj->getSystemID() ] = obj;
@@ -57,10 +60,11 @@ void SequentialSimulationManager::registerObject( object * obj ) {
 }
 
 void SequentialSimulationManager::unregisterObject( object * obj ) {
-    object_handle_map_t::iterator it = m_objects.find( obj->getSystemID() );
-    assert( it != m_objects.end() );
+    if( obj == NULL ) return;
 
-    m_objects.erase( it );
+    object_handle_map_t::iterator it = m_objects.find( obj->getSystemID() );
+    if( it != m_objects.end() )
+        m_objects.erase( it );
 }
 
 size_t SequentialSimulationManager::getObjectCount() const {
@@ -83,6 +87,7 @@ void SequentialSimulationManager::routeEvent( const event * evt ) {
 }
 
 void SequentialSimulationManager::notifyNextEvent( const system_id & obj, const event::vtime_t & t ) {
+    cout << "Simulation Manager notified of next event" << endl;
     object_next_event_map_t::iterator it = m_objects_next.find( obj );
 
     assert( it != m_objects_next.end() );
@@ -122,9 +127,16 @@ void SequentialSimulationManager::simulate( const event::vtime_t & until ) {
     while(! m_ordered_objs.empty() ) {
         pair_object_timestamp ot = getNextObject();
 
-        if( setSimulationTime( ot.second ) ) break;
+        cout << "Simulating event: " << ot.first << " @ " << ot.second << endl;
 
-        m_objects[ ot.first ]->process();
+        if( setSimulationTime( ot.second ) ) {
+            cout << "Simulation Complete" << endl;
+            break;
+        }
+
+        object * obj = m_objects[ ot.first ];
+        obj->updateLocalTime( ot.second );
+        obj->process();
     }
 }
 

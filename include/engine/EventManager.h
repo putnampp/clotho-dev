@@ -32,6 +32,7 @@ public:
     const event * getEvent() {
         const event * t = m_events->front();
         m_events->pop_front();
+        m_processed->push_back( t );
         return t;
     }
 
@@ -40,8 +41,12 @@ public:
         return m_events->front();
     }
 
-    size_t pendingEventCount() {
+    size_t pendingEventCount() const {
         return m_events->size();
+    }
+
+    size_t processedEventCount() const {
+        return m_processed->size();
     }
 
     virtual ~EventManager() {

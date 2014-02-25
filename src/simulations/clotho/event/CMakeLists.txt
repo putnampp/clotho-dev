@@ -28,28 +28,7 @@
 ################################################################################
 INCLUDE_DIRECTORIES( ${${PROJECT_NAME}_INCLUDE_DIR} )
 
-#LIST( APPEND CLOTHOLIBS event )
-#LIST( APPEND CLOTHOLIBS object )
+LIST( APPEND EVENT_SRCS birth_event.cpp)
 
-#FOREACH( D ${CLOTHOLIBS} )
-#    ADD_SUBDIRECTORY( ${D} )
-#ENDFOREACH(D)
+ADD_LIBRARY(event SHARED ${EVENT_SRCS} )
 
-LIST( APPEND EVENT_SRCS event/birth_event.cpp)
-
-ADD_LIBRARY( event SHARED ${EVENT_SRCS} )
-
-LIST( APPEND OBJECT_SRCS object/environment.cpp)
-LIST( APPEND OBJECT_SRCS object/individual.cpp)
-
-ADD_LIBRARY( object SHARED ${OBJECT_SRCS} )
-
-LIST( APPEND SRCS common_strings.cpp)
-LIST( APPEND SRCS sex.cpp)
-LIST( APPEND SRCS clotho_application.cpp)
-LIST( APPEND SRCS main.cpp)
-
-ADD_EXECUTABLE(clotho ${SRCS} )
-
-#TARGET_LINK_LIBRARIES( clotho ${Boost_LIBRARIES} warped jsoncpp ${YAML_LIB} ${GSL_LIBRARIES} cchmc csimulation )
-TARGET_LINK_LIBRARIES( clotho ${Boost_LIBRARIES} cchmc engine event object )

@@ -11,18 +11,18 @@
 class Individual : public SimulationObject< ClothoEventSet > {
 public:
     Individual( simulation_manager * manager,
-                GeneticReproduction * repro ) :
-        SimulationObject( manager ),
-        m_prop( new IndividualProperties() ),
-        m_repro( repro )
-    {
-        setSimulationManager( manager );
-    }
+                const system_id & env_id,
+                GeneticReproduction * repro );
+
+    virtual void initialize( );
 
     virtual void perform_event( const event * );
 
+    virtual void finalize();
+
     virtual ~Individual() {}
 protected:
+    system_id   m_env_id;
     IndividualProperties * m_prop;
     GeneticReproduction * m_repro;
 };

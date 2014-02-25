@@ -8,7 +8,7 @@ struct IndividualProperties {
     system_id population;
 
     SystemClock::vtime_t dob, eol;
-    sex_t   sex;
+    Sex   sex;
     AlleleGroupPtr genotypes;
 
     IndividualProperties( ) :
@@ -17,8 +17,8 @@ struct IndividualProperties {
         dob( SystemClock::getPositiveInfinity() ),
         eol( SystemClock::getPositiveInfinity() ),
         sex( UNASSIGNED ),
-        genotypes( g )
+        genotypes( NULL )
     {}
-}
+};
 
 #endif  // INDIVIDUAL_PROPERTIES_H_

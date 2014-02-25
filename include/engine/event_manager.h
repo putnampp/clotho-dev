@@ -9,7 +9,8 @@ struct event_manager {
     virtual const event * getEvent() = 0;
     virtual const event * peekEvent() const = 0;
 
-    virtual size_t pendingEventCount() = 0;
+    virtual size_t pendingEventCount() const = 0;
+    virtual size_t processedEventCount() const = 0;
 
     virtual ~event_manager() {}
 };

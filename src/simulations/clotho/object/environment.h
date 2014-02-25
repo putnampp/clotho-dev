@@ -15,23 +15,24 @@ using std::unordered_map;
 
 class Environment : public SimulationObject< ClothoEventSet > {
 public:
-    typedef unordered_map< const system_id, Population * > id_to_population_map_t;
+//    typedef unordered_map< const system_id, Population * > id_to_population_map_t;
 
-    Environment( simulation_manager * manager ) :
-        SimulationObject( manager )
-    {
-        setSimulationManager( manager );
-    }
+    Environment( simulation_manager * manager );
 
+    virtual void initialize();
+ 
     virtual void perform_event( const event * );
+
+    virtual void finalize();
+
+    system_id getIndividual();
 
     virtual ~Environment() {}
 
 protected:
-    system_id getIndividual();
 
-    void addIndividual();
-    void removeIndividual();
+    void addIndividual( const system_id & id );
+    void removeIndividual( const system_id & id );
 
     list< system_id > m_available_individuals;
 };

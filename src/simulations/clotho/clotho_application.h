@@ -8,6 +8,10 @@
 //
 #include "GeneticMap.h"
 
+#include <vector>
+
+using std::vector;
+
 class ClothoApplication : public application {
 public:
 //    friend class ConfigurationManager< ClothoApplication >;
@@ -26,6 +30,8 @@ protected:
     simulation_manager * m_sim_manager;
 
     GeneticMap::Ptr     m_genetic_map;
+
+    vector< system_id > m_system_objs;
 };
 
 #endif  // CLOTHO_APPLICATION_H_

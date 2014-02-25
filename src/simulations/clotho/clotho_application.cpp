@@ -1,4 +1,6 @@
 #include "clotho_application.h"
+//#include "object/individual.h"
+#include "object/environment.h"
 
 #include <cassert>
 
@@ -23,7 +25,18 @@ void ClothoApplication::initialize() {
 
     cout << "ClothoApplication: Initializing" << endl;
 
-//    m_config.initialize();
+    Environment * env = new Environment( m_sim_manager );
+    env->initialize();
+
+    m_system_objs.push_back( env->getSystemID() );
+    for( int i = 0; i < 10; ++i ) {
+        system_id obj_id = env->getIndividual();
+        object * obj = m_sim_manager->getObject( obj_id );
+
+        obj->initialize();
+
+        m_system_objs.push_back( obj_id );
+    }
 
     cout << "ClothoApplication: Initialization Complete" << endl;
 }
@@ -31,5 +44,19 @@ void ClothoApplication::initialize() {
 void ClothoApplication::finalize() {
     cout << "ClothoApplication: Finalizing" << endl;
 
+    size_t nProcessedEvents = 0;
+    while( !m_system_objs.empty() ) {
+        system_id tmp = m_system_objs.back();
+        m_system_objs.pop_back();
+        
+        object * tmp_obj = m_sim_manager->getObject( tmp );
+        if( tmp_obj ) {
+            cout << "ClothoApplication: finializing object " << tmp << endl;
+            nProcessedEvents += tmp_obj->processedEventCount();
+            tmp_obj->finalize();
+        }
+    }
+
+    cout << "ClothoApplication: Events Processed = " << nProcessedEvents << endl;
     cout << "ClothoApplication: Finalization Complete" << endl;
 }

@@ -5,6 +5,11 @@
 
 #include "simulation_manager.h"
 
+#include <iostream>
+
+using std::cout;
+using std::endl;
+
 class Object : virtual public object {
 public:
     const system_id & getSystemID() const {
@@ -36,6 +41,7 @@ public:
     virtual void process() {
         const event * tmp = peekEvent();
 
+        cout << "Processing Event" << endl;
         // while there are concurrent events
         while( tmp != NULL && tmp->getReceived() == m_local_time ) {
             tmp = getEvent();
@@ -43,12 +49,21 @@ public:
             perform_event( tmp );
 
             tmp = peekEvent();
+
+            if( tmp != NULL ) {
+                m_sim_manager->notifyNextEvent( getSystemID(), tmp->getReceived() );
+            }
         }
+
+        cout << "Done Processing" << endl;
     }
 
     virtual void perform_event( const event * e ) {}
 
-    virtual void finalize() { }
+    virtual void finalize() { 
+        if( m_sim_manager )
+            m_sim_manager->unregisterObject( this );
+    }
 
     virtual void sendEvent( const event * evt ) {
         if( evt->getReceiver() == getSystemID() ) {
@@ -77,23 +92,22 @@ public:
         return m_local_time;
     }
 
-    virtual ~Object() {
-        if( m_sim_manager )
-            m_sim_manager->unregisterObject( this );
-    }
+    virtual ~Object() { }
 
 protected:
     Object( ) :
         m_id(0),
         m_sim_manager( NULL ),
-        m_local_time( SystemClock::getZero() )
+        m_local_time( SystemClock::getZero() ),
+        m_next_eid( 0 )
     {}
 
 
     Object( simulation_manager * manager ) :
         m_id(0),
         m_sim_manager( NULL ),
-        m_local_time( SystemClock::getZero() )
+        m_local_time( SystemClock::getZero() ),
+        m_next_eid(0)
     {
         setSimulationManager( manager );
     }
@@ -102,9 +116,14 @@ protected:
         m_id = id;
     }
 
+    event::event_id_t getNextEventID() {
+        return m_next_eid++;
+    }
+
     system_id   m_id;
     simulation_manager * m_sim_manager;
     vtime_t     m_local_time;
+    event::event_id_t  m_next_eid;
 };
 
 #endif  // OBJECT_COMMON_IMPL_H_

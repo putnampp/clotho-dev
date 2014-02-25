@@ -2,6 +2,7 @@
 #define DEFAULT_EVENT_H_
 
 #include "event_interface.h"
+#include "system_object.h"
 
 class default_event : virtual public event {
 public:
@@ -16,7 +17,7 @@ public:
     {}
 
     default_event( const vtime_t & tSent, const vtime_t & tRecv,
-                    const object * sender, const object * receiver,
+                    const system_object * sender, const system_object * receiver,
                     event_id_t eid ):
                 m_sent( tSent ),
                 m_recv( tRecv ),
