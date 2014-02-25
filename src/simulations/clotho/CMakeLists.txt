@@ -26,11 +26,20 @@
 # of the authors and should not be interpreted as representing official policies,
 # either expressed or implied, of the FreeBSD Project.
 ################################################################################
-SET( DIRS examples )
+INCLUDE_DIRECTORIES( ${${PROJECT_NAME}_INCLUDE_DIR} )
 
-LIST( APPEND DIRS genetics_warped )
-LIST( APPEND DIRS clotho )
+#FOREACH( D ${CLOTHOLIBS} )
+#    ADD_SUBDIRECTORY( ${D} )
+#ENDFOREACH(D)
 
-FOREACH( D ${DIRS} )
-    ADD_SUBDIRECTORY( ${D} )
-ENDFOREACH( D )
+#ADD_DEPENDENCIES( clothoobjects events )
+
+LIST( APPEND SRCS common_strings.cpp)
+LIST( APPEND SRCS sex.cpp)
+LIST( APPEND SRCS clotho_application.cpp)
+LIST( APPEND SRCS main.cpp)
+
+ADD_EXECUTABLE(clotho ${SRCS} )
+
+#TARGET_LINK_LIBRARIES( clotho ${Boost_LIBRARIES} warped jsoncpp ${YAML_LIB} ${GSL_LIBRARIES} cchmc csimulation )
+TARGET_LINK_LIBRARIES( clotho ${Boost_LIBRARIES} cchmc engine )

@@ -1,8 +1,7 @@
 #ifndef _EVENT_INTERFACE_H_
 #define _EVENT_INTERFACE_H_
 
-#include "system_id.h"
-#include "system_clock.h"
+#include "engine.h"
 
 struct event {
     typedef unsigned int            event_id_t;

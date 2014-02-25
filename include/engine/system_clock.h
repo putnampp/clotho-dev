@@ -12,8 +12,10 @@ struct system_clock {
     static vtime_t getZero() {
         return vtime_t(0);
     }
-};
 
-typedef system_clock< unsigned int > SystemClock;
+    template< class T >
+    static vtime_t toVTime( const T & t );
+
+};
 
 #endif  // SYSTEM_CLOCK_H_

@@ -37,6 +37,7 @@ public:
 
     virtual void initialize() {}
     virtual void process() {}
+    virtual void perform_event( const event * ) {}
     virtual void finalize() {}
 
     virtual size_t pendingEventCount() {

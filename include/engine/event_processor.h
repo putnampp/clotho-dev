@@ -4,9 +4,11 @@
 #include "event_interface.h"
 
 struct event_processor {
-    virtual void initialize() = 0;
+//    virtual void initialize() = 0;
     virtual void process() = 0;
-    virtual void finalize() = 0;
+//    virtual void finalize() = 0;
+
+    virtual void perform_event( const event * ) = 0;
 
     virtual ~event_processor() {}
 };

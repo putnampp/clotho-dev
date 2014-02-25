@@ -1,7 +1,9 @@
 #ifndef _OBJECT_H_
 #define _OBJECT_H_
 
-#include "system_id.h"
+#include "engine.h"
+
+#include "system_object.h"
 #include "event_interface.h"
 
 #include "event_manager.h"
@@ -10,24 +12,26 @@
 
 struct simulation_manager;
 
-struct object : 
+struct object :
+    virtual public system_object,
     virtual public event_manager,
     virtual public event_processor,
     virtual public event_transceiver
 {
     typedef event::vtime_t  vtime_t;
     
-    virtual const system_id &       getSystemID() const = 0;
-    virtual system_id::object_id_t  getObjectID() const = 0;
+//    virtual const system_id &       getSystemID() const = 0;
+//    virtual system_id::object_id_t  getObjectID() const = 0;
 
-    virtual void setID( const system_id & id ) = 0;
+//    virtual void setID( const system_id & id ) = 0;
+//    virtual void initialize() = 0;
+//    virtual void finalize() = 0;
 
     virtual void setSimulationManager( simulation_manager * sim ) = 0;
 
 /*
-    virtual void initialize() = 0;
-    virtual void executeProcess() = 0;
-    virtual void finalize() = 0;
+    virtual void process() = 0;
+    virtual void perform_event( const event * ) = 0;
 
     virtual size_t pendingEventCount() = 0;
     virtual const event * getEvent() = 0;

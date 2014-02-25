@@ -40,9 +40,13 @@ public:
         while( tmp != NULL && tmp->getReceived() == m_local_time ) {
             tmp = getEvent();
 
+            perform_event( tmp );
+
             tmp = peekEvent();
         }
     }
+
+    virtual void perform_event( const event * e ) {}
 
     virtual void finalize() { }
 
