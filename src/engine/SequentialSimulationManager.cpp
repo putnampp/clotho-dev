@@ -7,6 +7,7 @@
 using std::cout;
 using std::endl;
 using std::lower_bound;
+using std::upper_bound;
 
 const string INIT_PHASE_K = "init";
 const string SIMULATE_PHASE_K = "simulate";
@@ -109,13 +110,15 @@ void SequentialSimulationManager::notifyNextEvent( const system_id & obj, const 
 
     pair_object_timestamp ot = make_pair( obj, t );
 
-    ordered_object_exe_t::iterator pos = lower_bound( m_ordered_objs.begin(), it->second, ot, object_timestamp_comp());
+    ordered_object_exe_t::iterator pos = upper_bound( m_ordered_objs.begin(), it->second, ot, object_timestamp_comp());
 
     if( it->second == m_ordered_objs.end() ) {
         it->second = m_ordered_objs.insert( pos, ot );
     } else if( it->second != pos ) {
-        m_ordered_objs.erase( it->second );
-        it->second = m_ordered_objs.insert( pos, ot );
+//        m_ordered_objs.erase( it->second );
+//        it->second = m_ordered_objs.insert( pos, ot );
+        m_ordered_objs.splice( pos, m_ordered_objs, it->second );
+        it->second->second = t;
     } else if( pos->first == obj ) {
         it->second->second = t;
     } else {
