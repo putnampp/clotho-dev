@@ -63,18 +63,6 @@ SequentialSimulationManager::~SequentialSimulationManager() {
     m_objects_next.clear();
 }
 
-//const system_id & SequentialSimulationManager::getSystemID() const {
-//    return m_id;
-//}
-
-//system_id::manager_id_t SequentialSimulationManager::getManagerID() const {
-//    return m_id.getManagerID();
-//}
-
-//const system_id SequentialSimulationManager::getNextObjectID() {
-//    return system_id( m_id.getManagerID(), m_next_object_id++);
-//}
-
 void SequentialSimulationManager::registerObject( object * obj ) {
     if( obj == NULL ) return;
 
