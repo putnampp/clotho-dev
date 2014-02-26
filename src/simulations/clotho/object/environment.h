@@ -7,10 +7,12 @@
 #include <list>
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 
 using std::list;
 using std::vector;
 using std::unordered_map;
+using std::unordered_set;
 
 
 class Environment : public SimulationObject< ClothoEventSet > {
@@ -34,6 +36,7 @@ protected:
     void addIndividual( const system_id & id );
     void removeIndividual( const system_id & id );
 
+    unordered_set< system_id > m_active_individuals;
     list< system_id > m_available_individuals;
 };
 

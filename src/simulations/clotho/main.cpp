@@ -32,6 +32,9 @@
 
 #include "clotho_application.h"
 #include "engine/SequentialSimulationManager.h"
+#include "engine/simulation_stats.h"
+
+const string RUNTIME_K = "total_runtime";
 
 int main( int argc, char ** argv ) {
 
@@ -54,15 +57,23 @@ int main( int argc, char ** argv ) {
 
     ClothoApplication ca( clotho_config );
 
-    SequentialSimulationManager ssm( (application *) &ca );
+    shared_ptr< SimulationStats > stats( new SimulationStats() );
+
+    SequentialSimulationManager ssm( (application *) &ca, stats );
 
     ca.setSimulationManager( (simulation_manager *) &ssm );
+
+    stats->startPhase( RUNTIME_K );
 
     ssm.initialize();
 
     ssm.simulate( tUntil );
 
     ssm.finalize();
+    
+    stats->stopPhase( RUNTIME_K );
+
+    cout << *stats;
 
     return 0;
 }

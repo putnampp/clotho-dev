@@ -41,7 +41,6 @@ public:
     virtual void process() {
         const event * tmp = peekEvent();
 
-        cout << "Processing Event" << endl;
         // while there are concurrent events
         while( tmp != NULL && tmp->getReceived() == m_local_time ) {
             tmp = getEvent();
@@ -54,8 +53,6 @@ public:
                 m_sim_manager->notifyNextEvent( getSystemID(), tmp->getReceived() );
             }
         }
-
-        cout << "Done Processing" << endl;
     }
 
     virtual void perform_event( const event * e ) {}

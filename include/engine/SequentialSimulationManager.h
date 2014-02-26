@@ -7,6 +7,8 @@
 #include <unordered_map>
 #include <list>
 
+#include "simulation_stats.h"
+
 using std::unordered_map;
 using std::pair;
 using std::make_pair;
@@ -20,6 +22,7 @@ public:
     typedef unordered_map< system_id, ordered_object_exe_t::iterator > object_next_event_map_t;
 
     SequentialSimulationManager( application *, system_id::manager_id_t id = 0 );
+    SequentialSimulationManager( application *, shared_ptr< SimulationStats >,  system_id::manager_id_t id = 0 );
 
     const system_id & getSystemID() const;
     system_id::manager_id_t getManagerID() const;
@@ -63,6 +66,10 @@ private:
     object_next_event_map_t m_objects_next;
 
     system_id::object_id_t   m_next_object_id;
+
+    unsigned int    m_nPendingEvents, m_nProcessedEvents;
+
+    shared_ptr< SimulationStats > m_stats;
 };
 
 #endif  // SEQUENTIALSIMULATIONMANAGER_H_

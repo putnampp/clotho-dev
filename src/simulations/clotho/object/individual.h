@@ -20,7 +20,9 @@ public:
 
     virtual void finalize();
 
-    virtual ~Individual() {}
+    virtual ~Individual() {
+        if(m_prop) delete m_prop;
+    }
 protected:
     system_id   m_env_id;
     IndividualProperties * m_prop;

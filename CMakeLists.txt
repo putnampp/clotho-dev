@@ -87,17 +87,20 @@ IF( Boost_FOUND )
     MESSAGE (STATUS "Boost Include: " ${Boost_INCLUDE_DIR} )
     MESSAGE (STATUS "Boost Library: " ${Boost_LIBRARIES} )
 ENDIF( Boost_FOUND )
+LIST( APPEND COMMON_LIBRARIES ${Boost_LIBRARIES} )
 
 FIND_PACKAGE( CUDA REQUIRED )
 IF( CUDA_FOUND )
     MESSAGE(STATUS "CUDA Include: " ${CUDA_INCLUDE_DIRS} )
     MESSAGE(STATUS "CUDA Library: " ${CUDA_LIBRARIES} )
 ENDIF( CUDA_FOUND )
+LIST( APPEND COMMON_LIBRARIES ${CUDA_LIBRARIES} )
 
 FIND_PACKAGE( GSL REQUIRED )
 IF( GSL_FOUND )
     MESSAGE( STATUS "GSL Library: " ${GSL_LIBRARIES} )
 ENDIF( GSL_FOUND )
+LIST( APPEND COMMON_LIBRARIES ${GSL_LIBRARIES} )
 
 SET( Warped_DIR "/opt/warped" CACHE PATH "Path to warped libraries")
 #SET( Warped_LIBRARIES "/opt/warped/utils/lib/libutils.so/opt/warped/warped/lib/libwarped.so")
@@ -106,7 +109,16 @@ MESSAGE( STATUS "Warped DIR: " ${Warped_DIR})
 SET( Warped_INCLUDE_DIRS "${Warped_DIR}/include")
 SET( Warped_LIBRARIES "${Warped_DIR}/lib")
 
-Set( YAML_LIB "yaml-cpp" )
+SET( YAML_LIB "yaml-cpp" )
+LIST( APPEND COMMON_LIBRARIES ${YAML_LIB} )
+
+SET( REALTIME_LIB "rt" )
+LIST( APPEND COMMON_LIBRARIES ${REALTIME_LIB} )
+
+FOREACH( L ${COMMON_LIBRARIES} ) 
+    MESSAGE( STATUS ${L} )
+ENDFOREACH(L)
+
 
 ################################################################################
 

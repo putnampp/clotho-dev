@@ -2,12 +2,15 @@
 #include <cassert>
 
 #include <algorithm>
-
 #include <iostream>
 
 using std::cout;
 using std::endl;
 using std::lower_bound;
+
+const string INIT_PHASE_K = "init";
+const string SIMULATE_PHASE_K = "simulate";
+const string FINALIZE_PHASE_K = "finalize";
 
 struct object_timestamp_comp {
     bool operator()( const SequentialSimulationManager::pair_object_timestamp & lhs, const SequentialSimulationManager::pair_object_timestamp & rhs ) const {
@@ -21,14 +24,34 @@ SequentialSimulationManager::SequentialSimulationManager( application * app, sys
     m_sim_time( SystemClock::getZero() ),
     m_sim_until( SystemClock::getPositiveInfinity() ),
     m_sim_complete(false),
-    m_next_object_id( 1 )
+    m_next_object_id( 1 ),
+    m_nPendingEvents(0),
+    m_nProcessedEvents(0),
+    m_stats( new SimulationStats() )
 {}
+
+SequentialSimulationManager::SequentialSimulationManager( application * app, shared_ptr< SimulationStats > stats, system_id::manager_id_t id ) :
+    m_app(app),
+    m_id( id, 0 ),
+    m_sim_time( SystemClock::getZero() ),
+    m_sim_until( SystemClock::getPositiveInfinity() ),
+    m_sim_complete(false),
+    m_next_object_id( 1 ),
+    m_nPendingEvents(0),
+    m_nProcessedEvents(0),
+    m_stats( stats )
+{
+
+}
 
 SequentialSimulationManager::~SequentialSimulationManager() {
     while( !m_objects.empty() ) {
         object * tmp = m_objects.begin()->second;
         m_objects.erase( m_objects.begin());
-        delete tmp;
+        if( tmp ) {
+            cout << tmp->getSystemID() << " was never unregistered" << endl;
+            delete tmp;
+        }
     }
 
     while( !m_ordered_objs.empty() ) {
@@ -63,8 +86,11 @@ void SequentialSimulationManager::unregisterObject( object * obj ) {
     if( obj == NULL ) return;
 
     object_handle_map_t::iterator it = m_objects.find( obj->getSystemID() );
-    if( it != m_objects.end() )
+    if( it != m_objects.end() ) {
+        m_nPendingEvents += obj->pendingEventCount();
+        m_nProcessedEvents += obj->processedEventCount();
         m_objects.erase( it );
+    }
 }
 
 size_t SequentialSimulationManager::getObjectCount() const {
@@ -87,7 +113,6 @@ void SequentialSimulationManager::routeEvent( const event * evt ) {
 }
 
 void SequentialSimulationManager::notifyNextEvent( const system_id & obj, const event::vtime_t & t ) {
-    cout << "Simulation Manager notified of next event" << endl;
     object_next_event_map_t::iterator it = m_objects_next.find( obj );
 
     assert( it != m_objects_next.end() );
@@ -118,19 +143,19 @@ SequentialSimulationManager::pair_object_timestamp SequentialSimulationManager::
 }
 
 void SequentialSimulationManager::initialize() {
+    m_stats->startPhase( INIT_PHASE_K );
     m_app->initialize();
+    m_stats->stopPhase( INIT_PHASE_K );
 }
 
 void SequentialSimulationManager::simulate( const event::vtime_t & until ) {
     setSimulateUntil( until );
 
+    m_stats->startPhase( SIMULATE_PHASE_K );
     while(! m_ordered_objs.empty() ) {
         pair_object_timestamp ot = getNextObject();
 
-        cout << "Simulating event: " << ot.first << " @ " << ot.second << endl;
-
         if( setSimulationTime( ot.second ) ) {
-            cout << "Simulation Complete" << endl;
             break;
         }
 
@@ -138,10 +163,22 @@ void SequentialSimulationManager::simulate( const event::vtime_t & until ) {
         obj->updateLocalTime( ot.second );
         obj->process();
     }
+
+    m_stats->stopPhase( SIMULATE_PHASE_K );
 }
 
 void SequentialSimulationManager::finalize() {
+    m_stats->startPhase( FINALIZE_PHASE_K );
+
     m_app->finalize();
+
+    m_stats->stopPhase( FINALIZE_PHASE_K );
+
+    cout << "\nSequentialSimulationManager: Events Processed = "
+         << m_nProcessedEvents
+         << "; Events Pending = "
+         << m_nPendingEvents
+         << endl;
 }
 
 bool SequentialSimulationManager::isSimulationComplete() const {

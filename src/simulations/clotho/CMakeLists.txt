@@ -36,6 +36,7 @@ INCLUDE_DIRECTORIES( ${${PROJECT_NAME}_INCLUDE_DIR} )
 #ENDFOREACH(D)
 
 LIST( APPEND EVENT_SRCS event/birth_event.cpp)
+LIST( APPEND EVENT_SRCS event/death_event.cpp)
 
 ADD_LIBRARY( event SHARED ${EVENT_SRCS} )
 
@@ -52,4 +53,4 @@ LIST( APPEND SRCS main.cpp)
 ADD_EXECUTABLE(clotho ${SRCS} )
 
 #TARGET_LINK_LIBRARIES( clotho ${Boost_LIBRARIES} warped jsoncpp ${YAML_LIB} ${GSL_LIBRARIES} cchmc csimulation )
-TARGET_LINK_LIBRARIES( clotho ${Boost_LIBRARIES} cchmc engine event object )
+TARGET_LINK_LIBRARIES( clotho ${COMMON_LIBRARIES} cchmc engine event object timer )

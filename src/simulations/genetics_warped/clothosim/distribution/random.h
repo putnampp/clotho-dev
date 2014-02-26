@@ -34,6 +34,7 @@
 #define uniformH
 
 #include "mtrand.h"
+#include <cmath>
 //#include "output.h"
 
 /**Random number generation class, uses various types of random generation depending on the implementation.*/

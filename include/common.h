@@ -33,9 +33,15 @@
 
 #include <string>
 #include <stdint.h>
+#include <cassert>
 
-#include <boost/smart_ptr.hpp>
-#include <boost/scoped_ptr.hpp>
+//#include <boost/smart_ptr.hpp>
+//#include <boost/scoped_ptr.hpp>
+//
+#include <memory>
+
+using std::shared_ptr;
+using std::static_pointer_cast;
 
 #include "Allele.h"
 
@@ -44,8 +50,8 @@ using std::string;
 typedef unsigned char   byte_t;
 typedef unsigned int    pos_t;
 
-using boost::shared_ptr;
-using boost::scoped_ptr;
+//using boost::shared_ptr;
+//using boost::scoped_ptr;
 
 typedef unsigned char   chromid_t;
 

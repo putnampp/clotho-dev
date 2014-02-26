@@ -36,7 +36,7 @@
 using std::cout;
 using std::endl;
 
-using boost::static_pointer_cast;
+//using boost::static_pointer_cast;
 
 
 PopulationModel::PopulationModel( int pop_size ) : m_living(0), m_lived(0), m_pop_size( pop_size ) {}

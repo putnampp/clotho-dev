@@ -31,6 +31,7 @@ SET( DIRS sandbox )
 LIST(APPEND DIRS cchmc)
 LIST(APPEND DIRS engine)
 LIST(APPEND DIRS simulations)
+LIST(APPEND DIRS time)
 
 FOREACH( D ${DIRS} )
     ADD_SUBDIRECTORY( ${D} )

@@ -51,7 +51,8 @@ public:
 
     virtual ~EventManager() {
         while( pendingEventCount() > 0 ) {
-            const event * t = getEvent();
+            const event * t = m_events->front();
+            m_events->pop_front();
             delete t;
         }
         delete m_events;
@@ -59,7 +60,7 @@ public:
         while( !m_processed->empty() ) {
             const event * t = m_processed->front();
             m_processed->pop_front();
-            delete t;
+            if( t ) delete t;
         }
         delete m_processed;
     }
