@@ -60,6 +60,7 @@ BOOST_AUTO_TEST_CASE( create_test_so2 ) {
 
     BOOST_REQUIRE_MESSAGE( so == tmp_obj, "Unexpected object returned by simulation manager" );
 
+    so->finalize();
     delete so;
 
     BOOST_REQUIRE_MESSAGE( ssm.getObjectCount() == 0, "Simulation Object was not unregistered" );
@@ -84,6 +85,7 @@ BOOST_AUTO_TEST_CASE( process_test ) {
 
     BOOST_REQUIRE_MESSAGE( so == tmp_obj, "Unexpected object returned by simulation manager" );
 
+    so->finalize();
     delete so;
 
     BOOST_REQUIRE_MESSAGE( ssm.getObjectCount() == 0, "Simulation Object was not unregistered" );

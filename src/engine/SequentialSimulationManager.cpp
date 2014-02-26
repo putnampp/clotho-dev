@@ -19,24 +19,26 @@ struct object_timestamp_comp {
 };
 
 SequentialSimulationManager::SequentialSimulationManager( application * app, system_id::manager_id_t id ) :
+    SimulationManager( id ),
     m_app(app),
-    m_id( id, 0 ),
+//    m_id( id, 0 ),
     m_sim_time( SystemClock::getZero() ),
     m_sim_until( SystemClock::getPositiveInfinity() ),
     m_sim_complete(false),
-    m_next_object_id( 1 ),
+//    m_next_object_id( 1 ),
     m_nPendingEvents(0),
     m_nProcessedEvents(0),
     m_stats( new SimulationStats() )
 {}
 
 SequentialSimulationManager::SequentialSimulationManager( application * app, shared_ptr< SimulationStats > stats, system_id::manager_id_t id ) :
+    SimulationManager( id ),
     m_app(app),
-    m_id( id, 0 ),
+//    m_id( id, 0 ),
     m_sim_time( SystemClock::getZero() ),
     m_sim_until( SystemClock::getPositiveInfinity() ),
     m_sim_complete(false),
-    m_next_object_id( 1 ),
+//    m_next_object_id( 1 ),
     m_nPendingEvents(0),
     m_nProcessedEvents(0),
     m_stats( stats )
@@ -61,17 +63,17 @@ SequentialSimulationManager::~SequentialSimulationManager() {
     m_objects_next.clear();
 }
 
-const system_id & SequentialSimulationManager::getSystemID() const {
-    return m_id;
-}
+//const system_id & SequentialSimulationManager::getSystemID() const {
+//    return m_id;
+//}
 
-system_id::manager_id_t SequentialSimulationManager::getManagerID() const {
-    return m_id.getManagerID();
-}
+//system_id::manager_id_t SequentialSimulationManager::getManagerID() const {
+//    return m_id.getManagerID();
+//}
 
-const system_id SequentialSimulationManager::getNextObjectID() {
-    return system_id( m_id.getManagerID(), m_next_object_id++);
-}
+//const system_id SequentialSimulationManager::getNextObjectID() {
+//    return system_id( m_id.getManagerID(), m_next_object_id++);
+//}
 
 void SequentialSimulationManager::registerObject( object * obj ) {
     if( obj == NULL ) return;

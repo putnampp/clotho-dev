@@ -12,11 +12,15 @@ using std::endl;
 
 class Object : virtual public object {
 public:
-    const system_id & getSystemID() const {
+    inline const system_id & getSystemID() const {
         return m_id;
     }
 
-    system_id::object_id_t getObjectID() const {
+    inline system_id::manager_id_t getManagerID() const {
+        return m_id.getManagerID();
+    }
+
+    inline system_id::object_id_t getObjectID() const {
         return m_id.getObjectID();
     }
 

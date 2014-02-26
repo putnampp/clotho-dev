@@ -20,6 +20,9 @@ public:
     virtual const system_id &       getSystemID() const {
         return m_id;
     }
+    virtual system_id::manager_id_t getManagerID() const {
+        return m_id.getManagerID();
+    }
     virtual system_id::object_id_t  getObjectID() const {
         return m_id.getObjectID();
     }

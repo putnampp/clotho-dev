@@ -1,7 +1,8 @@
 #ifndef SEQUENTIALSIMULATIONMANAGER_H_
 #define SEQUENTIALSIMULATIONMANAGER_H_
 
-#include "simulation_manager.h"
+//#include "simulation_manager.h"
+#include "simulation_manager_impl.h"
 #include "application.h"
 
 #include <unordered_map>
@@ -14,7 +15,7 @@ using std::pair;
 using std::make_pair;
 using std::list;
 
-class SequentialSimulationManager : public simulation_manager {
+class SequentialSimulationManager : public SimulationManager {
 public:
     typedef unordered_map< system_id, object * > object_handle_map_t;
     typedef pair< system_id, event::vtime_t > pair_object_timestamp;
@@ -24,13 +25,13 @@ public:
     SequentialSimulationManager( application *, system_id::manager_id_t id = 0 );
     SequentialSimulationManager( application *, shared_ptr< SimulationStats >,  system_id::manager_id_t id = 0 );
 
-    const system_id & getSystemID() const;
-    system_id::manager_id_t getManagerID() const;
+//    const system_id & getSystemID() const;
+//    system_id::manager_id_t getManagerID() const;
 
     virtual const event::vtime_t & getSimulationTime() const;
     virtual bool  isSimulationComplete() const;
 
-    virtual const system_id getNextObjectID();
+//    virtual const system_id getNextObjectID();
     virtual void registerObject( object * obj );
     virtual void unregisterObject( object * obj );
 
@@ -55,7 +56,7 @@ protected:
 private:
 
     application *   m_app;
-    const system_id m_id;
+//    const system_id m_id;
 
     event::vtime_t    m_sim_time;
     event::vtime_t    m_sim_until;
@@ -65,7 +66,7 @@ private:
     ordered_object_exe_t m_ordered_objs;
     object_next_event_map_t m_objects_next;
 
-    system_id::object_id_t   m_next_object_id;
+//    system_id::object_id_t   m_next_object_id;
 
     unsigned int    m_nPendingEvents, m_nProcessedEvents;
 

@@ -9,3 +9,4 @@ memcheck
 validation
 cachegrind
 src/third_party
+*.fuse*
