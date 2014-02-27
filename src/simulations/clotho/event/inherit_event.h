@@ -9,18 +9,22 @@ class InheritEvent : public ClothoEvent {
 public:
     InheritEvent( const vtime_t & tSent, const vtime_t & tRecv,
                 const system_id & sender, const system_id & receiver,
-                event_id_t eid, AlleleGroupPtr alleles );
+                event_id_t eid, Sex parent, AlleleGroupPtr alleles );
     InheritEvent( const vtime_t & tSent, const vtime_t & tRecv,
                 const system_object * sender, const system_object * receiver,
-                event_id_t eid, AlleleGroupPtr alleles );
+                event_id_t eid, Sex parent, AlleleGroupPtr alleles );
 
-    virtual const event_type_t & getEventType() const;
+    inline const event_type_t & getEventType() const {
+        return INHERIT_EVENT_K;
+    }
 
-    virtual AlleleGroupPtr getAlleles() const;
+    Sex getParentSex() const;
+    AlleleGroupPtr getAlleles() const;
 
     virtual ~InheritEvent() {}
 
 protected:
+    Sex             m_parent_sex;
     AlleleGroupPtr  m_alleles;
 };
 

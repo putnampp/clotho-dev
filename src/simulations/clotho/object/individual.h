@@ -30,6 +30,7 @@ public:
 protected:
     void handle_birth( const ClothoEvent * e );
     void handle_death( const ClothoEvent * e );
+    void handle_inherit( const ClothoEvent * e );
 
     system_id   m_env_id;
     IndividualProperties * m_prop;

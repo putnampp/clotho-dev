@@ -48,6 +48,7 @@ LIST( APPEND OBJECT_SRCS event/mate_event.cpp )
 LIST( APPEND OBJECT_SRCS event/inherit_event.cpp )
 LIST( APPEND OBJECT_SRCS object/environment.cpp )
 LIST( APPEND OBJECT_SRCS object/individual.cpp )
+LIST( APPEND OBJECT_SRCS object/individual_properties.cpp )
 
 ADD_LIBRARY( object SHARED ${OBJECT_SRCS} )
 
