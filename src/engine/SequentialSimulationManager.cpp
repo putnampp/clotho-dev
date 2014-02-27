@@ -167,11 +167,15 @@ void SequentialSimulationManager::finalize() {
 
     m_stats->stopPhase( FINALIZE_PHASE_K );
 
-    cout << "\nSequentialSimulationManager: Events Processed = "
+    m_stats->setProcessedEvents( m_nProcessedEvents );
+    m_stats->setPendingEvents( m_nPendingEvents );
+
+/*    cout << "\nSequentialSimulationManager: Events Processed = "
          << m_nProcessedEvents
          << "; Events Pending = "
          << m_nPendingEvents
          << endl;
+*/
 }
 
 bool SequentialSimulationManager::isSimulationComplete() const {

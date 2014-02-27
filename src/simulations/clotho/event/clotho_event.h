@@ -3,6 +3,7 @@
 
 #include "engine/default_event.h"
 #include "../clotho.h"
+#include "../ider.h"
 
 typedef std::string event_type_t;
 
@@ -23,6 +24,18 @@ protected:
                  event_id_t eid ) :
         default_event( tSent, tRecv, sender, receiver, eid )
     {}
+};
+
+template <>
+struct IDer< ClothoEvent > {
+    typedef event_type_t id_type_t;
+    inline id_type_t operator()( const ClothoEvent & ce ) const {
+        return ce.getEventType();
+    }
+
+    inline id_type_t operator()( const ClothoEvent * ce ) const {
+        return ce->getEventType();
+    }
 };
 
 #endif  // CLOTHO_EVENT_H_

@@ -19,6 +19,9 @@ struct IndividualProperties {
         sex( UNASSIGNED ),
         genotypes( NULL )
     {}
+
+    void inheritFromFather( AlleleGroupPtr genos );
+    void inheritFromMother( AlleleGroupPtr genos );
 };
 
 #endif  // INDIVIDUAL_PROPERTIES_H_

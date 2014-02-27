@@ -3,7 +3,7 @@
 
 #include "clotho_event.h"
 
-extern const string BIRTH_EVENT_K;
+extern const event_type_t BIRTH_EVENT_K;
 
 class BirthEvent : public ClothoEvent {
 public:
@@ -14,7 +14,9 @@ public:
                 const system_object * sender, const system_object * receiver,
                 event_id_t eid );
 
-    virtual const event_type_t & getEventType() const;
+    inline const event_type_t & getEventType() const {
+        return BIRTH_EVENT_K;
+    }
 
     virtual ~BirthEvent() {}
 };

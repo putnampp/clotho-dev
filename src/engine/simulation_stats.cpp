@@ -1,7 +1,10 @@
 #include "simulation_stats.h"
 #include <cassert>
 
-SimulationStats::SimulationStats() {}
+SimulationStats::SimulationStats() :
+    m_nProcessedEvents(0), 
+    m_nPendingEvents(0)
+{}
 
 SimulationStats::~SimulationStats() {
     m_phase_lookup.clear();
@@ -77,6 +80,14 @@ void SimulationStats::printPhase( ostream & out, const phase_id_t & id ) const {
     }
 }
 
+void SimulationStats::setProcessedEvents( size_t n ) {
+    m_nProcessedEvents = n;
+}
+
+void SimulationStats::setPendingEvents( size_t n ) {
+    m_nPendingEvents = n;
+}
+
 ostream & operator<<( ostream & out, const SimulationStats & ss ) {
     out << "Phase,Start,Stop,Lapse\n";
     for( SimulationStats::phase_list_t::const_iterator it = ss.m_phase_times.begin(); it != ss.m_phase_times.end(); it++ ) {
@@ -89,5 +100,9 @@ ostream & operator<<( ostream & out, const SimulationStats & ss ) {
             << "," << res
             << "\n";            
     }
+
+    out << ss.m_nProcessedEvents << " processed events\n";
+    out << ss.m_nPendingEvents << " pending events\n";
+
     return out;
 }

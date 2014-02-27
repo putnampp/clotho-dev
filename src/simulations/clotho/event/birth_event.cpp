@@ -1,6 +1,6 @@
 #include "birth_event.h"
 
-const string BIRTH_EVENT_K = "birth_event";
+const event_type_t BIRTH_EVENT_K = "birth_event";
 
 BirthEvent::BirthEvent( const vtime_t & tSent, const vtime_t & tRecv,
                 const system_id & sender, const system_id & receiver,
@@ -13,7 +13,3 @@ BirthEvent::BirthEvent( const vtime_t & tSent, const vtime_t & tRecv,
                 event_id_t eid ) :
     ClothoEvent( tSent, tRecv, sender, receiver, eid )
 {}
-
-const event_type_t & BirthEvent::getEventType() const {
-    return BIRTH_EVENT_K;
-}

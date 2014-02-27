@@ -5,8 +5,24 @@
 #include "../event/birth_event.h"
 #include "../event/death_event.h"
 
+template <>
+void EventPerformer< Environment, ClothoEvent>::initialize() {
+    addHandler( BIRTH_EVENT_K, &Environment::handle_birth );
+    addHandler( DEATH_EVENT_K, &Environment::handle_death );
+}
+
+EventPerformer< Environment, ClothoEvent > Environment::m_evt_performer;
+
 Environment::Environment( simulation_manager * manager ) :
-    SimulationObject< ClothoEventSet >( manager )
+    SimulationObject< ClothoEventSet >( manager ),
+    m_genetic_map( new GeneticMap() )
+{
+    setSimulationManager( manager );
+}
+
+Environment::Environment( simulation_manager * manager, GeneticMap::Ptr gmap ) :
+    SimulationObject< ClothoEventSet >( manager ),
+    m_genetic_map( gmap )
 {
     setSimulationManager( manager );
 }
@@ -25,11 +41,12 @@ void Environment::perform_event( const event * e ) {
     const ClothoEvent * evt = dynamic_cast< const ClothoEvent * >( e );
 
     if( evt ) {
-        if( evt->getEventType() == BIRTH_EVENT_K ) {
-            addIndividual( evt->getSender() );
-        } else if( evt->getEventType() == DEATH_EVENT_K ) {
-            removeIndividual( evt->getSender() );
-        }
+//        if( evt->getEventType() == BIRTH_EVENT_K ) {
+//            addIndividual( evt->getSender() );
+//        } else if( evt->getEventType() == DEATH_EVENT_K ) {
+//            removeIndividual( evt->getSender() );
+//        }
+        m_evt_performer( this, evt );
     }
 }
 
@@ -64,6 +81,19 @@ system_id Environment::getIndividual() {
     return id;
 }
 
+void Environment::handle_birth( const ClothoEvent * ce ) {
+//    addIndividual( evt->getSender() );
+    DeathEvent * de = new DeathEvent( getCurrentTime(), getCurrentTime() + 1, getSystemID(), ce->getSender(), getNextEventID() );
+    sendEvent(de);
+    m_active_individuals.insert( ce->getSender() );
+}
+
+void Environment::handle_death( const ClothoEvent * ce ) {
+//    removeIndividual( evt->getSender() );
+    m_active_individuals.erase( ce->getSender() );
+    m_available_individuals.push_back( ce->getSender() );
+}
+/*
 void Environment::addIndividual( const system_id & id ) {
 //    cout << "Environment encountered birth event: " << id << " @ " << getCurrentTime() << endl;
 
@@ -78,3 +108,5 @@ void Environment::removeIndividual( const system_id & id ) {
     m_active_individuals.erase( id );
     m_available_individuals.push_back( id );
 }
+*/
+

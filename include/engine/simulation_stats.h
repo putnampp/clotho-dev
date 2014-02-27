@@ -35,12 +35,17 @@ public:
 
     TIME getPhaseLapse( const phase_id_t & id ) const;
 
+    void setProcessedEvents( size_t n );
+    void setPendingEvents( size_t n );
+
     friend ostream & operator<<( ostream &, const SimulationStats & );
 
     virtual ~SimulationStats();
 protected:
     phase_list_t m_phase_times;
     phase_lookup_t m_phase_lookup;
+
+    size_t m_nProcessedEvents, m_nPendingEvents;
 };
 
 ostream & operator<<( ostream &, const SimulationStats & );

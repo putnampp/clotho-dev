@@ -4,10 +4,15 @@
 #include "../clotho.h"
 #include "engine/simulation_object.h"
 
+#include "GeneticMap.h"
+
 #include <list>
 #include <vector>
 #include <unordered_map>
 #include <unordered_set>
+
+#include "../event/clotho_event.h"
+#include "../event_performer.h"
 
 using std::list;
 using std::vector;
@@ -18,8 +23,11 @@ using std::unordered_set;
 class Environment : public SimulationObject< ClothoEventSet > {
 public:
 //    typedef unordered_map< const system_id, Population * > id_to_population_map_t;
+    friend class EventPerformer< Environment, ClothoEvent >;
 
     Environment( simulation_manager * manager );
+
+    Environment( simulation_manager * manager, GeneticMap::Ptr gmap );
 
     virtual void initialize();
  
@@ -33,11 +41,18 @@ public:
 
 protected:
 
-    void addIndividual( const system_id & id );
-    void removeIndividual( const system_id & id );
+    void handle_birth( const ClothoEvent * ce );
+    void handle_death( const ClothoEvent * ce );
+
+//    void addIndividual( const system_id & id );
+//    void removeIndividual( const system_id & id );
 
     unordered_set< system_id > m_active_individuals;
     list< system_id > m_available_individuals;
+
+    GeneticMap::Ptr     m_genetic_map;
+
+    static EventPerformer< Environment, ClothoEvent > m_evt_performer;
 };
 
 #endif  // ENVIRONMENT_H_
