@@ -8,7 +8,7 @@ IndividualProperties::IndividualProperties( ) :
     dob( SystemClock::getPositiveInfinity() ),
     eol( SystemClock::getPositiveInfinity() ),
     sex( UNASSIGNED ),
-    genotypes( NULL )
+    m_genome( NULL )
 {}
 
 const system_id & IndividualProperties::getFather() const {
@@ -27,6 +27,14 @@ const SystemClock::vtime_t & IndividualProperties::getEOL() const {
     return eol;
 }
 
+genome * IndividualProperties::getGenome() const {
+    return m_genome;
+}
+
+Sex IndividualProperties::getSex() const {
+    return sex;
+}
+
 void IndividualProperties::setFather( const system_id & id ) {
     father = id;
 }
@@ -43,12 +51,19 @@ void IndividualProperties::setEOL( const SystemClock::vtime_t & t ) {
     eol = t;
 }
 
-void IndividualProperties::inheritFrom( const system_id & id, Sex s, AlleleGroupPtr g ){
+void IndividualProperties::inheritFrom( const system_id & id, Sex s, zygote * g ){
     if( s == MALE ) {
         setFather( id );
+        // father's allelegroup determines sex?
+        m_genome->father = g;
+        determineSex();
     } else if ( s == FEMALE ) {
         setMother( id );
+        m_genome->mother = g;
     }
+}
+
+void IndividualProperties::determineSex() {
 
 }
 

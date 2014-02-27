@@ -3,6 +3,8 @@
 
 #include "../clotho.h"
 
+#include "genome.h"
+
 extern const system_id UNSET_ID;
 
 class IndividualProperties {
@@ -11,6 +13,8 @@ public:
 
     const system_id & getFather() const;
     const system_id & getMother() const;
+
+    Sex getSex() const;
 
     const SystemClock::vtime_t & getDOB() const;
     const SystemClock::vtime_t & getEOL() const;
@@ -21,16 +25,19 @@ public:
     void setFather( const system_id & id);
     void setMother( const system_id & id);
 
-    void inheritFrom( const system_id & id, Sex s, AlleleGroupPtr genos );
+    genome * getGenome() const;
+
+    void inheritFrom( const system_id & id, Sex s, zygote * genos );
 
     virtual ~IndividualProperties();
 protected:
+    void determineSex();
+
     system_id mother, father;
 
     SystemClock::vtime_t dob, eol;
     Sex   sex;
-    AlleleGroupPtr genotypes;
-
+    genome * m_genome;
 };
 
 #endif  // INDIVIDUAL_PROPERTIES_H_

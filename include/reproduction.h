@@ -1,8 +1,10 @@
 #ifndef REPRODUCTION_H_
 #define REPRODUCTION_H_
 
+#include "genome.h"
+
 struct reproduction {
-    virtual void reproduce( AlleleGroupPtr p0, AlleleGroupPtr offspring ) = 0;
+    virtual zygote * reproduce( genome * g ) = 0;
 };
 
 #endif  // REPRODUCTION_H_

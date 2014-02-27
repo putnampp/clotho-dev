@@ -6,26 +6,26 @@ InheritEvent::InheritEvent( const vtime_t & tSent, const vtime_t & tRecv,
                 const system_id & sender, const system_id & receiver,
                 event_id_t eid,
                 Sex parent,
-                AlleleGroupPtr alleles ) :
+                zygote * z ) :
     ClothoEvent( tSent, tRecv, sender, receiver, eid ),
     m_parent_sex( parent ),
-    m_alleles( alleles )
+    m_zygote( z )
 {}
 
 InheritEvent::InheritEvent( const vtime_t & tSent, const vtime_t & tRecv,
                 const system_object * sender, const system_object * receiver,
                 event_id_t eid, 
                 Sex parent,
-                AlleleGroupPtr alleles ) :
+                zygote * z ) :
     ClothoEvent( tSent, tRecv, sender, receiver, eid ),
     m_parent_sex( parent ),
-    m_alleles( alleles )
+    m_zygote( z )
 {}
 
 Sex InheritEvent::getParentSex() const {
     return m_parent_sex;
 }
 
-AlleleGroupPtr InheritEvent::getAlleles() const {
-    return m_alleles;
+zygote * InheritEvent::getZygote() const {
+    return m_zygote;
 }

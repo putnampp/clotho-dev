@@ -10,13 +10,14 @@ void EventPerformer< Individual, ClothoEvent >::initialize() {
     addHandler( BIRTH_EVENT_K, &Individual::handle_birth );
     addHandler( DEATH_EVENT_K, &Individual::handle_death );
     addHandler( INHERIT_EVENT_K, &Individual::handle_inherit );
+    addHandler( MATE_EVENT_K, &Individual::handle_mate );
 }
 
 EventPerformer< Individual, ClothoEvent > Individual::m_evt_performer;
 
 Individual::Individual( simulation_manager * manager, 
                         const system_id & env_id,
-                        GeneticReproduction * repro ) :
+                        reproduction * repro ) :
     SimulationObject< ClothoEventSet >( manager ),
     m_env_id( env_id ),
     m_prop( new IndividualProperties() ),
@@ -63,9 +64,21 @@ void Individual::handle_death( const ClothoEvent * evt ) {
 void Individual::handle_inherit( const ClothoEvent * evt ) {
     const InheritEvent * ie = static_cast< const InheritEvent * >( evt );
 
-    m_prop->inheritFrom( ie->getSender(), ie->getParentSex(), ie->getAlleles() );
+    m_prop->inheritFrom( ie->getSender(), ie->getParentSex(), ie->getZygote() );
 
     if( m_prop->getFather() != UNSET_ID && m_prop->getMother() != UNSET_ID ) {
         handle_birth( evt );
     }
+}
+
+void Individual::handle_mate( const ClothoEvent * evt ) {
+    const MateEvent * me  = static_cast< const MateEvent * >( evt );
+
+    assert( m_repro );
+    
+
+    zygote * z = m_repro->reproduce( m_prop->getGenome() );
+
+    InheritEvent * ie = new InheritEvent( getCurrentTime(), getCurrentTime(), this->getSystemID(), me->getOffspringID(), getNextEventID(), m_prop->getSex(), z );
+    sendEvent( ie );
 }
