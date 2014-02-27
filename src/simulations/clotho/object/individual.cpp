@@ -36,7 +36,16 @@ void Individual::perform_event( const event * e ) {
     const ClothoEvent * evt = dynamic_cast< const ClothoEvent * >( e );
 
     if( evt ) {
-        m_evt_performer( this, evt );
+//        m_evt_performer( this, evt );
+        if( evt->getEventType() == BIRTH_EVENT_K ) {
+            handle_birth( evt );
+        } else if( evt->getEventType() == DEATH_EVENT_K ) {
+            handle_death( evt );
+        } else if( evt->getEventType() == INHERIT_EVENT_K ) {
+            handle_inherit( evt );
+        } else if( evt->getEventType() == MATE_EVENT_K ) {
+            handle_mate( evt );
+        }
     }
 }
 

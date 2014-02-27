@@ -5,6 +5,7 @@
 
 struct reproduction {
     virtual zygote * reproduce( genome * g ) = 0;
+    virtual ~reproduction() {}
 };
 
 #endif  // REPRODUCTION_H_

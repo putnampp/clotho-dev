@@ -55,11 +55,13 @@ void IndividualProperties::inheritFrom( const system_id & id, Sex s, zygote * g 
     if( s == MALE ) {
         setFather( id );
         // father's allelegroup determines sex?
-        m_genome->father = g;
+//        m_genome->father = g;
+        m_genome->setZygote( g );
         determineSex();
     } else if ( s == FEMALE ) {
         setMother( id );
-        m_genome->mother = g;
+//        m_genome->mother = g;
+        m_genome->setZygote( g );
     }
 }
 

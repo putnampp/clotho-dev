@@ -15,14 +15,16 @@ EventPerformer< Environment, ClothoEvent > Environment::m_evt_performer;
 
 Environment::Environment( simulation_manager * manager ) :
     SimulationObject< ClothoEventSet >( manager ),
-    m_genetic_map( new GeneticMap() )
+    m_genetic_map( new GeneticMap() ),
+    m_reproduction_model( NULL )
 {
     setSimulationManager( manager );
 }
 
-Environment::Environment( simulation_manager * manager, GeneticMap::Ptr gmap ) :
+Environment::Environment( simulation_manager * manager, GeneticMap::Ptr gmap, reproduction * r ) :
     SimulationObject< ClothoEventSet >( manager ),
-    m_genetic_map( gmap )
+    m_genetic_map( gmap ),
+    m_reproduction_model( r )
 {
     setSimulationManager( manager );
 }
@@ -41,12 +43,12 @@ void Environment::perform_event( const event * e ) {
     const ClothoEvent * evt = dynamic_cast< const ClothoEvent * >( e );
 
     if( evt ) {
-//        if( evt->getEventType() == BIRTH_EVENT_K ) {
-//            addIndividual( evt->getSender() );
-//        } else if( evt->getEventType() == DEATH_EVENT_K ) {
-//            removeIndividual( evt->getSender() );
-//        }
-        m_evt_performer( this, evt );
+//        m_evt_performer( this, evt );
+        if( evt->getEventType() == BIRTH_EVENT_K ) {
+            handle_birth( evt );
+        } else if( evt->getEventType() == DEATH_EVENT_K ) {
+            handle_death( evt );
+        }
     }
 }
 
@@ -71,7 +73,7 @@ void Environment::finalize() {
 system_id Environment::getIndividual() {
     system_id id(0);
     if( m_available_individuals.empty() ) {
-        Individual * ind = new Individual( m_sim_manager, getSystemID(), NULL );
+        Individual * ind = new Individual( m_sim_manager, getSystemID(), m_reproduction_model );
         id = ind->getSystemID();
     } else {
         id = m_available_individuals.front();

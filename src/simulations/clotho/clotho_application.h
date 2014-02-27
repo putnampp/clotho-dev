@@ -7,6 +7,7 @@
 //#include "configuration_manager.h"
 //
 #include "GeneticMap.h"
+#include "reproduction.h"
 
 #include <vector>
 
@@ -23,7 +24,7 @@ public:
 
     void finalize();
 
-    virtual ~ClothoApplication() {}
+    virtual ~ClothoApplication();
 protected:
     string  m_config_file;
 //    ConfigurationManager< ClothoApplication > m_config;
@@ -32,6 +33,7 @@ protected:
     GeneticMap::Ptr     m_genetic_map;
 
     vector< system_id > m_system_objs;
+    reproduction *      m_reproduction_model;
 };
 
 #endif  // CLOTHO_APPLICATION_H_

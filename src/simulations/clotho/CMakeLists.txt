@@ -49,6 +49,9 @@ LIST( APPEND OBJECT_SRCS event/inherit_event.cpp )
 LIST( APPEND OBJECT_SRCS object/environment.cpp )
 LIST( APPEND OBJECT_SRCS object/individual.cpp )
 LIST( APPEND OBJECT_SRCS object/individual_properties.cpp )
+LIST( APPEND OBJECT_SRCS models/SimpleReproduction.cpp )
+LIST( APPEND OBJECT_SRCS genomes/human_genome.cpp)
+LIST( APPEND OBJECT_SRCS genomes/human_zygote.cpp)
 
 ADD_LIBRARY( object SHARED ${OBJECT_SRCS} )
 

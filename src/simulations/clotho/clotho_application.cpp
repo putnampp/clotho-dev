@@ -1,6 +1,8 @@
 #include "clotho_application.h"
 #include "object/environment.h"
 
+#include "models/SimpleReproduction.h"
+
 #include <cassert>
 
 //template <>
@@ -11,8 +13,13 @@
 ClothoApplication::ClothoApplication( const string & config ) :
     m_config_file( config ),
     m_sim_manager( NULL ),
-    m_genetic_map( new GeneticMap() )
+    m_genetic_map( new GeneticMap() ),
+    m_reproduction_model( new SimpleReproduction() )
 {}
+
+ClothoApplication::~ClothoApplication() {
+    if( m_reproduction_model ) delete m_reproduction_model;
+}
 
 void ClothoApplication::setSimulationManager( simulation_manager * manager ) {
     m_sim_manager = manager;
@@ -21,7 +28,7 @@ void ClothoApplication::setSimulationManager( simulation_manager * manager ) {
 void ClothoApplication::initialize() {
     assert( m_sim_manager != NULL );
 
-    Environment * env = new Environment( m_sim_manager, m_genetic_map );
+    Environment * env = new Environment( m_sim_manager, m_genetic_map, m_reproduction_model );
     env->initialize();
 
     m_system_objs.push_back( env->getSystemID() );

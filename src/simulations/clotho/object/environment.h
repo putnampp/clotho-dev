@@ -14,6 +14,8 @@
 #include "../event/clotho_event.h"
 #include "../event_performer.h"
 
+#include "reproduction.h"
+
 using std::list;
 using std::vector;
 using std::unordered_map;
@@ -27,7 +29,7 @@ public:
 
     Environment( simulation_manager * manager );
 
-    Environment( simulation_manager * manager, GeneticMap::Ptr gmap );
+    Environment( simulation_manager * manager, GeneticMap::Ptr gmap, reproduction * r );
 
     virtual void initialize();
  
@@ -51,6 +53,7 @@ protected:
     list< system_id > m_available_individuals;
 
     GeneticMap::Ptr     m_genetic_map;
+    reproduction *      m_reproduction_model;
 
     static EventPerformer< Environment, ClothoEvent > m_evt_performer;
 };
