@@ -5,13 +5,8 @@ template < class CLOCK >
 struct system_clock {
     typedef CLOCK vtime_t;
 
-    static vtime_t getPositiveInfinity() {
-        return vtime_t(-1);
-    }
-
-    static vtime_t getZero() {
-        return vtime_t(0);
-    }
+    static const vtime_t POSITIVE_INFINITY;
+    static const vtime_t ZERO;
 
     template< class T >
     static vtime_t toVTime( const T & t );

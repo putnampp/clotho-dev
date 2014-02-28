@@ -5,6 +5,7 @@
 
 struct ltsf_event_order {
     bool operator()( const event * lhs, const event * rhs ) const {
+        // event operator<( const event * ) const is defined;
         return *lhs < rhs;
     }
 };

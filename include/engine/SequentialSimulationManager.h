@@ -25,13 +25,9 @@ public:
     SequentialSimulationManager( application *, system_id::manager_id_t id = 0 );
     SequentialSimulationManager( application *, shared_ptr< SimulationStats >,  system_id::manager_id_t id = 0 );
 
-//    const system_id & getSystemID() const;
-//    system_id::manager_id_t getManagerID() const;
-
     virtual const event::vtime_t & getSimulationTime() const;
     virtual bool  isSimulationComplete() const;
 
-//    virtual const system_id getNextObjectID();
     virtual void registerObject( object * obj );
     virtual void unregisterObject( object * obj );
 
@@ -56,7 +52,6 @@ protected:
 private:
 
     application *   m_app;
-//    const system_id m_id;
 
     event::vtime_t    m_sim_time;
     event::vtime_t    m_sim_until;
@@ -66,11 +61,15 @@ private:
     ordered_object_exe_t m_ordered_objs;
     object_next_event_map_t m_objects_next;
 
-//    system_id::object_id_t   m_next_object_id;
-
     unsigned int    m_nPendingEvents, m_nProcessedEvents;
 
     shared_ptr< SimulationStats > m_stats;
+
+    struct object_timestamp_comp {
+        bool operator()( const SequentialSimulationManager::pair_object_timestamp & lhs, const SequentialSimulationManager::pair_object_timestamp & rhs ) const {
+            return lhs.second < rhs.second;
+        }
+    };
 };
 
 #endif  // SEQUENTIALSIMULATIONMANAGER_H_

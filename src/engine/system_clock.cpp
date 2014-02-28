@@ -5,13 +5,19 @@
 
 using std::string;
 
+template<>
+const system_clock< unsigned int >::vtime_t system_clock< unsigned int >::POSITIVE_INFINITY = -1;
+
+template<>
+const system_clock< unsigned int >::vtime_t system_clock< unsigned int >::ZERO = 0;
+
 template <> template <>
-unsigned int system_clock< unsigned int >::toVTime< string >( const string & t ) {
+system_clock< unsigned int >::vtime_t system_clock< unsigned int >::toVTime< string >( const string & t ) {
     unsigned int nt = boost::lexical_cast< unsigned int >( t );
     return nt;
 }
 
 template <> template <>
-unsigned int system_clock< unsigned int >::toVTime< unsigned int >( const unsigned int & t ) {
+system_clock< unsigned int >::vtime_t system_clock< unsigned int >::toVTime< unsigned int >( const unsigned int & t ) {
     return t;
 }

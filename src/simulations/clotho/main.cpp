@@ -46,7 +46,7 @@ int main( int argc, char ** argv ) {
     string engine_config( argv[1] );
     string clotho_config( argv[2] );
 
-    SystemClock::vtime_t tUntil = SystemClock::getPositiveInfinity();
+    SystemClock::vtime_t tUntil = SystemClock::POSITIVE_INFINITY;
 
     if( argc == 4 ) {
         string tmp = argv[3];

@@ -5,8 +5,8 @@ const system_id UNSET_ID(-1);
 IndividualProperties::IndividualProperties( ) :
     mother(UNSET_ID),
     father(UNSET_ID),
-    dob( SystemClock::getPositiveInfinity() ),
-    eol( SystemClock::getPositiveInfinity() ),
+    dob( SystemClock::POSITIVE_INFINITY ),
+    eol( SystemClock::POSITIVE_INFINITY ),
     sex( UNASSIGNED ),
     m_genome( NULL )
 {}

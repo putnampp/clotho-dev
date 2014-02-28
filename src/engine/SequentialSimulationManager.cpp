@@ -13,18 +13,12 @@ const string INIT_PHASE_K = "init";
 const string SIMULATE_PHASE_K = "simulate";
 const string FINALIZE_PHASE_K = "finalize";
 
-struct object_timestamp_comp {
-    bool operator()( const SequentialSimulationManager::pair_object_timestamp & lhs, const SequentialSimulationManager::pair_object_timestamp & rhs ) const {
-        return lhs.second < rhs.second;
-    }
-};
-
 SequentialSimulationManager::SequentialSimulationManager( application * app, system_id::manager_id_t id ) :
     SimulationManager( id ),
     m_app(app),
 //    m_id( id, 0 ),
-    m_sim_time( SystemClock::getZero() ),
-    m_sim_until( SystemClock::getPositiveInfinity() ),
+    m_sim_time( SystemClock::ZERO ),
+    m_sim_until( SystemClock::POSITIVE_INFINITY ),
     m_sim_complete(false),
 //    m_next_object_id( 1 ),
     m_nPendingEvents(0),
@@ -36,8 +30,8 @@ SequentialSimulationManager::SequentialSimulationManager( application * app, sha
     SimulationManager( id ),
     m_app(app),
 //    m_id( id, 0 ),
-    m_sim_time( SystemClock::getZero() ),
-    m_sim_until( SystemClock::getPositiveInfinity() ),
+    m_sim_time( SystemClock::ZERO ),
+    m_sim_until( SystemClock::POSITIVE_INFINITY ),
     m_sim_complete(false),
 //    m_next_object_id( 1 ),
     m_nPendingEvents(0),
@@ -69,8 +63,10 @@ void SequentialSimulationManager::registerObject( object * obj ) {
 
     assert( obj->getSystemID() != system_id(0) );
 
+    pair_object_timestamp ot = make_pair( obj->getSystemID(), SystemClock::POSITIVE_INFINITY );
+
     m_objects[ obj->getSystemID() ] = obj;
-    m_objects_next[ obj->getSystemID() ] = m_ordered_objs.end();
+    m_objects_next[ obj->getSystemID() ] = m_ordered_objs.insert( m_ordered_objs.end(), ot );
 }
 
 void SequentialSimulationManager::unregisterObject( object * obj ) {
@@ -80,6 +76,12 @@ void SequentialSimulationManager::unregisterObject( object * obj ) {
     if( it != m_objects.end() ) {
         m_nPendingEvents += obj->pendingEventCount();
         m_nProcessedEvents += obj->processedEventCount();
+
+        object_next_event_map_t::iterator nit = m_objects_next.find( obj->getSystemID() );
+        assert( nit != m_objects_next.end() );
+
+        m_ordered_objs.erase( nit->second );
+        m_objects_next.erase(nit);
         m_objects.erase( it );
     }
 }
@@ -110,7 +112,7 @@ void SequentialSimulationManager::notifyNextEvent( const system_id & obj, const 
 
     pair_object_timestamp ot = make_pair( obj, t );
 
-    ordered_object_exe_t::iterator pos = upper_bound( m_ordered_objs.begin(), it->second, ot, object_timestamp_comp());
+    ordered_object_exe_t::iterator pos = upper_bound( m_ordered_objs.begin(), it->second, ot, object_timestamp_comp() );
 
     if( it->second == m_ordered_objs.end() ) {
         it->second = m_ordered_objs.insert( pos, ot );
@@ -129,8 +131,10 @@ void SequentialSimulationManager::notifyNextEvent( const system_id & obj, const 
 SequentialSimulationManager::pair_object_timestamp SequentialSimulationManager::getNextObject() {
     pair_object_timestamp ot = m_ordered_objs.front();
 
-    m_ordered_objs.pop_front();
-    m_objects_next[ ot.first ] = m_ordered_objs.end();
+    // rotate the head node to the end of the list
+    // and set its time to be POSITIVE_INFINITY
+    m_ordered_objs.splice( m_ordered_objs.end(), m_ordered_objs, m_ordered_objs.begin() );
+    m_ordered_objs.back().second = SystemClock::POSITIVE_INFINITY;
 
     return ot;
 }
@@ -148,7 +152,7 @@ void SequentialSimulationManager::simulate( const event::vtime_t & until ) {
     while(! m_ordered_objs.empty() ) {
         pair_object_timestamp ot = getNextObject();
 
-        if( setSimulationTime( ot.second ) ) {
+        if( ot.second == SystemClock::POSITIVE_INFINITY || setSimulationTime( ot.second ) ) {
             break;
         }
 
