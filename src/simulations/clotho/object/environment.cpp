@@ -31,7 +31,7 @@ Environment::Environment( simulation_manager * manager, GeneticMap::Ptr gmap, re
 
 void Environment::initialize() {
 
-    for( int i = 0; i < 10; ++i ) {
+    for( int i = 0; i < 10000; ++i ) {
         system_id id = getIndividual();
         object * t = m_sim_manager->getObject( id );
 

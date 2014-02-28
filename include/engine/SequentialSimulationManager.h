@@ -9,6 +9,7 @@
 #include <list>
 
 #include "simulation_stats.h"
+#include "FSBAllocator.hh"
 
 using std::unordered_map;
 using std::pair;
@@ -19,7 +20,7 @@ class SequentialSimulationManager : public SimulationManager {
 public:
     typedef unordered_map< system_id, object * > object_handle_map_t;
     typedef pair< system_id, event::vtime_t > pair_object_timestamp;
-    typedef list< pair_object_timestamp > ordered_object_exe_t;
+    typedef list< pair_object_timestamp, FSBAllocator< pair_object_timestamp > > ordered_object_exe_t;
     typedef unordered_map< system_id, ordered_object_exe_t::iterator > object_next_event_map_t;
 
     SequentialSimulationManager( application *, system_id::manager_id_t id = 0 );
@@ -70,6 +71,7 @@ private:
             return lhs.second < rhs.second;
         }
     };
+    object_timestamp_comp m_ot_comp;
 };
 
 #endif  // SEQUENTIALSIMULATIONMANAGER_H_

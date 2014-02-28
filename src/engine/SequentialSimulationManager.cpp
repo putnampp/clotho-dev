@@ -65,8 +65,8 @@ void SequentialSimulationManager::registerObject( object * obj ) {
 
     pair_object_timestamp ot = make_pair( obj->getSystemID(), SystemClock::POSITIVE_INFINITY );
 
-    m_objects[ obj->getSystemID() ] = obj;
-    m_objects_next[ obj->getSystemID() ] = m_ordered_objs.insert( m_ordered_objs.end(), ot );
+    m_objects[ ot.first ] = obj;
+    m_objects_next[ ot.first ] = m_ordered_objs.insert( m_ordered_objs.end(), ot );
 }
 
 void SequentialSimulationManager::unregisterObject( object * obj ) {
@@ -112,7 +112,7 @@ void SequentialSimulationManager::notifyNextEvent( const system_id & obj, const 
 
     pair_object_timestamp ot = make_pair( obj, t );
 
-    ordered_object_exe_t::iterator pos = upper_bound( m_ordered_objs.begin(), it->second, ot, object_timestamp_comp() );
+    ordered_object_exe_t::iterator pos = upper_bound( m_ordered_objs.begin(), it->second, ot, m_ot_comp );
 
     if( it->second == m_ordered_objs.end() ) {
         it->second = m_ordered_objs.insert( pos, ot );
