@@ -25,8 +25,8 @@ public:
     virtual ~SimulationManager() { }
 protected:
     SimulationManager( system_id::manager_id_t man_id  ) :
-        m_id( man_id, 0 )
-        , m_next_object_id(1)
+        m_id( man_id, -1 )
+        , m_next_object_id(0)
     { }
 
     void setID( const system_id & id ) {

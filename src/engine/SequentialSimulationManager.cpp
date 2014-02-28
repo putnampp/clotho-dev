@@ -16,11 +16,9 @@ const string FINALIZE_PHASE_K = "finalize";
 SequentialSimulationManager::SequentialSimulationManager( application * app, system_id::manager_id_t id ) :
     SimulationManager( id ),
     m_app(app),
-//    m_id( id, 0 ),
     m_sim_time( SystemClock::ZERO ),
     m_sim_until( SystemClock::POSITIVE_INFINITY ),
     m_sim_complete(false),
-//    m_next_object_id( 1 ),
     m_nPendingEvents(0),
     m_nProcessedEvents(0),
     m_stats( new SimulationStats() )
@@ -29,11 +27,9 @@ SequentialSimulationManager::SequentialSimulationManager( application * app, sys
 SequentialSimulationManager::SequentialSimulationManager( application * app, shared_ptr< SimulationStats > stats, system_id::manager_id_t id ) :
     SimulationManager( id ),
     m_app(app),
-//    m_id( id, 0 ),
     m_sim_time( SystemClock::ZERO ),
     m_sim_until( SystemClock::POSITIVE_INFINITY ),
     m_sim_complete(false),
-//    m_next_object_id( 1 ),
     m_nPendingEvents(0),
     m_nProcessedEvents(0),
     m_stats( stats )
@@ -61,7 +57,7 @@ SequentialSimulationManager::~SequentialSimulationManager() {
 void SequentialSimulationManager::registerObject( object * obj ) {
     if( obj == NULL ) return;
 
-    assert( obj->getSystemID() != system_id(0) );
+    assert( obj->getSystemID() != m_id );
 
     pair_object_timestamp ot = make_pair( obj->getSystemID(), SystemClock::POSITIVE_INFINITY );
 
