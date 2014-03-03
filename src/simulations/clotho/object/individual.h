@@ -2,14 +2,16 @@
 #define INDIVIDUAL_H_
 
 #include "../clotho.h"
-#include "engine/simulation_object.h"
+#include "../clotho_object.h"
+//#include "engine/simulation_object.h"
 #include "../event/clotho_event.h"
 #include "../event_performer.h"
 
 #include "individual_properties.h"
 #include "reproduction.h"
 
-class Individual : public SimulationObject< ClothoEventSet > {
+//class Individual : public SimulationObject< ClothoEventSet > {
+class Individual : public ClothoObject {
 public:
     friend class EventPerformer< Individual, ClothoEvent >;
 

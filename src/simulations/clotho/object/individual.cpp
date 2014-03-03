@@ -18,7 +18,8 @@ EventPerformer< Individual, ClothoEvent > Individual::m_evt_performer;
 Individual::Individual( simulation_manager * manager, 
                         const system_id & env_id,
                         reproduction * repro ) :
-    SimulationObject< ClothoEventSet >( manager ),
+//    SimulationObject< ClothoEventSet >( manager ),
+    ClothoObject( manager ),
     m_env_id( env_id ),
     m_prop( new IndividualProperties() ),
     m_repro( repro )
@@ -27,6 +28,7 @@ Individual::Individual( simulation_manager * manager,
 }
 
 void Individual::initialize() {
+    //cout << "Initializing Individual: " << getSystemID() << endl;
     BirthEvent * be = new BirthEvent( getCurrentTime(), getCurrentTime(), this, this, getNextEventID() );
 
     sendEvent( be );
@@ -50,7 +52,7 @@ void Individual::perform_event( const event * e ) {
 }
 
 void Individual::finalize() {
-    SimulationObject< ClothoEventSet >::finalize();
+    ClothoObject::finalize();
 }
 
 void Individual::handle_birth( const ClothoEvent * evt ) {

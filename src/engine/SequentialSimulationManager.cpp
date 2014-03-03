@@ -21,6 +21,7 @@ SequentialSimulationManager::SequentialSimulationManager( application * app, sys
     m_sim_complete(false),
     m_nPendingEvents(0),
     m_nProcessedEvents(0),
+    m_nRegisteredObjs(0),
     m_stats( new SimulationStats() )
 {}
 
@@ -32,6 +33,7 @@ SequentialSimulationManager::SequentialSimulationManager( application * app, sha
     m_sim_complete(false),
     m_nPendingEvents(0),
     m_nProcessedEvents(0),
+    m_nRegisteredObjs(0),
     m_stats( stats )
 {
 
@@ -67,13 +69,20 @@ void SequentialSimulationManager::registerObject( object * obj ) {
 
     assert( obj->getSystemID() != m_id );
 
-    pair_object_timestamp ot = make_pair( obj->getSystemID(), SystemClock::POSITIVE_INFINITY );
 
 //    m_objects[ ot.first ] = obj;
 //    m_objects_next[ ot.first ] = m_ordered_objs.insert( m_ordered_objs.end(), ot );
 //
-    m_objects[ obj->getObjectID() ].first = obj;
-    m_objects[ obj->getObjectID() ].second = m_ordered_objs.insert( m_ordered_objs.end(), ot );
+    if( m_objects[ obj->getObjectID() ].first == NULL ) {
+        pair_object_timestamp ot = make_pair( obj->getSystemID(), SystemClock::POSITIVE_INFINITY );
+        m_objects[ obj->getObjectID() ].first = obj;
+        m_objects[ obj->getObjectID() ].second = m_ordered_objs.insert( m_ordered_objs.end(), ot );
+        ++m_nRegisteredObjs;
+    } else {
+        // update object pointer, and reset next event time
+        m_objects[ obj->getObjectID() ].first = obj;
+        notifyNextEvent( obj->getObjectID(), SystemClock::POSITIVE_INFINITY );
+    }
 }
 
 void SequentialSimulationManager::unregisterObject( object * obj ) {
@@ -91,16 +100,22 @@ void SequentialSimulationManager::unregisterObject( object * obj ) {
 //        m_objects_next.erase(nit);
 //        m_objects.erase( it );
 //    }
-    m_nPendingEvents += obj->pendingEventCount();
-    m_nProcessedEvents += obj->processedEventCount();
+//
+    if( m_objects[ obj->getObjectID() ].first != NULL ) {
+        m_nPendingEvents += obj->pendingEventCount( m_id );
+        m_nProcessedEvents += obj->processedEventCount( m_id );
 
-    m_ordered_objs.erase( m_objects[ obj->getObjectID() ].second );
-    m_objects[ obj->getObjectID() ].first = NULL;
-    m_objects[ obj->getObjectID() ].second = m_ordered_objs.end();
+        m_ordered_objs.erase( m_objects[ obj->getObjectID() ].second );
+        m_objects[ obj->getObjectID() ].first = NULL;
+        m_objects[ obj->getObjectID() ].second = m_ordered_objs.end();
+
+        --m_nRegisteredObjs;
+    }
 }
 
 size_t SequentialSimulationManager::getObjectCount() const {
-    return m_objects.size();
+//    return m_objects.size();
+    return m_nRegisteredObjs;
 }
 
 object * SequentialSimulationManager::getObject( const system_id & id ) const {

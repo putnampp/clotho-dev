@@ -25,10 +25,10 @@ public:
 
     EventManager();
     void insertEvent( const event * );
-    const event * getEvent();
-    const event * peekEvent() const;
-    size_t pendingEventCount() const;
-    size_t processedEventCount() const;
+    const event * getEvent( const system_id & );
+    const event * peekEvent(const system_id & ) const;
+    size_t pendingEventCount(const system_id & ) const;
+    size_t processedEventCount(const system_id & ) const;
     virtual ~EventManager();
 };
 
@@ -56,7 +56,7 @@ public:
         ++m_nPending;
     }
 
-    const event * getEvent() {
+    const event * getEvent( const system_id & ) {
         if( m_head == m_events.end() ) return NULL;
 
         const event * t = *m_head++;
@@ -65,15 +65,15 @@ public:
         return t;
     }
 
-    const event * peekEvent() const {
+    const event * peekEvent(const system_id & ) const {
         return ((m_head == m_events.end() ) ? NULL : *m_head);
     }
 
-    size_t pendingEventCount() const {
+    size_t pendingEventCount(const system_id & ) const {
         return m_nPending;
     }
 
-    size_t processedEventCount() const {
+    size_t processedEventCount(const system_id & ) const {
         return m_nProcessed;
     }
 
@@ -111,19 +111,19 @@ public:
         m_events.insert( pos, e );
     }
 
-    const event * getEvent() {
+    const event * getEvent( const system_id & ) {
         return ((m_head >= m_events.size() ) ? NULL : m_events[m_head++]);
     }
 
-    const event * peekEvent() const {
+    const event * peekEvent( const system_id & ) const {
         return ((m_head >= m_events.size() ) ? NULL : m_events[m_head]);
     }
 
-    size_t pendingEventCount() const {
+    size_t pendingEventCount( const system_id & ) const {
         return m_events.size() - m_head;
     }
 
-    size_t processedEventCount() const {
+    size_t processedEventCount( const system_id & ) const {
         return m_head;
     }
 
@@ -155,7 +155,7 @@ public:
         m_events.insert( e );
     }
 
-    const event * getEvent() {
+    const event * getEvent( const system_id & ) {
         if( m_events.empty() ) return NULL;
         const event * t = *(m_events.begin());
         m_events.erase( m_events.begin() );
@@ -163,16 +163,16 @@ public:
         return t;
     }
 
-    const event * peekEvent() const {
+    const event * peekEvent( const system_id & ) const {
         if( m_events.empty() ) return NULL;
         return *(m_events.begin());
     }
 
-    size_t pendingEventCount() const {
+    size_t pendingEventCount( const system_id & ) const {
         return m_events.size();
     }
 
-    size_t processedEventCount() const {
+    size_t processedEventCount( const system_id & ) const {
         return m_processed.size();
     }
 

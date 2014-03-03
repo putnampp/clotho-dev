@@ -14,7 +14,8 @@ void EventPerformer< Environment, ClothoEvent>::initialize() {
 EventPerformer< Environment, ClothoEvent > Environment::m_evt_performer;
 
 Environment::Environment( simulation_manager * manager ) :
-    SimulationObject< ClothoEventSet >( manager ),
+//    SimulationObject< ClothoEventSet >( manager ),
+    ClothoObject( manager ),
     m_genetic_map( new GeneticMap() ),
     m_reproduction_model( NULL )
 {
@@ -22,7 +23,8 @@ Environment::Environment( simulation_manager * manager ) :
 }
 
 Environment::Environment( simulation_manager * manager, GeneticMap::Ptr gmap, reproduction * r ) :
-    SimulationObject< ClothoEventSet >( manager ),
+//    SimulationObject< ClothoEventSet >( manager ),
+    ClothoObject( manager ),
     m_genetic_map( gmap ),
     m_reproduction_model( r )
 {
@@ -67,7 +69,8 @@ void Environment::finalize() {
         delete tmp;
     }
 
-    SimulationObject< ClothoEventSet >::finalize();
+//    SimulationObject< ClothoEventSet >::finalize();
+    ClothoObject::finalize();
 }
 
 system_id Environment::getIndividual() {

@@ -12,15 +12,15 @@ using std::endl;
 
 class Object : virtual public object {
 public:
-    inline const system_id & getSystemID() const {
+    const system_id & getSystemID() const {
         return m_id;
     }
 
-    inline system_id::manager_id_t getManagerID() const {
+    system_id::manager_id_t getManagerID() const {
         return m_id.getManagerID();
     }
 
-    inline system_id::object_id_t getObjectID() const {
+    system_id::object_id_t getObjectID() const {
         return m_id.getObjectID();
     }
 
@@ -43,15 +43,15 @@ public:
     }
 
     virtual void process() {
-        const event * tmp = peekEvent();
+        const event * tmp = peekEvent( m_id );
 
         // while there are concurrent events
         while( tmp != NULL && tmp->getReceived() == m_local_time ) {
-            tmp = getEvent();
+            tmp = getEvent( m_id );
 
             perform_event( tmp );
 
-            tmp = peekEvent();
+            tmp = peekEvent( m_id );
 
             if( tmp != NULL ) {
                 m_sim_manager->notifyNextEvent( getSystemID(), tmp->getReceived() );
@@ -76,7 +76,7 @@ public:
 
     virtual void receiveEvent( const event * evt ) {
         insertEvent( evt );
-        if( peekEvent() == evt ) {
+        if( peekEvent(m_id) == evt ) {
             m_sim_manager->notifyNextEvent( getSystemID(), evt->getReceived() );
         }
     }

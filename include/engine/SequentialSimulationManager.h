@@ -18,7 +18,7 @@ using std::make_pair;
 using std::list;
 using std::vector;
 
-class SequentialSimulationManager : public SimulationManager {
+class SequentialSimulationManager : public SimulationManager< void > {
 public:
 //    typedef unordered_map< system_id, object * > object_handle_map_t;
     typedef pair< system_id, event::vtime_t > pair_object_timestamp;
@@ -69,6 +69,7 @@ private:
 //    object_next_event_map_t m_objects_next;
 
     unsigned int    m_nPendingEvents, m_nProcessedEvents;
+    unsigned int    m_nRegisteredObjs;
 
     shared_ptr< SimulationStats > m_stats;
 

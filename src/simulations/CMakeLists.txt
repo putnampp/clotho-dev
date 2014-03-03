@@ -26,11 +26,11 @@
 # of the authors and should not be interpreted as representing official policies,
 # either expressed or implied, of the FreeBSD Project.
 ################################################################################
-SET( DIRS examples )
+#SET( DIRS examples )
 
-LIST( APPEND DIRS genetics_warped )
-LIST( APPEND DIRS clotho )
+#LIST( APPEND SIM_DIRS genetics_warped )
+LIST( APPEND SIM_DIRS clotho )
 
-FOREACH( D ${DIRS} )
+FOREACH( D ${SIM_DIRS} )
     ADD_SUBDIRECTORY( ${D} )
 ENDFOREACH( D )

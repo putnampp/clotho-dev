@@ -2,7 +2,8 @@
 #define ENVIRONMENT_H_
 
 #include "../clotho.h"
-#include "engine/simulation_object.h"
+#include "../clotho_object.h"
+//#include "engine/simulation_object.h"
 
 #include "GeneticMap.h"
 
@@ -22,7 +23,8 @@ using std::unordered_map;
 using std::unordered_set;
 
 
-class Environment : public SimulationObject< ClothoEventSet > {
+//class Environment : public SimulationObject< ClothoEventSet > {
+class Environment : public ClothoObject {
 public:
 //    typedef unordered_map< const system_id, Population * > id_to_population_map_t;
     friend class EventPerformer< Environment, ClothoEvent >;

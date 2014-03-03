@@ -31,10 +31,19 @@
 #include <cstdlib>
 
 #include "clotho_application.h"
-#include "engine/SequentialSimulationManager.h"
+#include "engine/SequentialSimulationManager.hpp"
 #include "engine/simulation_stats.h"
 
 const string RUNTIME_K = "total_runtime";
+
+template <>
+void SequentialSimulationManager< pooled_event_set >::routeEvent( const event * evt ) {
+    insertEvent( evt );
+
+    if( peekEvent( evt->getReceiver() ) == evt ) {
+        notifyNextEvent( evt->getReceiver(), evt->getReceived() );
+    }
+}
 
 int main( int argc, char ** argv ) {
 
@@ -59,7 +68,7 @@ int main( int argc, char ** argv ) {
 
     shared_ptr< SimulationStats > stats( new SimulationStats() );
 
-    SequentialSimulationManager ssm( (application *) &ca, stats );
+    SequentialSimulationManager< ClothoEventSet > ssm( (application *) &ca, stats );
 
     ca.setSimulationManager( (simulation_manager *) &ssm );
 

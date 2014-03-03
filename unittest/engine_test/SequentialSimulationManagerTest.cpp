@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE( create_seq_sim_man ) {
 
     SequentialSimulationManager ssm( app, man_id );
 
-    system_id expected_id(man_id, 0);
+    system_id expected_id(man_id, -1);
 
     BOOST_REQUIRE_MESSAGE( ssm.getSystemID() == expected_id, "Unexpected Sequential Simulation Manager system id: " << ssm.getSystemID() << " != " << expected_id );
 
@@ -58,13 +58,13 @@ BOOST_AUTO_TEST_CASE( register_object ) {
 
     SequentialSimulationManager ssm( app, man_id );
 
-    system_id expected_ssm_id( man_id, 0 );
+    system_id expected_ssm_id( man_id, -1 );
 
     BOOST_REQUIRE_MESSAGE( true, "" );
 
     TestObject obj( &ssm );
 
-    system_id expected_obj_id( man_id, 1 );
+    system_id expected_obj_id( man_id, 0 );
 
     BOOST_REQUIRE_MESSAGE( ssm.getObjectCount() == 1, "Unexpected number of registered objects: " << ssm.getObjectCount() << " != 1");
 
@@ -79,11 +79,11 @@ BOOST_AUTO_TEST_CASE( get_and_unregister_object ) {
 
     SequentialSimulationManager ssm( app, man_id );
 
-    system_id expected_ssm_id( man_id, 0 );
+    system_id expected_ssm_id( man_id, -1 );
 
     object * obj = new TestObject( &ssm );
 
-    system_id expected_obj_id( man_id, 1 );
+    system_id expected_obj_id( man_id, 0 );
 
     BOOST_REQUIRE_MESSAGE( ssm.getObjectCount() == 1, "Unexpected number of registered objects: " << ssm.getObjectCount() << " != 1");
 
@@ -97,7 +97,8 @@ BOOST_AUTO_TEST_CASE( get_and_unregister_object ) {
         BOOST_REQUIRE_MESSAGE( tmp_obj == obj, "Unexpected object returned by getObject: " << tmp_obj->getSystemID() << " != " << obj->getSystemID() );
     }
 
-    delete obj; // deleting object should unregister it from simulation manager
+    obj->finalize(); // finalizing object should unregister it from simulation manager
+    delete obj; 
 
     BOOST_REQUIRE_MESSAGE( ssm.getObjectCount() == 0, "Unexpected number of registered objects: " << ssm.getObjectCount() << " != 0");
 
@@ -109,7 +110,7 @@ BOOST_AUTO_TEST_CASE( route_event_test ) {
     system_id::manager_id_t man_id = 0x00000010;
 
     SequentialSimulationManager ssm( app, man_id );
-    system_id expected_ssm_id( man_id, 0 );
+    system_id expected_ssm_id( man_id, -1 );
 
     object * obj = new TestObject( &ssm );
 
@@ -120,9 +121,9 @@ BOOST_AUTO_TEST_CASE( route_event_test ) {
 
     ssm.routeEvent( evt );
 
-    BOOST_REQUIRE_MESSAGE( obj->pendingEventCount() == 1, "Unexpected number of pending events: " << obj->pendingEventCount() << " != 1" );
+    BOOST_REQUIRE_MESSAGE( obj->pendingEventCount( obj->getSystemID() ) == 1, "Unexpected number of pending events: " << obj->pendingEventCount( obj->getSystemID() ) << " != 1" );
 
-    const event * tmp_evt = obj->peekEvent( );
+    const event * tmp_evt = obj->peekEvent( obj->getSystemID() );
 
     if( tmp_evt == NULL ) {
         BOOST_REQUIRE_MESSAGE( false, "No event returned by peekEvent" );
@@ -130,7 +131,7 @@ BOOST_AUTO_TEST_CASE( route_event_test ) {
         BOOST_REQUIRE_MESSAGE( tmp_evt == evt, "Unexpected event returned by peekEvent");
     }
 
-    tmp_evt = obj->getEvent();
+    tmp_evt = obj->getEvent( obj->getSystemID() );
 
     if( tmp_evt == NULL ) {
         BOOST_REQUIRE_MESSAGE( false, "No event returned by getEvent" );

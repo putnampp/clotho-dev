@@ -2,19 +2,23 @@
 #define SIMULATION_MANAGER_IMPL_H_
 
 #include "simulation_manager.h"
+#include "simulation_manager_event_manager.h"
 
-class SimulationManager : virtual public simulation_manager
+template < class ES >
+class SimulationManager : 
+    virtual public simulation_manager,
+    virtual public SimulationManagerEventManager< ES >
 {
 public:
-    inline const system_id & getSystemID() const {
+    const system_id & getSystemID() const {
         return m_id;
     }
 
-    inline system_id::manager_id_t getManagerID() const {
+    system_id::manager_id_t getManagerID() const {
         return m_id.getManagerID();
     }
 
-    inline system_id::object_id_t getObjectID() const {
+    system_id::object_id_t getObjectID() const {
         return m_id.getObjectID();
     }
 

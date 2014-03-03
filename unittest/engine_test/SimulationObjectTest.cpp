@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE( create_test_so2 ) {
 
     object * so = new MyTestSO( &ssm );
 
-    system_id expected_id( man_id, 1 );
+    system_id expected_id( man_id, 0 );
 
     BOOST_REQUIRE_MESSAGE( ssm.getObjectCount() == 1, "Simulation Object was not registered" );
     BOOST_REQUIRE_MESSAGE( so->getSystemID() == expected_id, "Unexpected object id: " << so->getSystemID() << " != " << expected_id );
@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE( process_test ) {
 
     object * so = new MyTestSO( &ssm );
 
-    system_id expected_id( man_id, 1 );
+    system_id expected_id( man_id, 0 );
 
     BOOST_REQUIRE_MESSAGE( ssm.getObjectCount() == 1, "Simulation Object was not registered" );
     BOOST_REQUIRE_MESSAGE( so->getSystemID() == expected_id, "Unexpected object id: " << so->getSystemID() << " != " << expected_id );
