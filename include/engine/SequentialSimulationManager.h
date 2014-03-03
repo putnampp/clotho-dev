@@ -7,6 +7,7 @@
 
 #include <unordered_map>
 #include <list>
+#include <vector>
 
 #include "simulation_stats.h"
 #include "FSBAllocator.hh"
@@ -15,19 +16,24 @@ using std::unordered_map;
 using std::pair;
 using std::make_pair;
 using std::list;
+using std::vector;
 
 class SequentialSimulationManager : public SimulationManager {
 public:
-    typedef unordered_map< system_id, object * > object_handle_map_t;
+//    typedef unordered_map< system_id, object * > object_handle_map_t;
     typedef pair< system_id, event::vtime_t > pair_object_timestamp;
     typedef list< pair_object_timestamp, FSBAllocator< pair_object_timestamp > > ordered_object_exe_t;
-    typedef unordered_map< system_id, ordered_object_exe_t::iterator > object_next_event_map_t;
+//    typedef unordered_map< system_id, ordered_object_exe_t::iterator > object_next_event_map_t;
+    typedef pair< object *, ordered_object_exe_t::iterator > pair_object_handle_t;
+    typedef vector< pair_object_handle_t > object_handle_map_t;
 
     SequentialSimulationManager( application *, system_id::manager_id_t id = 0 );
     SequentialSimulationManager( application *, shared_ptr< SimulationStats >,  system_id::manager_id_t id = 0 );
 
     virtual const event::vtime_t & getSimulationTime() const;
     virtual bool  isSimulationComplete() const;
+
+    virtual const system_id getNextObjectID();
 
     virtual void registerObject( object * obj );
     virtual void unregisterObject( object * obj );
@@ -60,7 +66,7 @@ private:
 
     object_handle_map_t m_objects;
     ordered_object_exe_t m_ordered_objs;
-    object_next_event_map_t m_objects_next;
+//    object_next_event_map_t m_objects_next;
 
     unsigned int    m_nPendingEvents, m_nProcessedEvents;
 
