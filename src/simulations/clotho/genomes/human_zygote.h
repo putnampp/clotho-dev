@@ -16,7 +16,7 @@ public:
     static const zygote::zygote_type_t X_TYPE;
     static const zygote::zygote_type_t Y_TYPE;
 
-    HumanZygote( zygote::zygote_source_t s, zygote_type_t t );
+    HumanZygote( zygote::zygote_source_t s, zygote_type_t t, size_t );
     HumanZygote( const HumanZygote & z);
     
     zygote * clone() const;
@@ -26,6 +26,8 @@ public:
 
     virtual ~HumanZygote();
 protected:
+    size_t          m_nAlleles;
+    unsigned char * m_alleles;
 };
 
 

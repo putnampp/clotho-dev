@@ -34,9 +34,9 @@ void Individual::initialize() {
 //    BirthEvent * be = new BirthEvent( getCurrentTime(), getCurrentTime(), this, this, getNextEventID() );
 //    sendEvent( be );
 //
-    InheritEvent * ie = new InheritEvent( getCurrentTime(), getCurrentTime(), this, this, getNextEventID(), FEMALE, new HumanZygote( HumanZygote::FROM_MOTHER, HumanZygote::X_TYPE ) );
+    InheritEvent * ie = new InheritEvent( getCurrentTime(), getCurrentTime(), this, this, getNextEventID(), FEMALE, new HumanZygote( HumanZygote::FROM_MOTHER, HumanZygote::X_TYPE, 10000 ) );
     sendEvent( ie );
-    ie = new InheritEvent( getCurrentTime(), getCurrentTime(), this, this, getNextEventID(), MALE, new HumanZygote( HumanZygote::FROM_FATHER, ((getObjectID() % 2 == 0) ? HumanZygote::X_TYPE : HumanZygote::Y_TYPE)) );
+    ie = new InheritEvent( getCurrentTime(), getCurrentTime(), this, this, getNextEventID(), MALE, new HumanZygote( HumanZygote::FROM_FATHER, ((getObjectID() % 2 == 0) ? HumanZygote::X_TYPE : HumanZygote::Y_TYPE), 10000) );
     sendEvent( ie );
 }
 

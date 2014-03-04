@@ -1,8 +1,8 @@
 #include "human_genome.h"
 
 HumanGenome::HumanGenome() :
-    m_mother( new HumanZygote(HumanZygote::FROM_MOTHER, HumanZygote::X_TYPE) ),
-    m_father( new HumanZygote(HumanZygote::FROM_FATHER, HumanZygote::X_TYPE) ),
+    m_mother( new HumanZygote(HumanZygote::FROM_MOTHER, HumanZygote::X_TYPE, 1) ),
+    m_father( new HumanZygote(HumanZygote::FROM_FATHER, HumanZygote::X_TYPE, 1) ),
     m_sex( FEMALE )
 {}
 
