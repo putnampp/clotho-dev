@@ -5,6 +5,8 @@
 #include "../event/inherit_event.h"
 #include "../event/mate_event.h"
 
+#include "../genomes/human_zygote.h"
+
 template <>
 void EventPerformer< Individual, ClothoEvent >::initialize() {
     addHandler( BIRTH_EVENT_K, &Individual::handle_birth );
@@ -29,9 +31,13 @@ Individual::Individual( simulation_manager * manager,
 
 void Individual::initialize() {
     //cout << "Initializing Individual: " << getSystemID() << endl;
-    BirthEvent * be = new BirthEvent( getCurrentTime(), getCurrentTime(), this, this, getNextEventID() );
-
-    sendEvent( be );
+//    BirthEvent * be = new BirthEvent( getCurrentTime(), getCurrentTime(), this, this, getNextEventID() );
+//    sendEvent( be );
+//
+    InheritEvent * ie = new InheritEvent( getCurrentTime(), getCurrentTime(), this, this, getNextEventID(), FEMALE, new HumanZygote( HumanZygote::FROM_MOTHER, HumanZygote::X_TYPE ) );
+    sendEvent( ie );
+    ie = new InheritEvent( getCurrentTime(), getCurrentTime(), this, this, getNextEventID(), MALE, new HumanZygote( HumanZygote::FROM_FATHER, ((getObjectID() % 2 == 0) ? HumanZygote::X_TYPE : HumanZygote::Y_TYPE)) );
+    sendEvent( ie );
 }
 
 void Individual::perform_event( const event * e ) {
@@ -60,7 +66,7 @@ void Individual::handle_birth( const ClothoEvent * evt ) {
     //
     m_prop->setDOB( evt->getReceived() );
 
-    BirthEvent * be = new BirthEvent( getCurrentTime(), evt->getReceived(), this->getSystemID(), m_env_id, getNextEventID() );
+    BirthEvent * be = new BirthEvent( getCurrentTime(), evt->getReceived(), this->getSystemID(), m_env_id, getNextEventID(), m_prop->getSex() );
     sendEvent( be );
 }
 
@@ -86,7 +92,6 @@ void Individual::handle_mate( const ClothoEvent * evt ) {
     const MateEvent * me  = static_cast< const MateEvent * >( evt );
 
     assert( m_repro );
-    
 
     zygote * z = m_repro->reproduce( m_prop->getGenome() );
 

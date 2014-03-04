@@ -3,6 +3,8 @@
 SimpleReproduction::SimpleReproduction() : m_source(0) {}
 
 zygote * SimpleReproduction::reproduce( genome * g ) {
+    if( ! g ) return NULL;
+
     if( m_source >= g->getMaxSources() ) {
         m_source = 0;
     }

@@ -7,6 +7,8 @@
 //#include "configuration_manager.h"
 //
 #include "GeneticMap.h"
+
+#include "models/selection_model.h"
 #include "reproduction.h"
 
 #include <vector>
@@ -33,6 +35,7 @@ protected:
     GeneticMap::Ptr     m_genetic_map;
 
     vector< system_id > m_system_objs;
+    selection_model *   m_selection_model;
     reproduction *      m_reproduction_model;
 };
 

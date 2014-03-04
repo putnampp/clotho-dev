@@ -137,14 +137,19 @@ SequentialSimulationManager<ES>::SequentialSimulationManager( application * app,
 
 template< class ES >
 SequentialSimulationManager<ES>::~SequentialSimulationManager() {
+    unsigned int nUnfinalized = 0;
     while( !m_objects.empty() ) {
         object * tmp = m_objects.back().first;
         m_objects.pop_back();
         if( tmp ) {
-            cout << tmp->getSystemID() << " was never unregistered" << endl;
+//            cout << tmp->getSystemID() << " was never unregistered" << endl;
+            ++nUnfinalized;
+            tmp->finalize();
             delete tmp;
         }
     }
+
+    cout << nUnfinalized << " objects were finalized AFTER simulation finalization." << endl;
 
 //    while( !m_ordered_objs.empty() ) {
 //        m_ordered_objs.pop_back();
@@ -296,6 +301,8 @@ void SequentialSimulationManager<ES>::simulate( const event::vtime_t & until ) {
     }
 
     m_stats->stopPhase( SIMULATE_PHASE_K );
+
+    cout << "End simulation time: " <<  getSimulationTime() << endl;
 }
 
 template< class ES >

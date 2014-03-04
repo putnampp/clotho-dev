@@ -21,6 +21,8 @@ public:
         return 2;
     }
 
+    Sex getSex() const;
+
     zygote * getZygote( zygote::zygote_source_t ) const;
     zygote * getZygote( Sex ) const;
 

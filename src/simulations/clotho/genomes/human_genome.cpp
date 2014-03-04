@@ -7,7 +7,29 @@ HumanGenome::HumanGenome() :
 {}
 
 HumanGenome::HumanGenome( HumanZygote * hz0, HumanZygote * hz1 ) {
-    if( hz0->getSource() == HumanZygote::FROM_MOTHER ) {
+    if( hz0 == NULL ) {
+        m_sex = UNASSIGNED;
+        if( hz1 == NULL || hz1->getSource() == HumanZygote::FROM_FATHER ) {
+            m_mother = hz0;
+            m_father = hz1;
+        } else {
+            assert( hz1->getSource() == HumanZygote::X_TYPE );
+            m_mother = hz1;
+            m_father = hz0;
+        }
+        return;
+    } else if( hz1 == NULL ) {
+        m_sex = UNASSIGNED;
+        if( hz0->getSource() == HumanZygote::FROM_MOTHER ) {
+            assert( hz0->getType() == HumanZygote::X_TYPE );
+            m_mother = hz0;
+            m_father = hz1;
+        } else {
+            m_mother = hz1;
+            m_father = hz0;
+        }
+        return;
+    } else if( hz0->getSource() == HumanZygote::FROM_MOTHER ) {
         assert( hz0->getType() == HumanZygote::X_TYPE);
         assert( hz1->getSource() == HumanZygote::FROM_FATHER);
         m_mother = hz0;
@@ -37,6 +59,10 @@ HumanGenome::HumanGenome( const HumanGenome & g ) :
 
 genome * HumanGenome::clone() const {
     return new HumanGenome( *this );
+}
+
+Sex HumanGenome::getSex() const {
+    return m_sex;
 }
 
 zygote * HumanGenome::getZygote( zygote::zygote_source_t id ) const {

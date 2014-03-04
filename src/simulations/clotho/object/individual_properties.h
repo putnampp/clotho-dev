@@ -3,7 +3,9 @@
 
 #include "../clotho.h"
 
-#include "genome.h"
+//#include "genome.h"
+//
+#include "../genomes/human_genome.h"
 
 extern const system_id UNSET_ID;
 
@@ -37,7 +39,7 @@ protected:
 
     SystemClock::vtime_t dob, eol;
     Sex   sex;
-    genome * m_genome;
+    HumanGenome * m_genome;
 };
 
 #endif  // INDIVIDUAL_PROPERTIES_H_

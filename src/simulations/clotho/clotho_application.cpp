@@ -2,6 +2,7 @@
 #include "object/environment.h"
 
 #include "models/SimpleReproduction.h"
+#include "models/simple_random_selection.h"
 
 #include <cassert>
 
@@ -14,6 +15,7 @@ ClothoApplication::ClothoApplication( const string & config ) :
     m_config_file( config ),
     m_sim_manager( NULL ),
     m_genetic_map( new GeneticMap() ),
+    m_selection_model( new SimpleRandomSelection() ),
     m_reproduction_model( new SimpleReproduction() )
 {}
 
@@ -28,7 +30,7 @@ void ClothoApplication::setSimulationManager( simulation_manager * manager ) {
 void ClothoApplication::initialize() {
     assert( m_sim_manager != NULL );
 
-    Environment * env = new Environment( m_sim_manager, m_genetic_map, m_reproduction_model );
+    Environment * env = new Environment( m_sim_manager, m_genetic_map, m_selection_model, m_reproduction_model );
     env->initialize();
 
     m_system_objs.push_back( env->getSystemID() );

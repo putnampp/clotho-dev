@@ -1,6 +1,7 @@
 #ifndef SIMPLE_REPRODUCTION_H_
 #define SIMPLE_REPRODUCTION_H_
 
+#include "../clotho.h"
 #include "reproduction.h"
 
 /*
