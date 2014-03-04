@@ -4,6 +4,10 @@
 #include "../clotho.h"
 #include "zygote.h"
 
+#include <vector>
+
+using std::vector;
+
 class HumanZygote : public zygote {
 public:
     static const zygote::zygote_source_t FROM_MOTHER;
@@ -21,6 +25,7 @@ public:
     void setChromosome( chromosome * );
 
     virtual ~HumanZygote();
+protected:
 };
 
 

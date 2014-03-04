@@ -38,9 +38,10 @@ const string RUNTIME_K = "total_runtime";
 
 template <>
 void SequentialSimulationManager< pooled_event_set >::routeEvent( const event * evt ) {
-    insertEvent( evt );
+//    insertEvent( evt );
 
-    if( peekEvent( evt->getReceiver() ) == evt ) {
+//    if( peekEvent( evt->getReceiver() ) == evt ) {
+    if( insertEvent( evt ) ) {
         notifyNextEvent( evt->getReceiver(), evt->getReceived() );
     }
 }

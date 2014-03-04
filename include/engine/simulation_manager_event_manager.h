@@ -14,7 +14,7 @@ protected:
     size_t pendingEventCount( const system_id & ) const { return 0; }
     size_t processedEventCount( const system_id & ) const { return 0; }
     
-    void insertEvent( const event * ) {}
+    bool insertEvent( const event * ) { return false;}
 };
 
 #endif  // SIMULATION_MANAGER_EVENT_MANAGER_H_

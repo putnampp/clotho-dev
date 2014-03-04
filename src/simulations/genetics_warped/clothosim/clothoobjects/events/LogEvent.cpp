@@ -30,7 +30,7 @@
 #include "LogEvent.h"
 #include "../../ClothoModelCoordinator.h"
 
-DEFINE_REGISTERED_CLOTHO_EVENT( LogEvent );
+DEFINE_REGISTERED_CLOTHO_EVENT( LogEvent )
 
 LogEvent::LogEvent( const VTime & tSend, const VTime &tRecv,
                     SimulationObject * sender,

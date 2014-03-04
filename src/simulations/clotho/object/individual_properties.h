@@ -9,7 +9,28 @@
 
 extern const system_id UNSET_ID;
 
-class IndividualProperties {
+struct individual_properties {
+    virtual const system_id & getFather() const = 0;
+    virtual const system_id & getMother() const = 0;
+
+    virtual Sex getSex() const = 0;
+
+    virtual const SystemClock::vtime_t & getDOB() const = 0;
+    virtual const SystemClock::vtime_t & getEOL() const = 0;
+
+    virtual void setDOB( const SystemClock::vtime_t & t ) = 0;
+    virtual void setEOL( const SystemClock::vtime_t & t ) = 0;
+    
+    virtual void setFather( const system_id & id) = 0;
+    virtual void setMother( const system_id & id) = 0;
+
+    virtual genome * getGenome() const = 0;
+
+    virtual void inheritFrom( const system_id & id, Sex s, zygote * genos ) = 0;
+    virtual void reset() = 0;
+};
+
+class IndividualProperties : public individual_properties {
 public:
     IndividualProperties( );
 
@@ -30,6 +51,7 @@ public:
     genome * getGenome() const;
 
     void inheritFrom( const system_id & id, Sex s, zygote * genos );
+    void reset();
 
     virtual ~IndividualProperties();
 protected:

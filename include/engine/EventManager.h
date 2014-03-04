@@ -24,7 +24,7 @@ public:
     typedef typename event_set_t::iterator iterator;
 
     EventManager();
-    void insertEvent( const event * );
+    bool insertEvent( const event * );
     const event * getEvent( const system_id & );
     const event * peekEvent(const system_id & ) const;
     size_t pendingEventCount(const system_id & ) const;
@@ -46,14 +46,17 @@ public:
         m_nProcessed(0)
     {}
 
-    void insertEvent( const event * evt ) {
+    bool insertEvent( const event * evt ) {
         iterator pos = upper_bound( m_head, m_events.end(), evt, ltsf_event_order());
         
-        if( pos == m_head )
+        bool res = false;
+        if( pos == m_head ) {
             m_head = m_events.insert( pos, evt );
-        else
+            res = true;
+        } else
             m_events.insert( pos, evt );
         ++m_nPending;
+        return res;
     }
 
     const event * getEvent( const system_id & ) {
@@ -102,13 +105,14 @@ public:
         m_head(0)
     {}
 
-    void insertEvent( const event * e ) {
-        if( e == NULL ) return;
+    bool insertEvent( const event * e ) {
+        if( e == NULL ) return false;
         
         iterator s = m_events.begin() + m_head;
         iterator pos = upper_bound( s, m_events.end(), e, ltsf_event_order());
 
         m_events.insert( pos, e );
+        return (*m_events.begin() == e);
     }
 
     const event * getEvent( const system_id & ) {
@@ -151,8 +155,9 @@ public:
         m_processed()
     {}
 
-    void insertEvent( const event * e ) {
+    bool insertEvent( const event * e ) {
         m_events.insert( e );
+        return (*m_events.begin() == e );
     }
 
     const event * getEvent( const system_id & ) {

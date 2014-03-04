@@ -93,6 +93,7 @@ system_id Environment::getIndividual() {
     } else {
         id = m_available_individuals.front();
         m_available_individuals.pop_front();
+        assert( m_available_individuals.empty() || m_available_individuals.front() != id );
     }
 
     return id;
@@ -111,7 +112,6 @@ void Environment::handle_birth( const ClothoEvent * ce ) {
     if( be->getSex() == FEMALE ) {
         m_active_individuals.insert( make_pair( be->getSender(), make_pair( &m_females, m_females.size())));
         m_females.push_back( be->getSender() );
-
     } else if( be->getSex() == MALE ) {
         m_active_individuals.insert( make_pair( be->getSender(), make_pair( &m_males, m_males.size())));
         m_males.push_back( be->getSender() );
@@ -119,7 +119,6 @@ void Environment::handle_birth( const ClothoEvent * ce ) {
     } else {
         assert(false);
     }
-    //m_active_individuals.insert( ce->getSender() );
 }
 
 void Environment::handle_maturity( const ClothoEvent * ce ) {
@@ -144,8 +143,6 @@ void Environment::handle_maturity( const ClothoEvent * ce ) {
 }
 
 void Environment::handle_death( const ClothoEvent * ce ) {
-//    removeIndividual( evt->getSender() );
-//    m_active_individuals.erase( ce->getSender() );
     lookup_iterator it = m_active_individuals.find( ce->getSender() );
     assert( it != m_active_individuals.end() );
 
@@ -157,6 +154,9 @@ void Environment::handle_death( const ClothoEvent * ce ) {
         // and update the previously last individual's offset to be the offset of
         // the dead individual
         swap( igroup->back(), igroup->at( offset ) );
+        if( igroup->back() != ce->getSender() ) {
+            cout << "Swap failed: " << ce->getSender() << " <> " << igroup->back() << "; " << igroup->size() << endl;
+        }
         assert( igroup->back() == ce->getSender() );
         m_active_individuals[ igroup->at( offset ) ].second = offset;
     }

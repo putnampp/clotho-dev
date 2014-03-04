@@ -1,5 +1,10 @@
 #include "SimpleReproduction.h"
 
+#include <iostream>
+
+using std::cout;
+using std::endl;
+
 SimpleReproduction::SimpleReproduction() : m_source(0) {}
 
 zygote * SimpleReproduction::reproduce( genome * g ) {

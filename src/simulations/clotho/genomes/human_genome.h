@@ -4,6 +4,10 @@
 #include "../clotho.h"
 #include "genome.h"
 
+#include <vector>
+
+using std::vector;
+
 #include "human_zygote.h"
 
 class HumanGenome : public genome {

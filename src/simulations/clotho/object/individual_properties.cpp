@@ -62,10 +62,21 @@ void IndividualProperties::inheritFrom( const system_id & id, Sex s, zygote * g 
     }
 }
 
+void IndividualProperties::reset() {
+    setMother( UNSET_ID );
+    setFather( UNSET_ID );
+
+    setDOB( SystemClock::POSITIVE_INFINITY );
+    setEOL( SystemClock::POSITIVE_INFINITY );
+
+    sex = UNASSIGNED;
+}
+
 void IndividualProperties::determineSex() {
     sex = m_genome->getSex();   
 }
 
 IndividualProperties::~IndividualProperties() {
-
+    if( m_genome != NULL ) 
+        delete m_genome;
 }

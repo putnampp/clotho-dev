@@ -49,13 +49,10 @@ HumanGenome::HumanGenome( HumanZygote * hz0, HumanZygote * hz1 ) {
 }
 
 HumanGenome::HumanGenome( const HumanGenome & g ) :
-    m_mother( NULL ),
-    m_father( NULL ),
+    m_mother( dynamic_cast< HumanZygote * >(g.m_mother->clone()) ),
+    m_father( dynamic_cast< HumanZygote * >(g.m_father->clone()) ),
     m_sex( g.m_sex )
-{
-    setZygote( g.m_mother->clone() );
-    setZygote( g.m_father->clone() );
-}
+{ }
 
 genome * HumanGenome::clone() const {
     return new HumanGenome( *this );
@@ -82,9 +79,14 @@ void HumanGenome::setZygote( zygote * z ) {
 void HumanGenome::setZygote( HumanZygote * hz ) {
     if( hz->getSource() == HumanZygote::FROM_MOTHER ) {
         assert( hz->getType() == HumanZygote::X_TYPE);
+        if( m_mother ) {
+            delete m_mother;
+        }
         m_mother = hz;
     } else if( hz->getSource() == HumanZygote::FROM_FATHER ) {
-//        assert( z->getType() == HumanZygote::Y_TYPE || z->getType() == HumanZygote::X_TYPE );
+        if( m_father ) {
+            delete m_father;
+        }
         m_father = hz;
         m_sex = ((m_father->getType() == HumanZygote::Y_TYPE) ? MALE : FEMALE);
     } else {
@@ -95,4 +97,11 @@ void HumanGenome::setZygote( HumanZygote * hz ) {
 HumanGenome::~HumanGenome() {
     if(m_mother) delete m_mother;
     if(m_father) delete m_father;
+
+    //while( !m_old_zygotes.empty() ) {
+    //    HumanZygote * hz = *m_old_zygotes.begin();
+    //    m_old_zygotes.erase( m_old_zygotes.begin() );
+    //    if( hz != NULL )    // double delete occurring; why is human zygote existing in multiple genomes?
+    //        delete hz;
+    //}
 }

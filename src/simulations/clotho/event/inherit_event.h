@@ -23,7 +23,6 @@ public:
     zygote * getZygote() const;
 
     virtual ~InheritEvent() {}
-
 protected:
     Sex         m_parent_sex;
     zygote *    m_zygote;

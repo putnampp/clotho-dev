@@ -20,6 +20,7 @@ ClothoApplication::ClothoApplication( const string & config ) :
 {}
 
 ClothoApplication::~ClothoApplication() {
+    if( m_selection_model ) delete m_selection_model;
     if( m_reproduction_model ) delete m_reproduction_model;
 }
 

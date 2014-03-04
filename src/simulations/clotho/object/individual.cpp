@@ -81,6 +81,10 @@ void Individual::handle_death( const ClothoEvent * evt ) {
 void Individual::handle_inherit( const ClothoEvent * evt ) {
     const InheritEvent * ie = static_cast< const InheritEvent * >( evt );
 
+    if(m_prop->getEOL() != SystemClock::POSITIVE_INFINITY ) {
+        m_prop->reset();
+    }
+
     m_prop->inheritFrom( ie->getSender(), ie->getParentSex(), ie->getZygote() );
 
     if( m_prop->getFather() != UNSET_ID && m_prop->getMother() != UNSET_ID ) {

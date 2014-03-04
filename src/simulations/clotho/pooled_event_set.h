@@ -56,7 +56,7 @@ public:
 
     virtual ~SimulationObject() {}
 protected:
-    void insertEvent( const event * ) {}
+    bool insertEvent( const event * ) { return false; }
     void receiveEvent( const event * ) {}
 
 };
@@ -71,7 +71,7 @@ public:
     typedef typename object_event_set_t::iterator _iterator;
     typedef typename object_event_set_t::const_iterator _citerator;
 
-    void insertEvent( const event * e ) {
+    bool insertEvent( const event * e ) {
     //    cout << "simulation manager insert event: " << endl;
         _iterator it = m_event_set.find( e->getReceiver() );
         if( it == m_event_set.end() ) {
@@ -81,6 +81,7 @@ public:
         }
 
         it->second.first->insert( e );
+        return (*(it->second.first->begin()) == e);
     }
 
     const event * getEvent( const system_id & id ) {

@@ -34,20 +34,22 @@ template < class ES >
 class SequentialSimulationManager : public SimulationManager< ES > {
 public:
     typedef pair< object *, event::vtime_t > pair_object_timestamp;
-//    typedef list< pair_object_timestamp, FSBAllocator< pair_object_timestamp > > ordered_object_exe_t;
-//    typedef pair< object *, ordered_object_exe_t::iterator > pair_object_handle_t;
-//    typedef vector< pair_object_handle_t > object_handle_map_t;
-
     typedef vector< pair_object_timestamp > object_handle_map_t;
-    typedef pair< event::vtime_t, system_id > pair_timestamp_object;
+//    typedef pair< event::vtime_t, system_id > pair_timestamp_object;
 
-    struct timestamp_object_comp {
-        bool operator()( const pair_timestamp_object lhs, const pair_timestamp_object rhs ) const {
-            return ((lhs.first < rhs.first) || (lhs.first == rhs.first && lhs.second < rhs.second));
+//    struct timestamp_object_comp {
+//        bool operator()( const pair_timestamp_object lhs, const pair_timestamp_object rhs ) const {
+//            return ((lhs.first < rhs.first) || (lhs.first == rhs.first && lhs.second < rhs.second));
+//        }
+//    };
+    struct object_timestamp_comp {
+        bool operator()( const SequentialSimulationManager::pair_object_timestamp & lhs, const SequentialSimulationManager::pair_object_timestamp & rhs ) const {
+            return (lhs.second < rhs.second) || ( lhs.second == rhs.second && lhs.first->getSystemID() < rhs.first->getSystemID() );
         }
     };
 
-    typedef set< pair_timestamp_object, timestamp_object_comp  > ordered_object_exe_t;
+//    typedef set< pair_timestamp_object, timestamp_object_comp  > ordered_object_exe_t;
+    typedef set< pair_object_timestamp, object_timestamp_comp > ordered_object_exe_t;
     typedef typename ordered_object_exe_t::iterator _iterator;
 
     SequentialSimulationManager( application *, system_id::manager_id_t id = 0 );
@@ -95,12 +97,12 @@ private:
 
     shared_ptr< SimulationStats > m_stats;
 
-    struct object_timestamp_comp {
-        bool operator()( const SequentialSimulationManager::pair_object_timestamp & lhs, const SequentialSimulationManager::pair_object_timestamp & rhs ) const {
-            return lhs.second < rhs.second;
-        }
-    };
-    object_timestamp_comp m_ot_comp;
+//    struct object_timestamp_comp {
+//        bool operator()( const SequentialSimulationManager::pair_object_timestamp & lhs, const SequentialSimulationManager::pair_object_timestamp & rhs ) const {
+//            return lhs.second < rhs.second;
+//        }
+//    };
+//    object_timestamp_comp m_ot_comp;
 };
 
 //
@@ -142,7 +144,6 @@ SequentialSimulationManager<ES>::~SequentialSimulationManager() {
         object * tmp = m_objects.back().first;
         m_objects.pop_back();
         if( tmp ) {
-//            cout << tmp->getSystemID() << " was never unregistered" << endl;
             ++nUnfinalized;
             tmp->finalize();
             delete tmp;
@@ -150,10 +151,6 @@ SequentialSimulationManager<ES>::~SequentialSimulationManager() {
     }
 
     cout << nUnfinalized << " objects were finalized AFTER simulation finalization." << endl;
-
-//    while( !m_ordered_objs.empty() ) {
-//        m_ordered_objs.pop_back();
-//    }
     m_ordered_objs.clear();
 }
 
@@ -178,8 +175,8 @@ void SequentialSimulationManager<ES>::registerObject( object * obj ) {
 //        m_objects[ obj->getObjectID() ].second = m_ordered_objs.insert( m_ordered_objs.end(), ot );
         ++m_nRegisteredObjs;
     } else {
-        pair_timestamp_object to = make_pair( m_objects[ obj->getObjectID() ].second, obj->getSystemID() );
-        _iterator it = m_ordered_objs.find( to );
+//        pair_timestamp_object to = make_pair( m_objects[ obj->getObjectID() ].second, obj->getSystemID() );
+        _iterator it = m_ordered_objs.find( m_objects[ obj->getObjectID() ] );
         if( it != m_ordered_objs.end() ) {
             m_ordered_objs.erase( it );
         }
@@ -198,8 +195,8 @@ void SequentialSimulationManager<ES>::unregisterObject( object * obj ) {
         m_nProcessedEvents += obj->processedEventCount(obj->getSystemID());
 
         if( m_objects[ obj->getObjectID() ].second != SystemClock::POSITIVE_INFINITY ) {
-            pair_timestamp_object to = make_pair( m_objects[ obj->getObjectID() ].second, obj->getSystemID());
-            _iterator it = m_ordered_objs.find( to );
+//            pair_timestamp_object to = make_pair( m_objects[ obj->getObjectID() ].second, obj->getSystemID());
+            _iterator it = m_ordered_objs.find( m_objects[ obj->getObjectID() ] );
             assert( it != m_ordered_objs.end() );
 
             m_ordered_objs.erase( it );
@@ -231,46 +228,20 @@ void SequentialSimulationManager<ES>::routeEvent( const event * evt ) {
 template< class ES >
 void SequentialSimulationManager<ES>::notifyNextEvent( const system_id & obj, const event::vtime_t & t ) {
     if( m_objects[ obj.getObjectID() ].second != SystemClock::POSITIVE_INFINITY ) {
-        pair_timestamp_object f = make_pair( m_objects[ obj.getObjectID() ].second, obj );
-
-        _iterator it = m_ordered_objs.find( f );
-
+//        pair_timestamp_object f = make_pair( m_objects[ obj.getObjectID() ].second, obj );
+        _iterator it = m_ordered_objs.find( m_objects[ obj.getObjectID() ] );
         assert( it != m_ordered_objs.end() );
-
         m_ordered_objs.erase( it );
     }
 
-    pair_timestamp_object to = make_pair( t, obj );
-    m_ordered_objs.insert( to );
+//    pair_timestamp_object to = make_pair( t, obj );
     m_objects[ obj.getObjectID() ].second = t;
-//    pair_object_timestamp ot = make_pair( obj, t );
-
-//    ordered_object_exe_t::iterator it = m_objects[ obj.getObjectID() ].second;
-
-//    ordered_object_exe_t::iterator pos = upper_bound( m_ordered_objs.begin(), it, ot, m_ot_comp );
-
-//    if( it == m_ordered_objs.end() ) {
-//        it = m_ordered_objs.insert( pos, ot );
-//    } else if( it != pos ) {
-//        m_ordered_objs.splice( pos, m_ordered_objs, it );
-//        it->second = t;
-//    } else if( pos->first == obj ) {
-//        it->second = t;
-//    } else {
-//        assert( false );
-//    }
+    m_ordered_objs.insert( m_objects[ obj.getObjectID() ] );
 }
 
 template< class ES >
 typename SequentialSimulationManager<ES>::pair_object_timestamp SequentialSimulationManager<ES>::getNextObject() {
-//    pair_object_timestamp ot = m_ordered_objs.front();
-
-    // rotate the head node to the end of the list
-    // and set its time to be POSITIVE_INFINITY
-//    m_ordered_objs.splice( m_ordered_objs.end(), m_ordered_objs, m_ordered_objs.begin() );
-//    m_ordered_objs.back().second = SystemClock::POSITIVE_INFINITY;
-
-    pair_object_timestamp ot = m_objects[ m_ordered_objs.begin()->second.getObjectID() ];
+    pair_object_timestamp ot = *m_ordered_objs.begin();
     m_ordered_objs.erase( m_ordered_objs.begin() );
 
     m_objects[ ot.first->getObjectID()].second = SystemClock::POSITIVE_INFINITY;

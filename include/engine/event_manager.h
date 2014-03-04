@@ -4,7 +4,7 @@
 #include "event_interface.h"
 
 struct event_manager {
-    virtual void  insertEvent( const event * ) = 0;
+    virtual bool  insertEvent( const event * ) = 0;
 
     virtual const event * getEvent( const system_id & ) = 0;
     virtual const event * peekEvent( const system_id & ) const = 0;

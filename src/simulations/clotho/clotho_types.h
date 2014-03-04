@@ -17,9 +17,9 @@
 
 //typedef std::list< const event *, FSBAllocator< const event * > > ClothoEventSet;
 //typedef std::vector< const event * > ClothoEventSet;
-//typedef std::multiset< const event *, ltsf_event_order/*, FSBAllocator< const event * >*/ > ClothoEventSet;
+typedef std::multiset< const event *, ltsf_event_order/*, FSBAllocator< const event * >*/ > ClothoEventSet;
 //
-typedef pooled_event_set ClothoEventSet;
+//typedef pooled_event_set ClothoEventSet;
 
 
 #endif  // CLOTHO_TYPES_H_

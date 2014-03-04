@@ -5,6 +5,8 @@
 #include "../clotho.h"
 #include "../ider.h"
 
+#include <ostream>
+
 typedef std::string event_type_t;
 
 class ClothoEvent : public default_event {
@@ -37,5 +39,12 @@ struct IDer< ClothoEvent > {
         return ce->getEventType();
     }
 };
+
+std::ostream & operator<<( std::ostream & o, const ClothoEvent & ce );
+
+inline std::ostream & operator<<( std::ostream & o, const ClothoEvent * ce ) {
+    o << *ce;
+    return o;
+}
 
 #endif  // CLOTHO_EVENT_H_

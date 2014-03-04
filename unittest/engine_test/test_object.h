@@ -63,8 +63,9 @@ public:
         return m_events.front();
     }
 
-    virtual void insertEvent( const event * evt ) {
-        m_events.push_back( evt );    
+    virtual bool insertEvent( const event * evt ) {
+        m_events.push_back( evt );
+        return (m_events.size() == 1);
     }
 
     virtual void sendEvent( const event * evt ) {

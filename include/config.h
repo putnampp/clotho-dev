@@ -65,7 +65,7 @@
 #endif  // end verifications
 
 #ifndef MAX_ALLELES
-#define    MAX_ALLELES 256
+#define    MAX_ALLELES 32
 #endif  // MAX_ALLELES
 
 #if MAX_ALLELES < 0
