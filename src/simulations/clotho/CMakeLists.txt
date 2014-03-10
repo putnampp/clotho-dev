@@ -42,6 +42,7 @@ INCLUDE_DIRECTORIES( ${${PROJECT_NAME}_INCLUDE_DIR} )
 
 #ADD_LIBRARY( event SHARED ${EVENT_SRCS} )
 
+#LIST( APPEND OBJECT_SRCS rng/rng_gsl.cpp )
 LIST( APPEND OBJECT_SRCS event/clotho_event.cpp )
 LIST( APPEND OBJECT_SRCS event/birth_event.cpp )
 LIST( APPEND OBJECT_SRCS event/death_event.cpp )

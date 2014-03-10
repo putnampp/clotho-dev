@@ -34,6 +34,8 @@
 #include "engine/SequentialSimulationManager.hpp"
 #include "engine/simulation_stats.h"
 
+#include "rng/rng.hpp"
+
 const string RUNTIME_K = "total_runtime";
 
 template <>
@@ -64,6 +66,10 @@ int main( int argc, char ** argv ) {
     }
 
     cout << "Simulate until: " << tUntil << endl;
+
+    shared_ptr< iRNG > rng( new GSL_RNG());
+
+    cout << "RNG: " <<  rng->getType() << endl;
 
     ClothoApplication ca( clotho_config );
 
