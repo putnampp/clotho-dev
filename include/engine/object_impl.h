@@ -75,8 +75,7 @@ public:
     }
 
     virtual void receiveEvent( const event * evt ) {
-        insertEvent( evt );
-        if( peekEvent(m_id) == evt ) {
+        if( insertEvent( evt ) ) {
             m_sim_manager->notifyNextEvent( getSystemID(), evt->getReceived() );
         }
     }

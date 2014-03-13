@@ -13,7 +13,7 @@ const string INIT_PHASE_K = "init";
 const string SIMULATE_PHASE_K = "simulate";
 const string FINALIZE_PHASE_K = "finalize";
 
-SequentialSimulationManager::SequentialSimulationManager( application * app, system_id::manager_id_t id ) :
+SequentialSimulationManager::SequentialSimulationManager( shared_ptr< application > app, system_id::manager_id_t id ) :
     SimulationManager( id ),
     m_app(app),
     m_sim_time( SystemClock::ZERO ),
@@ -25,7 +25,7 @@ SequentialSimulationManager::SequentialSimulationManager( application * app, sys
     m_stats( new SimulationStats() )
 {}
 
-SequentialSimulationManager::SequentialSimulationManager( application * app, shared_ptr< SimulationStats > stats, system_id::manager_id_t id ) :
+SequentialSimulationManager::SequentialSimulationManager( shared_ptr< application > app, shared_ptr< SimulationStats > stats, system_id::manager_id_t id ) :
     SimulationManager( id ),
     m_app(app),
     m_sim_time( SystemClock::ZERO ),

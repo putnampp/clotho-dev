@@ -32,6 +32,7 @@
 
 #include "clotho_application.h"
 #include "engine/SequentialSimulationManager.hpp"
+#include "engine/CentralizedSimulationManager.hpp"
 #include "engine/simulation_stats.h"
 
 #include "rng/rng.hpp"
@@ -40,9 +41,13 @@ const string RUNTIME_K = "total_runtime";
 
 template <>
 void SequentialSimulationManager< pooled_event_set >::routeEvent( const event * evt ) {
-//    insertEvent( evt );
+    if( insertEvent( evt ) ) {
+        notifyNextEvent( evt->getReceiver(), evt->getReceived() );
+    }
+}
 
-//    if( peekEvent( evt->getReceiver() ) == evt ) {
+template <>
+void CentralizedSimulationManager< pooled_event_set >::routeEvent( const event * evt ) {
     if( insertEvent( evt ) ) {
         notifyNextEvent( evt->getReceiver(), evt->getReceived() );
     }
@@ -50,8 +55,8 @@ void SequentialSimulationManager< pooled_event_set >::routeEvent( const event * 
 
 int main( int argc, char ** argv ) {
 
-    if( argc != 3 && argc != 4 ) {
-        cerr << "Expected Usage: clotho <engine_config_file> <app_config_file> (simulateUntil)" << endl;
+    if( argc < 3 || argc > 5 ) {
+        cerr << "Expected Usage: clotho <engine_config_file> <app_config_file> (simulateUntil) ([C]entralized)" << endl;
         return EXIT_FAILURE;
     }
 
@@ -60,7 +65,7 @@ int main( int argc, char ** argv ) {
 
     SystemClock::vtime_t tUntil = SystemClock::POSITIVE_INFINITY;
 
-    if( argc == 4 ) {
+    if( argc >= 4 ) {
         string tmp = argv[3];
         tUntil = SystemClock::toVTime( tmp );
     }
@@ -69,27 +74,39 @@ int main( int argc, char ** argv ) {
 
     shared_ptr< iRNG > rng( new GSL_RNG());
 
-    cout << "RNG: " <<  rng->getType() << endl;
+    cout << "RNG: " <<  rng->getType() << "; seed: " << rng->getSeed() << endl;
 
-    ClothoApplication ca( clotho_config );
+    shared_ptr< application > app( new ClothoApplication( clotho_config, rng ) );
 
     shared_ptr< SimulationStats > stats( new SimulationStats() );
 
-    SequentialSimulationManager< ClothoEventSet > ssm( (application *) &ca, stats );
+    simulation_manager * sim = NULL;
 
-    ca.setSimulationManager( (simulation_manager *) &ssm );
+    if( argc == 5 && argv[4][0] == 'C' ) {
+        cout << "Using a Centralized Simulation Manager" << endl;
+        sim = new CentralizedSimulationManager< ClothoEventSet >( app, stats );
+    } else {
+        cout << "Using a Sequential Simulation Manager" << endl;
+        sim = new SequentialSimulationManager< ClothoEventSet >( app, stats );
+    }
+
+    assert( sim != NULL );
+
+    (std::static_pointer_cast<ClothoApplication>(app))->setSimulationManager( sim );
 
     stats->startPhase( RUNTIME_K );
 
-    ssm.initialize();
+    sim->initialize();
 
-    ssm.simulate( tUntil );
+    sim->simulate( tUntil );
 
-    ssm.finalize();
+    sim->finalize();
     
     stats->stopPhase( RUNTIME_K );
 
     cout << *stats;
+
+    delete sim;
 
     return 0;
 }

@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE( create_test_so ) {
 }
 
 BOOST_AUTO_TEST_CASE( create_test_so2 ) {
-    application * app = new TestApplication();
+    shared_ptr< application > app( new TestApplication());
 
     system_id::manager_id_t man_id = 0x00000020;
     SequentialSimulationManager ssm( app, man_id );
@@ -64,11 +64,10 @@ BOOST_AUTO_TEST_CASE( create_test_so2 ) {
     delete so;
 
     BOOST_REQUIRE_MESSAGE( ssm.getObjectCount() == 0, "Simulation Object was not unregistered" );
-    delete app;
 }
 
 BOOST_AUTO_TEST_CASE( process_test ) {
-    application * app = new TestApplication();
+    shared_ptr< application > app( new TestApplication());
 
     system_id::manager_id_t man_id = 0x00000030;
     SequentialSimulationManager ssm( app, man_id );
@@ -89,7 +88,6 @@ BOOST_AUTO_TEST_CASE( process_test ) {
     delete so;
 
     BOOST_REQUIRE_MESSAGE( ssm.getObjectCount() == 0, "Simulation Object was not unregistered" );
-    delete app;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -11,11 +11,12 @@
 //    cout << "Parsing: " << m_app->m_config_file << endl;
 //}
 
-ClothoApplication::ClothoApplication( const string & config ) :
+ClothoApplication::ClothoApplication( const string & config, shared_ptr< iRNG > rng) :
     m_config_file( config ),
     m_sim_manager( NULL ),
     m_genetic_map( new GeneticMap() ),
-    m_selection_model( new SimpleRandomSelection() ),
+    m_rng( rng ),
+    m_selection_model( new SimpleRandomSelection( m_rng ) ),
     m_reproduction_model( new SimpleReproduction() )
 {}
 

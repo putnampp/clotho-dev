@@ -35,25 +35,17 @@ class SequentialSimulationManager : public SimulationManager< ES > {
 public:
     typedef pair< object *, event::vtime_t > pair_object_timestamp;
     typedef vector< pair_object_timestamp > object_handle_map_t;
-//    typedef pair< event::vtime_t, system_id > pair_timestamp_object;
-
-//    struct timestamp_object_comp {
-//        bool operator()( const pair_timestamp_object lhs, const pair_timestamp_object rhs ) const {
-//            return ((lhs.first < rhs.first) || (lhs.first == rhs.first && lhs.second < rhs.second));
-//        }
-//    };
     struct object_timestamp_comp {
         bool operator()( const SequentialSimulationManager::pair_object_timestamp & lhs, const SequentialSimulationManager::pair_object_timestamp & rhs ) const {
             return (lhs.second < rhs.second) || ( lhs.second == rhs.second && lhs.first->getSystemID() < rhs.first->getSystemID() );
         }
     };
 
-//    typedef set< pair_timestamp_object, timestamp_object_comp  > ordered_object_exe_t;
     typedef set< pair_object_timestamp, object_timestamp_comp > ordered_object_exe_t;
     typedef typename ordered_object_exe_t::iterator _iterator;
 
-    SequentialSimulationManager( application *, system_id::manager_id_t id = 0 );
-    SequentialSimulationManager( application *, shared_ptr< SimulationStats >,  system_id::manager_id_t id = 0 );
+    SequentialSimulationManager( shared_ptr< application >, system_id::manager_id_t id = 0 );
+    SequentialSimulationManager( shared_ptr< application >, shared_ptr< SimulationStats >,  system_id::manager_id_t id = 0 );
 
     virtual const event::vtime_t & getSimulationTime() const;
     virtual bool  isSimulationComplete() const;
@@ -83,7 +75,7 @@ protected:
 
 private:
 
-    application *   m_app;
+    shared_ptr< application >   m_app;
 
     event::vtime_t    m_sim_time;
     event::vtime_t    m_sim_until;
@@ -96,13 +88,6 @@ private:
     unsigned int    m_nRegisteredObjs;
 
     shared_ptr< SimulationStats > m_stats;
-
-//    struct object_timestamp_comp {
-//        bool operator()( const SequentialSimulationManager::pair_object_timestamp & lhs, const SequentialSimulationManager::pair_object_timestamp & rhs ) const {
-//            return lhs.second < rhs.second;
-//        }
-//    };
-//    object_timestamp_comp m_ot_comp;
 };
 
 //
@@ -110,7 +95,7 @@ private:
 //
 
 template< class ES >
-SequentialSimulationManager<ES>::SequentialSimulationManager( application * app, system_id::manager_id_t id ) :
+SequentialSimulationManager<ES>::SequentialSimulationManager( shared_ptr< application > app, system_id::manager_id_t id ) :
     SimulationManager< ES >( id ),
     m_app(app),
     m_sim_time( SystemClock::ZERO ),
@@ -123,7 +108,7 @@ SequentialSimulationManager<ES>::SequentialSimulationManager( application * app,
 {}
 
 template< class ES >
-SequentialSimulationManager<ES>::SequentialSimulationManager( application * app, shared_ptr< SimulationStats > stats, system_id::manager_id_t id ) :
+SequentialSimulationManager<ES>::SequentialSimulationManager( shared_ptr< application > app, shared_ptr< SimulationStats > stats, system_id::manager_id_t id ) :
     SimulationManager<ES>( id ),
     m_app(app),
     m_sim_time( SystemClock::ZERO ),
@@ -133,9 +118,7 @@ SequentialSimulationManager<ES>::SequentialSimulationManager( application * app,
     m_nProcessedEvents(0),
     m_nRegisteredObjs(0),
     m_stats( stats )
-{
-
-}
+{ }
 
 template< class ES >
 SequentialSimulationManager<ES>::~SequentialSimulationManager() {

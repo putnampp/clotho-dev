@@ -27,8 +27,8 @@ public:
     typedef pair< object *, ordered_object_exe_t::iterator > pair_object_handle_t;
     typedef vector< pair_object_handle_t > object_handle_map_t;
 
-    SequentialSimulationManager( application *, system_id::manager_id_t id = 0 );
-    SequentialSimulationManager( application *, shared_ptr< SimulationStats >,  system_id::manager_id_t id = 0 );
+    SequentialSimulationManager( shared_ptr< application >, system_id::manager_id_t id = 0 );
+    SequentialSimulationManager( shared_ptr< application >, shared_ptr< SimulationStats >,  system_id::manager_id_t id = 0 );
 
     virtual const event::vtime_t & getSimulationTime() const;
     virtual bool  isSimulationComplete() const;
@@ -58,7 +58,7 @@ protected:
 
 private:
 
-    application *   m_app;
+    shared_ptr< application >   m_app;
 
     event::vtime_t    m_sim_time;
     event::vtime_t    m_sim_until;

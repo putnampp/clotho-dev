@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_SUITE( test_sequential_simulation_manager )
 
 BOOST_AUTO_TEST_CASE( create_seq_sim_man ) {
 
-    application * app = new TestApplication();
+    shared_ptr< application > app( new TestApplication() );
 
     system_id::manager_id_t man_id = 0x00000010;
 
@@ -48,12 +48,10 @@ BOOST_AUTO_TEST_CASE( create_seq_sim_man ) {
     system_id expected_id(man_id, -1);
 
     BOOST_REQUIRE_MESSAGE( ssm.getSystemID() == expected_id, "Unexpected Sequential Simulation Manager system id: " << ssm.getSystemID() << " != " << expected_id );
-
-    delete app;
 }
 
 BOOST_AUTO_TEST_CASE( register_object ) {
-    application * app = new TestApplication();
+    shared_ptr< application > app( new TestApplication() );
     system_id::manager_id_t man_id = 0x00000010;
 
     SequentialSimulationManager ssm( app, man_id );
@@ -69,12 +67,10 @@ BOOST_AUTO_TEST_CASE( register_object ) {
     BOOST_REQUIRE_MESSAGE( ssm.getObjectCount() == 1, "Unexpected number of registered objects: " << ssm.getObjectCount() << " != 1");
 
     BOOST_REQUIRE_MESSAGE( obj.getSystemID() == expected_obj_id, "Unexpected Test Object system id: " << obj.getSystemID() << " != " << expected_obj_id );
-
-    delete app;
 }
 
 BOOST_AUTO_TEST_CASE( get_and_unregister_object ) {
-    application * app = new TestApplication();
+    shared_ptr< application > app( new TestApplication());
     system_id::manager_id_t man_id = 0x00000010;
 
     SequentialSimulationManager ssm( app, man_id );
@@ -101,12 +97,10 @@ BOOST_AUTO_TEST_CASE( get_and_unregister_object ) {
     delete obj; 
 
     BOOST_REQUIRE_MESSAGE( ssm.getObjectCount() == 0, "Unexpected number of registered objects: " << ssm.getObjectCount() << " != 0");
-
-    delete app;
 }
 
 BOOST_AUTO_TEST_CASE( route_event_test ) {
-    application * app = new TestApplication();
+    shared_ptr< application > app( new TestApplication() );
     system_id::manager_id_t man_id = 0x00000010;
 
     SequentialSimulationManager ssm( app, man_id );
@@ -141,7 +135,6 @@ BOOST_AUTO_TEST_CASE( route_event_test ) {
 
     delete evt;
     delete obj;
-    delete app;
 }
 
 BOOST_AUTO_TEST_SUITE_END()
