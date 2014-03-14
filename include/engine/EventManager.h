@@ -10,7 +10,7 @@
 #include <set>
 
 #include "event_functor.h"
-#include "FSBAllocator.hh"
+//#include "FSBAllocator.hh"
 
 using std::list;
 using std::vector;
@@ -34,9 +34,9 @@ public:
 
 
 template < >
-class EventManager < std::list< const event *, FSBAllocator< const event * > > > : virtual public event_manager {
+class EventManager < std::list< const event * /*, FSBAllocator< const event * >*/ > > : virtual public event_manager {
 public:
-    typedef std::list< const event *, FSBAllocator< const event * > > event_set_t;
+    typedef std::list< const event * /*, FSBAllocator< const event * > */> event_set_t;
     typedef typename event_set_t::iterator iterator;
 
     EventManager() :
@@ -197,7 +197,7 @@ public:
 protected:
     event_set_t m_events;
 
-    std::list< const event *, FSBAllocator< const event *> > m_processed;
+    std::list< const event * /*, FSBAllocator< const event *>*/ > m_processed;
 };
 
 

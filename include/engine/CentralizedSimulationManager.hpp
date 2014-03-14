@@ -18,13 +18,6 @@ public:
     typedef pair< event::vtime_t, size_t > pair_time_offset;
     typedef pair< object *, pair_time_offset > pair_object_timestamp;
     typedef vector< pair_object_timestamp > object_handle_map_t;
-/*
-    struct object_timestamp_comp {
-        bool operator()( const CentralizedSimulationManager::pair_object_timestamp & lhs, const CentralizedSimulationManager::pair_object_timestamp & rhs ) const {
-            return (lhs.second < rhs.second) || ( lhs.second == rhs.second && lhs.first->getSystemID() < rhs.first->getSystemID() );
-        }
-    };
-*/
     typedef vector< object * > object_group_t;
     typedef pair< event::vtime_t, object_group_t * > concurrent_group_t;
     typedef map< event::vtime_t, object_group_t * > ordered_object_exe_t;
@@ -59,10 +52,8 @@ protected:
     virtual bool setSimulationTime( const event::vtime_t & t );
     virtual void setSimulateUntil( const event::vtime_t & t );
 
-protected:
     void moveObject( object * obj, event::vtime_t t );
 
-private:
     shared_ptr< application >   m_app;
 
     event::vtime_t    m_sim_time;
@@ -89,6 +80,7 @@ CentralizedSimulationManager<ES>::CentralizedSimulationManager( shared_ptr< appl
     m_app( app ),
     m_sim_time( SystemClock::ZERO ),
     m_sim_until( SystemClock::POSITIVE_INFINITY ),
+    m_sim_complete(false),
     m_nPendingEvents(0),
     m_nProcessedEvents(0),
     m_nRegisteredObjs(0),
@@ -102,6 +94,7 @@ CentralizedSimulationManager<ES>::CentralizedSimulationManager( shared_ptr< appl
     m_app( app ),
     m_sim_time( SystemClock::ZERO ),
     m_sim_until( SystemClock::POSITIVE_INFINITY ),
+    m_sim_complete(false),
     m_nPendingEvents(0),
     m_nProcessedEvents(0),
     m_nRegisteredObjs(0),
@@ -260,8 +253,11 @@ void CentralizedSimulationManager<ES>::simulate( const event::vtime_t & until ) 
             break;
         }
 
-        for( object_group_t::iterator it = ot.second->begin(); it != ot.second->end(); it++ ) {
-            object * obj = (*it);
+//        for( object_group_t::iterator it = ot.second->begin(); it != ot.second->end(); it++ ) {
+        while( !ot.second->empty() ) {
+            object * obj = ot.second->back();
+            ot.second->pop_back();
+
             m_objects[ obj->getObjectID() ].second.first = SystemClock::POSITIVE_INFINITY;
             obj->updateLocalTime(ot.first);
             obj->process();
@@ -274,7 +270,6 @@ void CentralizedSimulationManager<ES>::simulate( const event::vtime_t & until ) 
             }
         }
 
-        ot.second->clear();
         delete ot.second;
     }
 

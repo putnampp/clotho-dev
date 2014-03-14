@@ -5,17 +5,17 @@
 #include <list>
 #include <iostream>
 
-#include "engine/FSBAllocator.hh"
+/*#include "engine/FSBAllocator.hh"*/
 
-class MyTestSO : public SimulationObject< std::list< const event *, FSBAllocator< const event * >  > > {
+class MyTestSO : public SimulationObject< std::list< const event * /*, FSBAllocator< const event * >*/  > > {
 public:
     MyTestSO( ) : 
-        SimulationObject< std::list< const event *, FSBAllocator< const event * > > >( ),
+        SimulationObject< std::list< const event * /*, FSBAllocator< const event * >*/ > >( ),
         m_process_count(0) 
     {}
 
     MyTestSO( simulation_manager * manager ) : 
-        SimulationObject< std::list< const event *, FSBAllocator< const event * > > >( manager ),
+        SimulationObject< std::list< const event * /*, FSBAllocator< const event * >*/ > >( manager ),
         m_process_count(0)
     {
         setSimulationManager( manager );

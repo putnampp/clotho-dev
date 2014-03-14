@@ -33,11 +33,31 @@
 #include "clotho_application.h"
 #include "engine/SequentialSimulationManager.hpp"
 #include "engine/CentralizedSimulationManager.hpp"
+#include "engine/ThreadedCentralizedSimulationManager.hpp"
 #include "engine/simulation_stats.h"
 
 #include "rng/rng.hpp"
 
+#include <boost/program_options.hpp>
+
+namespace po=boost::program_options;
+
+bool parse_commandline( int argc, char ** argv, po::variables_map & vm );
+
 const string RUNTIME_K = "total_runtime";
+
+const string HELP_K = "help";
+const string VERSION_K = "version";
+
+const string ENGINE_CONFIG_K    = "engine_config";
+const string APP_CONFIG_K       = "app_config";
+
+const string SIM_UNTIL_K        = "sim-until";
+const string THREAD_COUNT_K     = "thread-count";
+
+const string SEQSM_K = "sequential";
+const string CENSM_K = "centralized";
+const string TCENSM_K = "threaded-centralized";
 
 template <>
 void SequentialSimulationManager< pooled_event_set >::routeEvent( const event * evt ) {
@@ -53,22 +73,31 @@ void CentralizedSimulationManager< pooled_event_set >::routeEvent( const event *
     }
 }
 
+template <>
+void ThreadedCentralizedSimulationManager< pooled_event_set >::clearBufferedEvents() {
+    for( unsigned int i = 0; i < m_nThreads; ++i ) {
+        while( !m_buffers[i]->empty() ) {
+            const event * t = m_buffers[i]->back();
+            m_buffers[i]->pop_back();
+
+            if( insertEvent( t ) ) {
+                notifyNextEvent( t->getReceiver(), t->getReceived() );
+            }
+        }
+    }
+}
+
 int main( int argc, char ** argv ) {
 
-    if( argc < 3 || argc > 5 ) {
-        cerr << "Expected Usage: clotho <engine_config_file> <app_config_file> (simulateUntil) ([C]entralized)" << endl;
-        return EXIT_FAILURE;
+    po::variables_map vm;
+    if( !parse_commandline( argc, argv, vm ) ) {
+        return 0;
     }
 
-    string engine_config( argv[1] );
-    string clotho_config( argv[2] );
+    string engine_config( "" );
+    string clotho_config( "" );
 
-    SystemClock::vtime_t tUntil = SystemClock::POSITIVE_INFINITY;
-
-    if( argc >= 4 ) {
-        string tmp = argv[3];
-        tUntil = SystemClock::toVTime( tmp );
-    }
+    SystemClock::vtime_t tUntil = vm[ SIM_UNTIL_K ].as< event::vtime_t >();
 
     cout << "Simulate until: " << tUntil << endl;
 
@@ -82,9 +111,15 @@ int main( int argc, char ** argv ) {
 
     simulation_manager * sim = NULL;
 
-    if( argc == 5 && argv[4][0] == 'C' ) {
+    if( vm.count( CENSM_K ) ) {
         cout << "Using a Centralized Simulation Manager" << endl;
         sim = new CentralizedSimulationManager< ClothoEventSet >( app, stats );
+    } else if( vm.count( TCENSM_K ) ) {
+        unsigned int tc = vm[ THREAD_COUNT_K ].as< unsigned int >();
+
+        assert( 0 < tc && tc <= 6 );
+        cout << "Using a Threaded Centralized Simulation Manager with " << tc << " threads" << endl;
+        sim = new ThreadedCentralizedSimulationManager< ClothoEventSet >( app, stats, tc );
     } else {
         cout << "Using a Sequential Simulation Manager" << endl;
         sim = new SequentialSimulationManager< ClothoEventSet >( app, stats );
@@ -109,4 +144,36 @@ int main( int argc, char ** argv ) {
     delete sim;
 
     return 0;
+}
+
+bool parse_commandline( int argc, char ** argv, po::variables_map & vm ) {
+    po::options_description gen( "General" );
+    gen.add_options()
+    ( (HELP_K + ",h").c_str(), "Print this" )
+    ( (VERSION_K + ",v").c_str(), "Version" )
+    ;
+
+    po::options_description simulation( "Simulation Parameters" );
+    simulation.add_options()
+    ( SIM_UNTIL_K.c_str(), po::value<event::vtime_t>()->default_value( SystemClock::POSITIVE_INFINITY ), "Simulate until time. Default value is positive infinity")
+    ( THREAD_COUNT_K.c_str(), po::value< unsigned int >()->default_value( 4 ), "Thread count for thread aware simulation managers are used. Does not apply when --sequential, or --centralized flags are used")
+    ( SEQSM_K.c_str(), "Run the simulation with the sequential simulation manager" )
+    ( CENSM_K.c_str(), "Run the simulation with the centralized simulation manager" )
+    ( TCENSM_K.c_str(), "Run the simulation with the centralized simulation manager (thread aware)")
+    ;
+
+//    po::options_description app( "Application Parameters" );
+
+    po::options_description cmdline;
+
+    cmdline.add(gen).add(simulation);
+    po::store( po::command_line_parser( argc, argv ).options( cmdline ).run(), vm );
+
+    bool res = true;
+    if( vm.count( HELP_K ) ) {
+        cout << cmdline << endl;
+        res = false;
+    }
+
+    return res;
 }
