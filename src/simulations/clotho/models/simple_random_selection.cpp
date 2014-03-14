@@ -5,7 +5,9 @@ SimpleRandomSelection::SimpleRandomSelection( shared_ptr< iRNG > rng ) : m_rng(r
 {}
 
 system_id SimpleRandomSelection::find_mate( const system_id & id, const vector< system_id > & pool ) {
-    int r = m_rng->nextInt(pool.size());
+    unsigned int r = m_rng->nextInt();
+    //cout << r << "\n";
+    r %= pool.size();
     return pool[r];
 }
 

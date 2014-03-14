@@ -24,7 +24,8 @@ Environment::Environment( simulation_manager * manager ) :
     ClothoObject( manager ),
     m_genetic_map( new GeneticMap() ),
     m_selection_model( NULL ),
-    m_reproduction_model( NULL )
+    m_reproduction_model( NULL ),
+    m_nIndAlloc(0)
 {
     setSimulationManager( manager );
 }
@@ -34,7 +35,8 @@ Environment::Environment( simulation_manager * manager, GeneticMap::Ptr gmap, se
     ClothoObject( manager ),
     m_genetic_map( gmap ),
     m_selection_model( s ),
-    m_reproduction_model( r )
+    m_reproduction_model( r ),
+    m_nIndAlloc(0)
 {
     setSimulationManager( manager );
 }
@@ -68,6 +70,7 @@ void Environment::finalize() {
     m_males.clear();
     m_females.clear();
 
+    cout << m_active_individuals.size() << " active individuals at the time of finalization" << endl;
     while( !m_active_individuals.empty() ) {
         object * tmp = m_sim_manager->getObject( m_active_individuals.begin()->first );
         m_active_individuals.erase( m_active_individuals.begin() );
@@ -75,6 +78,15 @@ void Environment::finalize() {
         delete tmp;
     }
 
+    cout << m_pending.size() << " individuals waiting to be born" << endl;
+    while( !m_pending.empty() ) {
+        object * tmp = m_sim_manager->getObject( *m_pending.begin() );
+        m_pending.erase( m_pending.begin() );
+        tmp->finalize();
+        delete tmp;
+    }
+
+    cout << m_available_individuals.size() << " available individuals at the time of finalization" << endl;
     while( !m_available_individuals.empty() ) {
         object * tmp = m_sim_manager->getObject( m_available_individuals.front() );
         m_available_individuals.pop_front();
@@ -83,11 +95,14 @@ void Environment::finalize() {
     }
 
     ClothoObject::finalize();
+
+    cout << m_nIndAlloc << " allocated individuals by the environment" << endl;
 }
 
 system_id Environment::getIndividual() {
     system_id id(0);
     if( m_available_individuals.empty() ) {
+        ++m_nIndAlloc;
         Individual * ind = new Individual( m_sim_manager, getSystemID(), m_reproduction_model );
         id = ind->getSystemID();
     } else {
@@ -96,6 +111,7 @@ system_id Environment::getIndividual() {
         assert( m_available_individuals.empty() || m_available_individuals.front() != id );
     }
 
+    m_pending.insert( id );
     return id;
 }
 
@@ -108,6 +124,8 @@ void Environment::handle_birth( const ClothoEvent * ce ) {
 
     DeathEvent * de = new DeathEvent( getCurrentTime(), getCurrentTime() + 3, getSystemID(), ce->getSender(), getNextEventID() );
     sendEvent(de);
+
+    m_pending.erase( be->getSender() );
 
     if( be->getSex() == FEMALE ) {
         m_active_individuals.insert( make_pair( be->getSender(), make_pair( &m_females, m_females.size())));

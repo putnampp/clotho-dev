@@ -30,6 +30,7 @@ INCLUDE_DIRECTORIES( ${${PROJECT_NAME}_INCLUDE_DIR} )
 INCLUDE_DIRECTORIES( ${${PROJECT_NAME}_INCLUDE_DIR}/engine )
 
 LIST( APPEND ENGINE_SRCS system_clock.cpp )
+LIST( APPEND ENGINE_SRCS event_interface.cpp )
 LIST( APPEND ENGINE_SRCS simulation_stats.cpp )
 LIST( APPEND ENGINE_SRCS SequentialSimulationManager.cpp)
 

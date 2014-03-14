@@ -11,6 +11,7 @@
 #include <vector>
 #include <unordered_map>
 #include <unordered_set>
+#include <set>
 
 #include "../event/clotho_event.h"
 #include "../event_performer.h"
@@ -20,6 +21,7 @@
 
 using std::deque;
 using std::vector;
+using std::set;
 using std::unordered_map;
 using std::unordered_set;
 
@@ -27,7 +29,6 @@ using std::unordered_set;
 //class Environment : public SimulationObject< ClothoEventSet > {
 class Environment : public ClothoObject {
 public:
-//    typedef unordered_map< const system_id, Population * > id_to_population_map_t;
     friend class EventPerformer< Environment, ClothoEvent >;
 
     typedef vector< system_id > individual_group_t;
@@ -61,13 +62,15 @@ protected:
 //    void removeIndividual( const system_id & id );
     
     individual_group_t m_males, m_females;
-//    unordered_set< system_id > m_active_individuals;
     individual_group_lookup_t m_active_individuals;
     deque< system_id > m_available_individuals;
+    set< system_id > m_pending; 
 
     GeneticMap::Ptr     m_genetic_map;
     selection_model *   m_selection_model;
     reproduction *      m_reproduction_model;
+
+    unsigned int        m_nIndAlloc;
 
     static EventPerformer< Environment, ClothoEvent > m_evt_performer;
 };

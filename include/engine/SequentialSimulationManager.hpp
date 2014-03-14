@@ -86,6 +86,7 @@ private:
 
     unsigned int    m_nPendingEvents, m_nProcessedEvents;
     unsigned int    m_nRegisteredObjs;
+    unsigned int    m_nUnregisterCalls;
 
     shared_ptr< SimulationStats > m_stats;
 };
@@ -104,6 +105,7 @@ SequentialSimulationManager<ES>::SequentialSimulationManager( shared_ptr< applic
     m_nPendingEvents(0),
     m_nProcessedEvents(0),
     m_nRegisteredObjs(0),
+    m_nUnregisterCalls(0),
     m_stats( new SimulationStats() )
 {}
 
@@ -117,11 +119,13 @@ SequentialSimulationManager<ES>::SequentialSimulationManager( shared_ptr< applic
     m_nPendingEvents(0),
     m_nProcessedEvents(0),
     m_nRegisteredObjs(0),
+    m_nUnregisterCalls(0),
     m_stats( stats )
 { }
 
 template< class ES >
 SequentialSimulationManager<ES>::~SequentialSimulationManager() {
+    cout << m_nUnregisterCalls << " objects unregistered BEFORE destruction" << endl;
     unsigned int nUnfinalized = 0;
     while( !m_objects.empty() ) {
         object * tmp = m_objects.back().first;
@@ -170,6 +174,7 @@ void SequentialSimulationManager<ES>::registerObject( object * obj ) {
 
 template< class ES >
 void SequentialSimulationManager<ES>::unregisterObject( object * obj ) {
+    ++m_nUnregisterCalls;
     if( obj == NULL ) return;
 
     if( m_objects[ obj->getObjectID() ].first != NULL ) {

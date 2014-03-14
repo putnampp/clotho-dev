@@ -74,6 +74,7 @@ private:
 
     unsigned int    m_nPendingEvents, m_nProcessedEvents;
     unsigned int    m_nRegisteredObjs;
+    unsigned int    m_nUnregisterCalls;
 
     shared_ptr< SimulationStats > m_stats;
 };
@@ -91,6 +92,7 @@ CentralizedSimulationManager<ES>::CentralizedSimulationManager( shared_ptr< appl
     m_nPendingEvents(0),
     m_nProcessedEvents(0),
     m_nRegisteredObjs(0),
+    m_nUnregisterCalls(0),
     m_stats( new SimulationStats() )
 {}
 
@@ -103,11 +105,13 @@ CentralizedSimulationManager<ES>::CentralizedSimulationManager( shared_ptr< appl
     m_nPendingEvents(0),
     m_nProcessedEvents(0),
     m_nRegisteredObjs(0),
+    m_nUnregisterCalls(0),
     m_stats( stats )
 {}
 
 template < class ES >
 CentralizedSimulationManager<ES>::~CentralizedSimulationManager() {
+    cout << m_nUnregisterCalls << " objects unregistered BEFORE destruction" << endl;
     unsigned int nUnfinalized = 0;
     while( !m_objects.empty() ) {
         object * tmp = m_objects.back().first;
@@ -145,6 +149,7 @@ void CentralizedSimulationManager<ES>::registerObject( object * obj ) {
 
 template< class ES >
 void CentralizedSimulationManager<ES>::unregisterObject( object * obj ) {
+    ++m_nUnregisterCalls;
     if( obj == NULL ) return;
 
     if( m_objects[ obj->getObjectID() ].first != NULL ) {

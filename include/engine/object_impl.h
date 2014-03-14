@@ -49,6 +49,7 @@ public:
         while( tmp != NULL && tmp->getReceived() == m_local_time ) {
             tmp = getEvent( m_id );
 
+//            cout << m_id << "@" << getCurrentTime() << ": " <<  tmp << "\n";
             perform_event( tmp );
 
             tmp = peekEvent( m_id );

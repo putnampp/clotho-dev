@@ -2,6 +2,7 @@
 #define _EVENT_INTERFACE_H_
 
 #include "engine.h"
+#include <ostream>
 
 struct event {
     typedef unsigned int            event_id_t;
@@ -19,5 +20,8 @@ struct event {
 
     virtual ~event() {}
 };
+
+std::ostream & operator<<( std::ostream &, const event * );
+std::ostream & operator<<( std::ostream &, const event & );
 
 #endif  // _EVENT_INTERFACE_H_
