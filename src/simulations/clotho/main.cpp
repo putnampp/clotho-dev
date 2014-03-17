@@ -59,6 +59,8 @@ const string SEQSM_K = "sequential";
 const string CENSM_K = "centralized";
 const string TCENSM_K = "threaded-centralized";
 
+const string FOUNDER_SIZE_K = "founder-size";
+
 template <>
 void SequentialSimulationManager< pooled_event_set >::routeEvent( const event * evt ) {
     if( insertEvent( evt ) ) {
@@ -128,6 +130,7 @@ int main( int argc, char ** argv ) {
     assert( sim != NULL );
 
     (std::static_pointer_cast<ClothoApplication>(app))->setSimulationManager( sim );
+    (std::static_pointer_cast<ClothoApplication>(app))->setFounderSize( vm[ FOUNDER_SIZE_K ].as<unsigned int>() );
 
     stats->startPhase( RUNTIME_K );
 
@@ -162,11 +165,14 @@ bool parse_commandline( int argc, char ** argv, po::variables_map & vm ) {
     ( TCENSM_K.c_str(), "Run the simulation with the centralized simulation manager (thread aware)")
     ;
 
-//    po::options_description app( "Application Parameters" );
+    po::options_description clotho_app( "Clotho Application Parameters" );
+    clotho_app.add_options()
+    ( FOUNDER_SIZE_K.c_str(), po::value< unsigned int >()->default_value(10000), "Founding population size" )
+    ;
 
     po::options_description cmdline;
 
-    cmdline.add(gen).add(simulation);
+    cmdline.add(gen).add(simulation).add( clotho_app );
     po::store( po::command_line_parser( argc, argv ).options( cmdline ).run(), vm );
 
     bool res = true;

@@ -42,6 +42,8 @@ public:
 
     Environment( simulation_manager * manager, GeneticMap::Ptr gmap, selection_model * s, reproduction * r );
 
+    void setFounderSize( unsigned int s );
+
     virtual void initialize();
  
     virtual void perform_event( const event * );
@@ -71,6 +73,7 @@ protected:
     reproduction *      m_reproduction_model;
 
     unsigned int        m_nIndAlloc;
+    unsigned int        m_nFounder;
 
     static EventPerformer< Environment, ClothoEvent > m_evt_performer;
 };

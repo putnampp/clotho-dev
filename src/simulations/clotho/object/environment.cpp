@@ -25,7 +25,8 @@ Environment::Environment( simulation_manager * manager ) :
     m_genetic_map( new GeneticMap() ),
     m_selection_model( NULL ),
     m_reproduction_model( NULL ),
-    m_nIndAlloc(0)
+    m_nIndAlloc(0),
+    m_nFounder(0)
 {
     setSimulationManager( manager );
 }
@@ -36,14 +37,19 @@ Environment::Environment( simulation_manager * manager, GeneticMap::Ptr gmap, se
     m_genetic_map( gmap ),
     m_selection_model( s ),
     m_reproduction_model( r ),
-    m_nIndAlloc(0)
+    m_nIndAlloc(0),
+    m_nFounder(0)
 {
     setSimulationManager( manager );
 }
 
+void Environment::setFounderSize( unsigned int s ) {
+    m_nFounder = s;
+}
+
 void Environment::initialize() {
 
-    for( int i = 0; i < 10000; ++i ) {
+    for( unsigned int i = 0; i < m_nFounder; ++i ) {
         system_id id = getIndividual();
         object * t = m_sim_manager->getObject( id );
 

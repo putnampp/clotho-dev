@@ -22,6 +22,7 @@ public:
     ClothoApplication( const string & config, shared_ptr< iRNG > );
 
     void setSimulationManager( simulation_manager * manager );
+    void setFounderSize( unsigned int s );
 
     void initialize();
 
@@ -39,6 +40,8 @@ protected:
     vector< system_id > m_system_objs;
     selection_model *   m_selection_model;
     reproduction *      m_reproduction_model;
+
+    unsigned int        m_nFounder;
 };
 
 #endif  // CLOTHO_APPLICATION_H_

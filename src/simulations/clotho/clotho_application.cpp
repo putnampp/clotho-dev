@@ -17,7 +17,8 @@ ClothoApplication::ClothoApplication( const string & config, shared_ptr< iRNG > 
     m_genetic_map( new GeneticMap() ),
     m_rng( rng ),
     m_selection_model( new SimpleRandomSelection( m_rng ) ),
-    m_reproduction_model( new SimpleReproduction() )
+    m_reproduction_model( new SimpleReproduction() ),
+    m_nFounder(10000)
 {}
 
 ClothoApplication::~ClothoApplication() {
@@ -29,10 +30,15 @@ void ClothoApplication::setSimulationManager( simulation_manager * manager ) {
     m_sim_manager = manager;
 }
 
+void ClothoApplication::setFounderSize( unsigned int s ) {
+    m_nFounder = s;
+}
+
 void ClothoApplication::initialize() {
     assert( m_sim_manager != NULL );
 
     Environment * env = new Environment( m_sim_manager, m_genetic_map, m_selection_model, m_reproduction_model );
+    env->setFounderSize( m_nFounder );
     env->initialize();
 
     m_system_objs.push_back( env->getSystemID() );

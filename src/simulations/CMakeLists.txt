@@ -28,7 +28,7 @@
 ################################################################################
 #SET( DIRS examples )
 
-LIST( APPEND SIM_DIRS genetics_warped )
+#LIST( APPEND SIM_DIRS genetics_warped )
 LIST( APPEND SIM_DIRS clotho )
 
 FOREACH( D ${SIM_DIRS} )
