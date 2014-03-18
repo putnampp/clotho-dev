@@ -19,7 +19,7 @@ using std::vector;
 class ClothoApplication : public application {
 public:
 //    friend class ConfigurationManager< ClothoApplication >;
-    ClothoApplication( const string & config, shared_ptr< iRNG > );
+    ClothoApplication( const string & config, shared_ptr< iRNG >, unsigned int nEnvs = 1 );
 
     void setSimulationManager( simulation_manager * manager );
     void setFounderSize( unsigned int s );
@@ -30,9 +30,15 @@ public:
 
     virtual ~ClothoApplication();
 protected:
+
+    void setupDistributedEnvironment();
+    void setupEnvironment();
+
     string  m_config_file;
 //    ConfigurationManager< ClothoApplication > m_config;
     simulation_manager * m_sim_manager;
+
+    unsigned int m_nEnvironments;
 
     GeneticMap::Ptr     m_genetic_map;
     shared_ptr< iRNG >  m_rng;

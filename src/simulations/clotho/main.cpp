@@ -59,7 +59,10 @@ const string SEQSM_K = "sequential";
 const string CENSM_K = "centralized";
 const string TCENSM_K = "threaded-centralized";
 
+const string DISTRIBUTED_ENV_K = "dist-env";
 const string FOUNDER_SIZE_K = "founder-size";
+
+static const unsigned int MAX_THREADS = 24;
 
 template <>
 void SequentialSimulationManager< pooled_event_set >::routeEvent( const event * evt ) {
@@ -101,29 +104,39 @@ int main( int argc, char ** argv ) {
 
     SystemClock::vtime_t tUntil = vm[ SIM_UNTIL_K ].as< event::vtime_t >();
 
+    tUntil *= LIFE_CYCLE_PADDING;
+
     cout << "Simulate until: " << tUntil << endl;
 
     shared_ptr< iRNG > rng( new GSL_RNG());
 
     cout << "RNG: " <<  rng->getType() << "; seed: " << rng->getSeed() << endl;
 
-    shared_ptr< application > app( new ClothoApplication( clotho_config, rng ) );
-
+    shared_ptr< application > app;
     shared_ptr< SimulationStats > stats( new SimulationStats() );
 
     simulation_manager * sim = NULL;
 
     if( vm.count( CENSM_K ) ) {
         cout << "Using a Centralized Simulation Manager" << endl;
+        app.reset( new ClothoApplication( clotho_config, rng, vm[ DISTRIBUTED_ENV_K ].as< unsigned int >() ) );
         sim = new CentralizedSimulationManager< ClothoEventSet >( app, stats );
     } else if( vm.count( TCENSM_K ) ) {
         unsigned int tc = vm[ THREAD_COUNT_K ].as< unsigned int >();
 
-        assert( 0 < tc && tc <= 6 );
+        assert( 0 < tc && tc <= MAX_THREADS );
         cout << "Using a Threaded Centralized Simulation Manager with " << tc << " threads" << endl;
+
+        if( tc > vm[ DISTRIBUTED_ENV_K ].as< unsigned int >() ) {
+            app.reset( new ClothoApplication( clotho_config, rng, tc ) );
+        } else {
+            app.reset( new ClothoApplication( clotho_config, rng, vm[ DISTRIBUTED_ENV_K ].as< unsigned int >() ) );
+        }
         sim = new ThreadedCentralizedSimulationManager< ClothoEventSet >( app, stats, tc );
+
     } else {
         cout << "Using a Sequential Simulation Manager" << endl;
+        app.reset( new ClothoApplication( clotho_config, rng, vm[ DISTRIBUTED_ENV_K ].as< unsigned int >() ) );
         sim = new SequentialSimulationManager< ClothoEventSet >( app, stats );
     }
 
@@ -167,6 +180,7 @@ bool parse_commandline( int argc, char ** argv, po::variables_map & vm ) {
 
     po::options_description clotho_app( "Clotho Application Parameters" );
     clotho_app.add_options()
+    ( DISTRIBUTED_ENV_K.c_str(), po::value< unsigned int >()->default_value( 1 ), "Number of environment partitions; Thread aware simulation managers will partition the environment into the max of the number of partitions and thread count" )
     ( FOUNDER_SIZE_K.c_str(), po::value< unsigned int >()->default_value(10000), "Founding population size" )
     ;
 

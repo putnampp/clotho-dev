@@ -3,6 +3,7 @@
 #include "../event/birth_event.h"
 #include "../event/death_event.h"
 #include "../event/inherit_event.h"
+#include "../event/maturity_event.h"
 #include "../event/mate_event.h"
 
 #include "../genomes/human_zygote.h"
@@ -45,6 +46,7 @@ void Individual::perform_event( const event * e ) {
 
     if( evt ) {
 //        m_evt_performer( this, evt );
+//        cout <<"Individual-" << getSystemID() << "@" << getCurrentTime() << ": " << evt << endl;
         if( evt->getEventType() == BIRTH_EVENT_K ) {
             handle_birth( evt );
         } else if( evt->getEventType() == DEATH_EVENT_K ) {
@@ -53,6 +55,8 @@ void Individual::perform_event( const event * e ) {
             handle_inherit( evt );
         } else if( evt->getEventType() == MATE_EVENT_K ) {
             handle_mate( evt );
+        } else if( evt->getEventType() == MATURITY_EVENT_K ) {
+            handle_maturity( evt );
         }
     }
 }
@@ -88,7 +92,12 @@ void Individual::handle_inherit( const ClothoEvent * evt ) {
     m_prop->inheritFrom( ie->getSender(), ie->getParentSex(), ie->getZygote() );
 
     if( m_prop->getFather() != UNSET_ID && m_prop->getMother() != UNSET_ID ) {
-        handle_birth( evt );
+        event::vtime_t bday = evt->getReceived();
+        bday = ((bday / LIFE_CYCLE_PADDING) + 1) * LIFE_CYCLE_PADDING;
+
+        BirthEvent * be = new BirthEvent( getCurrentTime(), bday, this->getSystemID(), this->getSystemID(), getNextEventID(), m_prop->getSex() );
+//        handle_birth( evt );
+        sendEvent( be );
     }
 }
 
@@ -101,4 +110,9 @@ void Individual::handle_mate( const ClothoEvent * evt ) {
 
     InheritEvent * ie = new InheritEvent( getCurrentTime(), getCurrentTime(), this->getSystemID(), me->getOffspringID(), getNextEventID(), m_prop->getSex(), z );
     sendEvent( ie );
+}
+
+void Individual::handle_maturity( const ClothoEvent * evt ) {
+    MaturityEvent * me = new MaturityEvent( getCurrentTime(), getCurrentTime(), this->getSystemID(), m_env_id, getNextEventID(), m_prop->getSex());
+    sendEvent( me );
 }

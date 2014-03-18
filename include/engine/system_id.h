@@ -68,6 +68,8 @@ private:
     _system_id m_id;
 };
 
+static const system_id DefaultSystemID;
+
 inline ostream & operator<<( ostream & out, const system_id & id ) {
     out << "[" << id.getManagerID() << "," << id.getObjectID() << "]";
     return out;

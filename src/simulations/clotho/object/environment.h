@@ -56,9 +56,9 @@ public:
 
 protected:
 
-    void handle_birth( const ClothoEvent * ce );
-    void handle_maturity( const ClothoEvent * ce );
-    void handle_death( const ClothoEvent * ce );
+    virtual void handle_birth( const ClothoEvent * ce );
+    virtual void handle_maturity( const ClothoEvent * ce );
+    virtual void handle_death( const ClothoEvent * ce );
 
 //    void addIndividual( const system_id & id );
 //    void removeIndividual( const system_id & id );

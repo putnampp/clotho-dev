@@ -33,6 +33,7 @@ protected:
     void handle_death( const ClothoEvent * e );
     void handle_inherit( const ClothoEvent * e );
     void handle_mate( const ClothoEvent * e );
+    void handle_maturity( const ClothoEvent * e );
 
     system_id   m_env_id;
     IndividualProperties * m_prop;

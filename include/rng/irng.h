@@ -1,12 +1,16 @@
 #ifndef IRNG_H_
 #define IRNG_H_
 
-#include <string>
+//#include <string>
+#include "common.h"
+
 
 typedef unsigned int    seed_t;
 typedef std::string     type_t;
 
 struct iRNG {
+    virtual shared_ptr< iRNG > clone() = 0;
+
     virtual const type_t & getType() const = 0;
     virtual seed_t    getSeed() const = 0;
     virtual void    reseed( seed_t ) = 0;

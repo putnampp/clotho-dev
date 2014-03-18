@@ -38,6 +38,12 @@ public:
         initialize();
     }
 
+    shared_ptr< iRNG > clone() {
+        shared_ptr< iRNG> c( new RNG< gsl_rng * >( this->getType(), this->getSeed() ));
+
+        return c;
+    }
+
     const type_t & getType() const {
         return m_type;
     }

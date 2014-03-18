@@ -6,7 +6,9 @@
 
 #include "simulation_stats.h"
 #include <map>
+#include <deque>
 
+using std::deque;
 using std::map;
 using std::pair;
 using std::make_pair;
@@ -17,7 +19,7 @@ class CentralizedSimulationManager : public SimulationManager< ES > {
 public:
     typedef pair< event::vtime_t, size_t > pair_time_offset;
     typedef pair< object *, pair_time_offset > pair_object_timestamp;
-    typedef vector< pair_object_timestamp > object_handle_map_t;
+    typedef deque< pair_object_timestamp > object_handle_map_t;
     typedef vector< object * > object_group_t;
     typedef pair< event::vtime_t, object_group_t * > concurrent_group_t;
     typedef map< event::vtime_t, object_group_t * > ordered_object_exe_t;
