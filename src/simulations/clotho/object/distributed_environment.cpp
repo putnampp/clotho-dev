@@ -5,11 +5,14 @@
 #include "../event/mate_event.h"
 #include "../event/environment_snapshot_event.h"
 #include "../event/signal_mate_event.h"
+#include "../event/selection_event.h"
+#include "../event/maturity_event.h"
 
 DistributedEnvironment::DistributedEnvironment( simulation_manager * manager, const system_id & global_env ) :
     Environment( manager ),
     m_global_env( global_env ),
-    m_snapshot()
+    m_snapshot(),
+    m_view_threshold( 0.5 )
 {
     setSimulationManager( manager );
     if( m_global_env == DefaultSystemID ) {
@@ -18,10 +21,12 @@ DistributedEnvironment::DistributedEnvironment( simulation_manager * manager, co
     }
 }
 
-DistributedEnvironment::DistributedEnvironment( simulation_manager * manager, const system_id & global_env, GeneticMap::Ptr gmap, selection_model * s, reproduction * r ) :
+DistributedEnvironment::DistributedEnvironment( simulation_manager * manager, const system_id & global_env, GeneticMap::Ptr gmap, selection_model * s, reproduction * r, shared_ptr< iRNG > rng, double threshold ) :
     Environment( manager, gmap, s, r ),
     m_global_env( global_env ),
-    m_snapshot()
+    m_snapshot(),
+    m_rng( rng->clone() ),
+    m_view_threshold( threshold )
 {
     setSimulationManager( manager );
     if( m_global_env == DefaultSystemID ) {
@@ -57,6 +62,8 @@ void DistributedEnvironment::perform_event( const event * e) {
             handle_signal_mate( evt );
         } else if( evt->getEventType() == ENVIRONMENT_SNAPSHOT_EVENT_K ) {
             handle_snapshot( evt );
+        } else if( evt->getEventType() == SELECTION_EVENT_K ) {
+            handle_selection( evt );
         } else {
             assert(false);
         }
@@ -114,18 +121,16 @@ void DistributedEnvironment::handle_maturity( const ClothoEvent * ce ) {
         return;
     }
 
-    if( m_id == m_global_env ) {
-        // a root global env
-        const MaturityEvent * me = static_cast< const MaturityEvent * >(ce);
-        determineMate( me );
-    } else {
-        // not the true root global env, but a local root
-        // local roots have the choice to either select a mate from within in their local
-        // neighborhood, or request that its global env to make the selection 
-        // for now just assuming that determine from its own neighborhood
-        const MaturityEvent * me = static_cast< const MaturityEvent * >(ce );
-        determineMate( me );
-    }
+    const MaturityEvent * me = static_cast< const MaturityEvent *>( ce );
+
+    system_id offspring_id = getIndividual();
+
+    MateEvent * me0 = new MateEvent( getCurrentTime(), getCurrentTime() + 1, getSystemID(), ce->getSender(), getNextEventID(), offspring_id );
+    sendEvent( me0 );
+
+    SelectionEvent * se = new SelectionEvent( getCurrentTime(), getCurrentTime(), getSystemID(), m_global_env, getNextEventID(), me->getSex(), offspring_id );
+
+    sendEvent( se );
 }
 
 void DistributedEnvironment::handle_snapshot( const ClothoEvent * ce ) {
@@ -161,7 +166,24 @@ void DistributedEnvironment::handle_signal_mate( const ClothoEvent * ce ) {
     sendEvent( me1 );
 }
 
-void DistributedEnvironment::determineMate( const MaturityEvent * me ) {
+//void DistributedEnvironment::determineMate( const MaturityEvent * me ) {
+void DistributedEnvironment::handle_selection( const ClothoEvent * ce ) {
+    const SelectionEvent * me = static_cast< const SelectionEvent * >( ce );
+    if( getSystemID() != m_global_env ) {
+        // this env is not considered a root node
+        // thus its snapshot only reflects it and its
+        // neighbors individuals
+    
+        if( m_rng->nextUniform() <= m_view_threshold ) {
+            // determined that the selection of the mate
+            // should be passed along to a higher view
+            // of the environment
+            SelectionEvent * se = new SelectionEvent( getCurrentTime(), getCurrentTime(), getSystemID(), m_global_env, getNextEventID(), me->getSex(), me->getOffspring() );
+            sendEvent( se );
+            return;
+        }
+    }
+
     unsigned int idx = 0;
     if (me->getSex() == MALE ) {
         idx = m_selection_model->find_mate_index( me->getSender(), m_snapshot.female_count );
@@ -169,16 +191,16 @@ void DistributedEnvironment::determineMate( const MaturityEvent * me ) {
         idx = m_selection_model->find_mate_index( me->getSender(), m_snapshot.male_count );
     }
 
-    system_id offspring_id = getIndividual();
+//    system_id offspring_id = getIndividual();
 
-    MateEvent * me0 = new MateEvent( getCurrentTime(), getCurrentTime() + 1, getSystemID(), me->getSender(), getNextEventID(), offspring_id );
-    sendEvent( me0 );
+//    MateEvent * me0 = new MateEvent( getCurrentTime(), getCurrentTime() + 1, getSystemID(), me->getSender(), getNextEventID(), offspring_id );
+//    sendEvent( me0 );
 
     SignalMateEvent * sme = NULL;
     if( m_neighbors.size() > 0 ) {
-        sme = new SignalMateEvent( getCurrentTime(), getCurrentTime(), getSystemID(), m_neighbors[ idx % m_neighbors.size() ].first, getNextEventID(), ((me->getSex() == MALE) ? FEMALE : MALE), idx, offspring_id );
+        sme = new SignalMateEvent( getCurrentTime(), getCurrentTime(), getSystemID(), m_neighbors[ idx % m_neighbors.size() ].first, getNextEventID(), ((me->getSex() == MALE) ? FEMALE : MALE), idx, me->getOffspring() );
     } else {
-        sme = new SignalMateEvent( getCurrentTime(), getCurrentTime(), getSystemID(), getSystemID(), getNextEventID(), ((me->getSex() == MALE) ? FEMALE : MALE), idx, offspring_id );
+        sme = new SignalMateEvent( getCurrentTime(), getCurrentTime(), getSystemID(), getSystemID(), getNextEventID(), ((me->getSex() == MALE) ? FEMALE : MALE), idx, me->getOffspring() );
     }
 
     sendEvent( sme );

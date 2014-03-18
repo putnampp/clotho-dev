@@ -17,11 +17,13 @@
 #include <set>
 
 #include "../event/clotho_event.h"
-#include "../event/maturity_event.h"
+//#include "../event/maturity_event.h"
 #include "../event_performer.h"
 
 #include "../models/selection_model.h"
 #include "reproduction.h"
+
+#include "rng/rng.hpp"
 
 using std::deque;
 using std::vector;
@@ -34,7 +36,7 @@ public:
     typedef vector< pair< system_id, EnvironmentSnapshot > > neighborhood_t;
     DistributedEnvironment( simulation_manager * manager, const system_id & global_env );
 
-    DistributedEnvironment( simulation_manager * manager, const system_id & global_env, GeneticMap::Ptr gmap, selection_model * s, reproduction * r );
+    DistributedEnvironment( simulation_manager * manager, const system_id & global_env, GeneticMap::Ptr gmap, selection_model * s, reproduction * r, shared_ptr< iRNG > rng, double view_threshold );
 
     virtual void process();
 
@@ -50,8 +52,9 @@ protected:
     virtual void handle_maturity( const ClothoEvent * ce );
     virtual void handle_signal_mate( const ClothoEvent * ce );
     virtual void handle_snapshot( const ClothoEvent * ce );
+    virtual void handle_selection( const ClothoEvent * ce );
 
-    virtual void determineMate( const MaturityEvent * me );
+//    virtual void determineMate( const MaturityEvent * me );
 
     void updateSnapShot();
 
@@ -59,6 +62,8 @@ protected:
     neighborhood_t m_neighbors;
 
     EnvironmentSnapshot m_snapshot;
+    shared_ptr< iRNG >  m_rng;
+    double              m_view_threshold;
 };
 
 #endif  // DISTRIBUTED_ENVIRONMENT_H_

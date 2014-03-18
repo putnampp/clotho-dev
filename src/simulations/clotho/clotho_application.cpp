@@ -74,13 +74,14 @@ void ClothoApplication::setupDistributedEnvironment() {
     cout << "Partitioning environment into " << m_nEnvironments << " parts" << endl;
     unsigned int nSize = m_nFounder / m_nEnvironments;
 
-    DistributedEnvironment * root_env = new DistributedEnvironment( m_sim_manager, DefaultSystemID, m_genetic_map, m_selection_model, m_reproduction_model );
+    double view_threshold = 1.0 - (1.0 / (double) m_nEnvironments );
+    DistributedEnvironment * root_env = new DistributedEnvironment( m_sim_manager, DefaultSystemID, m_genetic_map, m_selection_model, m_reproduction_model, m_rng, view_threshold );
     root_env->setFounderSize( m_nFounder - ((m_nEnvironments - 1) * nSize ) );
     root_env->initialize();
     m_system_objs.push_back( root_env->getSystemID() );
 
     for( unsigned int i = 1; i < m_nEnvironments; ++i ) {
-        DistributedEnvironment * denv = new DistributedEnvironment( m_sim_manager, root_env->getSystemID(), m_genetic_map, m_selection_model, m_reproduction_model );
+        DistributedEnvironment * denv = new DistributedEnvironment( m_sim_manager, root_env->getSystemID(), m_genetic_map, m_selection_model, m_reproduction_model, m_rng, view_threshold );
         denv->setFounderSize( nSize );
         denv->initialize();
 
