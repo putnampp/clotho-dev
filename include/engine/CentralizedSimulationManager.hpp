@@ -20,7 +20,7 @@ public:
     typedef pair< event::vtime_t, size_t > pair_time_offset;
     typedef pair< object *, pair_time_offset > pair_object_timestamp;
     typedef deque< pair_object_timestamp > object_handle_map_t;
-    typedef deque< object * > object_group_t;
+    typedef vector< object * > object_group_t;
     typedef pair< event::vtime_t, object_group_t * > concurrent_group_t;
     typedef map< event::vtime_t, object_group_t * > ordered_object_exe_t;
     typedef typename ordered_object_exe_t::iterator _iterator;
@@ -199,6 +199,8 @@ void CentralizedSimulationManager<ES>::moveObject( object * obj, event::vtime_t 
             pair< _iterator, bool > res = m_ordered_objs.insert( make_pair(newT, new object_group_t() ) );
             assert( res.second );
             it = res.first;
+
+//            it->second->reserve( m_nRegisteredObjs );
         }
 
         m_objects[ obj->getObjectID() ].second.second = it->second->size();
