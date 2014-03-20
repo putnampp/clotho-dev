@@ -20,7 +20,7 @@ public:
     typedef pair< event::vtime_t, size_t > pair_time_offset;
     typedef pair< object *, pair_time_offset > pair_object_timestamp;
     typedef deque< pair_object_timestamp > object_handle_map_t;
-    typedef vector< object * > object_group_t;
+    typedef deque< object * > object_group_t;
     typedef pair< event::vtime_t, object_group_t * > concurrent_group_t;
     typedef map< event::vtime_t, object_group_t * > ordered_object_exe_t;
     typedef typename ordered_object_exe_t::iterator _iterator;
