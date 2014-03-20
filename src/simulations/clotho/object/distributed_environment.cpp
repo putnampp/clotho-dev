@@ -92,6 +92,7 @@ void DistributedEnvironment::addNeighborEnvironment( const system_id & env_id ) 
         cout << m_id << " -> " << env_id << endl;
     }
 }
+
 void DistributedEnvironment::handle_birth( const ClothoEvent * ce ) {
     // assume that the individual will always send a maturity event at time + 1
     const BirthEvent * be = static_cast< const BirthEvent * >( ce );

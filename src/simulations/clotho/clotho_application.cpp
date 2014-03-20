@@ -1,6 +1,9 @@
 #include "clotho_application.h"
-#include "object/environment.h"
+//#include "object/environment.h"
 #include "object/distributed_environment.h"
+//
+//#include "object/environment.hpp"
+#include "models/default_life_cycle.h"
 
 #include "models/SimpleReproduction.h"
 #include "models/simple_random_selection.h"
@@ -64,7 +67,7 @@ void ClothoApplication::finalize() {
 
 void ClothoApplication::setupEnvironment() {
     cout << "Unpartitioned environment" << endl;
-    Environment * env = new Environment( m_sim_manager, m_genetic_map, m_selection_model, m_reproduction_model );
+    DefaultEnvironment * env = new DefaultEnvironment( m_sim_manager, m_genetic_map, m_selection_model, m_reproduction_model );
     env->setFounderSize( m_nFounder );
     env->initialize();
     m_system_objs.push_back( env->getSystemID() );
@@ -75,13 +78,13 @@ void ClothoApplication::setupDistributedEnvironment() {
     unsigned int nSize = m_nFounder / m_nEnvironments;
 
     double view_threshold = 1.0 - (1.0 / (double) m_nEnvironments );
-    DistributedEnvironment * root_env = new DistributedEnvironment( m_sim_manager, DefaultSystemID, m_genetic_map, m_selection_model, m_reproduction_model, m_rng, view_threshold );
+    DefaultDistributedEnvironment * root_env = new DefaultDistributedEnvironment( m_sim_manager, DefaultSystemID, m_genetic_map, m_selection_model, m_reproduction_model, m_rng, view_threshold );
     root_env->setFounderSize( m_nFounder - ((m_nEnvironments - 1) * nSize ) );
     root_env->initialize();
     m_system_objs.push_back( root_env->getSystemID() );
 
     for( unsigned int i = 1; i < m_nEnvironments; ++i ) {
-        DistributedEnvironment * denv = new DistributedEnvironment( m_sim_manager, root_env->getSystemID(), m_genetic_map, m_selection_model, m_reproduction_model, m_rng, view_threshold );
+        DefaultDistributedEnvironment * denv = new DefaultDistributedEnvironment( m_sim_manager, root_env->getSystemID(), m_genetic_map, m_selection_model, m_reproduction_model, m_rng, view_threshold );
         denv->setFounderSize( nSize );
         denv->initialize();
 

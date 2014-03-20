@@ -3,8 +3,7 @@
 
 #include "../clotho.h"
 #include "../clotho_object.h"
-//#include "engine/simulation_object.h"
-//
+
 #include "environment.h"
 #include "environment_snapshot.h"
 
@@ -17,7 +16,6 @@
 #include <set>
 
 #include "../event/clotho_event.h"
-//#include "../event/maturity_event.h"
 #include "../event_performer.h"
 
 #include "../models/selection_model.h"
