@@ -39,7 +39,9 @@ public:
     }
 
     shared_ptr< iRNG > clone() {
-        shared_ptr< iRNG> c( new RNG< gsl_rng * >( this->getType(), this->getSeed() ));
+        seed_t r = this->nextInt();
+
+        shared_ptr< iRNG> c( new RNG< gsl_rng * >( this->getType(), r ));
 
         return c;
     }
