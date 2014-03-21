@@ -1,0 +1,69 @@
+\documentclass{article}
+
+\usepackage{amsmath}
+
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+
+\tikzset{
+notice/.style={draw,rectangle,rounded corners,inner sep=.3cm},
+notification/.style={draw,rectangle},
+to/.style={->},
+lambda/.style={dashed,->},
+}
+
+\begin{document}
+\begin{centering}
+\begin{tikzpicture}
+
+%
+% Nodes
+%
+\coordinate (allocpos) at (0,0);
+\node[notice,left] (allocated) at (allocpos) {Allocated};
+\node[notice,text width=1.5cm] (paternal) at (2.0,-4.0) {Has \\ Paternal};
+\node[notice,text width=1.5cm] (maternal) at (2.0,2.0) {Has \\ Maternal};
+
+\coordinate (envbirthpos) at (4.0,0);
+\node[notification,text width=1.5cm] (envbirth) at (envbirthpos) {Notify ENV \\ of Birth};
+
+\coordinate (alivepos) at (6.0,0);
+\node[notice] (alive) at (alivepos) {Alive};
+
+\coordinate (deceasedpos) at (10.0,0);
+\node[notice] (deceased) at (deceasedpos) {Deceased};
+
+\coordinate (deallocatedpos) at (3.0,-6.0);
+\node[notice] (deallocated) at (deallocatedpos) {Deallocated};
+
+\coordinate (zygotepos) at (5.0,-2.0);
+\node[notice,text width=1.5cm] (zygote) at (zygotepos) {Produce \\ Zygote};
+
+
+
+%
+% Edges
+%
+\draw[to] (allocated) edge[bend right=30] node[midway,left]{Finalized} (deallocated);
+
+\draw[to] (allocated) edge[bend right=20] node[rotate=-50,midway,above]{From} node[rotate=-50,midway,below]{Father} (paternal);
+\draw[to] (allocated) edge[bend left=20] node[rotate=30,midway,above]{From} node[rotate=30,midway,below]{Mother} (maternal);
+
+\draw[to] (maternal) -- node[midway,above]{From} node[midway,below]{Father} (envbirth);
+\draw[to] (paternal) -- node[midway,above]{From} node[midway,below]{Mother} (envbirth);
+
+\draw[to] (maternal) edge[bend left=20] (deceased);
+\draw[to] (paternal) edge[bend right=20] (deceased);
+
+\draw[to] (alive) -- node[midway,above]{Death} (deceased);
+
+\draw[lambda] (envbirth) -- node[midway,above]{$\lambda$} (alive);
+\draw[lambda] (deceased) edge[bend right=90] node[midway,above]{$\lambda$} (allocated);
+
+\draw[to] (alive) -- node[midway,right]{Mate} (zygote);
+\draw[lambda] (zygote) edge[bend left=10] node[midway,left]{$\lambda$} (alive);
+
+\end{tikzpicture}
+\end{centering}
+
+\end{document}

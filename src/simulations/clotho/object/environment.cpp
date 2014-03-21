@@ -125,7 +125,8 @@ void Environment::handle_birth( const ClothoEvent * ce ) {
     // assume that the individual will always send a maturity event at time + 1
     const BirthEvent * be = static_cast< const BirthEvent * >( ce );
 
-    MaturityEvent * me = new MaturityEvent( getCurrentTime(), getCurrentTime() + 1, ce->getSender(), getSystemID(), getNextEventID(), be->getSex() );
+//    MaturityEvent * me = new MaturityEvent( getCurrentTime(), getCurrentTime() + 1, ce->getSender(), getSystemID(), getNextEventID(), be->getSex() );
+    MaturityEvent * me = new MaturityEvent( getCurrentTime(), getCurrentTime() + 1, getSystemID(), getSystemID(), getNextEventID(), be->getSender(), be->getSex() );
     sendEvent( me );
 
     DeathEvent * de = new DeathEvent( getCurrentTime(), getCurrentTime() + 3, getSystemID(), ce->getSender(), getNextEventID() );

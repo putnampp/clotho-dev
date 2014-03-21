@@ -1,0 +1,83 @@
+\documentclass{article}
+
+\usepackage{tikz}
+\usetikzlibrary{arrows,calc}
+
+\tikzset{
+pred line/.style={dashed,->, thin},   % predicted event line
+axis/.style={<->},
+sched line/.style={->,red},
+}
+
+\begin{document}
+
+\begin{tikzpicture}
+
+%
+% Coordinates
+%
+
+\coordinate (y) at (0,10);
+\coordinate (x) at (10,0);
+\coordinate (xlbloffset) at (0,-0.25);
+
+\draw[axis] (y) -- (0,0) -- (x);
+
+\coordinate (ind) at ($ 0.75 *(y) $);
+\coordinate (env) at ($ 0.25 *(y) $);
+
+\coordinate (indborn) at ($ (ind) + 0.1*(x)$ );
+\coordinate (indmate) at ($ (ind) + 0.5*(x)$ );
+\coordinate (inddead) at ($ (ind) + 0.9*(x)$ );
+
+\coordinate (envborn) at( $(env) + 0.1*(x)$ );
+\coordinate (envmature) at( $(env)+0.35*(x)$ );
+
+%
+% Y-Axis labels
+%
+\draw (ind) node[left] {Individual};
+\draw (env) node[left] {Environment};
+
+%
+% X-Axis labels
+%
+
+%\foreach \tp in {0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9} {
+%    \draw[dotted] ($\tp*(x)$) -- ($\tp*(x)+(y)$);
+%    \draw ($\tp*(x)$) node[below] {\tp};
+%}
+
+\draw (x) node[below] {G};
+
+%
+% Transition from state to state
+%
+%\draw[pred line] let \p1=(indborn), \p2=(inddead) in
+%(\p1) node[above] {Born} -- (\p2) node[above] {Dead};
+
+\draw[sched line] let \p1=($(indborn)+(-0.5,-0.5)$), \p2=(indborn) in
+(\p1) node[below] {From Mother} -- (\p2);
+
+\draw[sched line] let \p1=($(indborn)+(-0.5,0.5)$), \p2=(indborn) in
+(\p1) node[above] {From Father} -- (\p2);
+
+\draw[pred line] (indborn) -- (indmate);
+
+\draw[sched line] let \p1=(indborn), \p2=(envborn) in
+(\p1) -- (\p2);
+
+\draw[sched line] let \p1=(envborn), \p2=(inddead) in
+(\p1) -- (\p2) node[above]{Died};
+
+\draw[pred line] let \p1=(envborn), \p2=(envmature) in
+(\p1) node[below]{Individual Born} -- (\p2) node[above]{Individual Matured};
+
+\draw[sched line] let \p1=(envmature), \p2=(indmate) in
+(\p1) -- (\p2);
+
+\draw (indmate) node[above]{Reproduce};
+
+\end{tikzpicture}
+
+\end{document}

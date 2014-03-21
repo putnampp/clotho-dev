@@ -113,6 +113,7 @@ void Individual::handle_mate( const ClothoEvent * evt ) {
 }
 
 void Individual::handle_maturity( const ClothoEvent * evt ) {
-    MaturityEvent * me = new MaturityEvent( getCurrentTime(), getCurrentTime(), this->getSystemID(), m_env_id, getNextEventID(), m_prop->getSex());
+//    MaturityEvent * me = new MaturityEvent( getCurrentTime(), getCurrentTime(), this->getSystemID(), m_env_id, getNextEventID(), m_prop->getSex());
+    MaturityEvent * me = new MaturityEvent( getCurrentTime(), getCurrentTime(), this->getSystemID(), m_env_id, getNextEventID(), this->getSystemID(), m_prop->getSex());
     sendEvent( me );
 }
