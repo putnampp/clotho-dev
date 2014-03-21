@@ -10,3 +10,6 @@ validation
 cachegrind
 src/third_party
 *.fuse*
+*.aux 
+*.log 
+*.pdf
