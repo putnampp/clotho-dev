@@ -92,9 +92,9 @@ public:
     }
 protected:
     void initialize() {
-        gsl_rng_env_setup();
         const gsl_rng_type * T = NULL;
         if( m_type.empty() ) {
+            gsl_rng_env_setup();
             T = gsl_rng_default;
             m_type = T->name;
             m_seed = gsl_rng_default_seed;
