@@ -49,5 +49,8 @@ LIST( APPEND CCHMC_SRCS Locus.cpp )
 LIST( APPEND CCHMC_SRCS DefaultTrait.cpp )
 LIST( APPEND CCHMC_SRCS DefaultAllelicEffect.cpp )
 LIST( APPEND CCHMC_SRCS DefaultLocusGenotyper.cpp )
+LIST( APPEND CCHMC_SRCS genetic_mapping.cpp )
+LIST( APPEND CCHMC_SRCS genetic_region.cpp )
+LIST( APPEND CCHMC_SRCS variant_base.cpp )
 
 ADD_LIBRARY(cchmc SHARED ${CCHMC_SRCS})

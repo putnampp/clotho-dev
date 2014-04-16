@@ -102,7 +102,7 @@ protected:
         m_snapshot.male_count = TEnvironment<LCM>::m_males.size();
         m_snapshot.female_count = TEnvironment<LCM>::m_females.size();
         m_snapshot.pending_count = TEnvironment<LCM>::m_pending.size();
-        m_snapshot.available_count = TEnvironment<LCM>::m_available_individuals.size();
+        m_snapshot.available_count = ((TEnvironment<LCM>::m_available_individuals.empty())? 0: TEnvironment<LCM>::m_available_individuals.size());
     }
 
     system_id   m_global_env;

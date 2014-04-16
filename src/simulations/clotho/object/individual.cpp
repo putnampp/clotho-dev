@@ -6,7 +6,7 @@
 #include "../event/maturity_event.h"
 #include "../event/mate_event.h"
 
-#include "../genomes/human_zygote.h"
+#include "../genomes/human_gamete.h"
 
 template <>
 void EventPerformer< Individual, ClothoEvent >::initialize() {
@@ -35,9 +35,9 @@ void Individual::initialize() {
 //    BirthEvent * be = new BirthEvent( getCurrentTime(), getCurrentTime(), this, this, getNextEventID() );
 //    sendEvent( be );
 //
-    InheritEvent * ie = new InheritEvent( getCurrentTime(), getCurrentTime(), this, this, getNextEventID(), FEMALE, new HumanZygote( HumanZygote::FROM_MOTHER, HumanZygote::X_TYPE, 10000 ) );
+    InheritEvent * ie = new InheritEvent( getCurrentTime(), getCurrentTime(), this, this, getNextEventID(), FEMALE, new HumanGamete( HumanGamete::FROM_MOTHER, HumanGamete::X_TYPE, 10000 ) );
     sendEvent( ie );
-    ie = new InheritEvent( getCurrentTime(), getCurrentTime(), this, this, getNextEventID(), MALE, new HumanZygote( HumanZygote::FROM_FATHER, ((getObjectID() % 2 == 0) ? HumanZygote::X_TYPE : HumanZygote::Y_TYPE), 10000) );
+    ie = new InheritEvent( getCurrentTime(), getCurrentTime(), this, this, getNextEventID(), MALE, new HumanGamete( HumanGamete::FROM_FATHER, ((getObjectID() % 2 == 0) ? HumanGamete::X_TYPE : HumanGamete::Y_TYPE), 10000) );
     sendEvent( ie );
 }
 
@@ -89,7 +89,7 @@ void Individual::handle_inherit( const ClothoEvent * evt ) {
         m_prop->reset();
     }
 
-    m_prop->inheritFrom( ie->getSender(), ie->getParentSex(), ie->getZygote() );
+    m_prop->inheritFrom( ie->getSender(), ie->getParentSex(), ie->getGamete() );
 
     if( m_prop->getFather() != UNSET_ID && m_prop->getMother() != UNSET_ID ) {
         event::vtime_t bday = evt->getReceived();
@@ -106,7 +106,7 @@ void Individual::handle_mate( const ClothoEvent * evt ) {
 
     assert( m_repro );
 
-    zygote * z = m_repro->reproduce( m_prop->getGenome() );
+    gamete * z = m_repro->reproduce( m_prop->getGenome() );
 
     InheritEvent * ie = new InheritEvent( getCurrentTime(), getCurrentTime(), this->getSystemID(), me->getOffspringID(), getNextEventID(), m_prop->getSex(), z );
     sendEvent( ie );

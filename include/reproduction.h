@@ -4,7 +4,7 @@
 #include "genome.h"
 
 struct reproduction {
-    virtual zygote * reproduce( genome * g ) = 0;
+    virtual gamete * reproduce( genome * g ) = 0;
     virtual ~reproduction() {}
 };
 

@@ -51,14 +51,14 @@ void IndividualProperties::setEOL( const SystemClock::vtime_t & t ) {
     eol = t;
 }
 
-void IndividualProperties::inheritFrom( const system_id & id, Sex s, zygote * g ){
+void IndividualProperties::inheritFrom( const system_id & id, Sex s, gamete * g ){
     if( s == MALE ) {
         setFather( id );
-        m_genome->setZygote( g );
+        m_genome->setGamete( g );
         determineSex();
     } else if ( s == FEMALE ) {
         setMother( id );
-        m_genome->setZygote( g );
+        m_genome->setGamete( g );
     }
 }
 

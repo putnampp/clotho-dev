@@ -1,8 +1,5 @@
 #include "default_life_cycle.h"
 
-//#include "../object/individual.hpp"
-//#include "../object/environment.hpp"
-
 #include "../event/birth_event.h"
 #include "../event/death_event.h"
 #include "../event/inherit_event.h"
@@ -12,7 +9,7 @@
 #include "../event/selection_event.h"
 #include "../event/environment_snapshot_event.h"
 
-#include "../genomes/human_zygote.h"
+#include "../genomes/human_gamete.h"
 
 #include <algorithm>
 
@@ -24,9 +21,9 @@ using std::swap;
 
 template <>
 void TIndividual<default_life_cycle>::initialize() {
-    InheritEvent * ie = new InheritEvent( getCurrentTime(), getCurrentTime(), this, this, getNextEventID(), FEMALE, new HumanZygote( HumanZygote::FROM_MOTHER, HumanZygote::X_TYPE, 10000 ) );
+    InheritEvent * ie = new InheritEvent( getCurrentTime(), getCurrentTime(), this, this, getNextEventID(), FEMALE, new HumanGamete( HumanGamete::FROM_MOTHER, HumanGamete::X_TYPE, 10000 ) );
     sendEvent( ie );
-    ie = new InheritEvent( getCurrentTime(), getCurrentTime(), this, this, getNextEventID(), MALE, new HumanZygote( HumanZygote::FROM_FATHER, ((getObjectID() % 2 == 0) ? HumanZygote::X_TYPE : HumanZygote::Y_TYPE), 10000) );
+    ie = new InheritEvent( getCurrentTime(), getCurrentTime(), this, this, getNextEventID(), MALE, new HumanGamete( HumanGamete::FROM_FATHER, ((getObjectID() % 2 == 0) ? HumanGamete::X_TYPE : HumanGamete::Y_TYPE), 10000) );
     sendEvent( ie );
 }
 
@@ -34,19 +31,20 @@ template < >
 void TIndividual<default_life_cycle>::perform_event( const event * e ) {
     const ClothoEvent * evt = dynamic_cast< const ClothoEvent * >( e );
 
-    if( evt ) {
-        if( evt->getEventType() == BIRTH_EVENT_K ) {
-            handle_birth( evt );
-        } else if( evt->getEventType() == DEATH_EVENT_K ) {
-            handle_death( evt );
-        } else if( evt->getEventType() == INHERIT_EVENT_K ) {
-            handle_inherit( evt );
-        } else if( evt->getEventType() == MATE_EVENT_K ) {
-            handle_mate( evt );
-        } else if( evt->getEventType() == MATURITY_EVENT_K ) {
-            handle_maturity( evt );
-        }
+    if( !evt ) return;
+
+    if( evt->getEventType() == BIRTH_EVENT_K ) {
+        handle_birth( evt );
+    } else if( evt->getEventType() == DEATH_EVENT_K ) {
+        handle_death( evt );
+    } else if( evt->getEventType() == INHERIT_EVENT_K ) {
+        handle_inherit( evt );
+    } else if( evt->getEventType() == MATE_EVENT_K ) {
+        handle_mate( evt );
+    } else if( evt->getEventType() == MATURITY_EVENT_K ) {
+        handle_maturity( evt );
     }
+
 }
 
 template <>
@@ -81,14 +79,12 @@ void TIndividual<default_life_cycle>::handle_inherit( const ClothoEvent * evt ) 
         m_prop->reset();
     }
 
-    m_prop->inheritFrom( ie->getSender(), ie->getParentSex(), ie->getZygote() );
+    m_prop->inheritFrom( ie->getSender(), ie->getParentSex(), ie->getGamete() );
 
     if( m_prop->getFather() != UNSET_ID && m_prop->getMother() != UNSET_ID ) {
         event::vtime_t bday = evt->getReceived();
         bday = ((bday / LIFE_CYCLE_PADDING) + 1) * LIFE_CYCLE_PADDING;
 
-//        BirthEvent * be = new BirthEvent( getCurrentTime(), bday, this->getSystemID(), this->getSystemID(), getNextEventID(), m_prop->getSex() );
-//        handle_birth( evt );
         m_prop->setDOB( bday );
         BirthEvent * be = new BirthEvent( getCurrentTime(), bday, this->getSystemID(), m_env_id, getNextEventID(), m_prop->getSex());
         sendEvent( be );
@@ -101,7 +97,7 @@ void TIndividual<default_life_cycle>::handle_mate( const ClothoEvent * evt ) {
 
     assert( m_repro );
 
-    zygote * z = m_repro->reproduce( m_prop->getGenome() );
+    gamete * z = m_repro->reproduce( m_prop->getGenome() );
 
     InheritEvent * ie = new InheritEvent( getCurrentTime(), getCurrentTime(), this->getSystemID(), me->getOffspringID(), getNextEventID(), m_prop->getSex(), z );
     sendEvent( ie );
@@ -184,7 +180,6 @@ void TEnvironment<default_life_cycle>::handle_birth( const ClothoEvent * ce ) {
     // assume that the individual will always send a maturity event at time + 1
     const BirthEvent * be = static_cast< const BirthEvent * >( ce );
 
-//    MaturityEvent * me = new MaturityEvent( getCurrentTime(), getCurrentTime() + 1, ce->getSender(), getSystemID(), getNextEventID(), be->getSex() );
     MaturityEvent * me = new MaturityEvent( getCurrentTime(), getCurrentTime() + 1, getSystemID(), getSystemID(), getNextEventID(), be->getSender(), be->getSex() );
     sendEvent( me );
 
@@ -199,7 +194,6 @@ void TEnvironment<default_life_cycle>::handle_birth( const ClothoEvent * ce ) {
     } else if( be->getSex() == MALE ) {
         m_active_individuals.insert( make_pair( be->getSender(), make_pair( &m_males, m_males.size())));
         m_males.push_back( be->getSender() );
-        
     } else {
         assert(false);
     }
@@ -257,14 +251,14 @@ template < >
 void TEnvironment<default_life_cycle>::perform_event( const event * e ) {
     const ClothoEvent * evt = dynamic_cast< const ClothoEvent * >( e );
 
-    if( evt ) {
-        if( evt->getEventType() == BIRTH_EVENT_K ) {
-            handle_birth( evt );
-        } else if( evt->getEventType() == MATURITY_EVENT_K ) {
-            handle_maturity( evt );
-        } else if( evt->getEventType() == DEATH_EVENT_K ) {
-            handle_death( evt );
-        }
+    if( !evt )  return;
+
+    if( evt->getEventType() == BIRTH_EVENT_K ) {
+        handle_birth( evt );
+    } else if( evt->getEventType() == MATURITY_EVENT_K ) {
+        handle_maturity( evt );
+    } else if( evt->getEventType() == DEATH_EVENT_K ) {
+        handle_death( evt );
     }
 }
 
@@ -286,24 +280,23 @@ template<>
 void TDistributedEnvironment<default_life_cycle>::perform_event( const event * e) {
     const ClothoEvent * evt = dynamic_cast< const ClothoEvent * >( e );
 
-    if( evt ) {
-//        cout << "DistEnv-" << getSystemID() << "@" << getCurrentTime() << ": " << evt << endl;
-        if( evt->getEventType() == BIRTH_EVENT_K ) {
-            handle_birth( evt );
-        } else if( evt->getEventType() == MATURITY_EVENT_K ) {
-            handle_maturity( evt );
-        } else if( evt->getEventType() == DEATH_EVENT_K ) {
-            handle_death( evt );
-        } else if( evt->getEventType() == SIGNAL_MATE_EVENT_K ) {
-            handle_signal_mate( evt );
-        } else if( evt->getEventType() == ENVIRONMENT_SNAPSHOT_EVENT_K ) {
-            handle_snapshot( evt );
-        } else if( evt->getEventType() == SELECTION_EVENT_K ) {
-            handle_selection( evt );
-        } else {
-            cout << "Unhandled event type: " << evt->getEventType() << endl;
-            assert(false);
-        }
+    if( !evt ) return;
+
+    if( evt->getEventType() == BIRTH_EVENT_K ) {
+        handle_birth( evt );
+    } else if( evt->getEventType() == MATURITY_EVENT_K ) {
+        handle_maturity( evt );
+    } else if( evt->getEventType() == DEATH_EVENT_K ) {
+        handle_death( evt );
+    } else if( evt->getEventType() == SIGNAL_MATE_EVENT_K ) {
+        handle_signal_mate( evt );
+    } else if( evt->getEventType() == ENVIRONMENT_SNAPSHOT_EVENT_K ) {
+        handle_snapshot( evt );
+    } else if( evt->getEventType() == SELECTION_EVENT_K ) {
+        handle_selection( evt );
+    } else {
+        cout << "Unhandled event type: " << evt->getEventType() << endl;
+        assert(false);
     }
 }
 template <>
@@ -311,7 +304,6 @@ void TDistributedEnvironment<default_life_cycle>::handle_birth( const ClothoEven
     // assume that the individual will always send a maturity event at time + 1
     const BirthEvent * be = static_cast< const BirthEvent * >( ce );
 
-//    MaturityEvent * me = new MaturityEvent( getCurrentTime(), getCurrentTime() + 1, getSystemID(), ce->getSender(), getNextEventID() , be->getSex() );
     MaturityEvent * me = new MaturityEvent( getCurrentTime(), getCurrentTime() + 1, getSystemID(), getSystemID(), getNextEventID(), be->getSender(), be->getSex() );
     sendEvent( me );
 
@@ -368,6 +360,8 @@ void TDistributedEnvironment<default_life_cycle>::handle_snapshot( const ClothoE
         EnvironmentSnapshotEvent * e2 = new EnvironmentSnapshotEvent( getCurrentTime(), getCurrentTime(), getSystemID(), m_global_env, getNextEventID(), m_snapshot );
         sendEvent( e2 );
     }
+
+//    cout << getSystemID() << " -> " << m_snapshot << endl;
 }
 
 template<>
@@ -391,8 +385,8 @@ void TDistributedEnvironment<default_life_cycle>::handle_selection( const Clotho
     if( getSystemID() != m_global_env ) {
         // this env is not considered a root node
         // thus its snapshot only reflects it and its
-        // neighbors individuals
-    
+        // neighbors (children) individuals
+
         if( m_rng->nextUniform() <= m_view_threshold ) {
             // determined that the selection of the mate
             // should be passed along to a higher view
@@ -402,6 +396,7 @@ void TDistributedEnvironment<default_life_cycle>::handle_selection( const Clotho
             return;
         }
     }
+
 
     unsigned int idx = 0;
     if (me->getSex() == MALE ) {

@@ -8,6 +8,10 @@ selection_model * SimpleRandomSelection::clone() {
     return c;
 }
 
+unsigned int SimpleRandomSelection::find_mate() {
+    return m_rng->nextInt();
+}
+
 system_id SimpleRandomSelection::find_mate( const system_id & id, const vector< system_id > & pool ) {
     unsigned int r = m_rng->nextInt( pool.size() );
     return pool[r];
@@ -17,5 +21,8 @@ unsigned int SimpleRandomSelection::find_mate_index( const system_id & id, const
     return m_rng->nextInt( pool_size );
 }
 
-SimpleRandomSelection::~SimpleRandomSelection() {
+unsigned int SimpleRandomSelection::find_mate_index( ) {
+    return m_rng->nextInt();
 }
+
+SimpleRandomSelection::~SimpleRandomSelection() { }

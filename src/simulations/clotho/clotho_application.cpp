@@ -22,7 +22,7 @@ ClothoApplication::ClothoApplication( const string & config, shared_ptr< iRNG > 
     m_genetic_map( new GeneticMap() ),
     m_rng( rng ),
     m_selection_model( new SimpleRandomSelection( m_rng ) ),
-    m_reproduction_model( new SimpleReproduction() ),
+    m_reproduction_model( new SimpleReproduction( m_rng ) ),
     m_nFounder(10000)
 {}
 

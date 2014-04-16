@@ -60,7 +60,7 @@ LIST( APPEND OBJECT_SRCS models/default_life_cycle.cpp )
 LIST( APPEND OBJECT_SRCS models/SimpleReproduction.cpp )
 LIST( APPEND OBJECT_SRCS models/simple_random_selection.cpp )
 LIST( APPEND OBJECT_SRCS genomes/human_genome.cpp)
-LIST( APPEND OBJECT_SRCS genomes/human_zygote.cpp)
+LIST( APPEND OBJECT_SRCS genomes/human_gamete.cpp)
 
 ADD_LIBRARY( object SHARED ${OBJECT_SRCS} )
 

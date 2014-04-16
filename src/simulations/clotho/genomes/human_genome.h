@@ -8,35 +8,35 @@
 
 using std::vector;
 
-#include "human_zygote.h"
+#include "human_gamete.h"
 
 class HumanGenome : public genome {
 public:
-    HumanGenome( HumanZygote * hz0, HumanZygote * hz1 );
+    HumanGenome( HumanGamete * hz0, HumanGamete * hz1 );
     HumanGenome( const HumanGenome & );
 
     genome * clone() const;
 
-    inline zygote::zygote_source_t getSource() const {
-        return ((m_sex == MALE) ? HumanZygote::FROM_FATHER : HumanZygote::FROM_MOTHER );
+    inline gamete::gamete_source_t getSource() const {
+        return ((m_sex == MALE) ? HumanGamete::FROM_FATHER : HumanGamete::FROM_MOTHER );
     }
 
-    inline zygote::zygote_source_t getMaxSources() const {
+    inline gamete::gamete_source_t getMaxSources() const {
         return 2;
     }
 
     Sex getSex() const;
 
-    zygote * getZygote( zygote::zygote_source_t ) const;
-    zygote * getZygote( Sex ) const;
+    gamete * getGamete( gamete::gamete_source_t ) const;
+    gamete * getGamete( Sex ) const;
 
-    void setZygote( zygote * );
-    void setZygote( HumanZygote * );
+    void setGamete( gamete * );
+    void setGamete( HumanGamete * );
 
     virtual ~HumanGenome();
 protected:
     HumanGenome();
-    HumanZygote * m_mother, * m_father;
+    HumanGamete * m_mother, * m_father;
     Sex m_sex;
 };
 

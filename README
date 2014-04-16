@@ -19,8 +19,7 @@ OVERVIEW
 
 SYSTEM REQUIREMENTS
     - Boost 1.54.0 (or higher)
-    - OpenCL 1.1 (or higher) and supported hardware
-    - Warped (https://github.com/putnampp/pdes)
+    - TCMalloc (https://code.google.com/p/gperftools/)
 
 USEFUL COMMANDS:
 
@@ -36,12 +35,6 @@ Example Command: if [ ! -d build ]; then mkdir build; fi; cd build; cmake -DMAX_
     The MAX_ALLELES variable is used to define the maximum number of forms a locus is
     allowed to have. In other words, locus, l, can have allele, a, is an enumerated value
     in [0, MAX_ALLELES).
-
-Compilation Variable: Warped_DIR
-Description: The Warped_DIR variable establishes the root directory for the Warped Libraries.
-    Specifically, the Warped Utils (libutils.so) and the Warped (libwarped.so) files.
-Example Command: cmake -DWarped_DIR=<path> ..
-    This command will update the Warped root directory
 
 Compilation Variable: PWORD_SIZE
 Description: Establishes the desired processor word size.  Allows user to use 32-bit on 64-bit machine

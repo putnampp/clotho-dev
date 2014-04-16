@@ -26,7 +26,7 @@ struct individual_properties {
 
     virtual genome * getGenome() const = 0;
 
-    virtual void inheritFrom( const system_id & id, Sex s, zygote * genos ) = 0;
+    virtual void inheritFrom( const system_id & id, Sex s, gamete * genos ) = 0;
     virtual void reset() = 0;
 };
 
@@ -50,7 +50,7 @@ public:
 
     genome * getGenome() const;
 
-    void inheritFrom( const system_id & id, Sex s, zygote * genos );
+    void inheritFrom( const system_id & id, Sex s, gamete * genos );
     void reset();
 
     virtual ~IndividualProperties();

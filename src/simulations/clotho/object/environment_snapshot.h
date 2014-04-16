@@ -1,6 +1,8 @@
 #ifndef ENVIRONMENT_SNAPSHOT_H_
 #define ENVIRONMENT_SNAPSHOT_H_
 
+#include <ostream>
+
 struct EnvironmentSnapshot {
     size_t male_count, female_count;
     size_t pending_count;
@@ -17,7 +19,7 @@ struct EnvironmentSnapshot {
         male_count(nMales), 
         female_count(nFemales), 
         pending_count(nPending), 
-        available_count(nAvail )
+        available_count(nAvail)
     {}
 
     EnvironmentSnapshot( const EnvironmentSnapshot & es ) :
@@ -50,6 +52,13 @@ struct EnvironmentSnapshot {
         available_count += es.available_count;
         return *this;
     }
+
+    friend std::ostream & operator<<( std::ostream & o, const EnvironmentSnapshot & es );
 };
+
+inline std::ostream & operator<<( std::ostream & o, const EnvironmentSnapshot & es ) {
+    o << "{Males=" << es.male_count << "; Females=" << es.female_count << "; Pending=" << es.pending_count << "; Available=" << es.available_count << "}";
+    return o;
+}
 
 #endif  // ENVIRONMENT_SNAPSHOT_H_

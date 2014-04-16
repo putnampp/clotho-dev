@@ -10,9 +10,11 @@ public:
 
     selection_model * clone();
 
-    system_id find_mate( const system_id & id, const vector< system_id > & pool );
+    unsigned int find_mate();
 
+    system_id find_mate( const system_id & id, const vector< system_id > & pool );
     unsigned int find_mate_index( const system_id & id, const size_t pool_size );
+    unsigned int find_mate_index( );
 
     virtual ~SimpleRandomSelection();
 protected:
