@@ -9,7 +9,7 @@
 #include "../event/selection_event.h"
 #include "../event/environment_snapshot_event.h"
 
-#include "../genomes/human_gamete.h"
+//#include "../genomes/human_gamete.h"
 
 #include <algorithm>
 
@@ -19,16 +19,16 @@ using std::swap;
 // TIndividual
 //
 
-template <>
-void TIndividual<default_life_cycle>::initialize() {
+/*template < class LCM, class IP >
+void TIndividual<default_life_cycle, IP>::initialize() {
     InheritEvent * ie = new InheritEvent( getCurrentTime(), getCurrentTime(), this, this, getNextEventID(), FEMALE, new HumanGamete( HumanGamete::FROM_MOTHER, HumanGamete::X_TYPE, 10000 ) );
     sendEvent( ie );
     ie = new InheritEvent( getCurrentTime(), getCurrentTime(), this, this, getNextEventID(), MALE, new HumanGamete( HumanGamete::FROM_FATHER, ((getObjectID() % 2 == 0) ? HumanGamete::X_TYPE : HumanGamete::Y_TYPE), 10000) );
     sendEvent( ie );
-}
-
-template < >
-void TIndividual<default_life_cycle>::perform_event( const event * e ) {
+}*/
+/*
+template < class VT >
+void TIndividual<default_life_cycle, VT>::perform_event( const event * e ) {
     const ClothoEvent * evt = dynamic_cast< const ClothoEvent * >( e );
 
     if( !evt ) return;
@@ -47,13 +47,13 @@ void TIndividual<default_life_cycle>::perform_event( const event * e ) {
 
 }
 
-template <>
-void TIndividual<default_life_cycle>::finalize() {
+template < class VT >
+void TIndividual<default_life_cycle, VT>::finalize() {
     ClothoObject::finalize();
 }
 
-template<>
-void TIndividual<default_life_cycle>::handle_birth( const ClothoEvent * evt ) {
+template < class VT >
+void TIndividual<default_life_cycle, VT>::handle_birth( const ClothoEvent * evt ) {
     // notify environment of birth
     //
     m_prop->setDOB( evt->getReceived() );
@@ -62,8 +62,8 @@ void TIndividual<default_life_cycle>::handle_birth( const ClothoEvent * evt ) {
     sendEvent( be );
 }
 
-template <>
-void TIndividual<default_life_cycle>::handle_death( const ClothoEvent * evt ) {
+template < class VT >
+void TIndividual<default_life_cycle, VT>::handle_death( const ClothoEvent * evt ) {
     // notify environment of death
     m_prop->setEOL( evt->getReceived() );
 
@@ -71,8 +71,8 @@ void TIndividual<default_life_cycle>::handle_death( const ClothoEvent * evt ) {
     sendEvent( de );
 }
 
-template <>
-void TIndividual<default_life_cycle>::handle_inherit( const ClothoEvent * evt ) {
+template < class VT >
+void TIndividual<default_life_cycle, VT>::handle_inherit( const ClothoEvent * evt ) {
     const InheritEvent * ie = static_cast< const InheritEvent * >( evt );
 
     if(m_prop->getEOL() != SystemClock::POSITIVE_INFINITY ) {
@@ -91,8 +91,8 @@ void TIndividual<default_life_cycle>::handle_inherit( const ClothoEvent * evt ) 
     }
 }
 
-template <>
-void TIndividual<default_life_cycle>::handle_mate( const ClothoEvent * evt ) {
+template < class VT >
+void TIndividual<default_life_cycle, VT>::handle_mate( const ClothoEvent * evt ) {
     const MateEvent * me  = static_cast< const MateEvent * >( evt );
 
     assert( m_repro );
@@ -103,8 +103,8 @@ void TIndividual<default_life_cycle>::handle_mate( const ClothoEvent * evt ) {
     sendEvent( ie );
 }
 
-template <>
-void TIndividual<default_life_cycle>::handle_maturity( const ClothoEvent * evt ) {
+template < class VT >
+void TIndividual<default_life_cycle, VT>::handle_maturity( const ClothoEvent * evt ) {
     MaturityEvent * me = new MaturityEvent( getCurrentTime(), getCurrentTime(), this->getSystemID(), m_env_id, getNextEventID(), this->getSystemID(), m_prop->getSex());
     sendEvent( me );
 }
@@ -113,12 +113,13 @@ void TIndividual<default_life_cycle>::handle_maturity( const ClothoEvent * evt )
 // TENVIRONMENT
 //
 
-template <>
-system_id TEnvironment<default_life_cycle>::getIndividual() {
+template < class VT >
+system_id TEnvironment<default_life_cycle, VT>::getIndividual() {
     system_id id(0);
     if( m_available_individuals.empty() ) {
         ++m_nIndAlloc;
-        TIndividual<default_life_cycle> * ind = new TIndividual<default_life_cycle>( m_sim_manager, getSystemID(), m_reproduction_model );
+//        TIndividual<default_life_cycle, VT> * ind = new TIndividual<default_life_cycle, VT>( m_sim_manager, getSystemID(), m_reproduction_model );
+        individual_t    * ind = new individual_t(m_sim_manager, getSystemID(), m_reproduction_model);
         id = ind->getSystemID();
     } else {
         id = m_available_individuals.front();
@@ -130,8 +131,8 @@ system_id TEnvironment<default_life_cycle>::getIndividual() {
     return id;
 }
 
-template < >
-void TEnvironment<default_life_cycle>::initialize() {
+template < class VT >
+void TEnvironment<default_life_cycle, VT>::initialize() {
 
     for( unsigned int i = 0; i < m_nFounder; ++i ) {
         system_id id = getIndividual();
@@ -141,8 +142,8 @@ void TEnvironment<default_life_cycle>::initialize() {
     }
 }
 
-template < >
-void TEnvironment<default_life_cycle>::finalize() {
+template < class VT >
+void TEnvironment<default_life_cycle, VT>::finalize() {
     m_males.clear();
     m_females.clear();
 
@@ -175,8 +176,8 @@ void TEnvironment<default_life_cycle>::finalize() {
     cout << m_nIndAlloc << " allocated individuals by the environment" << endl;
 }
 
-template < >
-void TEnvironment<default_life_cycle>::handle_birth( const ClothoEvent * ce ) {
+template < class VT >
+void TEnvironment<default_life_cycle, VT>::handle_birth( const ClothoEvent * ce ) {
     // assume that the individual will always send a maturity event at time + 1
     const BirthEvent * be = static_cast< const BirthEvent * >( ce );
 
@@ -199,8 +200,8 @@ void TEnvironment<default_life_cycle>::handle_birth( const ClothoEvent * ce ) {
     }
 }
 
-template <>
-void TEnvironment< default_life_cycle >::handle_maturity( const ClothoEvent * ce ) {
+template < class VT >
+void TEnvironment< default_life_cycle, VT >::handle_maturity( const ClothoEvent * ce ) {
     if( ! m_selection_model ) return;
 
     const MaturityEvent *me = static_cast< const MaturityEvent * >( ce );
@@ -222,8 +223,8 @@ void TEnvironment< default_life_cycle >::handle_maturity( const ClothoEvent * ce
     sendEvent( me1 );
 }
 
-template <>
-void TEnvironment<default_life_cycle>::handle_death( const ClothoEvent * ce ) {
+template < class VT >
+void TEnvironment<default_life_cycle, VT>::handle_death( const ClothoEvent * ce ) {
     lookup_iterator it = m_active_individuals.find( ce->getSender() );
     assert( it != m_active_individuals.end() );
 
@@ -236,7 +237,7 @@ void TEnvironment<default_life_cycle>::handle_death( const ClothoEvent * ce ) {
         // the dead individual
         swap( igroup->back(), igroup->at( offset ) );
         if( igroup->back() != ce->getSender() ) {
-            cout << "Swap failed: " << ce->getSender() << " <> " << igroup->back() << "; " << igroup->size() << endl;
+            cout << "Swap failed: " << ce->getSender() << " < class VT > " << igroup->back() << "; " << igroup->size() << endl;
         }
         assert( igroup->back() == ce->getSender() );
         m_active_individuals[ igroup->at( offset ) ].second = offset;
@@ -247,8 +248,8 @@ void TEnvironment<default_life_cycle>::handle_death( const ClothoEvent * ce ) {
     m_available_individuals.push_back( ce->getSender() );
 }
 
-template < >
-void TEnvironment<default_life_cycle>::perform_event( const event * e ) {
+template < class VT >
+void TEnvironment<default_life_cycle, VT>::perform_event( const event * e ) {
     const ClothoEvent * evt = dynamic_cast< const ClothoEvent * >( e );
 
     if( !evt )  return;
@@ -265,9 +266,9 @@ void TEnvironment<default_life_cycle>::perform_event( const event * e ) {
 //
 // TDistributedEnvironment
 //
-template<>
-void TDistributedEnvironment<default_life_cycle>::process() {
-    TEnvironment<default_life_cycle>::process();
+template< class VT >
+void TDistributedEnvironment<default_life_cycle, VT>::process() {
+    TEnvironment<default_life_cycle, VT>::process();
 
     updateSnapShot();
     if( m_global_env != m_id ) {
@@ -276,8 +277,8 @@ void TDistributedEnvironment<default_life_cycle>::process() {
     }
 }
 
-template<>
-void TDistributedEnvironment<default_life_cycle>::perform_event( const event * e) {
+template< class VT >
+void TDistributedEnvironment<default_life_cycle, VT>::perform_event( const event * e) {
     const ClothoEvent * evt = dynamic_cast< const ClothoEvent * >( e );
 
     if( !evt ) return;
@@ -299,8 +300,8 @@ void TDistributedEnvironment<default_life_cycle>::perform_event( const event * e
         assert(false);
     }
 }
-template <>
-void TDistributedEnvironment<default_life_cycle>::handle_birth( const ClothoEvent * ce ) {
+template < class VT >
+void TDistributedEnvironment<default_life_cycle, VT>::handle_birth( const ClothoEvent * ce ) {
     // assume that the individual will always send a maturity event at time + 1
     const BirthEvent * be = static_cast< const BirthEvent * >( ce );
 
@@ -323,8 +324,8 @@ void TDistributedEnvironment<default_life_cycle>::handle_birth( const ClothoEven
     }
 }
 
-template <>
-void TDistributedEnvironment<default_life_cycle>::handle_maturity( const ClothoEvent * ce ) {
+template < class VT >
+void TDistributedEnvironment<default_life_cycle, VT>::handle_maturity( const ClothoEvent * ce ) {
     if(! m_selection_model ) {
         cout << "No Selection model" << endl;
         return;
@@ -342,8 +343,8 @@ void TDistributedEnvironment<default_life_cycle>::handle_maturity( const ClothoE
     sendEvent( se );
 }
 
-template <>
-void TDistributedEnvironment<default_life_cycle>::handle_snapshot( const ClothoEvent * ce ) {
+template < class VT >
+void TDistributedEnvironment<default_life_cycle, VT>::handle_snapshot( const ClothoEvent * ce ) {
     const EnvironmentSnapshotEvent * ese = static_cast< const EnvironmentSnapshotEvent * >( ce );
 
     // linear scan, but neighbor pool intended to be small (< 10)
@@ -364,8 +365,8 @@ void TDistributedEnvironment<default_life_cycle>::handle_snapshot( const ClothoE
 //    cout << getSystemID() << " -> " << m_snapshot << endl;
 }
 
-template<>
-void TDistributedEnvironment<default_life_cycle>::handle_signal_mate( const ClothoEvent * ce ) {
+template< class VT >
+void TDistributedEnvironment<default_life_cycle, VT>::handle_signal_mate( const ClothoEvent * ce ) {
     const SignalMateEvent * sme = static_cast< const SignalMateEvent * >( ce );
     system_id mate_id;
 
@@ -379,8 +380,8 @@ void TDistributedEnvironment<default_life_cycle>::handle_signal_mate( const Clot
     sendEvent( me1 );
 }
 
-template <>
-void TDistributedEnvironment<default_life_cycle>::handle_selection( const ClothoEvent * ce ) {
+template < class VT >
+void TDistributedEnvironment<default_life_cycle, VT>::handle_selection( const ClothoEvent * ce ) {
     const SelectionEvent * me = static_cast< const SelectionEvent * >( ce );
     if( getSystemID() != m_global_env ) {
         // this env is not considered a root node
@@ -413,4 +414,4 @@ void TDistributedEnvironment<default_life_cycle>::handle_selection( const Clotho
     }
 
     sendEvent( sme );
-}
+}*/

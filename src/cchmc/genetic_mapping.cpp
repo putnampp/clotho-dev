@@ -1,10 +1,23 @@
 #include "genetic_mapping.h"
 #include <cassert>
 
-const double MAX_CHROM_LENGTH = 3.0e8;
+const double genetic_mapping::MAX_CHROM_LENGTH = 3.0e8;
 
 genetic_mapping::chromosome_map_t   genetic_mapping::m_chrom_lookup;
 genetic_mapping::chromosome_list_t       genetic_mapping::m_chroms;
+
+
+template <> 
+double genetic_mapping::convertToKey<double>( const chromosome_t & c, pos_t p ) {
+    chromosome_map_t::iterator it = m_chrom_lookup.find(c);
+
+    assert( it != m_chrom_lookup.end() );
+    double res = (((double) it->second) / ((double) m_chroms.size()));
+
+    res += ((double)p) / MAX_CHROM_LENGTH;
+
+    return res;
+}
 
 void genetic_mapping::addChromosome( const chromosome_t & c ) {
     if( genetic_mapping::m_chrom_lookup.find(c) == genetic_mapping::m_chrom_lookup.end() ) {
@@ -71,18 +84,6 @@ std::shared_ptr< genetic_mapping::chromosome_list_t > genetic_mapping::getAllChr
         }
         it++;
     }
-
-    return res;
-}
-
-genetic_mapping::key_t  genetic_mapping::getKey( const chromosome_t & c, pos_t p ) {
-    chromsome_map_t::iterator it = m_chrom_lookup.find(c);
-
-    assert( it != m_chrom_lookup.end() );
-
-    key_t res = (((double) it->second) / ((double) m_chroms.size()));
-
-    res += ((double)p) / MAX_CHROM_LENGTH;
 
     return res;
 }

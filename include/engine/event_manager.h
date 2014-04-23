@@ -6,11 +6,15 @@
 struct event_manager {
     virtual bool  insertEvent( const event * ) = 0;
 
+    virtual void reset_pending() = 0;
+    virtual void reset_processed() = 0;
+
     virtual const event * getEvent( const system_id & ) = 0;
     virtual const event * peekEvent( const system_id & ) const = 0;
 
-    virtual size_t pendingEventCount( const system_id & ) const = 0;
-    virtual size_t processedEventCount( const system_id & ) const = 0;
+    virtual size_t  pendingEventCount( const system_id & ) const = 0;
+    virtual size_t  processedEventCount( const system_id & ) const = 0;
+    virtual size_t  canceledEventCount( const system_id & ) const = 0;
 
     virtual ~event_manager() {}
 };

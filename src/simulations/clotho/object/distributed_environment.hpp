@@ -19,7 +19,7 @@
 #include "../event_performer.h"
 
 #include "../models/selection_model.h"
-#include "reproduction.h"
+//#include "reproduction.h"
 
 #include "rng/rng.hpp"
 
@@ -32,17 +32,17 @@ using std::set;
 using std::unordered_map;
 using std::unordered_set;
 
-template < class LCM, class Enabled = void >
+template < class LCM, class VT, class Enabled = void >
 class TDistributedEnvironment;
 
-template < class LCM >
-class TDistributedEnvironment < LCM, typename std::enable_if< std::is_base_of< life_cycle_model, LCM >::value >::type >
-    : public TEnvironment<LCM> {
+template < class LCM, class VT >
+class TDistributedEnvironment < LCM, VT, typename std::enable_if< std::is_base_of< life_cycle_model, LCM >::value >::type >
+    : public TEnvironment<LCM, VT> {
 public:
     typedef vector< pair< system_id, EnvironmentSnapshot > > neighborhood_t;
 
     TDistributedEnvironment( simulation_manager * manager, const system_id & global_env ) :
-        TEnvironment<LCM>( manager ),
+        TEnvironment<LCM, VT>( manager ),
         m_global_env( global_env ),
         m_snapshot(),
         m_view_threshold( 0.5 )
@@ -55,7 +55,7 @@ public:
     }
 
     TDistributedEnvironment( simulation_manager * manager, const system_id & global_env, GeneticMap::Ptr gmap, selection_model * s, reproduction * r, shared_ptr< iRNG > rng, double threshold ) :
-        TEnvironment<LCM>( manager, gmap, s, r ),
+        TEnvironment<LCM,VT>( manager, gmap, s, r ),
         m_global_env( global_env ),
         m_snapshot(),
         m_rng( rng->clone() ),
@@ -99,10 +99,10 @@ protected:
     virtual void handle_selection( const ClothoEvent * ce );
 
     void updateSnapShot() {
-        m_snapshot.male_count = TEnvironment<LCM>::m_males.size();
-        m_snapshot.female_count = TEnvironment<LCM>::m_females.size();
-        m_snapshot.pending_count = TEnvironment<LCM>::m_pending.size();
-        m_snapshot.available_count = ((TEnvironment<LCM>::m_available_individuals.empty())? 0: TEnvironment<LCM>::m_available_individuals.size());
+        m_snapshot.male_count = TEnvironment<LCM, VT>::m_males.size();
+        m_snapshot.female_count = TEnvironment<LCM,VT>::m_females.size();
+        m_snapshot.pending_count = TEnvironment<LCM, VT>::m_pending.size();
+        m_snapshot.available_count = ((TEnvironment<LCM,VT>::m_available_individuals.empty())? 0: TEnvironment<LCM,VT>::m_available_individuals.size());
     }
 
     system_id   m_global_env;

@@ -6,7 +6,9 @@
 #include "../event/maturity_event.h"
 #include "../event/mate_event.h"
 
-#include "../genomes/human_gamete.h"
+static const SystemClock::vtime_t LIFE_CYCLE_PADDING = 100;
+
+//#include "../genomes/human_gamete.h"
 
 template <>
 void EventPerformer< Individual, ClothoEvent >::initialize() {
@@ -35,10 +37,10 @@ void Individual::initialize() {
 //    BirthEvent * be = new BirthEvent( getCurrentTime(), getCurrentTime(), this, this, getNextEventID() );
 //    sendEvent( be );
 //
-    InheritEvent * ie = new InheritEvent( getCurrentTime(), getCurrentTime(), this, this, getNextEventID(), FEMALE, new HumanGamete( HumanGamete::FROM_MOTHER, HumanGamete::X_TYPE, 10000 ) );
-    sendEvent( ie );
-    ie = new InheritEvent( getCurrentTime(), getCurrentTime(), this, this, getNextEventID(), MALE, new HumanGamete( HumanGamete::FROM_FATHER, ((getObjectID() % 2 == 0) ? HumanGamete::X_TYPE : HumanGamete::Y_TYPE), 10000) );
-    sendEvent( ie );
+//    InheritEvent * ie = new InheritEvent( getCurrentTime(), getCurrentTime(), this, this, getNextEventID(), FEMALE, new HumanGamete( HumanGamete::FROM_MOTHER, HumanGamete::X_TYPE, 10000 ) );
+//    sendEvent( ie );
+//    ie = new InheritEvent( getCurrentTime(), getCurrentTime(), this, this, getNextEventID(), MALE, new HumanGamete( HumanGamete::FROM_FATHER, ((getObjectID() % 2 == 0) ? HumanGamete::X_TYPE : HumanGamete::Y_TYPE), 10000) );
+//    sendEvent( ie );
 }
 
 void Individual::perform_event( const event * e ) {

@@ -8,7 +8,8 @@ IndividualProperties::IndividualProperties( ) :
     dob( SystemClock::POSITIVE_INFINITY ),
     eol( SystemClock::POSITIVE_INFINITY ),
     sex( UNASSIGNED ),
-    m_genome( new HumanGenome( NULL, NULL) )
+//    m_genome( new HumanGenome( NULL, NULL) )
+    m_genome(NULL)
 {}
 
 const system_id & IndividualProperties::getFather() const {
@@ -73,7 +74,8 @@ void IndividualProperties::reset() {
 }
 
 void IndividualProperties::determineSex() {
-    sex = m_genome->getSex();   
+    //sex = m_genome->getSex();   
+    sex = UNKNOWN;
 }
 
 IndividualProperties::~IndividualProperties() {

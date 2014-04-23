@@ -15,6 +15,4 @@ using std::cerr;
 using std::endl;
 using std::string;
 
-static const unsigned int LIFE_CYCLE_PADDING = 100;
-
 #endif  // CLOTHO_H_

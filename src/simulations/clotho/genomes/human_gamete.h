@@ -21,8 +21,8 @@ public:
     
     gamete * clone() const;
 
-    chromosome * getChromosome( chromosome::chrom_id_t );
-    void setChromosome( chromosome * );
+//    chromosome * getChromosome( chromosome::chrom_id_t );
+//    void setChromosome( chromosome * );
 
     virtual void print( std::ostream & o );
 

@@ -43,11 +43,18 @@ public:
     virtual void perform_event( const event * ) {}
     virtual void finalize() {}
 
+    virtual void reset_pending() {}
+    virtual void reset_processed() {}
+
     virtual size_t pendingEventCount( const system_id & ) const {
         return m_events.size();
     }
 
     virtual size_t processedEventCount( const system_id & ) const {
+        return 0;
+    }
+
+    virtual size_t canceledEventCount( const system_id & ) const {
         return 0;
     }
 

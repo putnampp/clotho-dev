@@ -7,8 +7,8 @@ enum variant_flags { NEUTRAL = 1 };
 
 class variant_base : public genetic_region {
 public:
+    variant_base( const key_t & k, double cSelection, double cDominance, variant_flags f);
     variant_base( const chromosome_t & c, pos_t s, double cSelection, double cDominance, variant_flags f);
-    variant_base( const chromosome_t & c, pos_t s, pos_t e, double cSelection, double cDominance, variant_flags f );
 
     bool isNeutral() const;
     unsigned int getPenetrance() const;

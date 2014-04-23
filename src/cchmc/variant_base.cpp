@@ -1,15 +1,15 @@
 #include "variant_base.h"
 
-variant_base::variant_base( const chromosome_t & c, pos_t s, double cSelection, double cDominance, variant_flags f ) : 
-    genetic_region( c, s, s), 
+variant_base::variant_base( const key_t & k, double cSelection, double cDominance, variant_flags f ) :
+    genetic_region( k ),
     m_penetrance(1),
-    m_coeff_selection(cSelection),
-    m_coeff_dominance(cDominance),
-    m_flags( f ) 
+    m_coeff_selection( cSelection ),
+    m_coeff_dominance( cDominance ),
+    m_flags(f)
 {}
 
-variant_base::variant_base( const chromosome_t & c, pos_t s, pos_t e, double cSelection, double cDominance, variant_flags f ) : 
-    genetic_region( c, s, e), 
+variant_base::variant_base( const chromosome_t & c, pos_t s, double cSelection, double cDominance, variant_flags f ) : 
+    genetic_region(c, s),
     m_penetrance(1),
     m_coeff_selection(cSelection),
     m_coeff_dominance(cDominance),
@@ -25,9 +25,7 @@ double variant_base::getSelection() const { return m_coeff_selection; }
 double variant_base::getDominance() const { return m_coeff_dominance; }
 
 void variant_base::incrementPenetrance() {
-    if( m_penetrance++ == 0) {
-        ++m_reemergence;
-    }
+    ++m_penetrance;
 }
 
 void variant_base::decrementPenetrance() {

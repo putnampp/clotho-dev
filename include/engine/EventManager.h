@@ -8,6 +8,7 @@
 #include <list>
 #include <vector>
 #include <set>
+#include <deque>
 
 #include "event_functor.h"
 //#include "FSBAllocator.hh"
@@ -25,10 +26,15 @@ public:
 
     EventManager();
     bool insertEvent( const event * );
+    void reset_pending();
+
     const event * getEvent( const system_id & );
     const event * peekEvent(const system_id & ) const;
+
     size_t pendingEventCount(const system_id & ) const;
     size_t processedEventCount(const system_id & ) const;
+    size_t canceledEventCount(const system_id & ) const;
+
     virtual ~EventManager();
 };
 
@@ -43,7 +49,8 @@ public:
         m_events( ),
         m_head( m_events.begin() ),
         m_nPending(0),
-        m_nProcessed(0)
+        m_nProcessed(0),
+        m_nCanceled(0)
     {}
 
     bool insertEvent( const event * evt ) {
@@ -53,10 +60,31 @@ public:
         if( pos == m_head ) {
             m_head = m_events.insert( pos, evt );
             res = true;
-        } else
+        } else {
             m_events.insert( pos, evt );
+        }
         ++m_nPending;
         return res;
+    }
+
+    void reset_pending() {
+        while( !m_events.empty() ) {
+            const event * t = m_events.back();
+            m_events.pop_back();
+            if( t ) delete t;
+            --m_nPending;
+            ++m_nCanceled;
+        }
+
+        assert( m_nPending == 0 );
+    }
+
+    void reset_processed() {
+        while( m_events.begin() != m_head ) {
+            const event * t = *m_events.begin();
+            m_events.pop_front();
+            if( t ) delete t;
+        }
     }
 
     const event * getEvent( const system_id & ) {
@@ -80,6 +108,10 @@ public:
         return m_nProcessed;
     }
 
+    size_t canceledEventCount( const system_id & ) const {
+        return m_nCanceled;
+    }
+
     virtual ~EventManager() {
         while( !m_events.empty() ) {
             const event * t = m_events.back();
@@ -91,7 +123,7 @@ protected:
     event_set_t   m_events;
 
     iterator    m_head;
-    size_t      m_nPending, m_nProcessed;
+    size_t      m_nPending, m_nProcessed, m_nCanceled;
 };
 
 template <>
@@ -102,7 +134,9 @@ public:
 
     EventManager() :
         m_events(),
-        m_head(0)
+        m_head(0),
+        m_nProcessed(0),
+        m_nCanceled(0)
     {}
 
     bool insertEvent( const event * e ) {
@@ -112,7 +146,26 @@ public:
         iterator pos = upper_bound( s, m_events.end(), e, ltsf_event_order());
 
         m_events.insert( pos, e );
-        return (*m_events.begin() == e);
+        return (*(m_events.begin() + m_head) == e);
+    }
+
+    void reset_pending() {
+        while( m_events.begin() + m_head != m_events.end() ) {
+            const event * t = m_events.back();
+            m_events.pop_back();
+            if( t ) delete t;
+            ++m_nCanceled;
+        }
+    }
+
+    void reset_processed() {
+        while( m_head != 0 ) {
+            const event * t = m_events[ --m_head ];
+            m_events.erase( m_events.begin() + m_head );
+            
+            if( t ) delete t;
+            ++m_nProcessed;
+        }
     }
 
     const event * getEvent( const system_id & ) {
@@ -128,7 +181,11 @@ public:
     }
 
     size_t processedEventCount( const system_id & ) const {
-        return m_head;
+        return m_head + m_nProcessed;
+    }
+
+    size_t canceledEventCount( const system_id & ) const {
+        return m_nCanceled;
     }
 
     virtual ~EventManager() {
@@ -142,6 +199,7 @@ public:
 protected:
     event_set_t     m_events;
     size_t      m_head;
+    size_t      m_nProcessed, m_nCanceled;
 };
 
 template <>
@@ -152,12 +210,32 @@ public:
 
     EventManager() :
         m_events(),
-        m_processed()
+        m_processed(),
+        m_nProcessed(0),
+        m_nCanceled(0)
     {}
 
     bool insertEvent( const event * e ) {
         m_events.insert( e );
         return (*m_events.begin() == e );
+    }
+
+    void reset_pending() {
+        while(!m_events.empty() ) {
+            const event * t = *(m_events.begin());
+            m_events.erase( m_events.begin());
+            if(t) delete t;
+            ++m_nCanceled;
+        }
+    }
+
+    void reset_processed() {
+        while( !m_processed.empty() ) {
+            const event * t = m_processed.back();
+            m_processed.pop_back();
+            if( t ) delete t;
+            ++m_nProcessed;
+        }
     }
 
     const event * getEvent( const system_id & ) {
@@ -178,26 +256,33 @@ public:
     }
 
     size_t processedEventCount( const system_id & ) const {
-        return m_processed.size();
+        return m_nProcessed + m_processed.size();
+    }
+
+    size_t  canceledEventCount( const system_id & ) const {
+        return m_nCanceled;
     }
 
     virtual ~EventManager() {
-        while( !m_events.empty() ) {
-            const event * t = *(m_events.begin());
-            m_events.erase( m_events.begin());
-            if(t) delete t;
-        }
+        reset_pending();
+        //while( !m_events.empty() ) {
+        //    const event * t = *(m_events.begin());
+        //    m_events.erase( m_events.begin());
+        //    if(t) delete t;
+        //}
 
-        while( !m_processed.empty() ) {
-            const event * t = m_processed.back();
-            m_processed.pop_back();
-            if( t ) delete t;
-        }
+        reset_processed();
+        //while( !m_processed.empty() ) {
+        //    const event * t = m_processed.back();
+        //    m_processed.pop_back();
+        //    if( t ) delete t;
+        //}
     }
 protected:
     event_set_t m_events;
 
-    std::list< const event * /*, FSBAllocator< const event *>*/ > m_processed;
+    std::deque< const event * /*, FSBAllocator< const event *>*/ > m_processed;
+    size_t  m_nProcessed, m_nCanceled;
 };
 
 

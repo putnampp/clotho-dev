@@ -13,3 +13,4 @@ src/third_party
 *.aux 
 *.log 
 *.pdf
+helgrind

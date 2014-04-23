@@ -1,24 +1,25 @@
 #include "genetic_region.h"
 
-genetic_region::genetic_region( const chromosome_t & c, pos_t s ) : genetic_region(c, s, s)
+#include <limits>
+#include <cmath>
+
+genetic_region::genetic_region( key_t  k ) :
+    m_key( k )
 {}
 
-genetic_region::genetic_region( const chromosome_t & c, pos_t s, pos_t e ) :
-    m_region( point_t( genetic_mapping::getChromosomeID(c), s),
-                    point_t( genetic_mapping::getChromosomeID(c), e ) )
+genetic_region::genetic_region( const chromosome_t & c, pos_t s ) : genetic_region(genetic_mapping::convertToKey< key_t >( c, s))
 {}
 
-genetic_region::region_t genetic_region::getRegion() const {
-    return m_region;
+genetic_region::key_t genetic_region::getKey() const {
+    return m_key;
 }
 
 bool genetic_region::operator==( const genetic_region & rhs ) const {
-    // note: genetic regions can only occur on the same chromosome
+    return std::fabs(m_key - rhs.m_key) <= std::numeric_limits<double>::epsilon();
+}
 
-    return (m_region.min_corner().get<0>() == rhs.m_region.min_corner().get<0>()) 
-            && (m_region.min_corner().get<1>() == rhs.m_region.min_corner().get<1>()) 
-//            && (m_region.max_corner().get<0>() == rhs.m_region.max_corner().get<0>() )
-            && (m_region.max_corner().get<1>() == rhs.m_region.max_corner().get<1>());
+bool genetic_region::operator<( const genetic_region & rhs ) const {
+    return m_key < rhs.m_key;
 }
 
 genetic_region::~genetic_region() {}
