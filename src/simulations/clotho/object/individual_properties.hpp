@@ -33,6 +33,8 @@ public:
 //    typedef VT variant_t;
     typedef G gamete_t;
 
+    enum { GAMETE_COUNT = 1 };
+
     individual_props() :
         p0_id( 0 ),
         p0( NULL )
@@ -43,6 +45,13 @@ public:
     }
 
     void setDOB( SystemClock::vtime_t d ) {
+        if( m_dob != d ) {
+            if( d != SystemClock::POSITIVE_INFINITY ) {
+                p0->increasePenetrance();
+            } else {
+                p0->decreasePenetrance();
+            }
+        }
         m_dob = d;
     }
     
@@ -54,6 +63,14 @@ public:
         assert( !p0 );
         p0_id = p_id;
         p0 = g;
+    }
+
+    gamete_t * cloneGamete( unsigned char ) const {
+        if( p0 ) {
+            gamete_t * tmp = new gamete_t(p0->begin(), p0->end());
+            return tmp;
+        }
+        return new gamete_t();
     }
 
     void reset() {
@@ -79,6 +96,8 @@ public:
 //    typedef VT  variant_t;
     typedef G   gamete_t;
 
+    enum { GAMETE_COUNT = 2 };
+
     individual_props() :
         m_dob( SystemClock::POSITIVE_INFINITY ),
         p0_id(0),
@@ -92,6 +111,15 @@ public:
     }
 
     void setDOB( SystemClock::vtime_t d ) {
+        if( m_dob != d ) {
+            if( d != SystemClock::POSITIVE_INFINITY ) {
+                p0->increasePenetrance();
+                p1->increasePenetrance();
+            } else {
+                p0->decreasePenetrance();
+                p1->decreasePenetrance();
+            }
+        }
         m_dob = d;
     }
 
@@ -125,6 +153,15 @@ public:
             std::cout << "Unexpected gamete index: " << (int) gidx << std::endl;
             assert(false);
         }
+    }
+
+    gamete_t * cloneGamete( unsigned char gamete_idx ) const {
+        if( gamete_idx == 0 && p0 ) {
+            return p0->clone();
+        } else if( gamete_idx == 1 && p1 ) {
+            return p1->clone();
+        }
+        return new gamete_t();
     }
 
     void reset() {

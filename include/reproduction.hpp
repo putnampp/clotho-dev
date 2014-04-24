@@ -1,6 +1,8 @@
 #ifndef REPRODUCTION_HPP_
 #define REPRODUCTION_HPP_
 
+#include "rng/random_process.hpp"
+
 namespace reproduction {
 
 namespace models {
@@ -12,23 +14,21 @@ struct model {
 
 }   // namespace models
 
-template < class MODEL = models::model<void> >
+//template < class MODEL = models::model<void> >
+template < class MUT, class REC >
 class IndividualReproduction {
 public:
-    typedef MODEL model_t;
-    typedef typename MODEL::parameter_t parameter_t;
+//    typedef MODEL model_t;
+    typedef MUT mutation_t;
+    typedef REC recombination_t;
 
     template < typename IND, typename GAM = typename IND::properties_t::gamete_t >
-    static GAM * reproduce( IND * ind ) {
-        return reproduce( ind, ind->reproduction_parameter() );
-    }
+    static GAM * reproduce( IND * ind, GAM * ) {
+        GAM * res = recombination_t::recombine(ind->m_prop, (GAM *) NULL );
+        mutation_t::mutate( res );
 
-    template < typename IND, typename GAM = typename IND::properties_t::gamete_t >
-    static GAM * reproduce( IND * ind, parameter_t  * c ) {
-        GAM * res = new GAM();
         return res;
     }
-
 };
 
 } // namespace reproduction

@@ -1,7 +1,7 @@
 #ifndef GAMETE_HPP_
 #define GAMETE_HPP_
 
-#include <ostream>
+#include <iostream>
 
 /*
  * A gamete is a logical unit of population genetic simulation
@@ -55,6 +55,19 @@ public:
 
     void addVariant( typename variant_set_t::key_type v ) {
         m_vars.insert( v );
+    }
+
+    void increasePenetrance() {
+        for( typename variant_set_t::iterator it = m_vars.begin(); it != m_vars.end(); it++ ) {
+            (*it)->incrementPenetrance();
+        }
+    }
+
+    void decreasePenetrance() {
+        for( typename variant_set_t::iterator it = m_vars.begin(); it != m_vars.end(); it++ ) {
+            (*it)->decrementPenetrance();
+        }
+
     }
 
     virtual void print( std::ostream & o ) const {

@@ -33,8 +33,6 @@
 #include "clotho_application.hpp"
 #include "engine/engine.hpp"
 
-#include "common_initializers.hpp"
-
 //#include "selection.hpp"
 //#include "reproduction.hpp"
 
@@ -104,12 +102,13 @@ void ThreadedCentralizedSimulationManager< pooled_event_set >::clearBufferedEven
 typedef life_cycle::def_life_cycle    LCM_t;
 typedef variant_base      VT_t;
 
-typedef reproduction::models::mutation::infinite_site< VT_t > mutation_model_t;
+typedef reproduction::models::mutation::infinite_site< VT_t >   mutation_model_t;
+typedef reproduction::models::recombination::no_recomb< 2 >     recombination_model_t;
 
 typedef typename mutation_model_t::variant_map_t variant_map_t;
 typedef typename mutation_model_t::gamete_t gamete_t;
 
-typedef reproduction::models::model< int > reproduction_model_t;
+typedef reproduction::IndividualReproduction< mutation_model_t, recombination_model_t > reproduction_model_t;
 typedef selection::models::random_selection selection_model_t;
 
 typedef TIndividual< LCM_t, individual_props< /*VT_t,*/ gamete_t, 2 >, reproduction_model_t > IND_t;
@@ -132,11 +131,10 @@ void ClothoAppInitializer::createEnvironment< SIMPLE_CENTRAL_APP_t, SIMPLE_CENTR
     env->initialize();
     a->m_objects.push_back( env->getSystemID());
 }
-}
+}   // namespace initializer
 
 
 int main( int argc, char ** argv ) {
-
 
     po::variables_map vm;
     if( !parse_commandline( argc, argv, vm ) ) {
@@ -156,8 +154,10 @@ int main( int argc, char ** argv ) {
     cout << "Simulate until: " << tUntil << endl;
 
     shared_ptr< iRNG > rng( new GSL_RNG());
-
     cout << "RNG: " <<  rng->getType() << "; seed: " << rng->getSeed() << endl;
+
+    RandomProcess::initialize( rng );
+    mutation_model_t::initialize();
 
     shared_ptr< application > app;
     shared_ptr< SimulationStats > stats( new SimulationStats() );
@@ -196,9 +196,6 @@ int main( int argc, char ** argv ) {
 
     assert( sim != NULL );
 
-//    (std::static_pointer_cast<ClothoApplication>(app))->setSimulationManager( sim );
-//    (std::static_pointer_cast<ClothoApplication>(app))->setFounderSize( vm[ FOUNDER_SIZE_K ].as<unsigned int>() );
-
     stats->startPhase( RUNTIME_K );
 
     sim->initialize();
@@ -210,6 +207,8 @@ int main( int argc, char ** argv ) {
     stats->stopPhase( RUNTIME_K );
 
     cout << *stats;
+
+    cout << "Created " << mutation_model_t::getVariantMap()->size() << " variants" << std::endl;
 
     delete sim;
 

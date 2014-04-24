@@ -36,10 +36,14 @@ public:
     typedef std::set< value_ptr_t, vt_comparator > variant_set_t;
     typedef gamete< variant_set_t >     gamete_t;
 
-    variant_map( std::shared_ptr< iRNG > r ) :
-        m_rng(r)
+    variant_map( /*std::shared_ptr< iRNG > r*/ ) /*:
+        m_rng(r)*/
     {}
 
+    value_ptr_t createVariant( key_t k, bool bReplace = false ) {
+        value_ptr_t nVar( new value_t( k, 0.0, 0.0, NEUTRAL ) );
+        return addVariant( nVar, bReplace );
+    }
 /*
  *  By default variant_map assumes an infite site model for every
  *  variant type (VT).  Thus we randomly generate a key value from
@@ -47,7 +51,7 @@ public:
  *  pool of variants.
  *
  */
-    value_ptr_t getNewVariant() {
+/*    value_ptr_t getNewVariant() {
         key_t   k = 0.0;
         do {
             k = m_rng->nextUniform();
@@ -57,10 +61,28 @@ public:
         m_variants.insert(std::make_pair( k, v));
 
         return v;
+    }*/
+
+    value_ptr_t addVariant( value_ptr_t v, bool bReplace ) {
+        typename lookup_map_t::iterator it = m_variants.find( v->getKey() );
+        if( it == m_variants.end() ) {
+            m_variants.insert( std::make_pair( v->getKey(), v ) );
+        } else if( bReplace ) {
+            it->second.reset();
+            it->second = v;
+        } else {
+            v.reset();  // delete duplicate
+            v = it->second;
+        }
+        return v;
     }
 
     bool is_known( key_t k ) const {
         return m_variants.find( k ) != m_variants.end();
+    }
+
+    size_t size() const {
+        return m_variants.size();
     }
 
     virtual ~variant_map() {
@@ -68,13 +90,6 @@ public:
     }
 
 protected:
-
-    value_ptr_t createNewVariant( key_t k ) {
-        value_ptr_t nVar( new value_t( k, 0.0, 0.0, NEUTRAL ) );
-        return nVar;
-    }
-
-    std::shared_ptr< iRNG > m_rng;
     lookup_map_t    m_variants;
 };
 

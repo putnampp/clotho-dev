@@ -60,6 +60,7 @@ LIST( APPEND OBJECT_SRCS object/individual_properties.cpp )
 LIST( APPEND OBJECT_SRCS models/default_life_cycle.cpp )
 LIST( APPEND OBJECT_SRCS models/SimpleReproduction.cpp )
 LIST( APPEND OBJECT_SRCS models/simple_random_selection.cpp )
+#LIST( APPEND OBJECT_SRCS models/reproduction_models.cpp )
 #LIST( APPEND OBJECT_SRCS genomes/human_genome.cpp)
 #LIST( APPEND OBJECT_SRCS genomes/human_gamete.cpp)
 

@@ -206,7 +206,7 @@ protected:
 
         typedef typename IND::properties_t::gamete_t   gamete_t;
         
-        gamete_t * z = IND::reproduction_model_t::reproduce( ind );
+        gamete_t * z = IND::reproduction_model_t::reproduce( ind, (gamete_t *) NULL );
 
         typedef typename IND::inherit_event_t ievent_t;
         ievent_t * ie = new ievent_t( ind->getCurrentTime(), ind->getCurrentTime(), ind->getSystemID(), me->getOffspringID(), ind->getNextEventID(), z );

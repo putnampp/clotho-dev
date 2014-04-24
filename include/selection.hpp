@@ -1,6 +1,8 @@
 #ifndef SELECTION_HPP_
 #define SELECTION_HPP_
 
+#include "rng/random_process.hpp"
+
 namespace selection {
 
 namespace models {
@@ -13,7 +15,7 @@ struct model {
 }   // namespace models
 
 template < class MODEL >
-class MateSelector {
+class MateSelector : public RandomProcess {
 public:
     typedef MODEL model_t;
     typedef typename MODEL::parameter_t parameter_t;

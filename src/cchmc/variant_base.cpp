@@ -2,7 +2,7 @@
 
 variant_base::variant_base( const key_t & k, double cSelection, double cDominance, variant_flags f ) :
     genetic_region( k ),
-    m_penetrance(1),
+    m_penetrance(0),
     m_coeff_selection( cSelection ),
     m_coeff_dominance( cDominance ),
     m_flags(f)
@@ -10,7 +10,7 @@ variant_base::variant_base( const key_t & k, double cSelection, double cDominanc
 
 variant_base::variant_base( const chromosome_t & c, pos_t s, double cSelection, double cDominance, variant_flags f ) : 
     genetic_region(c, s),
-    m_penetrance(1),
+    m_penetrance(0),
     m_coeff_selection(cSelection),
     m_coeff_dominance(cDominance),
     m_flags( f ) 

@@ -16,7 +16,7 @@ struct random_selection {
 }   // namespace models
 
 template <>
-class MateSelector< models::random_selection > {
+class MateSelector< models::random_selection > : public RandomProcess {
 public:
     template < class ENV >
     static std::pair< system_id, system_id > select( ENV * env, std::pair< system_id, system_id > * ) {
@@ -25,11 +25,11 @@ public:
         if( env->m_gender_group_map.size() == 1 ) {
             size_t nInd = env->m_gender_group_map.begin()->second->size();
 
-            size_t i0 = env->m_rng->nextInt( nInd );
+            size_t i0 = m_rng->nextInt( nInd );
             size_t i1 = i0;
 
             while( i1 == i0 ) {
-                i1 = env->m_rng->nextInt( nInd );
+                i1 = m_rng->nextInt( nInd );
             }
 
             res.first = env->m_gender_group_map.begin()->second->at( i0 );
@@ -41,11 +41,11 @@ public:
                 it_g1++;
             } else {
                 size_t nGroups = env->m_gender_group_map.size();
-                size_t g0 = env->m_rng->nextInt( nGroups );
+                size_t g0 = m_rng->nextInt( nGroups );
                 size_t g1 = g0;
 
                 while( g1 == g0 ) {
-                    g1 = env->m_rng->nextInt( nGroups );
+                    g1 = m_rng->nextInt( nGroups );
                 }
                 while( g0 > 0 && g1 > 0) {
                     it_g0++;
