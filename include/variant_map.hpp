@@ -5,6 +5,7 @@
 #include <memory>
 #include <unordered_map>
 #include <set>
+#include <vector>
 
 #include <cmath>
 #include <limits>
@@ -25,7 +26,8 @@ public:
     typedef typename VT::key_t key_t;    // assuming for the moment that key_t is double
     typedef std::shared_ptr< value_t >   value_ptr_t;
 
-    typedef std::unordered_map< key_t, value_ptr_t, std::hash< key_t >, equal_eps< key_t > > lookup_map_t;
+    typedef std::unordered_map< key_t, size_t, std::hash< key_t >, equal_eps< key_t > > lookup_map_t;
+    typedef std::vector< value_ptr_t >   value_list_t;
 
     struct vt_comparator {
         bool operator()( const value_ptr_t l, const value_ptr_t r ) const {
@@ -58,39 +60,64 @@ public:
         } while( is_known(k) );
 
         value_ptr_t v = createNewVariant( k );
-        m_variants.insert(std::make_pair( k, v));
+        m_variants_lookup.insert(std::make_pair( k, v));
 
         return v;
     }*/
 
     value_ptr_t addVariant( value_ptr_t v, bool bReplace ) {
-        typename lookup_map_t::iterator it = m_variants.find( v->getKey() );
-        if( it == m_variants.end() ) {
-            m_variants.insert( std::make_pair( v->getKey(), v ) );
+        typename lookup_map_t::iterator it = m_variants_lookup.find( v->getKey() );
+        if( it == m_variants_lookup.end() ) {
+            m_variants_lookup.insert( std::make_pair( v->getKey(), m_variants.size() ) );
+            m_variants.push_back( v );
         } else if( bReplace ) {
-            it->second.reset();
-            it->second = v;
+            m_variants[it->second].reset();
+            m_variants[it->second] = v;
         } else {
             v.reset();  // delete duplicate
-            v = it->second;
+            v = m_variants[it->second];
         }
         return v;
     }
 
     bool is_known( key_t k ) const {
-        return m_variants.find( k ) != m_variants.end();
+        return m_variants_lookup.find( k ) != m_variants_lookup.end();
+    }
+
+    value_ptr_t operator[]( unsigned int relative_index ) {
+        assert( relative_index < m_variants.size() );
+        return m_variants[ relative_index ];
+    }
+
+    value_ptr_t getVariantByKey( key_t k ) {
+        typename lookup_map_t::iterator it = m_variants_lookup.find( k );
+        if( it == m_variants_lookup.end() ) {
+            return value_ptr_t();
+        }
+
+        return m_variants[ it->second ];
     }
 
     size_t size() const {
         return m_variants.size();
     }
 
+    typename value_list_t::const_iterator begin() const {
+        return m_variants.begin();
+    }
+
+    typename value_list_t::const_iterator end() const {
+        return m_variants.end();
+    }
+
     virtual ~variant_map() {
+        m_variants_lookup.clear();
         m_variants.clear();
     }
 
 protected:
-    lookup_map_t    m_variants;
+    lookup_map_t    m_variants_lookup;
+    value_list_t    m_variants;
 };
 
 #endif  // VARIANT_MAP_HPP_

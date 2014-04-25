@@ -3,6 +3,8 @@
 
 #include <iostream>
 
+#include "gamete_base.h"
+
 /*
  * A gamete is a logical unit of population genetic simulation
  *
@@ -19,17 +21,13 @@
  * females only produce one type of gamete (X).
  */
 template < class VS >
-class gamete {
+class gamete : public gamete_base {
 public:
-    typedef unsigned short gamete_key_t;
-    typedef unsigned char gamete_source_t;
-    typedef unsigned char gamete_type_t;
-
     typedef VS  variant_set_t;
 
-    gamete( ) : m_id(0) {}
-    gamete( gamete_source_t s, gamete_type_t t ) : m_id(s, t ) {}
-    gamete( const gamete & z ) : m_id( z.m_id ), m_vars(z.m_vars)  {}
+    gamete( ) : gamete_base(0) {}
+    gamete( gamete_source_t s, gamete_type_t t ) : gamete_base(s, t) {}
+    gamete( const gamete & z ) : gamete_base( z.m_id ), m_vars(z.m_vars)  {}
     
     virtual gamete<VS> * clone() const {
         gamete<VS> * child = new gamete<VS>( *this );
@@ -37,24 +35,12 @@ public:
         return child;
     }
 
-    inline gamete_type_t getType() const {
-        return m_id.id_component.type;
-    }
-
-    inline gamete_source_t getSource() const {
-        return m_id.id_component.source;
-    }
-
-    void setSource( gamete_source_t id ) {
-        m_id.id_component.source = id;
-    }
-
-    void setType( gamete_type_t id ) {
-        m_id.id_component.type = id;
-    }
-
     void addVariant( typename variant_set_t::key_type v ) {
         m_vars.insert( v );
+    }
+
+    bool operator[]( typename variant_set_t::key_type k ) const {
+        return m_vars.find(k) != m_vars.end();
     }
 
     void increasePenetrance() {
@@ -70,6 +56,10 @@ public:
 
     }
 
+    size_t size() const {
+        return m_vars.size();
+    }
+
     virtual void print( std::ostream & o ) const {
         o << "{" << (int) m_id.id_component.source << ", " << (int) m_id.id_component.type << "}";
     }
@@ -78,21 +68,6 @@ public:
         m_vars.clear();
     }
 protected:
-    union _gamete_id {
-        gamete_key_t    key;
-        struct z {
-            gamete_source_t source;
-            gamete_type_t   type;
-            z( gamete_source_t s, gamete_type_t t ) : source(s), type(t) {}
-        } id_component;
-
-        _gamete_id( ) : key(0) {}
-        _gamete_id( gamete_key_t k ) : key(k) {}
-        _gamete_id( gamete_source_t s, gamete_type_t t ) : id_component( s, t) {}
-        _gamete_id( const _gamete_id & id ) : key( id.key ) {}
-    };
-
-    _gamete_id m_id;
     variant_set_t   m_vars;
 };
 

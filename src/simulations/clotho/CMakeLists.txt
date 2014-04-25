@@ -68,12 +68,15 @@ ADD_LIBRARY( object SHARED ${OBJECT_SRCS} )
 
 LIST( APPEND SRCS common_strings.cpp )
 LIST( APPEND SRCS sex.cpp )
+LIST( APPEND SRCS clotho_commandline.cpp )
 #LIST( APPEND SRCS clotho_application.cpp )
 #LIST( APPEND SRCS main.cpp )
-LIST( APPEND SRCS clotho2.cpp )
+#LIST( APPEND SRCS clotho2.cpp )
 
-ADD_EXECUTABLE(clotho ${SRCS} )
+ADD_EXECUTABLE(clotho clotho2.cpp ${SRCS} )
+ADD_EXECUTABLE(clotho_fixed clotho_fixed.cpp ${SRCS} )
 
 #TARGET_LINK_LIBRARIES( clotho ${Boost_LIBRARIES} warped jsoncpp ${YAML_LIB} ${GSL_LIBRARIES} cchmc csimulation )
 #TARGET_LINK_LIBRARIES( clotho ${COMMON_LIBRARIES} cchmc engine event object timer )
 TARGET_LINK_LIBRARIES( clotho ${COMMON_LIBRARIES} cchmc engine object timer )
+TARGET_LINK_LIBRARIES( clotho_fixed ${COMMON_LIBRARIES} cchmc engine object timer )

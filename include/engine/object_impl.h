@@ -58,6 +58,8 @@ public:
                 m_sim_manager->notifyNextEvent( getSystemID(), tmp->getReceived() );
             }
         }
+
+        reset_processed();
     }
 
     virtual void perform_event( const event * e ) {}
