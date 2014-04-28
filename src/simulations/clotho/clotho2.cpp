@@ -42,6 +42,7 @@
 #include "rng/rng.hpp"
 //#include "models/default_life_cycle.h"
 #include "models/default_life_cycle.hpp"
+#include "models/opt_default_life_cycle.hpp"
 #include "models/selection_models.hpp"
 #include "models/reproduction_models.hpp"
 /*
@@ -101,7 +102,7 @@ void ThreadedCentralizedSimulationManager< pooled_event_set >::clearBufferedEven
     }
 }
 
-typedef life_cycle::def_life_cycle    LCM_t;
+typedef life_cycle::opt_default_life_cycle    LCM_t;
 typedef variant_base      VT_t;
 
 typedef reproduction::models::mutation::mutate_site< VT_t >   mutation_model_t;

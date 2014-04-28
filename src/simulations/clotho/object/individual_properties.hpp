@@ -129,7 +129,7 @@ public:
 
     bool hasSourceGametes() const { return (p0 != NULL && p1 != NULL); }
 
-    void inheritFrom( const system_id & p_id, gamete_t * g, unsigned char gidx) {
+    void inheritFrom( const system_id & p_id, gamete_t * g, unsigned char gidx = UNKNOWN_GAMETE_INDEX) {
         if( gidx == UNKNOWN_GAMETE_INDEX) {
             if( !p0 ) {
                 p0_id = p_id;

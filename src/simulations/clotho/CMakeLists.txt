@@ -75,8 +75,10 @@ LIST( APPEND SRCS clotho_commandline.cpp )
 
 ADD_EXECUTABLE(clotho clotho2.cpp ${SRCS} )
 ADD_EXECUTABLE(clotho_fixed clotho_fixed.cpp ${SRCS} )
+ADD_EXECUTABLE(clotho_no_sim clotho_no_sim.cpp ${SRCS} )
 
 #TARGET_LINK_LIBRARIES( clotho ${Boost_LIBRARIES} warped jsoncpp ${YAML_LIB} ${GSL_LIBRARIES} cchmc csimulation )
 #TARGET_LINK_LIBRARIES( clotho ${COMMON_LIBRARIES} cchmc engine event object timer )
 TARGET_LINK_LIBRARIES( clotho ${COMMON_LIBRARIES} cchmc engine object timer )
 TARGET_LINK_LIBRARIES( clotho_fixed ${COMMON_LIBRARIES} cchmc engine object timer )
+TARGET_LINK_LIBRARIES( clotho_no_sim ${COMMON_LIBRARIES} cchmc engine object timer )

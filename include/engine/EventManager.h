@@ -216,8 +216,8 @@ public:
     {}
 
     bool insertEvent( const event * e ) {
-        m_events.insert( e );
-        return (*m_events.begin() == e );
+        event_set_t::iterator it = m_events.insert( e );
+        return (m_events.begin() == it );
     }
 
     void reset_pending() {

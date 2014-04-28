@@ -39,6 +39,12 @@ public:
 
     friend reproduction_model_t;
 
+    TIndividual( ) :
+        ClothoObject( NULL ),
+        m_env_id(0),
+        m_prop( new properties_t())
+    {}
+
     TIndividual( simulation_manager * manager, 
                         const system_id & env_id/*,
                         reproduction_parameter_t * repro = NULL*/ ) :
@@ -69,6 +75,10 @@ public:
 
     virtual void reset() {
         m_prop->reset();
+    }
+
+    properties_t * getProperties() {
+        return m_prop;
     }
 
     virtual ~TIndividual() {

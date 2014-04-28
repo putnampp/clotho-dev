@@ -26,12 +26,12 @@ public:
                 m_eid( eid )
     {}
 
-    virtual const event_id_t &  getEventID() const { return m_eid; }
-    virtual const system_id &   getSender() const { return m_sender; }
-    virtual const system_id &   getReceiver() const { return m_receiver; }
+    inline const event_id_t &  getEventID() const { return m_eid; }
+    inline const system_id &   getSender() const { return m_sender; }
+    inline const system_id &   getReceiver() const { return m_receiver; }
 
-    virtual const vtime_t &     getSent() const { return m_sent; }
-    virtual const vtime_t &     getReceived() const { return m_recv; }
+    inline const vtime_t &     getSent() const { return m_sent; }
+    inline const vtime_t &     getReceived() const { return m_recv; }
 
     virtual bool operator<( const event * rhs ) const {
         return (m_recv < rhs->getReceived()) ||

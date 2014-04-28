@@ -1,5 +1,5 @@
-#ifndef DEFAULT_LIFE_CYCLE_HPP_
-#define DEFAULT_LIFE_CYCLE_HPP_
+#ifndef OPT_DEFAULT_LIFE_CYCLE_HPP_
+#define OPT_DEFAULT_LIFE_CYCLE_HPP_
 
 #include "../clotho.h"
 
@@ -22,7 +22,7 @@
 namespace life_cycle {
 
 /*
- * The def_life_cycle model is a very simple abstraction of a natural
+ * The opt_default_life_cycle model is a very simple abstraction of a natural
  * life cycle.  In this model, all individuals encounter the same
  * life cycle events at the same time.  There are 4 phases to this 
  * life cycle: Birth, Maturity, Mating, and Death.  For simplicity,
@@ -70,7 +70,7 @@ namespace life_cycle {
  * where all mating individuals always produce an offspring.  In other words,
  * every mate_select event will result an offspring in the next generation.
  */
-struct def_life_cycle : public life_cycle_model {
+struct opt_default_life_cycle : public life_cycle_model {
     // Note: these offset and padding values are completely
     // arbitrary.  They are for debugging purposes
     // only.  The idea being that each generation always
@@ -90,7 +90,7 @@ struct def_life_cycle : public life_cycle_model {
 };
 
 template < > 
-class EnvironmentLifeCycle< def_life_cycle > {
+class EnvironmentLifeCycle< opt_default_life_cycle > {
 public:
     template < class ENV >
     static void handle_event( ENV * env, const event * e) {
@@ -119,10 +119,19 @@ protected:
         const BirthEvent * be = static_cast< const BirthEvent * >( ce );
 
         event::vtime_t ctime = env->getCurrentTime();
-        MaturityEvent * me = new MaturityEvent( ctime, ctime + def_life_cycle::MATURITY_OFFSET, env->getSystemID(), ce->getSender(), env->getNextEventID(), be->getSender() );
-        env->sendEvent( me );
+//
+//        MaturityEvent * me = new MaturityEvent( ctime, ctime + opt_default_life_cycle::MATURITY_OFFSET, env->getSystemID(), ce->getSender(), env->getNextEventID(), be->getSender() );
+//        env->sendEvent( me );
+//
+//        MateSelectEvent * mse = new MateSelectEvent( ctime, ctime + opt_default_life_cycle::MATE_OFFSET, env, env, env->getNextEventID() );
+//        env->sendEvent( mse );
+//
+        if( env->m_nMateOps++ == 0) {
+            MateSelectEvent * mse = new MateSelectEvent( ctime, ctime + opt_default_life_cycle::MATE_OFFSET, env, env, env->getNextEventID() );
+            env->sendEvent(mse);
+        }
 
-        DeathEvent * de = new DeathEvent( ctime, ctime + def_life_cycle::DEATH_OFFSET, env->getSystemID(), ce->getSender(), env->getNextEventID() );
+        DeathEvent * de = new DeathEvent( ctime, ctime + opt_default_life_cycle::DEATH_OFFSET, env->getSystemID(), ce->getSender(), env->getNextEventID() );
         env->sendEvent(de);
 
         env->activateIndividual( be->getSender() );
@@ -130,28 +139,31 @@ protected:
 
     template < class ENV >
     static void handle_maturity( ENV * env, const ClothoEvent * ce ) {
-        MateSelectEvent * mse = new MateSelectEvent( env->getCurrentTime(), env->getCurrentTime() + def_life_cycle::MATE_OFFSET, env, env, env->getNextEventID() );
+        MateSelectEvent * mse = new MateSelectEvent( env->getCurrentTime(), env->getCurrentTime() + opt_default_life_cycle::MATE_OFFSET, env, env, env->getNextEventID() );
         env->sendEvent( mse );
     }
 
     template < class ENV >
     static void handle_mate_select( ENV * env, const ClothoEvent * ce ) {
 
-        // get system ids of parent 0 and parent 1
-        std::pair< system_id, system_id > parents = ENV::selection_model_t::select( env, (system_id *)NULL );
+        while( env->m_nMateOps ) {
+            // get system ids of parent 0 and parent 1
+            std::pair< system_id, system_id > parents = ENV::selection_model_t::select( env, (system_id *)NULL );
 
-        // get system id of their future offspring
-        system_id offspring_id = env->getIndividual();
+            // get system id of their future offspring
+            system_id offspring_id = env->getIndividual();
 
-        ClothoEvent::vtime_t ctime = env->getCurrentTime();
+            ClothoEvent::vtime_t ctime = env->getCurrentTime();
 
-        MateEvent * me0 = new MateEvent( ctime, ctime, env->getSystemID(), parents.first, env->getNextEventID(), offspring_id );
-        MateEvent * me1 = new MateEvent( ctime, ctime, env->getSystemID(), parents.second, env->getNextEventID(), offspring_id );
+            MateEvent * me0 = new MateEvent( ctime, ctime, env->getSystemID(), parents.first, env->getNextEventID(), offspring_id );
+            MateEvent * me1 = new MateEvent( ctime, ctime, env->getSystemID(), parents.second, env->getNextEventID(), offspring_id );
 
 //        std::cout << parents.first << " + " << parents.second << " = " << offspring_id << std::endl;
 
-        env->sendEvent( me0 );
-        env->sendEvent( me1 );
+            env->sendEvent( me0 );
+            env->sendEvent( me1 );
+            --env->m_nMateOps;
+        }
     }
 
     template < class ENV >
@@ -161,7 +173,7 @@ protected:
 };
 
 template < >
-class IndividualLifeCycle< def_life_cycle > {
+class IndividualLifeCycle< opt_default_life_cycle > {
 public:
     template < typename IND >
     static void handle_event( IND * ind, const event * e ) {
@@ -226,10 +238,13 @@ protected:
 
         if( ind->m_prop->hasSourceGametes() ) {
             event::vtime_t bday = evt->getReceived();
-            bday = def_life_cycle::nextGeneration( bday );
+            bday = opt_default_life_cycle::nextGeneration( bday );
 
-            BirthEvent * be = new BirthEvent( ind->getCurrentTime(), bday, ind, ind, ind->getNextEventID() );
-            ind->sendEvent( be );
+//            BirthEvent * be = new BirthEvent( ind->getCurrentTime(), bday, ind, ind, ind->getNextEventID() );
+//            ind->sendEvent( be );
+            ind->m_prop->setDOB(bday);
+            BirthEvent * be = new BirthEvent( ind->getCurrentTime(), bday, ind->getSystemID(), ind->m_env_id, ind->getNextEventID());
+            ind->sendEvent(be);
         }
     }
 
@@ -244,4 +259,4 @@ protected:
 
 }   // namespace life_cycle
 
-#endif  // DEFAULT_LIFE_CYCLE_HPP_
+#endif  // OPT_DEFAULT_LIFE_CYCLE_HPP_

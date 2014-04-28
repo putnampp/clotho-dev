@@ -68,7 +68,8 @@ public:
         //m_variants( new variant_map_t(r) ),
         m_sel_param( NULL ),
         m_nIndAlloc(0),
-        m_nFounder(0)
+        m_nFounder(0),
+        m_nMateOps(0)
     {
         ClothoObject::setSimulationManager( manager );
     }
@@ -79,7 +80,8 @@ public:
 //        m_variants( vmap ),
         m_sel_param( s ),
         m_nIndAlloc(0),
-        m_nFounder(0)
+        m_nFounder(0),
+        m_nMateOps(0)
     {
         ClothoObject::setSimulationManager( manager );
     }
@@ -192,6 +194,8 @@ protected:
 
     unsigned int        m_nIndAlloc;
     unsigned int        m_nFounder;
+
+    unsigned int        m_nMateOps;
 };
 
 #endif  // ENVIRONMENT_HPP_

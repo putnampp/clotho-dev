@@ -15,12 +15,12 @@ struct random_selection {
 
 }   // namespace models
 
-template <>
+template < >
 class MateSelector< models::random_selection > : public RandomProcess {
 public:
-    template < class ENV >
-    static std::pair< system_id, system_id > select( ENV * env, std::pair< system_id, system_id > * ) {
-        std::pair< system_id, system_id > res;
+    template < class ENV, class ID = system_id >
+    static std::pair< ID, ID > select( ENV * env, ID * ) {
+        std::pair< ID, ID > res;
 
         if( env->m_gender_group_map.size() == 1 ) {
             size_t nInd = env->m_gender_group_map.begin()->second->size();
@@ -66,9 +66,30 @@ public:
             }
             assert(it_g0 != it_g1 && it_g0 != env->m_gender_group_map.end() && it_g1 != env->m_gender_group_map.end() );
 
-            res.first = it_g0->second->at( env->m_rng->nextInt( it_g0->second->size() ));
-            res.second =it_g1->second->at( env->m_rng->nextInt( it_g1->second->size() ));
+            res.first = it_g0->second->at( m_rng->nextInt( it_g0->second->size() ));
+            res.second =it_g1->second->at( m_rng->nextInt( it_g1->second->size() ));
         }
+
+        return res;
+    }
+
+protected:
+
+    template < class ID >
+    static std::pair< ID , ID > select( std::vector< ID > * env, ID ) {
+        std::pair< ID, ID > res;
+
+        size_t nInd = env->size();
+
+        size_t i0 = m_rng->nextInt( nInd );
+        size_t i1 = i0;
+
+        while( i1 == i0 ) {
+            i1 = m_rng->nextInt( nInd );
+        }
+
+        res.first = env->at( i0 );
+        res.second = env->at( i1 );
 
         return res;
     }
