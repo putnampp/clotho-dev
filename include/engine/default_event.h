@@ -33,13 +33,13 @@ public:
     inline const vtime_t &     getSent() const { return m_sent; }
     inline const vtime_t &     getReceived() const { return m_recv; }
 
-    virtual bool operator<( const event * rhs ) const {
+    inline bool operator<( const event * rhs ) const {
         return (m_recv < rhs->getReceived()) ||
             (m_recv == rhs->getReceived() &&
              m_eid < rhs->getEventID() );
     }
 
-    virtual bool operator==( const event * rhs ) const {
+    inline bool operator==( const event * rhs ) const {
         return (m_sender == rhs->getSender()
                 && m_eid == rhs->getEventID());
     }

@@ -43,7 +43,7 @@ class TEnvironment < LCM,/* VT,*/ IND, SMODEL, typename std::enable_if< std::is_
     : public ClothoObject {
 public:
     typedef vector< system_id > individual_group_t;
-    typedef pair< individual_group_t *, size_t > pair_individual_group_offset;
+    typedef std::pair< individual_group_t *, size_t > pair_individual_group_offset;
     typedef unordered_map< system_id, pair_individual_group_offset > individual_group_lookup_t;
     typedef unordered_map< unsigned char, individual_group_t * > gender_group_map_t;
     typedef typename individual_group_lookup_t::iterator        lookup_iterator;
@@ -149,7 +149,7 @@ protected:
 
         gender_group_map_t::iterator it = m_gender_group_map.find(gtype);
         if( it == m_gender_group_map.end() ) {
-            pair< gender_group_map_t::iterator, bool > res = m_gender_group_map.insert( make_pair( gtype, new individual_group_t() ) );
+            std::pair< gender_group_map_t::iterator, bool > res = m_gender_group_map.insert( make_pair( gtype, new individual_group_t() ) );
             assert( res.second );
 
             it = res.first;

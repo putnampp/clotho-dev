@@ -19,7 +19,7 @@ class CentralizedSimulationManager : public SimulationManager< ES > {
 public:
     typedef pair< event::vtime_t, size_t > pair_time_offset;
     typedef pair< object *, pair_time_offset > pair_object_timestamp;
-    typedef deque< pair_object_timestamp > object_handle_map_t;
+    typedef vector< pair_object_timestamp > object_handle_map_t;
     typedef vector< object * > object_group_t;
     typedef pair< event::vtime_t, object_group_t * > concurrent_group_t;
     typedef map< event::vtime_t, object_group_t * > ordered_object_exe_t;
@@ -162,7 +162,9 @@ void CentralizedSimulationManager<ES>::unregisterObject( object * obj ) {
 
 template < class ES >
 void CentralizedSimulationManager<ES>::moveObject( object * obj, event::vtime_t newT ) {
-    pair_time_offset pto = m_objects[ obj->getObjectID() ].second;
+    system_id::object_id_t o_id = obj->getObjectID();
+
+    pair_time_offset pto = m_objects[ o_id ].second;
 
     if( pto.first != SystemClock::POSITIVE_INFINITY ) {
         // objects with time set to POSITIVE_INFINITY are not "queued"
@@ -171,27 +173,28 @@ void CentralizedSimulationManager<ES>::moveObject( object * obj, event::vtime_t 
         if( it != m_ordered_objs.end() ) {
             object_group_t * g = it->second;
 
-            assert( pto.second < g->size() &&  g->at( pto.second ) == obj );
+//            assert( pto.second < g->size() &&  g->at( pto.second ) == obj );
 
             if( g->back() != obj ) {
                 // object is not at the end of vector
                 // swap with object at the end of the vector
                 // and update that objects offset value to
                 // be that of the current obj 
-                system_id other = g->back()->getSystemID();
+                system_id::object_id_t other = g->back()->getObjectID();
 
-                (*g)[ pto.second ] = g->back();
-                g->back() = obj;
+//                (*g)[ pto.second ] = g->back();
+//                g->back() = obj;
+                swap( g->at(pto.second), g->back() );
 
                 assert( g->back() == obj );
 
-                m_objects[ other.getObjectID() ].second.second = pto.second;
+                m_objects[ other ].second.second = pto.second;
             }
             g->pop_back();
         }
     }
 
-    m_objects[ obj->getObjectID() ].second.first = newT;
+    m_objects[ o_id ].second.first = newT;
     if( newT != SystemClock::POSITIVE_INFINITY ) {
         _iterator it = m_ordered_objs.find( newT );
         if( it == m_ordered_objs.end() ) {
@@ -203,7 +206,7 @@ void CentralizedSimulationManager<ES>::moveObject( object * obj, event::vtime_t 
 //            it->second->reserve( m_nRegisteredObjs );
         }
 
-        m_objects[ obj->getObjectID() ].second.second = it->second->size();
+        m_objects[ o_id ].second.second = it->second->size();
         it->second->push_back( obj );
     }
 }

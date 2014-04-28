@@ -2,6 +2,7 @@
 #define CLOTHO_OBJECT_H_
 
 #include "clotho.h"
+#include "engine/simulation_object.h"
 
 class ClothoObject : public SimulationObject< ClothoEventSet > {
 public:

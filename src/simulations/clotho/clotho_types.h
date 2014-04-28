@@ -11,9 +11,9 @@
 #include "sex.h"
 #include "AlleleTuple.h"
 
-#include "engine/FSBAllocator.hh"
+//#include "engine/FSBAllocator.hh"
 
-#include "pooled_event_set.h"
+//#include "pooled_event_set.h"
 
 //typedef std::list< const event *, FSBAllocator< const event * > > ClothoEventSet;
 //typedef std::vector< const event * > ClothoEventSet;

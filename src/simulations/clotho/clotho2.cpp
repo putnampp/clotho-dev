@@ -45,62 +45,8 @@
 #include "models/opt_default_life_cycle.hpp"
 #include "models/selection_models.hpp"
 #include "models/reproduction_models.hpp"
-/*
-#include <boost/program_options.hpp>
-
-namespace po=boost::program_options;
-
-bool parse_commandline( int argc, char ** argv, po::variables_map & vm );
-
-const string RUNTIME_K = "total_runtime";
-
-const string HELP_K = "help";
-const string VERSION_K = "version";
-
-const string ENGINE_CONFIG_K    = "engine_config";
-const string APP_CONFIG_K       = "app_config";
-
-const string SIM_UNTIL_K        = "sim-until";
-const string THREAD_COUNT_K     = "thread-count";
-const string GENERATIONS_K       = "generations";
-
-const string SEQSM_K = "sequential";
-const string CENSM_K = "centralized";
-const string TCENSM_K = "threaded-centralized";
-
-const string DISTRIBUTED_ENV_K = "dist-env";
-const string FOUNDER_SIZE_K = "founder-size";
-*/
 
 const unsigned int MAX_THREADS = 24;
-
-template <>
-void SequentialSimulationManager< pooled_event_set >::routeEvent( const event * evt ) {
-    if( insertEvent( evt ) ) {
-        notifyNextEvent( evt->getReceiver(), evt->getReceived() );
-    }
-}
-
-template <>
-void CentralizedSimulationManager< pooled_event_set >::routeEvent( const event * evt ) {
-    if( insertEvent( evt ) ) {
-        notifyNextEvent( evt->getReceiver(), evt->getReceived() );
-    }
-}
-
-template <>
-void ThreadedCentralizedSimulationManager< pooled_event_set >::clearBufferedEvents() {
-    for( unsigned int i = 0; i < m_nThreads; ++i ) {
-        while( !m_buffers[i]->empty() ) {
-            const event * t = m_buffers[i]->back();
-            m_buffers[i]->pop_back();
-
-            if( insertEvent( t ) ) {
-                notifyNextEvent( t->getReceiver(), t->getReceived() );
-            }
-        }
-    }
-}
 
 typedef life_cycle::opt_default_life_cycle    LCM_t;
 typedef variant_base      VT_t;

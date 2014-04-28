@@ -45,34 +45,6 @@
 
 const unsigned int MAX_THREADS = 24;
 
-template <>
-void SequentialSimulationManager< pooled_event_set >::routeEvent( const event * evt ) {
-    if( insertEvent( evt ) ) {
-        notifyNextEvent( evt->getReceiver(), evt->getReceived() );
-    }
-}
-
-template <>
-void CentralizedSimulationManager< pooled_event_set >::routeEvent( const event * evt ) {
-    if( insertEvent( evt ) ) {
-        notifyNextEvent( evt->getReceiver(), evt->getReceived() );
-    }
-}
-
-template <>
-void ThreadedCentralizedSimulationManager< pooled_event_set >::clearBufferedEvents() {
-    for( unsigned int i = 0; i < m_nThreads; ++i ) {
-        while( !m_buffers[i]->empty() ) {
-            const event * t = m_buffers[i]->back();
-            m_buffers[i]->pop_back();
-
-            if( insertEvent( t ) ) {
-                notifyNextEvent( t->getReceiver(), t->getReceived() );
-            }
-        }
-    }
-}
-
 typedef life_cycle::def_life_cycle    LCM_t;
 typedef variant_base      VT_t;
 
