@@ -45,6 +45,7 @@ class EnvironmentLifeCycle< environment_only_life_cycle > {
 public:
     template < class ENV >
     static void handle_event( ENV * env, const event * e) {
+        assert(false);
         const ClothoEvent * evt = dynamic_cast< const ClothoEvent * >( e );
         if( ! evt ) return;
 
@@ -130,6 +131,7 @@ class IndividualLifeCycle< environment_only_life_cycle > {
 public:
     template < typename IND >
     static void handle_event( IND * ind, const event * e ) {
+        assert(false);
         const ClothoEvent * evt = dynamic_cast< const ClothoEvent * >( e );
         if( !evt ) return;
         handle_event( ind, evt );

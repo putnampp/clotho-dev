@@ -134,7 +134,7 @@ protected:
             id = m_available_individuals.front();
             m_available_individuals.pop_front();
 
-            individual_ptr_t t = dynamic_cast< individual_ptr_t >( m_sim_manager->getObject( id ) );
+            individual_ptr_t t = static_cast< individual_ptr_t >( m_sim_manager->getObject( id ) );
             assert( t );
             t->reset();
 

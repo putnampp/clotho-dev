@@ -85,7 +85,7 @@ void EnvironmentInitializer::createPopulation( ENV_t * env, IND_t * ind ) {
     for( unsigned int i = 0; i < env->m_nFounder; ++i ) {
         system_id id = env->getIndividual();    // adds individual to pending list
         
-        IND_t * ind = dynamic_cast< IND_t * >( env->m_sim_manager->getObject(id) );
+        IND_t * ind = static_cast< IND_t * >( env->m_sim_manager->getObject(id) );
 
         gamete_t * g = new gamete_t();
         ind->getProperties()->inheritFrom( p0, g);
