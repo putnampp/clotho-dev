@@ -38,7 +38,7 @@
 //#include "clotho_application.hpp"
 //#include "engine/engine.hpp"
 #include "engine/simulation_stats.h"
-#include "object/individual.hpp"
+#include "object/individual2.hpp"
 
 #include "variant_base.h"
 #include "variant_map.hpp"

@@ -1,8 +1,10 @@
-#ifndef CENTRALIZEDSIMULATIONMANAGER_HPP_
-#define CENTRALIZEDSIMULATIONMANAGER_HPP_
+#ifndef CENTRALIZEDSIMULATIONMANAGER2_HPP_
+#define CENTRALIZEDSIMULATIONMANAGER2_HPP_
 
-#include "simulation_manager_impl.h"
+#include "simulation_manager_impl.hpp"
 #include "application.h"
+
+#include "common_engine_strings.h"
 
 #include "simulation_stats.h"
 #include <map>
@@ -14,52 +16,56 @@ using std::pair;
 using std::make_pair;
 using std::swap;
 
-template < class ES >
-class CentralizedSimulationManager : public SimulationManager< ES > {
+template < class E, class O >
+class CentralizedSimulationManager : public SimulationManager< E, O > {
 public:
-    typedef pair< event::vtime_t, size_t > pair_time_offset;
-    typedef pair< object *, pair_time_offset > pair_object_timestamp;
+    typedef typename SimulationManager< E, O >::object_t object_t;
+    typedef typename SimulationManager< E, O >::vtime_t vtime_t;
+    typedef typename SimulationManager< E, O >::event_t event_t;
+
+    typedef pair< vtime_t, size_t > pair_time_offset;
+    typedef pair< object_t *, pair_time_offset > pair_object_timestamp;
     typedef vector< pair_object_timestamp > object_handle_map_t;
-    typedef vector< object * > object_group_t;
-    typedef pair< event::vtime_t, object_group_t * > concurrent_group_t;
+    typedef vector< object_t * > object_group_t;
+    typedef pair< vtime_t, object_group_t * > concurrent_group_t;
     typedef map< event::vtime_t, object_group_t * > ordered_object_exe_t;
     typedef typename ordered_object_exe_t::iterator _iterator;
 
     CentralizedSimulationManager( shared_ptr< application >, system_id::manager_id_t id = 0 );
     CentralizedSimulationManager( shared_ptr< application >, shared_ptr< SimulationStats >,  system_id::manager_id_t id = 0 );
 
-    virtual const event::vtime_t & getSimulationTime() const;
+    virtual const vtime_t & getSimulationTime() const;
     virtual bool  isSimulationComplete() const;
 
     virtual const system_id getNextObjectID();
 
-    virtual void registerObject( object * obj );
-    virtual void unregisterObject( object * obj );
+    virtual void registerObject( object_t * obj );
+    virtual void unregisterObject( object_t * obj );
 
     virtual size_t getObjectCount() const;
-    virtual object * getObject( const system_id & id ) const;
+    virtual object_t * getObject( const system_id & id ) const;
 
     virtual void initialize();
-    virtual void simulate( const event::vtime_t & until );
+    virtual void simulate( const vtime_t & until );
     virtual void finalize();
 
-    virtual void routeEvent( const event * evt );
-    virtual void notifyNextEvent( const system_id & obj, const event::vtime_t & t );
+    virtual void routeEvent( const event_t * evt );
+    virtual void notifyNextEvent( const system_id & obj, const vtime_t & t );
 
     virtual ~CentralizedSimulationManager();
 protected:
 
     virtual concurrent_group_t getNextObjectGroup();
 
-    virtual bool setSimulationTime( const event::vtime_t & t );
-    virtual void setSimulateUntil( const event::vtime_t & t );
+    virtual bool setSimulationTime( const vtime_t & t );
+    virtual void setSimulateUntil( const vtime_t & t );
 
-    void moveObject( object * obj, event::vtime_t t );
+    void moveObject( object_t * obj, vtime_t t );
 
     shared_ptr< application >   m_app;
 
-    event::vtime_t    m_sim_time;
-    event::vtime_t    m_sim_until;
+    vtime_t    m_sim_time;
+    vtime_t    m_sim_until;
     bool m_sim_complete;
 
     object_handle_map_t m_objects;
@@ -76,9 +82,9 @@ protected:
 // Implementation
 //
 
-template < class ES >
-CentralizedSimulationManager<ES>::CentralizedSimulationManager( shared_ptr< application > app, system_id::manager_id_t id ) :
-    SimulationManager<ES>(id),
+template < class E, class O >
+CentralizedSimulationManager<E, O>::CentralizedSimulationManager( shared_ptr< application > app, system_id::manager_id_t id ) :
+    SimulationManager<E,O>(id),
     m_app( app ),
     m_sim_time( SystemClock::ZERO ),
     m_sim_until( SystemClock::POSITIVE_INFINITY ),
@@ -90,9 +96,9 @@ CentralizedSimulationManager<ES>::CentralizedSimulationManager( shared_ptr< appl
     m_stats( new SimulationStats() )
 {}
 
-template < class ES >
-CentralizedSimulationManager<ES>::CentralizedSimulationManager( shared_ptr< application > app, shared_ptr< SimulationStats > stats, system_id::manager_id_t id ) :
-    SimulationManager<ES>(id),
+template < class E, class O >
+CentralizedSimulationManager<E,O>::CentralizedSimulationManager( shared_ptr< application > app, shared_ptr< SimulationStats > stats, system_id::manager_id_t id ) :
+    SimulationManager<E,O>(id),
     m_app( app ),
     m_sim_time( SystemClock::ZERO ),
     m_sim_until( SystemClock::POSITIVE_INFINITY ),
@@ -104,8 +110,8 @@ CentralizedSimulationManager<ES>::CentralizedSimulationManager( shared_ptr< appl
     m_stats( stats )
 {}
 
-template < class ES >
-CentralizedSimulationManager<ES>::~CentralizedSimulationManager() {
+template < class E, class O >
+CentralizedSimulationManager<E, O>::~CentralizedSimulationManager() {
     cout << m_nUnregisterCalls << " objects unregistered BEFORE destruction" << endl;
     unsigned int nUnfinalized = 0;
     while( !m_objects.empty() ) {
@@ -121,15 +127,15 @@ CentralizedSimulationManager<ES>::~CentralizedSimulationManager() {
     m_ordered_objs.clear();
 }
 
-template < class ES >
-const system_id CentralizedSimulationManager<ES>::getNextObjectID() {
+template < class E, class O >
+const system_id CentralizedSimulationManager<E, O>::getNextObjectID() {
     system_id nid( this->getManagerID(), m_objects.size() );
-    m_objects.push_back( make_pair( (object *)NULL, make_pair(SystemClock::POSITIVE_INFINITY, 0 ) ) );
+    m_objects.push_back( make_pair( (object_t *)NULL, make_pair(SystemClock::POSITIVE_INFINITY, 0 ) ) );
     return nid;
 }
 
-template< class ES >
-void CentralizedSimulationManager<ES>::registerObject( object * obj ) {
+template< class E, class O >
+void CentralizedSimulationManager<E, O>::registerObject( object_t * obj ) {
     if( obj == NULL ) return;
 
     assert( obj->getSystemID() != this->m_id );
@@ -142,8 +148,8 @@ void CentralizedSimulationManager<ES>::registerObject( object * obj ) {
     }
 }
 
-template< class ES >
-void CentralizedSimulationManager<ES>::unregisterObject( object * obj ) {
+template< class E, class O >
+void CentralizedSimulationManager<E, O>::unregisterObject( object_t * obj ) {
     ++m_nUnregisterCalls;
     if( obj == NULL ) return;
 
@@ -160,8 +166,8 @@ void CentralizedSimulationManager<ES>::unregisterObject( object * obj ) {
     }
 }
 
-template < class ES >
-void CentralizedSimulationManager<ES>::moveObject( object * obj, event::vtime_t newT ) {
+template < class E, class O >
+void CentralizedSimulationManager<E, O>::moveObject( object_t * obj, vtime_t newT ) {
     system_id::object_id_t o_id = obj->getObjectID();
 
     pair_time_offset pto = m_objects[ o_id ].second;
@@ -211,45 +217,45 @@ void CentralizedSimulationManager<ES>::moveObject( object * obj, event::vtime_t 
     }
 }
 
-template< class ES >
-size_t CentralizedSimulationManager<ES>::getObjectCount() const {
+template< class E, class O >
+size_t CentralizedSimulationManager<E, O>::getObjectCount() const {
     return m_nRegisteredObjs;
 }
 
 
-template< class ES >
-object * CentralizedSimulationManager<ES>::getObject( const system_id & id ) const {
+template< class E, class O >
+typename CentralizedSimulationManager<E, O>::object_t * CentralizedSimulationManager<E, O>::getObject( const system_id & id ) const {
     return m_objects[ id.getObjectID() ].first;
 }
 
-template< class ES >
-void CentralizedSimulationManager<ES>::routeEvent( const event * evt ) {
+template< class E, class O >
+void CentralizedSimulationManager<E, O>::routeEvent( const event_t * evt ) {
     assert( m_objects.size() > evt->getReceiver().getObjectID() );
     m_objects[ evt->getReceiver().getObjectID() ].first->receiveEvent( evt );
 }
 
-template< class ES >
-void CentralizedSimulationManager<ES>::notifyNextEvent( const system_id & obj, const event::vtime_t & t ) {
+template< class E, class O >
+void CentralizedSimulationManager<E, O>::notifyNextEvent( const system_id & obj, const vtime_t & t ) {
     moveObject( m_objects[ obj.getObjectID() ].first, t );
 }
 
-template< class ES >
-typename CentralizedSimulationManager<ES>::concurrent_group_t CentralizedSimulationManager<ES>::getNextObjectGroup() {
+template< class E, class O >
+typename CentralizedSimulationManager<E, O>::concurrent_group_t CentralizedSimulationManager<E, O>::getNextObjectGroup() {
     concurrent_group_t ot = *m_ordered_objs.begin();
     m_ordered_objs.erase( m_ordered_objs.begin() );
 
     return ot;
 }
 
-template< class ES >
-void CentralizedSimulationManager<ES>::initialize() {
+template< class E, class O >
+void CentralizedSimulationManager<E, O>::initialize() {
     m_stats->startPhase( INIT_PHASE_K );
     m_app->initialize();
     m_stats->stopPhase( INIT_PHASE_K );
 }
 
-template< class ES >
-void CentralizedSimulationManager<ES>::simulate( const event::vtime_t & until ) {
+template< class E, class O >
+void CentralizedSimulationManager<E, O>::simulate( const vtime_t & until ) {
     setSimulateUntil( until );
 
     m_stats->startPhase( SIMULATE_PHASE_K );
@@ -262,7 +268,7 @@ void CentralizedSimulationManager<ES>::simulate( const event::vtime_t & until ) 
 
 //        for( object_group_t::iterator it = ot.second->begin(); it != ot.second->end(); it++ ) {
         while( !ot.second->empty() ) {
-            object * obj = ot.second->back();
+            object_t * obj = ot.second->back();
             ot.second->pop_back();
 
             m_objects[ obj->getObjectID() ].second.first = SystemClock::POSITIVE_INFINITY;
@@ -285,8 +291,8 @@ void CentralizedSimulationManager<ES>::simulate( const event::vtime_t & until ) 
     cout << "End simulation time: " <<  getSimulationTime() << endl;
 }
 
-template< class ES >
-void CentralizedSimulationManager<ES>::finalize() {
+template< class E, class O >
+void CentralizedSimulationManager<E, O>::finalize() {
     m_stats->startPhase( FINALIZE_PHASE_K );
 
     m_app->finalize();
@@ -298,13 +304,13 @@ void CentralizedSimulationManager<ES>::finalize() {
 
 }
 
-template< class ES >
-bool CentralizedSimulationManager<ES>::isSimulationComplete() const {
+template< class E, class O >
+bool CentralizedSimulationManager<E, O>::isSimulationComplete() const {
     return m_sim_complete;
 }
 
-template< class ES >
-bool CentralizedSimulationManager<ES>::setSimulationTime( const event::vtime_t & t ) {
+template< class E, class O >
+bool CentralizedSimulationManager<E, O>::setSimulationTime( const vtime_t & t ) {
     assert( m_sim_time <= t );
     if( m_sim_time != t ) {
         m_sim_time = t;
@@ -314,13 +320,13 @@ bool CentralizedSimulationManager<ES>::setSimulationTime( const event::vtime_t &
     return m_sim_complete;
 }
 
-template< class ES >
-void CentralizedSimulationManager<ES>::setSimulateUntil( const event::vtime_t & t ) {
+template< class E, class O >
+void CentralizedSimulationManager<E, O>::setSimulateUntil( const vtime_t & t ) {
     m_sim_until = t;
 }
 
-template< class ES >
-const event::vtime_t & CentralizedSimulationManager<ES>::getSimulationTime() const {
+template< class E, class O >
+const typename CentralizedSimulationManager<E,O>::vtime_t & CentralizedSimulationManager<E, O>::getSimulationTime() const {
     return m_sim_time;
 }
-#endif  // CENTRALIZEDSIMULATIONMANAGER_HPP_
+#endif  // CENTRALIZEDSIMULATIONMANAGER2_HPP_

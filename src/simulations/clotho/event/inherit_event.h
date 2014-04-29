@@ -1,7 +1,7 @@
 #ifndef INHERIT_EVENT_H_
 #define INHERIT_EVENT_H_
 
-#include "clotho_event.h"
+#include "../clotho_event.h"
 #include "gamete.h"
 
 extern const string INHERIT_EVENT_K;

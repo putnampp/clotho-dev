@@ -1,7 +1,7 @@
 #ifndef ENVIRONMENT_SNAPSHOT_EVENT_H_
 #define ENVIRONMENT_SNAPSHOT_EVENT_H_
 
-#include "clotho_event.h"
+#include "../clotho_event.h"
 #include "../object/environment_snapshot.h"
 
 extern const event_type_t   ENVIRONMENT_SNAPSHOT_EVENT_K;

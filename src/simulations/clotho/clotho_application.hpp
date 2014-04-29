@@ -3,11 +3,11 @@
 
 #include "clotho.h"
 #include "engine/application.h"
-#include "engine/simulation_manager.h"
+#include "engine/simulation_manager_impl.hpp"
 
 #include "clotho_application_initializer.hpp"
 #include "clotho_application_finalizer.hpp"
-#include "object/environment.hpp"
+#include "object/environment2.hpp"
 
 #include <type_traits>
 #include <vector>
@@ -19,7 +19,7 @@ class ClothoApplication;
 
 template < class MGR, class ENV >
 class ClothoApplication< MGR, ENV,
-    typename std::enable_if< std::is_base_of< simulation_manager, MGR>::value && std::is_base_of<ClothoObject, ENV>::value >::type >
+    typename std::enable_if< std::is_base_of< SimulationManager< ClothoEvent, ClothoObject >, MGR>::value && std::is_base_of<ClothoObject, ENV>::value >::type >
     : public application {
 public:
     typedef MGR     manager_t;

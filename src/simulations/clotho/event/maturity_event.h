@@ -1,7 +1,7 @@
 #ifndef MATURITY_EVENT_H_
 #define MATURITY_EVENT_H_
 
-#include "clotho_event.h"
+#include "../clotho_event.h"
 
 extern const string MATURITY_EVENT_K;
 

@@ -8,7 +8,7 @@
 
 #include <iostream>
 
-#include "../event/clotho_event.h"
+#include "../clotho_event.h"
 #include "../event/birth_event.h"
 #include "../event/death_event.h"
 #include "../event/inherit_event.hpp"

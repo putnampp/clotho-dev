@@ -1,7 +1,7 @@
 #ifndef INHERIT_EVENT_HPP_
 #define INHERIT_EVENT_HPP_
 
-#include "clotho_event.h"
+#include "../clotho_event.h"
 
 static const string INHERIT_EVENT_K = "inherit_event";
 

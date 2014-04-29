@@ -5,6 +5,8 @@
 #include "simulation_manager_impl.h"
 #include "application.h"
 
+#include "common_engine_strings.h"
+
 #include <unordered_map>
 #include <list>
 #include <vector>
@@ -26,9 +28,9 @@ using std::lower_bound;
 using std::upper_bound;
 
 
-static const string INIT_PHASE_K = "init";
-static const string SIMULATE_PHASE_K = "simulate";
-static const string FINALIZE_PHASE_K = "finalize";
+//static const string INIT_PHASE_K = "init";
+//static const string SIMULATE_PHASE_K = "simulate";
+//static const string FINALIZE_PHASE_K = "finalize";
 
 template < class ES >
 class SequentialSimulationManager : public SimulationManager< ES > {

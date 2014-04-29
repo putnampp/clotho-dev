@@ -1,5 +1,5 @@
-#ifndef ENVIRONMENT_HPP_
-#define ENVIRONMENT_HPP_
+#ifndef ENVIRONMENT2_HPP_
+#define ENVIRONMENT2_HPP_
 
 #include "../clotho.h"
 #include "../clotho_object.hpp"
@@ -24,7 +24,7 @@
 #include <type_traits>
 #include <functional>
 
-#include "individual.hpp"
+#include "individual2.hpp"
 //#include "individual_properties.hpp"
 
 using std::deque;
@@ -35,13 +35,15 @@ using std::unordered_set;
 using std::swap;
 
 
-template < class LCM, /*class VT,*/ class IND, class SMODEL, class Enable = void >
+template < class LCM, class IND, class SMODEL, class Enable = void >
 class TEnvironment;
 
-template < class LCM, /* class VT,*/ class IND, class SMODEL >
-class TEnvironment < LCM,/* VT,*/ IND, SMODEL, typename std::enable_if< std::is_base_of< life_cycle::life_cycle_model, LCM >::value >::type >
+template < class LCM, class IND, class SMODEL >
+class TEnvironment < LCM, IND, SMODEL, typename std::enable_if< std::is_base_of< life_cycle::life_cycle_model, LCM >::value >::type >
     : public ClothoObject {
 public:
+    typedef typename ClothoObject::simulation_manager_t simulation_manager_t;
+
     typedef vector< system_id > individual_group_t;
     typedef std::pair< individual_group_t *, size_t > pair_individual_group_offset;
     typedef unordered_map< system_id, pair_individual_group_offset > individual_group_lookup_t;
@@ -62,7 +64,7 @@ public:
 
     friend selection_model_t;
 
-    TEnvironment( simulation_manager * manager, shared_ptr< iRNG > r ) :
+    TEnvironment( simulation_manager_t * manager, shared_ptr< iRNG > r ) :
         ClothoObject( manager ),
         m_rng(r),
         //m_variants( new variant_map_t(r) ),
@@ -74,7 +76,7 @@ public:
         ClothoObject::setSimulationManager( manager );
     }
 
-    TEnvironment( simulation_manager * manager, shared_ptr< iRNG > r,/* std::shared_ptr< variant_map_t > vmap,*/ selection_parameter_t * s ) :
+    TEnvironment( simulation_manager_t * manager, shared_ptr< iRNG > r,/* std::shared_ptr< variant_map_t > vmap,*/ selection_parameter_t * s ) :
         ClothoObject( manager ),
         m_rng(r),
 //        m_variants( vmap ),
@@ -98,7 +100,7 @@ public:
         initializer::EnvironmentInitializer::init(this);
     }
  
-    virtual void perform_event( const event * e) {
+    virtual void perform_event( const event_t * e) {
         life_cycle::EnvironmentLifeCycle<LCM>::handle_event( this, e );
     }
 

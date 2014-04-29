@@ -1,7 +1,7 @@
 #ifndef MATE_EVENT_H_
 #define MATE_EVENT_H_
 
-#include "clotho_event.h"
+#include "../clotho_event.h"
 
 extern const string MATE_EVENT_K;
 

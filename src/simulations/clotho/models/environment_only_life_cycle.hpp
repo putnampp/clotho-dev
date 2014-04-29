@@ -1,5 +1,5 @@
-#ifndef OPT_DEFAULT_LIFE_CYCLE_HPP_
-#define OPT_DEFAULT_LIFE_CYCLE_HPP_
+#ifndef ENVIRONMENT_ONLY_LIFE_CYCLE_HPP_
+#define ENVIRONMENT_ONLY_LIFE_CYCLE_HPP_
 
 #include "../clotho.h"
 
@@ -21,56 +21,7 @@
 
 namespace life_cycle {
 
-/*
- * The opt_default_life_cycle model is a very simple abstraction of a natural
- * life cycle.  In this model, all individuals encounter the same
- * life cycle events at the same time.  There are 4 phases to this 
- * life cycle: Birth, Maturity, Mating, and Death.  For simplicity,
- * all individuals are born at t_0, mature at t_1 = t_0 + MATURITY_OFFSET,
- * mate at t_2 = t_1 + MATE_OFFSET, and die at t_3 = t_0 + DEATH_OFFSET.
- *
- * The life cycle starts with the birth of an individual.
- * When an individual handles a birth event, its DOB is updated to the
- * current simulation time and then notifies the environment of its
- * birth. The environment notification occurs with in the same "time step"
- * as the individual being born.  Upon notification of an individual's
- * birth, the environment generates a Maturity event
- * for the individual, and Death event for the individual.  Additionally,
- * the environment adds the individual to its "active" set.
- *
- * The next time step starts with an individual becoming mature.
- * A mature individual simply notifies the environment of its maturity.
- * The environment handles this notification by scheduling a mate_select event.
- * 
- * The mate select process starts the Mate phase. The mate select process
- * selects two parents from the current environment using the selection
- * procedure associated with the environment. An individual is created
- * to be used as their offspring.  A mate_event is sent to each parent.
- * When an individual encounters a mate_event, they produce a gamete
- * following the reproduction process associated with the individual.
- * The gamete is then sent to the offspring individual via an inherit_event.
- * Inheritance essentially sets the individual gamete property accordingly.
- * In this model, gamete index is "unknown"/"ignored". This is analogous
- * to not considering the gamete source's gender in mating.  Once both
- * parents have supplied their gamete to the offspring, the offspring's
- * birth is scheduled for the start of the next generation.
- *
- * Finally, the current generation enters the Death phase.  This starts
- * with the individual changing its state to being not alive (reseting
- * DOB to be POSITIVE_INFINITY).  It then notifies the environment of its
- * death.  The environment then simply removes the individual from its
- * active set.
- *
- * This life_cycle makes several "assumptions" about the natural life cycle.
- * First, all individuals follow the same life cycle. This means that all
- * individuals are born, mature, and die.  Whether they actually reproduce
- * to the next generation is left to the Selection process defined by environment.
- * Second, it assumes that by default all individuals require two parents
- * (mating population).  Third, this model assumes a constant population
- * where all mating individuals always produce an offspring.  In other words,
- * every mate_select event will result an offspring in the next generation.
- */
-struct opt_default_life_cycle : public life_cycle_model {
+struct environment_only_life_cycle : public life_cycle_model {
     // Note: these offset and padding values are completely
     // arbitrary.  They are for debugging purposes
     // only.  The idea being that each generation always
@@ -90,7 +41,7 @@ struct opt_default_life_cycle : public life_cycle_model {
 };
 
 template < > 
-class EnvironmentLifeCycle< opt_default_life_cycle > {
+class EnvironmentLifeCycle< environment_only_life_cycle > {
 public:
     template < class ENV >
     static void handle_event( ENV * env, const event * e) {
@@ -104,8 +55,6 @@ public:
     static void handle_event( ENV * env, const ClothoEvent * evt ) {
         if( evt->getEventType() == BIRTH_EVENT_K ) {
             handle_birth( env, evt );
-        //} else if( evt->getEventType() == MATURITY_EVENT_K ) {
-        //    handle_maturity( env, evt );
         } else if( evt->getEventType() == DEATH_EVENT_K ) {
             handle_death(env, evt );
         } else if( evt->getEventType() == MATE_SELECT_EVENT_K ) {
@@ -116,31 +65,21 @@ public:
 protected:
     template < class ENV >
     static void handle_birth( ENV * env, const ClothoEvent * ce ) {
-        const BirthEvent * be = static_cast< const BirthEvent * >( ce );
+        env->m_nMateOps = env->m_pending.size();
 
-        event::vtime_t ctime = env->getCurrentTime();
-//
-//        MaturityEvent * me = new MaturityEvent( ctime, ctime + opt_default_life_cycle::MATURITY_OFFSET, env->getSystemID(), ce->getSender(), env->getNextEventID(), be->getSender() );
-//        env->sendEvent( me );
-//
-//        MateSelectEvent * mse = new MateSelectEvent( ctime, ctime + opt_default_life_cycle::MATE_OFFSET, env, env, env->getNextEventID() );
-//        env->sendEvent( mse );
-//
-        if( env->m_nMateOps++ == 0) {
-            MateSelectEvent * mse = new MateSelectEvent( ctime, ctime + opt_default_life_cycle::MATE_OFFSET, env, env, env->getNextEventID() );
-            env->sendEvent(mse);
+        while( !env->m_pending.empty() ) {
+            system_id id = *env->m_pending.begin();
+            env->m_pending.erase( env->m_pending.begin());
+
+            typename ENV::individual_t * ind  = dynamic_cast< typename ENV::individual_t * >( env->m_sim_manager->getObject( id ) );
+            ind->getProperties()->setDOB( ce->getReceived() );
+
+            env->activateIndividual(id);
         }
 
-        DeathEvent * de = new DeathEvent( ctime, ctime + opt_default_life_cycle::DEATH_OFFSET, env->getSystemID(), ce->getSender(), env->getNextEventID() );
-        env->sendEvent(de);
-
-        env->activateIndividual( be->getSender() );
-    }
-
-    template < class ENV >
-    static void handle_maturity( ENV * env, const ClothoEvent * ce ) {
-        MateSelectEvent * mse = new MateSelectEvent( env->getCurrentTime(), env->getCurrentTime() + opt_default_life_cycle::MATE_OFFSET, env, env, env->getNextEventID() );
-        env->sendEvent( mse );
+        
+        MateSelectEvent * mse = new MateSelectEvent( ce->getReceived(), ce->getReceived() + environment_only_life_cycle::MATE_OFFSET, env, env, env->getNextEventID() );
+        env->sendEvent(mse);
     }
 
     template < class ENV >
@@ -153,27 +92,41 @@ protected:
             // get system id of their future offspring
             system_id offspring_id = env->getIndividual();
 
-            ClothoEvent::vtime_t ctime = env->getCurrentTime();
+            typename ENV::individual_t * p0 = dynamic_cast< typename ENV::individual_t * >( env->m_sim_manager->getObject( parents.first ) );
+            typename ENV::individual_t * p1 = dynamic_cast< typename ENV::individual_t * >( env->m_sim_manager->getObject( parents.second ) );
+            typename ENV::individual_t * child = dynamic_cast< typename ENV::individual_t *>( env->m_sim_manager->getObject( offspring_id ) );
 
-            MateEvent * me0 = new MateEvent( ctime, ctime, env->getSystemID(), parents.first, env->getNextEventID(), offspring_id );
-            MateEvent * me1 = new MateEvent( ctime, ctime, env->getSystemID(), parents.second, env->getNextEventID(), offspring_id );
+            typedef typename ENV::individual_t::properties_t::gamete_t   gamete_t;
+            gamete_t * z = ENV::individual_t::reproduction_model_t::reproduce( p0, (gamete_t *) NULL );
+            child->getProperties()->inheritFrom( parents.first, z );
 
-//        std::cout << parents.first << " + " << parents.second << " = " << offspring_id << std::endl;
+            z = ENV::individual_t::reproduction_model_t::reproduce( p1, (gamete_t *) NULL );
+            child->getProperties()->inheritFrom( parents.second, z );
 
-            env->sendEvent( me0 );
-            env->sendEvent( me1 );
             --env->m_nMateOps;
         }
+
+        DeathEvent * de = new DeathEvent( ce->getReceived(), ce->getReceived() + environment_only_life_cycle::DEATH_OFFSET, env, env, env->getNextEventID() );
+        env->sendEvent(de);
     }
 
     template < class ENV >
     static void handle_death( ENV * env, const ClothoEvent * ce ) {
-        env->deactivateIndividual( ce->getSender() );
+        while( !env->m_active_individuals.empty() ) {
+            system_id id = env->m_active_individuals.begin()->first;
+            typename ENV::individual_t * ind = dynamic_cast< typename ENV::individual_t * >( env->m_sim_manager->getObject(id));
+            ind->getProperties()->died();
+            env->deactivateIndividual( id );
+        }
+        event::vtime_t bday = environment_only_life_cycle::nextGeneration( ce->getReceived() );
+
+        BirthEvent * be = new BirthEvent(ce->getReceived(), bday, env, env, env->getNextEventID() );
+        env->sendEvent( be );
     }
 };
 
 template < >
-class IndividualLifeCycle< opt_default_life_cycle > {
+class IndividualLifeCycle< environment_only_life_cycle > {
 public:
     template < typename IND >
     static void handle_event( IND * ind, const event * e ) {
@@ -238,7 +191,7 @@ protected:
 
         if( ind->m_prop->hasSourceGametes() ) {
             event::vtime_t bday = evt->getReceived();
-            bday = opt_default_life_cycle::nextGeneration( bday );
+            bday = environment_only_life_cycle::nextGeneration( bday );
 
 //            BirthEvent * be = new BirthEvent( ind->getCurrentTime(), bday, ind, ind, ind->getNextEventID() );
 //            ind->sendEvent( be );
@@ -259,4 +212,4 @@ protected:
 
 }   // namespace life_cycle
 
-#endif  // OPT_DEFAULT_LIFE_CYCLE_HPP_
+#endif  // ENVIRONMENT_ONLY_LIFE_CYCLE_HPP_

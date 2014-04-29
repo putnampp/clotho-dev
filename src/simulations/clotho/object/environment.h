@@ -13,7 +13,7 @@
 #include <unordered_set>
 #include <set>
 
-#include "../event/clotho_event.h"
+#include "../clotho_event.h"
 #include "../event_performer.h"
 
 #include "../models/selection_model.h"

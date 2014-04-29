@@ -2,8 +2,8 @@
 #define CLOTHO_EVENT_H_
 
 #include "engine/default_event.h"
-#include "../clotho.h"
-#include "../ider.h"
+#include "clotho.h"
+#include "ider.h"
 
 #include <ostream>
 

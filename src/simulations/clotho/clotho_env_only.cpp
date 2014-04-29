@@ -28,27 +28,24 @@
  ******************************************************************************/
 
 #include "clotho.h"
+#include "clotho_commandline.h"
 #include <cstdlib>
 
 #include "clotho_application.hpp"
-#include "clotho_commandline.h"
 #include "engine/engine.hpp"
 
-//#include "selection.hpp"
-//#include "reproduction.hpp"
-
 #include "variant_base.h"
+#include "variant_map.hpp"
+#include "fixed_length_gamete.hpp"
 
 #include "rng/rng.hpp"
-//#include "models/default_life_cycle.h"
-#include "models/default_life_cycle.hpp"
-#include "models/opt_default_life_cycle.hpp"
+#include "models/environment_only_life_cycle.hpp"
 #include "models/selection_models.hpp"
 #include "models/reproduction_models.hpp"
 
 const unsigned int MAX_THREADS = 24;
 
-typedef life_cycle::opt_default_life_cycle    LCM_t;
+typedef life_cycle::environment_only_life_cycle    LCM_t;
 typedef variant_base      VT_t;
 
 typedef reproduction::models::mutation::mutate_site< VT_t >   mutation_model_t;
@@ -66,8 +63,6 @@ typedef TEnvironment< LCM_t, /*VT_t,*/ IND_t, selection_model_t > ENV_t;
 typedef CentralizedSimulationManager< ClothoEvent, ClothoObject >  CENTRAL_MGR_t;
 typedef ClothoApplication< CENTRAL_MGR_t, ENV_t > SIMPLE_CENTRAL_APP_t;
 
-typedef SimulationManager< ClothoEvent, ClothoObject > simulation_manager_t;
-
 namespace initializer {
 
 template < > 
@@ -78,6 +73,29 @@ void ClothoAppInitializer::createEnvironment< SIMPLE_CENTRAL_APP_t, SIMPLE_CENTR
     env->setFounderSize( a->m_nFounder );
     env->initialize();
     a->m_objects.push_back( env->getSystemID());
+}
+
+template<>
+void EnvironmentInitializer::createPopulation( ENV_t * env, IND_t * ind ) {
+    cout << "Creating founding population of " << env->m_nFounder << " [ENV ONLY]" << endl;
+    system_id p0(0);
+
+    typedef typename IND_t::properties_t::gamete_t gamete_t;
+
+    for( unsigned int i = 0; i < env->m_nFounder; ++i ) {
+        system_id id = env->getIndividual();    // adds individual to pending list
+        
+        IND_t * ind = dynamic_cast< IND_t * >( env->m_sim_manager->getObject(id) );
+
+        gamete_t * g = new gamete_t();
+        ind->getProperties()->inheritFrom( p0, g);
+
+        g = new gamete_t();
+        ind->getProperties()->inheritFrom( p0, g);
+    }
+
+    BirthEvent * be = new BirthEvent( env->getCurrentTime(), env->getCurrentTime(), env, env, env->getNextEventID() );
+    env->sendEvent(be);
 }
 }   // namespace initializer
 
@@ -104,13 +122,23 @@ int main( int argc, char ** argv ) {
     shared_ptr< iRNG > rng( new GSL_RNG());
     cout << "RNG: " <<  rng->getType() << "; seed: " << rng->getSeed() << endl;
 
+    mutation_model_t::initialize( 0.0001, false);
+    
+//    const double dMaxVariants = 10000.0;
+//    for( double i = 0.0; i < dMaxVariants; i += 1.0 ) {
+//        mutation_model_t::getVariantMap()->createVariant( i / dMaxVariants);
+//    }
+
+//    assert(mutation_model_t::getVariantMap()->size() == dMaxVariants);
+
     RandomProcess::initialize( rng );
-    mutation_model_t::initialize();
+
+    cout << "Getting HEre" << endl;
 
     shared_ptr< application > app;
     shared_ptr< SimulationStats > stats( new SimulationStats() );
 
-    simulation_manager_t * sim = NULL;
+    SimulationManager< ClothoEvent, ClothoObject > * sim = NULL;
 
     if( vm.count( CENSM_K ) ) {
         cout << "Using a Centralized Simulation Manager" << endl;
@@ -162,41 +190,3 @@ int main( int argc, char ** argv ) {
 
     return 0;
 }
-
-/*
-bool parse_commandline( int argc, char ** argv, po::variables_map & vm ) {
-    po::options_description gen( "General" );
-    gen.add_options()
-    ( (HELP_K + ",h").c_str(), "Print this" )
-    ( (VERSION_K + ",v").c_str(), "Version" )
-    ;
-
-    po::options_description simulation( "Simulation Parameters" );
-    simulation.add_options()
-    ( SIM_UNTIL_K.c_str(), po::value<SystemClock::vtime_t>()->default_value( SystemClock::POSITIVE_INFINITY ), "Simulate until time. Default value is positive infinity.")
-    ( THREAD_COUNT_K.c_str(), po::value< unsigned int >()->default_value( 4 ), "Thread count for thread aware simulation managers are used. Does not apply when --sequential, or --centralized flags are used")
-    ( SEQSM_K.c_str(), "Run the simulation with the sequential simulation manager" )
-    ( CENSM_K.c_str(), "Run the simulation with the centralized simulation manager" )
-    ( TCENSM_K.c_str(), "Run the simulation with the centralized simulation manager (thread aware)")
-    ;
-
-    po::options_description clotho_app( "Clotho Application Parameters" );
-    clotho_app.add_options()
-    ( GENERATIONS_K.c_str(), po::value<unsigned int>()->default_value(-1), "Simulate a number of generations.")
-    ( DISTRIBUTED_ENV_K.c_str(), po::value< unsigned int >()->default_value( 1 ), "Number of environment partitions; Thread aware simulation managers will partition the environment into the max of the number of partitions and thread count" )
-    ( FOUNDER_SIZE_K.c_str(), po::value< unsigned int >()->default_value(10000), "Founding population size" )
-    ;
-
-    po::options_description cmdline;
-
-    cmdline.add(gen).add(simulation).add( clotho_app );
-    po::store( po::command_line_parser( argc, argv ).options( cmdline ).run(), vm );
-
-    bool res = true;
-    if( vm.count( HELP_K ) ) {
-        cout << cmdline << endl;
-        res = false;
-    }
-
-    return res;
-}*/

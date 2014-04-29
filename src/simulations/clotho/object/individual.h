@@ -4,7 +4,7 @@
 #include "../clotho.h"
 #include "../clotho_object.h"
 //#include "engine/simulation_object.h"
-#include "../event/clotho_event.h"
+#include "../clotho_event.h"
 #include "../event_performer.h"
 
 #include "individual_properties.h"

@@ -1,7 +1,7 @@
 #ifndef DEATH_EVENT_H_
 #define DEATH_EVENT_H_
 
-#include "clotho_event.h"
+#include "../clotho_event.h"
 
 extern const event_type_t DEATH_EVENT_K;
 

@@ -1,5 +1,5 @@
-#ifndef INDIVIDUAL_HPP_
-#define INDIVIDUAL_HPP_
+#ifndef INDIVIDUAL2_HPP_
+#define INDIVIDUAL2_HPP_
 
 #include "../clotho.h"
 #include "../clotho_object.hpp"
@@ -32,6 +32,8 @@ public:
 
     typedef RMODEL reproduction_model_t;
 //    typedef typename RMODEL::parameter_t   reproduction_parameter_t;
+//
+    typedef typename ClothoObject::simulation_manager_t simulation_manager_t;
 
     friend class initializer::IndividualInitializer;
     friend class finalizer::IndividualFinalizer;
@@ -45,7 +47,7 @@ public:
         m_prop( new properties_t())
     {}
 
-    TIndividual( simulation_manager * manager, 
+    TIndividual( simulation_manager_t * manager, 
                         const system_id & env_id/*,
                         reproduction_parameter_t * repro = NULL*/ ) :
         ClothoObject( manager ),
@@ -64,7 +66,7 @@ public:
         return this->m_repro;
     }
 */
-    virtual void perform_event( const event * e) {
+    virtual void perform_event( const event_t * e) {
         life_cycle::IndividualLifeCycle<LCM>::handle_event( this, e );
     }
 
@@ -96,4 +98,4 @@ protected:
 //    reproduction_parameter_t * m_repro;
 };
 
-#endif  // INDIVIDUAL_HPP_
+#endif  // INDIVIDUAL2_HPP_

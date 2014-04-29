@@ -1,7 +1,7 @@
 #ifndef MATE_SELECT_EVENT_H_
 #define MATE_SELECT_EVENT_H_
 
-#include "clotho_event.h"
+#include "../clotho_event.h"
 
 extern const event_type_t MATE_SELECT_EVENT_K;
 

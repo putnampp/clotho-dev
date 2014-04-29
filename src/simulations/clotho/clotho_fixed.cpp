@@ -60,10 +60,10 @@ typedef selection::models::random_selection selection_model_t;
 typedef TIndividual< LCM_t, individual_props< /*VT_t,*/ gamete_t, 2 >, reproduction_model_t > IND_t;
 typedef TEnvironment< LCM_t, /*VT_t,*/ IND_t, selection_model_t > ENV_t;
 
-typedef SequentialSimulationManager< ClothoEventSet >   SEQUENTIAL_MGR_t;
-typedef ClothoApplication< SEQUENTIAL_MGR_t, ENV_t >    SEQUENTIAL_APP_t;
+//typedef SequentialSimulationManager< ClothoEventSet >   SEQUENTIAL_MGR_t;
+//typedef ClothoApplication< SEQUENTIAL_MGR_t, ENV_t >    SEQUENTIAL_APP_t;
 
-typedef CentralizedSimulationManager< ClothoEventSet >  CENTRAL_MGR_t;
+typedef CentralizedSimulationManager< ClothoEvent, ClothoObject >  CENTRAL_MGR_t;
 typedef ClothoApplication< CENTRAL_MGR_t, ENV_t > SIMPLE_CENTRAL_APP_t;
 
 namespace initializer {
@@ -116,7 +116,7 @@ int main( int argc, char ** argv ) {
     shared_ptr< application > app;
     shared_ptr< SimulationStats > stats( new SimulationStats() );
 
-    simulation_manager * sim = NULL;
+    SimulationManager< ClothoEvent, ClothoObject > * sim = NULL;
 
     if( vm.count( CENSM_K ) ) {
         cout << "Using a Centralized Simulation Manager" << endl;
