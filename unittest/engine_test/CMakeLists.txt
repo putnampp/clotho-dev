@@ -33,5 +33,6 @@ INCLUDE_DIRECTORIES( ${${PROJECT_NAME}_INCLUDE_DIR}/engine )
 LIST(APPEND ENGINE_SRCS SystemIDTest.cpp )
 LIST(APPEND ENGINE_SRCS SequentialSimulationManagerTest.cpp )
 LIST(APPEND ENGINE_SRCS SimulationObjectTest.cpp )
+LIST(APPEND ENGINE_SRCS ltsf_pool_test.cpp )
 
 ADD_LIBRARY(engine_test SHARED ${ENGINE_SRCS} )

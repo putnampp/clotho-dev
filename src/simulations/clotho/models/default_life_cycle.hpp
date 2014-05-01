@@ -89,10 +89,11 @@ struct def_life_cycle : public life_cycle_model {
     }
 };
 
-template < > 
-class EnvironmentLifeCycle< def_life_cycle > {
+template < class ENV > 
+class EnvironmentLifeCycle< def_life_cycle, ENV, ClothoEvent > {
 public:
-    template < class ENV >
+    static void initialize() {}
+
     static void handle_event( ENV * env, const event * e) {
         const ClothoEvent * evt = dynamic_cast< const ClothoEvent * >( e );
         if( ! evt ) return;
@@ -100,7 +101,6 @@ public:
         handle_event(env, evt );
     }
 
-    template < class ENV >
     static void handle_event( ENV * env, const ClothoEvent * evt ) {
         if( evt->getEventType() == BIRTH_EVENT_K ) {
             handle_birth( env, evt );
@@ -114,7 +114,6 @@ public:
     }
 
 protected:
-    template < class ENV >
     static void handle_birth( ENV * env, const ClothoEvent * ce ) {
         const BirthEvent * be = static_cast< const BirthEvent * >( ce );
 
@@ -128,13 +127,11 @@ protected:
         env->activateIndividual( be->getSender() );
     }
 
-    template < class ENV >
     static void handle_maturity( ENV * env, const ClothoEvent * ce ) {
         MateSelectEvent * mse = new MateSelectEvent( env->getCurrentTime(), env->getCurrentTime() + def_life_cycle::MATE_OFFSET, env, env, env->getNextEventID() );
         env->sendEvent( mse );
     }
 
-    template < class ENV >
     static void handle_mate_select( ENV * env, const ClothoEvent * ce ) {
 
         // get system ids of parent 0 and parent 1
@@ -154,7 +151,6 @@ protected:
         env->sendEvent( me1 );
     }
 
-    template < class ENV >
     static void handle_death( ENV * env, const ClothoEvent * ce ) {
         env->deactivateIndividual( ce->getSender() );
     }

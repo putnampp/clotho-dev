@@ -40,10 +40,11 @@ struct environment_only_life_cycle : public life_cycle_model {
     }
 };
 
-template < > 
-class EnvironmentLifeCycle< environment_only_life_cycle > {
+template < class ENV > 
+class EnvironmentLifeCycle< environment_only_life_cycle, ENV, ClothoEvent > {
 public:
-    template < class ENV >
+    static void initialize() {}
+
     static void handle_event( ENV * env, const event * e) {
         assert(false);
         const ClothoEvent * evt = dynamic_cast< const ClothoEvent * >( e );
@@ -52,7 +53,6 @@ public:
         handle_event(env, evt );
     }
 
-    template < class ENV >
     static void handle_event( ENV * env, const ClothoEvent * evt ) {
         if( evt->getEventType() == BIRTH_EVENT_K ) {
             handle_birth( env, evt );
@@ -64,7 +64,6 @@ public:
     }
 
 protected:
-    template < class ENV >
     static void handle_birth( ENV * env, const ClothoEvent * ce ) {
         env->m_nMateOps = env->m_pending.size();
 
@@ -83,7 +82,6 @@ protected:
         env->sendEvent(mse);
     }
 
-    template < class ENV >
     static void handle_mate_select( ENV * env, const ClothoEvent * ce ) {
 
         while( env->m_nMateOps ) {
@@ -111,7 +109,6 @@ protected:
         env->sendEvent(de);
     }
 
-    template < class ENV >
     static void handle_death( ENV * env, const ClothoEvent * ce ) {
         while( !env->m_active_individuals.empty() ) {
             system_id id = env->m_active_individuals.begin()->first;

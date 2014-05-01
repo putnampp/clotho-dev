@@ -14,9 +14,9 @@ public:
                 const system_object * sender, const system_object * receiver,
                 event_id_t eid, const system_object * offspring );
 
-    virtual const event_type_t & getEventType() const;
+    const event_type_t & getEventType() const;
 
-    virtual const system_id & getOffspringID() const;
+    const system_id & getOffspringID() const;
 
     virtual ~MateEvent() {}
 

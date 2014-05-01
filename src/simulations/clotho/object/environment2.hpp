@@ -57,10 +57,11 @@ public:
     typedef typename SMODEL::parameter_t   selection_parameter_t;
 
     typedef selection::MateSelector< SMODEL > selection_model_t;
+    typedef TEnvironment < LCM, IND, SMODEL > environment_t;
 
     friend class initializer::EnvironmentInitializer;
     friend class finalizer::EnvironmentFinalizer;
-    friend class life_cycle::EnvironmentLifeCycle<LCM>;
+    friend class life_cycle::EnvironmentLifeCycle<LCM, environment_t, ClothoEvent>;
 
     friend selection_model_t;
 
@@ -97,11 +98,12 @@ public:
     }
 
     virtual void initialize() {
+        life_cycle::EnvironmentLifeCycle<LCM, environment_t, ClothoEvent>::initialize();
         initializer::EnvironmentInitializer::init(this);
     }
  
     virtual void perform_event( const event_t * e) {
-        life_cycle::EnvironmentLifeCycle<LCM>::handle_event( this, e );
+        life_cycle::EnvironmentLifeCycle<LCM, environment_t, ClothoEvent>::handle_event( this, e );
     }
 
     virtual void finalize() {

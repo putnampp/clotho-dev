@@ -89,10 +89,19 @@ struct opt_default_life_cycle : public life_cycle_model {
     }
 };
 
-template < > 
-class EnvironmentLifeCycle< opt_default_life_cycle > {
+template < class ENV > 
+class EnvironmentLifeCycle< opt_default_life_cycle, ENV, ClothoEvent > {
 public:
-    template < class ENV >
+    typedef void (*handler_t)( ENV *, const ClothoEvent * );
+
+    typedef std::unordered_map< event_type_t, handler_t > handler_map_t;
+
+    static void initialize() {
+        addHandler(BIRTH_EVENT_K, &handle_birth );
+        addHandler(DEATH_EVENT_K, &handle_death );
+        addHandler(MATE_SELECT_EVENT_K, &handle_mate_select );
+    }
+
     static void handle_event( ENV * env, const event * e) {
         const ClothoEvent * evt = dynamic_cast< const ClothoEvent * >( e );
         if( ! evt ) return;
@@ -100,21 +109,30 @@ public:
         handle_event(env, evt );
     }
 
-    template < class ENV >
     static void handle_event( ENV * env, const ClothoEvent * evt ) {
-        if( evt->getEventType() == BIRTH_EVENT_K ) {
-            handle_birth( env, evt );
+        event_type_t tmp = evt->getEventType();
+//        if( tmp == BIRTH_EVENT_K ) {
+//            handle_birth( env, evt );
         //} else if( evt->getEventType() == MATURITY_EVENT_K ) {
         //    handle_maturity( env, evt );
-        } else if( evt->getEventType() == DEATH_EVENT_K ) {
-            handle_death(env, evt );
-        } else if( evt->getEventType() == MATE_SELECT_EVENT_K ) {
-            handle_mate_select( env, evt );
+//        } else if( tmp == DEATH_EVENT_K ) {
+//            handle_death(env, evt );
+//        } else if( tmp == MATE_SELECT_EVENT_K ) {
+//            handle_mate_select( env, evt );
+//        }
+//
+        typename handler_map_t::iterator it = m_handlers.find( evt->getEventType() );
+        if( it != m_handlers.end() ) {
+            (*(it->second))(env, evt);   
         }
     }
 
 protected:
-    template < class ENV >
+
+    static void addHandler( event_type_t key, handler_t h ) {
+        m_handlers[ key ] = h;
+    }
+
     static void handle_birth( ENV * env, const ClothoEvent * ce ) {
         const BirthEvent * be = static_cast< const BirthEvent * >( ce );
 
@@ -137,13 +155,11 @@ protected:
         env->activateIndividual( be->getSender() );
     }
 
-    template < class ENV >
     static void handle_maturity( ENV * env, const ClothoEvent * ce ) {
         MateSelectEvent * mse = new MateSelectEvent( env->getCurrentTime(), env->getCurrentTime() + opt_default_life_cycle::MATE_OFFSET, env, env, env->getNextEventID() );
         env->sendEvent( mse );
     }
 
-    template < class ENV >
     static void handle_mate_select( ENV * env, const ClothoEvent * ce ) {
 
         while( env->m_nMateOps ) {
@@ -166,11 +182,15 @@ protected:
         }
     }
 
-    template < class ENV >
     static void handle_death( ENV * env, const ClothoEvent * ce ) {
         env->deactivateIndividual( ce->getSender() );
     }
+
+    static handler_map_t   m_handlers;
 };
+
+template < class ENV >
+typename EnvironmentLifeCycle< opt_default_life_cycle, ENV, ClothoEvent >::handler_map_t EnvironmentLifeCycle< opt_default_life_cycle, ENV, ClothoEvent >::m_handlers;
 
 template < >
 class IndividualLifeCycle< opt_default_life_cycle > {

@@ -4,7 +4,7 @@
 #include "event_interface.h"
 #include "system_object.h"
 
-class default_event : virtual public event {
+class default_event : public event {
 public:
     default_event(  const vtime_t & tSent, const vtime_t & tRecv,
                     const system_id & sender, const system_id & receiver,
@@ -33,10 +33,17 @@ public:
     inline const vtime_t &     getSent() const { return m_sent; }
     inline const vtime_t &     getReceived() const { return m_recv; }
 
+    inline bool isReceivedAt( const vtime_t & t ) const { return (m_recv == t); }
+
     inline bool operator<( const event * rhs ) const {
-        return (m_recv < rhs->getReceived()) ||
-            (m_recv == rhs->getReceived() &&
-             m_eid < rhs->getEventID() );
+//        return (m_recv < rhs->getReceived()) ||
+//            (m_recv == rhs->getReceived() &&
+//             m_eid < rhs->getEventID() );
+//        int res = (m_recv - rhs->getReceived());
+
+//        return ((res < 0 ) || ( res == 0 && m_eid < rhs->getEventID() ));
+//
+        return (m_recv < rhs->getReceived());
     }
 
     inline bool operator==( const event * rhs ) const {

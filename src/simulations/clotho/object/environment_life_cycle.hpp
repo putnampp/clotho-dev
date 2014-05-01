@@ -5,12 +5,10 @@
 
 namespace life_cycle {
 
-template < typename LC >
+template < typename LC, class ENV, class EVT >
 class EnvironmentLifeCycle {
 public:
-    template < typename ENV, typename EVT >
     static void handle_event( ENV * env, const EVT * evt );
-
 protected:
 };
 

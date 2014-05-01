@@ -12,6 +12,8 @@
 
 #include "event_functor.h"
 
+#include "ltsf_queue.hpp"
+
 using std::list;
 using std::vector;
 using std::multiset;
@@ -278,5 +280,74 @@ protected:
     size_t  m_nProcessed, m_nCanceled;
 };
 
+template < class E >
+class EventManager<E, ltsf_queue< typename E::vtime_t, const E > > : virtual public event_manager< E > {
+public:
+    typedef typename event_manager< E >::event_t event_t;
+    typedef ltsf_queue< typename E::vtime_t, const E > event_set_t;
+
+    EventManager() :
+        m_events(),
+        m_processed(),
+        m_nProcessed(0),
+        m_nCanceled(0)
+    {}
+
+    bool insertEvent( const event_t * e ) {
+        return m_events.enqueue( e, e->getReceived() );
+    }
+
+    void reset_pending() {
+        while(!m_events.empty() ) {
+            const event_t * e = m_events.dequeue();
+            if( e ) {
+                delete e;
+                ++m_nCanceled;
+            }
+        }
+    }
+
+    void reset_processed() {
+        while( !m_processed.empty() ) {
+            const event * t = m_processed.back();
+            m_processed.pop_back();
+            if( t ) delete t;
+            ++m_nProcessed;
+        }
+    }
+
+    const event_t * getEvent( const system_id & ) {
+        const event_t * t = m_events.dequeue();
+        if( t != NULL )
+            m_processed.push_back(t);
+        return t;
+    }
+
+    const event_t * peekEvent( const system_id & ) const {
+        return m_events.peek();
+    }
+
+    size_t pendingEventCount( const system_id & ) const {
+        return m_events.size();
+    }
+
+    size_t processedEventCount( const system_id & ) const {
+        return m_nProcessed + m_processed.size();
+    }
+
+    size_t  canceledEventCount( const system_id & ) const {
+        return m_nCanceled;
+    }
+
+    virtual ~EventManager() {
+        reset_pending();
+        reset_processed();
+    }
+protected:
+    event_set_t m_events;
+
+    std::deque< const event_t * > m_processed;
+    size_t  m_nProcessed, m_nCanceled;
+};
 
 #endif  // GENERIC_EVENT_MANAGER_HPP_

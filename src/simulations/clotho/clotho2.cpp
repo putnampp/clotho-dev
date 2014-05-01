@@ -48,6 +48,7 @@
 
 const unsigned int MAX_THREADS = 24;
 
+//typedef life_cycle::def_life_cycle    LCM_t;
 typedef life_cycle::opt_default_life_cycle    LCM_t;
 typedef variant_base      VT_t;
 

@@ -5,13 +5,15 @@
 #include "engine/simulation_object.hpp"
 #include "engine/simulation_manager_impl.hpp"
 #include "clotho_event.h"
+#include "engine/ltsf_queue.hpp"
 
 class ClothoObject;
 
-class ClothoObject : public SimulationObject< ClothoEvent, std::multiset< const ClothoEvent *, ltsf_event_order > > {
+//class ClothoObject : public SimulationObject< ClothoEvent, std::multiset< const ClothoEvent *, ltsf_event_order > > {
+class ClothoObject : public SimulationObject< ClothoEvent, ltsf_queue< typename ClothoEvent::vtime_t, const ClothoEvent > > {
 public:
-    typedef SimulationObject< ClothoEvent, std::multiset< const ClothoEvent * , ltsf_event_order > > base_object_t;
-
+//    typedef SimulationObject< ClothoEvent, std::multiset< const ClothoEvent * , ltsf_event_order > > base_object_t;
+    typedef SimulationObject< ClothoEvent, ltsf_queue< typename ClothoEvent::vtime_t, const ClothoEvent > > base_object_t;
     typedef SimulationManager< ClothoEvent, ClothoObject > simulation_manager_t;
 
     ClothoObject( ) : 
