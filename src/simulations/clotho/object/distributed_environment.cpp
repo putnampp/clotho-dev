@@ -52,17 +52,18 @@ void DistributedEnvironment::perform_event( const event * e) {
 
     if( evt ) {
 //        cout << "DistEnv-" << getSystemID() << "@" << getCurrentTime() << ": " << evt << endl;
-        if( evt->getEventType() == BIRTH_EVENT_K ) {
+        event_type_t e_id = evt->getEventType();
+        if( e_id == BirthEvent::TYPE_ID ) {
             handle_birth( evt );
-        } else if( evt->getEventType() == MATURITY_EVENT_K ) {
+        } else if( e_id == MaturityEvent::TYPE_ID ) {
             handle_maturity( evt );
-        } else if( evt->getEventType() == DEATH_EVENT_K ) {
+        } else if( e_id == DeathEvent::TYPE_ID ) {
             handle_death( evt );
-        } else if( evt->getEventType() == SIGNAL_MATE_EVENT_K ) {
+        } else if( e_id == SignalMateEvent::TYPE_ID) {
             handle_signal_mate( evt );
-        } else if( evt->getEventType() == ENVIRONMENT_SNAPSHOT_EVENT_K ) {
+        } else if( e_id == EnvironmentSnapshotEvent::TYPE_ID ) {
             handle_snapshot( evt );
-        } else if( evt->getEventType() == SELECTION_EVENT_K ) {
+        } else if( e_id == SelectionEvent::TYPE_ID ) {
             handle_selection( evt );
         } else {
             assert(false);

@@ -11,13 +11,13 @@
 
 using std::swap;
 
-template <>
-void EventPerformer< Environment, ClothoEvent>::initialize() {
-    addHandler( BIRTH_EVENT_K, &Environment::handle_birth );
-    addHandler( DEATH_EVENT_K, &Environment::handle_death );
-}
+//template <>
+//void EventPerformer< Environment, ClothoEvent>::initialize() {
+//    addHandler( BIRTH_EVENT_K, &Environment::handle_birth );
+//    addHandler( DEATH_EVENT_K, &Environment::handle_death );
+//}
 
-EventPerformer< Environment, ClothoEvent > Environment::m_evt_performer;
+//EventPerformer< Environment, ClothoEvent > Environment::m_evt_performer;
 
 Environment::Environment( simulation_manager * manager ) :
 //    SimulationObject< ClothoEventSet >( manager ),
@@ -62,11 +62,12 @@ void Environment::perform_event( const event * e ) {
 
     if( evt ) {
 //        m_evt_performer( this, evt );
-        if( evt->getEventType() == BIRTH_EVENT_K ) {
+        event_type_t e_id = evt->getEventType();
+        if( e_id == BirthEvent::TYPE_ID ) {
             handle_birth( evt );
-        } else if( evt->getEventType() == MATURITY_EVENT_K ) {
+        } else if( e_id == MaturityEvent::TYPE_ID ) {
             handle_maturity( evt );
-        } else if( evt->getEventType() == DEATH_EVENT_K ) {
+        } else if( e_id == DeathEvent::TYPE_ID ) {
             handle_death( evt );
         }
     }

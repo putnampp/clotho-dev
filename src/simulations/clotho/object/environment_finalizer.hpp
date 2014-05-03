@@ -9,8 +9,16 @@ class EnvironmentFinalizer {
 public:
     template < typename E >
     static void finalize( E * env ) {
+        env->m_individual_pool.reset();
 
-        while( !env->m_active_individuals.empty() ) {
+        env->m_id_pool_index_map.clear();
+
+        while( !env->m_individuals.empty() ) {
+            env->m_individuals.back().finalize();
+
+            env->m_individuals.pop_back();
+        }
+/*        while( !env->m_active_individuals.empty() ) {
             object * tmp = env->m_sim_manager->getObject( env->m_active_individuals.begin()->first );
             env->m_active_individuals.erase( env->m_active_individuals.begin() );
 
@@ -37,6 +45,7 @@ public:
                 delete tmp;
             }
         }
+*/
     }
 
 protected:

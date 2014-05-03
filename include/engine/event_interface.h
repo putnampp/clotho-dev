@@ -18,6 +18,8 @@ struct event {
     virtual bool operator<( const event * rhs ) const = 0;
     virtual bool operator==( const event * rhs ) const = 0;
 
+    virtual bool isReceivedAt( const vtime_t & t ) const = 0;
+
     virtual ~event() {}
 };
 

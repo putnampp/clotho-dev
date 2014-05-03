@@ -10,15 +10,15 @@ static const SystemClock::vtime_t LIFE_CYCLE_PADDING = 100;
 
 //#include "../genomes/human_gamete.h"
 
-template <>
-void EventPerformer< Individual, ClothoEvent >::initialize() {
-    addHandler( BIRTH_EVENT_K, &Individual::handle_birth );
-    addHandler( DEATH_EVENT_K, &Individual::handle_death );
-    addHandler( INHERIT_EVENT_K, &Individual::handle_inherit );
-    addHandler( MATE_EVENT_K, &Individual::handle_mate );
-}
+//template <>
+//void EventPerformer< Individual, ClothoEvent >::initialize() {
+//    addHandler( BIRTH_EVENT_K, &Individual::handle_birth );
+//    addHandler( DEATH_EVENT_K, &Individual::handle_death );
+//    addHandler( INHERIT_EVENT_K, &Individual::handle_inherit );
+//    addHandler( MATE_EVENT_K, &Individual::handle_mate );
+//}
 
-EventPerformer< Individual, ClothoEvent > Individual::m_evt_performer;
+//EventPerformer< Individual, ClothoEvent > Individual::m_evt_performer;
 
 Individual::Individual( simulation_manager * manager, 
                         const system_id & env_id,
@@ -49,15 +49,16 @@ void Individual::perform_event( const event * e ) {
     if( evt ) {
 //        m_evt_performer( this, evt );
 //        cout <<"Individual-" << getSystemID() << "@" << getCurrentTime() << ": " << evt << endl;
-        if( evt->getEventType() == BIRTH_EVENT_K ) {
+        event_type_t e_id = evt->getEventType();
+        if( e_id == BirthEvent::TYPE_ID ) {
             handle_birth( evt );
-        } else if( evt->getEventType() == DEATH_EVENT_K ) {
+        } else if( e_id == DeathEvent::TYPE_ID ) {
             handle_death( evt );
-        } else if( evt->getEventType() == INHERIT_EVENT_K ) {
+        } else if( e_id == InheritEvent::TYPE_ID ) {
             handle_inherit( evt );
-        } else if( evt->getEventType() == MATE_EVENT_K ) {
+        } else if( e_id == MateEvent::TYPE_ID ) {
             handle_mate( evt );
-        } else if( evt->getEventType() == MATURITY_EVENT_K ) {
+        } else if( e_id == MaturityEvent::TYPE_ID ) {
             handle_maturity( evt );
         }
     }

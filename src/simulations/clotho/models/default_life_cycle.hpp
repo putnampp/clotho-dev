@@ -102,13 +102,14 @@ public:
     }
 
     static void handle_event( ENV * env, const ClothoEvent * evt ) {
-        if( evt->getEventType() == BIRTH_EVENT_K ) {
+        event_type_t e_id = evt->getEventType();
+        if( e_id == BirthEvent::TYPE_ID ) {
             handle_birth( env, evt );
-        } else if( evt->getEventType() == MATURITY_EVENT_K ) {
+        } else if( e_id == MaturityEvent::TYPE_ID ) {
             handle_maturity( env, evt );
-        } else if( evt->getEventType() == DEATH_EVENT_K ) {
+        } else if( e_id == DeathEvent::TYPE_ID ) {
             handle_death(env, evt );
-        } else if( evt->getEventType() == MATE_SELECT_EVENT_K ) {
+        } else if( e_id == MateSelectEvent::TYPE_ID ) {
             handle_mate_select( env, evt );
         }
     }
@@ -168,15 +169,17 @@ public:
 
     template < typename IND >
     static void handle_event( IND * ind, const ClothoEvent * evt ) {
-        if( evt->getEventType() == BIRTH_EVENT_K ) {
+        event_type_t e_id = evt->getEventType();
+
+        if( e_id == BirthEvent::TYPE_ID ) {
             handle_birth( ind, evt );
-        } else if( evt->getEventType() == DEATH_EVENT_K ) {
+        } else if( e_id == DeathEvent::TYPE_ID ) {
            handle_death(ind, evt );
-        } else if( evt->getEventType() == INHERIT_EVENT_K ) {
+        } else if( e_id == IND::inherit_event_t::TYPE_ID ) {
             handle_inherit(ind, evt );
-        } else if( evt->getEventType() == MATE_EVENT_K ) {
+        } else if( e_id == MateEvent::TYPE_ID ) {
             handle_mate(ind, evt );
-        } else if( evt->getEventType() == MATURITY_EVENT_K ) {
+        } else if( e_id == MaturityEvent::TYPE_ID ) {
             handle_maturity(ind, evt );
         }
     }
@@ -184,7 +187,7 @@ public:
 protected:
     template < typename IND >
     static void handle_birth( IND * ind, const ClothoEvent * evt ){
-        ind->m_prop->setDOB( evt->getReceived() );
+        ind->m_prop.setDOB( evt->getReceived() );
 
         BirthEvent * be = new BirthEvent( ind->getCurrentTime(), evt->getReceived(), ind->getSystemID(), ind->m_env_id, ind->getNextEventID() );
         ind->sendEvent( be );
@@ -216,11 +219,11 @@ protected:
 
         // assert that alive individual is not inheriting
         // new genetic material
-        assert( !ind->m_prop->isAlive() );
+        assert( !ind->m_prop.isAlive() );
 
-        ind->m_prop->inheritFrom( ie->getSender(), ie->getGamete(), ie->getParentIndex() );
+        ind->m_prop.inheritFrom( ie->getSender(), ie->getGamete(), ie->getParentIndex() );
 
-        if( ind->m_prop->hasSourceGametes() ) {
+        if( ind->m_prop.hasSourceGametes() ) {
             event::vtime_t bday = evt->getReceived();
             bday = def_life_cycle::nextGeneration( bday );
 
@@ -231,7 +234,7 @@ protected:
 
     template < typename IND >
     static void handle_death( IND * ind, const ClothoEvent * evt ) {
-        ind->m_prop->died();
+        ind->m_prop.died();
 
         DeathEvent * de = new DeathEvent( ind->getCurrentTime(), evt->getReceived(), ind->getSystemID(), ind->m_env_id, ind->getNextEventID());
         ind->sendEvent( de );

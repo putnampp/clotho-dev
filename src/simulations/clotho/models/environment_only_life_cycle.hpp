@@ -54,55 +54,59 @@ public:
     }
 
     static void handle_event( ENV * env, const ClothoEvent * evt ) {
-        if( evt->getEventType() == BIRTH_EVENT_K ) {
+        event_type_t e_id = evt->getEventType();
+        if( e_id == BirthEvent::TYPE_ID ) {
             handle_birth( env, evt );
-        } else if( evt->getEventType() == DEATH_EVENT_K ) {
+        } else if( e_id == DeathEvent::TYPE_ID ) {
             handle_death(env, evt );
-        } else if( evt->getEventType() == MATE_SELECT_EVENT_K ) {
+        } else if( e_id == MateSelectEvent::TYPE_ID ) {
             handle_mate_select( env, evt );
         }
     }
 
 protected:
     static void handle_birth( ENV * env, const ClothoEvent * ce ) {
-        env->m_nMateOps = env->m_pending.size();
+//        while( !env->m_pending.empty() ) {
+//            system_id id = *env->m_pending.begin();
+//            env->m_pending.erase( env->m_pending.begin());
 
-        while( !env->m_pending.empty() ) {
-            system_id id = *env->m_pending.begin();
-            env->m_pending.erase( env->m_pending.begin());
+//            typename ENV::individual_t * ind  = dynamic_cast< typename ENV::individual_t * >( env->m_sim_manager->getObject( id ) );
+//            ind->getProperties()->setDOB( ce->getReceived() );
+//           env->activateIndividual(id);
+//        }
 
-            typename ENV::individual_t * ind  = dynamic_cast< typename ENV::individual_t * >( env->m_sim_manager->getObject( id ) );
-            ind->getProperties()->setDOB( ce->getReceived() );
+        ClothoEvent::vtime_t ctime = ce->getReceived();
 
-            env->activateIndividual(id);
+        size_t idx = env->activateNextIndividual(); // activate next pending individual
+        while( idx != ENV::active_pool_t::UNKNOWN_INDEX ) {
+            env->m_individuals[idx].getProperties()->setDOB( ctime );            
+            idx = env->activateNextIndividual();
         }
 
-        
-        MateSelectEvent * mse = new MateSelectEvent( ce->getReceived(), ce->getReceived() + environment_only_life_cycle::MATE_OFFSET, env, env, env->getNextEventID() );
+        MateSelectEvent * mse = new MateSelectEvent( ctime, ctime + environment_only_life_cycle::MATE_OFFSET, env, env, env->getNextEventID() );
         env->sendEvent(mse);
     }
 
     static void handle_mate_select( ENV * env, const ClothoEvent * ce ) {
 
-        while( env->m_nMateOps ) {
+        size_t nMateOps = env->getActiveIndividualCount();
+        while( nMateOps-- ) {
             // get system ids of parent 0 and parent 1
             std::pair< system_id, system_id > parents = ENV::selection_model_t::select( env, (system_id *)NULL );
 
             // get system id of their future offspring
-            system_id offspring_id = env->getIndividual();
+            system_id offspring_id = env->getIndividual();  // child is left in pending queue until birth event is handled
 
-            typename ENV::individual_t * p0 = dynamic_cast< typename ENV::individual_t * >( env->m_sim_manager->getObject( parents.first ) );
-            typename ENV::individual_t * p1 = dynamic_cast< typename ENV::individual_t * >( env->m_sim_manager->getObject( parents.second ) );
-            typename ENV::individual_t * child = dynamic_cast< typename ENV::individual_t *>( env->m_sim_manager->getObject( offspring_id ) );
+            typename ENV::individual_t & p0 = env->getIndividual( parents.first );
+            typename ENV::individual_t & p1 = env->getIndividual( parents.second );
+            typename ENV::individual_t & child = env->getIndividual( offspring_id );
 
             typedef typename ENV::individual_t::properties_t::gamete_t   gamete_t;
-            gamete_t * z = ENV::individual_t::reproduction_model_t::reproduce( p0, (gamete_t *) NULL );
-            child->getProperties()->inheritFrom( parents.first, z );
+            gamete_t * z = ENV::individual_t::reproduction_model_t::reproduce( &p0, (gamete_t *) NULL );
+            child.getProperties()->inheritFrom( parents.first, z );
 
-            z = ENV::individual_t::reproduction_model_t::reproduce( p1, (gamete_t *) NULL );
-            child->getProperties()->inheritFrom( parents.second, z );
-
-            --env->m_nMateOps;
+            z = ENV::individual_t::reproduction_model_t::reproduce( &p1, (gamete_t *) NULL );
+            child.getProperties()->inheritFrom( parents.second, z );
         }
 
         DeathEvent * de = new DeathEvent( ce->getReceived(), ce->getReceived() + environment_only_life_cycle::DEATH_OFFSET, env, env, env->getNextEventID() );
@@ -110,11 +114,17 @@ protected:
     }
 
     static void handle_death( ENV * env, const ClothoEvent * ce ) {
-        while( !env->m_active_individuals.empty() ) {
+/*        while( !env->m_active_individuals.empty() ) {
             system_id id = env->m_active_individuals.begin()->first;
             typename ENV::individual_t * ind = dynamic_cast< typename ENV::individual_t * >( env->m_sim_manager->getObject(id));
             ind->getProperties()->died();
             env->deactivateIndividual( id );
+        }
+*/
+        size_t idx = env->inactivateNextIndividual();
+        while( idx != ENV::active_pool_t::UNKNOWN_INDEX ) {
+            env->m_individuals[idx].getProperties()->died();
+            idx = env->inactivateNextIndividual();
         }
         event::vtime_t bday = environment_only_life_cycle::nextGeneration( ce->getReceived() );
 
@@ -122,7 +132,7 @@ protected:
         env->sendEvent( be );
     }
 };
-
+/*
 template < >
 class IndividualLifeCycle< environment_only_life_cycle > {
 public:
@@ -208,7 +218,7 @@ protected:
         ind->sendEvent( de );
     }
 };
-
+*/
 }   // namespace life_cycle
 
 #endif  // ENVIRONMENT_ONLY_LIFE_CYCLE_HPP_

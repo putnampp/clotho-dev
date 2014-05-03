@@ -2,7 +2,7 @@
 #define LTSF_POOL_HPP_
 
 #include <type_traits>
-#include <deque>
+#include <vector>
 
 #include "poolable.h"
 
@@ -57,7 +57,7 @@ public:
     obj_pointer getPoolObject( size_t pool_idx ) {
         assert( pool_idx < m_objects.size() );
 
-        return m_objects[ pool_idx ].object;
+        return m_objects[ pool_idx ]->object;
     }
 
     void setPoolObject( obj_pointer p ) {
@@ -74,7 +74,7 @@ public:
         size_t p_idx = p->getPoolIndex();
         if( p_idx == UNKNOWN_INDEX ) return false;
 
-        object_node * obj = &m_objects[ p_idx ];
+        object_node * obj = m_objects[ p_idx ];
 
         obj->object = NULL;
 
@@ -99,7 +99,7 @@ public:
     void updateObject( size_t pool_idx, vtime_t t ) {
         assert( t != (vtime_t) -1 );
         assert( pool_idx != UNKNOWN_INDEX && pool_idx < m_objects.size() );
-        object_node * obj = &m_objects[pool_idx];
+        object_node * obj = m_objects[pool_idx];
         updateObject( obj, t );
     }
 
@@ -109,7 +109,6 @@ public:
 
             m_root->head = n->next;
             if( m_root->head == NULL ) {
-//                std::cout << "Got last object from " << m_root->timestamp << " @ " << t << std::endl;
                 remove_ltsf_node( m_root );
             }
 
@@ -154,8 +153,18 @@ public:
     }
 
     virtual ~ltsf_pool() {
-        m_objects.clear();
-        m_nodes.clear();
+        while( !m_objects.empty() ) {
+            object_node * tmp = m_objects.back();
+            m_objects.pop_back();
+            if( tmp ) delete tmp;
+        }
+
+        while( !m_nodes.empty() ) {
+            ltsf_node * tmp = m_nodes.back();
+            m_nodes.pop_back();
+
+            if( tmp ) delete tmp;
+        }
     }
 protected:
     void updateObject( object_node * obj, vtime_t t ) {
@@ -208,8 +217,8 @@ protected:
             n = m_unset_object;
             m_unset_object = m_unset_object->next;
         } else {
-            m_objects.push_back( object_node( m_objects.size() ));
-            n = &m_objects.back();
+            m_objects.push_back( new object_node( m_objects.size() ));
+            n = m_objects.back();
         }
         return n;
     }
@@ -221,8 +230,8 @@ protected:
             q = m_available;
             m_available = m_available->next;
         } else {
-            m_nodes.push_back( ltsf_node() );
-            q = &m_nodes.back();
+            m_nodes.push_back( new ltsf_node() );
+            q = m_nodes.back();
         }
         return q;
     }
@@ -300,8 +309,8 @@ protected:
         m_available = n;
     }
 
-    std::deque< object_node > m_objects;
-    std::deque< ltsf_node > m_nodes;
+    std::vector< object_node * > m_objects;
+    std::vector< ltsf_node * > m_nodes;
 
     object_node * m_unset_object;
     ltsf_node * m_root;

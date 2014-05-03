@@ -36,8 +36,15 @@ public:
         m_next_eid(0)
     { }
 
-    size_t getPoolIndex() const { return m_pool_idx; }
+    SimulationObject( const SimulationObject & so ) :
+        object( so ),
+        m_router( so.m_router ),
+        m_local_time( so.m_local_time ),
+        m_pool_idx( so.m_pool_idx ),
+        m_next_eid( so.m_next_eid )
+    {}
 
+    size_t getPoolIndex() const { return m_pool_idx; }
     void setPoolIndex( size_t idx ) { m_pool_idx = idx; }
 
     virtual void process() {
@@ -62,7 +69,6 @@ public:
     virtual void perform_event( const event_t * e ) {}
 
     virtual void sendEvent( const event_t * evt ) {
-//        if( evt->getReceiver() == getSystemID() ) {
         if( compareID( evt->getReceiver() ) ) {
             receiveEvent( evt );
         } else {

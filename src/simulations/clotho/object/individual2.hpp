@@ -44,19 +44,25 @@ public:
     TIndividual( ) :
         ClothoObject( NULL ),
         m_env_id(0),
-        m_prop( new properties_t())
-    {}
+        m_prop()
+    {    }
 
     TIndividual( simulation_manager_t * manager, 
                         const system_id & env_id/*,
                         reproduction_parameter_t * repro = NULL*/ ) :
         ClothoObject( manager ),
         m_env_id( env_id ),
-        m_prop( new properties_t() )/*,
+        m_prop( )/*,
         m_repro( repro )*/
     {
         ClothoObject::setSimulationManager( manager );
     }
+
+    TIndividual( const TIndividual< LCM, IP, RMODEL> & ind ) :
+        ClothoObject( ind ),
+        m_env_id( ind.m_env_id ),
+        m_prop( ind.m_prop )
+    {}
 
     virtual void initialize( ) {
         initializer::IndividualInitializer::init( this );
@@ -76,15 +82,14 @@ public:
     }
 
     virtual void reset() {
-        m_prop->reset();
+        m_prop.reset();
     }
 
     properties_t * getProperties() {
-        return m_prop;
+        return &m_prop;
     }
 
     virtual ~TIndividual() {
-        if(m_prop) delete m_prop;
     }
 protected:
     //void handle_birth( const ClothoEvent * e ) { assert(false); }
@@ -93,8 +98,8 @@ protected:
     //void handle_mate( const ClothoEvent * e ) { assert(false); }
     //void handle_maturity( const ClothoEvent * e ) { assert(false); }
 
-    system_id   m_env_id;
-    properties_t * m_prop;
+    system_id    m_env_id;
+    properties_t m_prop;
 //    reproduction_parameter_t * m_repro;
 };
 

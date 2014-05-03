@@ -24,7 +24,7 @@ public:
 
     template < typename IND, typename GAM = typename IND::properties_t::gamete_t >
     static GAM * reproduce( IND * ind, GAM * ) {
-        GAM * res = recombination_t::recombine(ind->m_prop, (GAM *) NULL );
+        GAM * res = recombination_t::recombine(ind->getProperties(), (GAM *) NULL );
         mutation_t::mutate( res );
 
         return res;

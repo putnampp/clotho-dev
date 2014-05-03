@@ -17,10 +17,11 @@ protected:
     static void createPopulation( E * env, IND * ) {
         cout << "Creating founding population of " << env->m_nFounder << endl;
         for( unsigned int i = 0; i < env->m_nFounder; ++i ) {
-            system_id id = env->getIndividual();
-            object * ind = env->m_sim_manager->getObject( id );
-
-            ind->initialize();
+            //system_id id = env->getIndividual();
+            //object * ind = env->m_sim_manager->getObject( id );
+            //ind->initialize();
+            //
+            env->getIndividualObject().initialize();
         }
     }
 };

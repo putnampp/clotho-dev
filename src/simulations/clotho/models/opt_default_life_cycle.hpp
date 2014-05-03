@@ -94,12 +94,12 @@ class EnvironmentLifeCycle< opt_default_life_cycle, ENV, ClothoEvent > {
 public:
     typedef void (*handler_t)( ENV *, const ClothoEvent * );
 
-    typedef std::unordered_map< event_type_t, handler_t > handler_map_t;
+    //typedef std::unordered_map< event_type_t, handler_t > handler_map_t;
 
     static void initialize() {
-        addHandler(BIRTH_EVENT_K, &handle_birth );
-        addHandler(DEATH_EVENT_K, &handle_death );
-        addHandler(MATE_SELECT_EVENT_K, &handle_mate_select );
+        //addHandler(BIRTH_EVENT_K, &handle_birth );
+        //addHandler(DEATH_EVENT_K, &handle_death );
+        //addHandler(MATE_SELECT_EVENT_K, &handle_mate_select );
     }
 
     static void handle_event( ENV * env, const event * e) {
@@ -111,40 +111,31 @@ public:
 
     static void handle_event( ENV * env, const ClothoEvent * evt ) {
         event_type_t tmp = evt->getEventType();
-//        if( tmp == BIRTH_EVENT_K ) {
-//            handle_birth( env, evt );
-        //} else if( evt->getEventType() == MATURITY_EVENT_K ) {
-        //    handle_maturity( env, evt );
-//        } else if( tmp == DEATH_EVENT_K ) {
-//            handle_death(env, evt );
-//        } else if( tmp == MATE_SELECT_EVENT_K ) {
-//            handle_mate_select( env, evt );
-//        }
-//
-        typename handler_map_t::iterator it = m_handlers.find( evt->getEventType() );
-        if( it != m_handlers.end() ) {
-            (*(it->second))(env, evt);   
+        if( tmp == BirthEvent::TYPE_ID ) {
+            handle_birth( env, evt );
+//        } else if( evt->getEventType() == MATURITY_EVENT_K ) {
+//            handle_maturity( env, evt );
+        } else if( tmp == DeathEvent::TYPE_ID ) {
+            handle_death(env, evt );
+        } else if( tmp == MateSelectEvent::TYPE_ID ) {
+            handle_mate_select( env, evt );
+        } else {
+            assert(false);
         }
     }
 
 protected:
 
-    static void addHandler( event_type_t key, handler_t h ) {
-        m_handlers[ key ] = h;
-    }
+//    static void addHandler( event_type_t key, handler_t h ) {
+//        m_handlers[ key ] = h;
+//    }
 
     static void handle_birth( ENV * env, const ClothoEvent * ce ) {
         const BirthEvent * be = static_cast< const BirthEvent * >( ce );
 
         event::vtime_t ctime = env->getCurrentTime();
-//
-//        MaturityEvent * me = new MaturityEvent( ctime, ctime + opt_default_life_cycle::MATURITY_OFFSET, env->getSystemID(), ce->getSender(), env->getNextEventID(), be->getSender() );
-//        env->sendEvent( me );
-//
-//        MateSelectEvent * mse = new MateSelectEvent( ctime, ctime + opt_default_life_cycle::MATE_OFFSET, env, env, env->getNextEventID() );
-//        env->sendEvent( mse );
-//
-        if( env->m_nMateOps++ == 0) {
+
+        if( env->getActiveIndividualCount() == 0 ) {
             MateSelectEvent * mse = new MateSelectEvent( ctime, ctime + opt_default_life_cycle::MATE_OFFSET, env, env, env->getNextEventID() );
             env->sendEvent(mse);
         }
@@ -155,14 +146,14 @@ protected:
         env->activateIndividual( be->getSender() );
     }
 
-    static void handle_maturity( ENV * env, const ClothoEvent * ce ) {
-        MateSelectEvent * mse = new MateSelectEvent( env->getCurrentTime(), env->getCurrentTime() + opt_default_life_cycle::MATE_OFFSET, env, env, env->getNextEventID() );
-        env->sendEvent( mse );
-    }
+//    static void handle_maturity( ENV * env, const ClothoEvent * ce ) {
+//        MateSelectEvent * mse = new MateSelectEvent( env->getCurrentTime(), env->getCurrentTime() + opt_default_life_cycle::MATE_OFFSET, env, env, env->getNextEventID() );
+//        env->sendEvent( mse );
+//    }
 
     static void handle_mate_select( ENV * env, const ClothoEvent * ce ) {
-
-        while( env->m_nMateOps ) {
+        size_t n = env->getActiveIndividualCount();
+        while( n-- ) {
             // get system ids of parent 0 and parent 1
             std::pair< system_id, system_id > parents = ENV::selection_model_t::select( env, (system_id *)NULL );
 
@@ -171,14 +162,12 @@ protected:
 
             ClothoEvent::vtime_t ctime = env->getCurrentTime();
 
-            MateEvent * me0 = new MateEvent( ctime, ctime, env->getSystemID(), parents.first, env->getNextEventID(), offspring_id );
-            MateEvent * me1 = new MateEvent( ctime, ctime, env->getSystemID(), parents.second, env->getNextEventID(), offspring_id );
-
-//        std::cout << parents.first << " + " << parents.second << " = " << offspring_id << std::endl;
+            system_id id = env->getSystemID();
+            MateEvent * me0 = new MateEvent( ctime, ctime, id, parents.first, env->getNextEventID(), offspring_id );
+            MateEvent * me1 = new MateEvent( ctime, ctime, id, parents.second, env->getNextEventID(), offspring_id );
 
             env->sendEvent( me0 );
             env->sendEvent( me1 );
-            --env->m_nMateOps;
         }
     }
 
@@ -186,11 +175,11 @@ protected:
         env->deactivateIndividual( ce->getSender() );
     }
 
-    static handler_map_t   m_handlers;
+//    static handler_map_t   m_handlers;
 };
 
-template < class ENV >
-typename EnvironmentLifeCycle< opt_default_life_cycle, ENV, ClothoEvent >::handler_map_t EnvironmentLifeCycle< opt_default_life_cycle, ENV, ClothoEvent >::m_handlers;
+//template < class ENV >
+//typename EnvironmentLifeCycle< opt_default_life_cycle, ENV, ClothoEvent >::handler_map_t EnvironmentLifeCycle< opt_default_life_cycle, ENV, ClothoEvent >::m_handlers;
 
 template < >
 class IndividualLifeCycle< opt_default_life_cycle > {
@@ -204,13 +193,14 @@ public:
 
     template < typename IND >
     static void handle_event( IND * ind, const ClothoEvent * evt ) {
-        if( evt->getEventType() == BIRTH_EVENT_K ) {
+        event_type_t e_id = evt->getEventType();
+        if( e_id == BirthEvent::TYPE_ID ) {
             handle_birth( ind, evt );
-        } else if( evt->getEventType() == DEATH_EVENT_K ) {
+        } else if( e_id == DeathEvent::TYPE_ID ) {
            handle_death(ind, evt );
-        } else if( evt->getEventType() == INHERIT_EVENT_K ) {
+        } else if( e_id == IND::inherit_event_t::TYPE_ID ) {
             handle_inherit(ind, evt );
-        } else if( evt->getEventType() == MATE_EVENT_K ) {
+        } else if( e_id == MateEvent::TYPE_ID ) {
             handle_mate(ind, evt );
         //} else if( evt->getEventType() == MATURITY_EVENT_K ) {
         //    handle_maturity(ind, evt );
@@ -220,7 +210,7 @@ public:
 protected:
     template < typename IND >
     static void handle_birth( IND * ind, const ClothoEvent * evt ){
-        ind->m_prop->setDOB( evt->getReceived() );
+        ind->m_prop.setDOB( evt->getReceived() );
 
         BirthEvent * be = new BirthEvent( ind->getCurrentTime(), evt->getReceived(), ind->getSystemID(), ind->m_env_id, ind->getNextEventID() );
         ind->sendEvent( be );
@@ -252,17 +242,17 @@ protected:
 
         // assert that alive individual is not inheriting
         // new genetic material
-        assert( !ind->m_prop->isAlive() );
+        assert( !ind->m_prop.isAlive() );
 
-        ind->m_prop->inheritFrom( ie->getSender(), ie->getGamete(), ie->getParentIndex() );
+        ind->m_prop.inheritFrom( ie->getSender(), ie->getGamete(), ie->getParentIndex() );
 
-        if( ind->m_prop->hasSourceGametes() ) {
+        if( ind->m_prop.hasSourceGametes() ) {
             event::vtime_t bday = evt->getReceived();
             bday = opt_default_life_cycle::nextGeneration( bday );
 
 //            BirthEvent * be = new BirthEvent( ind->getCurrentTime(), bday, ind, ind, ind->getNextEventID() );
 //            ind->sendEvent( be );
-            ind->m_prop->setDOB(bday);
+            ind->m_prop.setDOB(bday);
             BirthEvent * be = new BirthEvent( ind->getCurrentTime(), bday, ind->getSystemID(), ind->m_env_id, ind->getNextEventID());
             ind->sendEvent(be);
         }
@@ -270,7 +260,7 @@ protected:
 
     template < typename IND >
     static void handle_death( IND * ind, const ClothoEvent * evt ) {
-        ind->m_prop->died();
+        ind->m_prop.died();
 
         DeathEvent * de = new DeathEvent( ind->getCurrentTime(), evt->getReceived(), ind->getSystemID(), ind->m_env_id, ind->getNextEventID());
         ind->sendEvent( de );

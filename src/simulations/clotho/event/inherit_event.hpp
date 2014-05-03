@@ -3,11 +3,11 @@
 
 #include "../clotho_event.h"
 
-static const string INHERIT_EVENT_K = "inherit_event";
-
 template < class GM >
 class InheritEvent : public ClothoEvent {
 public:
+
+    static const event_type_t TYPE_ID = 4;
     typedef GM gamete_t;
 
     // by default gamete index is unknown (-1)
@@ -28,9 +28,8 @@ public:
         m_gidx( gidx ),
         m_gamete( z )
     {}
-    inline const event_type_t & getEventType() const {
-        return INHERIT_EVENT_K;
-    }
+
+    inline event_type_t getEventType() const { return TYPE_ID; }
 
     unsigned char getParentIndex() const { return m_gidx; }
     gamete_t * getGamete() const { return m_gamete; }

@@ -106,6 +106,14 @@ public:
         p1( NULL )
     {}
 
+    individual_props( const individual_props< G, 2> & ip ) :
+        m_dob( ip.m_dob ),
+        p0_id(ip.p0_id),
+        p1_id(ip.p1_id),
+        p0(ip.p0),
+        p1(ip.p1)
+    {}
+
     void died() {
         setDOB( SystemClock::POSITIVE_INFINITY );
     }

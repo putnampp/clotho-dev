@@ -1,31 +1,68 @@
 #ifndef CLOTHO_EVENT_H_
 #define CLOTHO_EVENT_H_
 
-#include "engine/default_event.h"
+//#include "engine/default_event.h"
+#include "engine/event_interface.h"
+#include "engine/system_object.h"
 #include "clotho.h"
 #include "ider.h"
 
 #include <ostream>
 
-typedef std::string event_type_t;
+//typedef std::string event_type_t;
+typedef unsigned int event_type_t;
 
-class ClothoEvent : public default_event {
+class ClothoEvent : public event {
 public:
-    virtual const event_type_t & getEventType() const = 0;
+
+    inline const event_id_t &  getEventID() const { return m_eid; }
+    inline const system_id &   getSender() const { return m_sender; }
+    inline const system_id &   getReceiver() const { return m_receiver; }
+
+    inline const vtime_t &     getSent() const { return m_sent; }
+    inline const vtime_t &     getReceived() const { return m_recv; }
+
+    inline bool isReceivedAt( const vtime_t & t ) const { return (m_recv == t); }
+
+    inline bool operator<( const event * rhs ) const {
+        return m_recv < rhs->getReceived();
+    }
+
+    inline bool operator<( const ClothoEvent * rhs ) const {
+        return m_recv < rhs->m_recv;
+    }
+
+    inline bool operator==( const event * rhs ) const {
+        return ( m_sender == rhs->getSender() && m_eid == rhs->getEventID() );
+    }
+
+    inline bool operator==( const ClothoEvent * rhs ) const {
+        return (m_sender == rhs->m_sender && m_eid == rhs->m_eid);
+    }
+
+    virtual event_type_t getEventType() const = 0;
+//    virtual void release_for_reuse() = 0;
 
     virtual ~ClothoEvent() {}
 protected:
     ClothoEvent(  const vtime_t & tSent, const vtime_t & tRecv,
                     const system_id & sender, const system_id & receiver,
                     event_id_t eid ) :
-        default_event( tSent, tRecv, sender, receiver, eid ) 
+        m_sent( tSent),
+        m_recv( tRecv),
+        m_sender( sender ),
+        m_receiver( receiver ),
+        m_eid( eid )
     {}
 
     ClothoEvent( const vtime_t & tSent, const vtime_t & tRecv,
-                 const system_object * sender, const system_object * receiver,
-                 event_id_t eid ) :
-        default_event( tSent, tRecv, sender, receiver, eid )
+                 const system_object * sender, const system_object * receiver, event_id_t eid ) :
+        ClothoEvent( tSent, tRecv, sender->getSystemID(), receiver->getSystemID(), eid )
     {}
+
+    vtime_t       m_sent, m_recv;
+    system_id     m_sender, m_receiver;
+    event_id_t    m_eid;
 };
 
 template <>
