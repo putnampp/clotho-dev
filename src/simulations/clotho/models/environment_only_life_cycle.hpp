@@ -14,7 +14,7 @@
 #include "../event/inherit_event.hpp"
 #include "../event/maturity_event.h"
 #include "../event/mate_select_event.h"
-#include "../event/mate_event.h"
+#include "../event/mate_event2.h"
 #include "../event/signal_mate_event.h"
 #include "../event/selection_event.h"
 #include "../event/environment_snapshot_event.h"
@@ -83,34 +83,41 @@ protected:
             idx = env->activateNextIndividual();
         }
 
-        MateSelectEvent * mse = new MateSelectEvent( ctime, ctime + environment_only_life_cycle::MATE_OFFSET, env, env, env->getNextEventID() );
-        env->sendEvent(mse);
+        ClothoObject * co = env->m_clotho_object;
+        MateSelectEvent * mse = new MateSelectEvent( ctime, ctime + environment_only_life_cycle::MATE_OFFSET, co, co, co->getNextEventID() );
+        co->sendEvent(mse);
     }
 
     static void handle_mate_select( ENV * env, const ClothoEvent * ce ) {
 
         size_t nMateOps = env->getActiveIndividualCount();
+        size_t nParents = nMateOps;
+
         while( nMateOps-- ) {
             // get system ids of parent 0 and parent 1
-            std::pair< system_id, system_id > parents = ENV::selection_model_t::select( env, (system_id *)NULL );
+            //std::pair< system_id, system_id > parents = ENV::selection_model_t::select( env, (system_id *)NULL );
+            std::pair< size_t, size_t > parents = ENV::selection_model_t::select( nParents );
 
             // get system id of their future offspring
-            system_id offspring_id = env->getIndividual();  // child is left in pending queue until birth event is handled
+            size_t offspring_idx = env->getIndividualIndex();  // child is left in pending queue until birth event is handled
 
-            typename ENV::individual_t & p0 = env->getIndividual( parents.first );
-            typename ENV::individual_t & p1 = env->getIndividual( parents.second );
-            typename ENV::individual_t & child = env->getIndividual( offspring_id );
+            typename ENV::individual_t & p0 = env->getActiveIndividualAt( parents.first );
+            typename ENV::individual_t & p1 = env->getActiveIndividualAt( parents.second );
+            typename ENV::individual_t & child = env->getIndividualAt( offspring_idx );
 
             typedef typename ENV::individual_t::properties_t::gamete_t   gamete_t;
             gamete_t * z = ENV::individual_t::reproduction_model_t::reproduce( &p0, (gamete_t *) NULL );
-            child.getProperties()->inheritFrom( parents.first, z );
+            child.getProperties()->inheritFrom( p0.getClothoObject()->getSystemID(), z );
 
             z = ENV::individual_t::reproduction_model_t::reproduce( &p1, (gamete_t *) NULL );
-            child.getProperties()->inheritFrom( parents.second, z );
+            child.getProperties()->inheritFrom( p1.getClothoObject()->getSystemID(), z );
         }
 
-        DeathEvent * de = new DeathEvent( ce->getReceived(), ce->getReceived() + environment_only_life_cycle::DEATH_OFFSET, env, env, env->getNextEventID() );
-        env->sendEvent(de);
+        ClothoEvent::vtime_t ctime = ce->getReceived();
+        ClothoObject * co = env->m_clotho_object;
+
+        DeathEvent * de = new DeathEvent( ctime, ctime + environment_only_life_cycle::DEATH_OFFSET, co, co, co->getNextEventID() );
+        co->sendEvent(de);
     }
 
     static void handle_death( ENV * env, const ClothoEvent * ce ) {
@@ -126,10 +133,12 @@ protected:
             env->m_individuals[idx].getProperties()->died();
             idx = env->inactivateNextIndividual();
         }
-        event::vtime_t bday = environment_only_life_cycle::nextGeneration( ce->getReceived() );
+        ClothoEvent::vtime_t ctime = ce->getReceived();
+        event::vtime_t bday = environment_only_life_cycle::nextGeneration( ctime );
 
-        BirthEvent * be = new BirthEvent(ce->getReceived(), bday, env, env, env->getNextEventID() );
-        env->sendEvent( be );
+        ClothoObject * co = env->m_clotho_object;
+        BirthEvent * be = new BirthEvent(ctime, bday, co, co, co->getNextEventID() );
+        co->sendEvent( be );
     }
 };
 /*

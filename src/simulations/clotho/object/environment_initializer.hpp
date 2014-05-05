@@ -22,7 +22,8 @@ protected:
             //object * ind = env->m_sim_manager->getObject( id );
             //ind->initialize();
             //
-            env->getIndividualObject().initialize();
+            size_t idx = env->getIndividualIndex();
+            env->getIndividualAt(idx).initialize();
         }
     }
 };

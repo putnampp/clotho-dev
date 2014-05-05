@@ -11,7 +11,8 @@ public:
     virtual const vtime_t & getSimulationTime() const = 0;
     virtual bool isSimulationComplete() const = 0;
 
-    virtual const system_id getNextObjectID() = 0;
+//    virtual const system_id getNextObjectID() = 0;
+    virtual object_t * getSimulationObject() = 0;
 
     virtual void registerObject( object_t * obj ) = 0;
     virtual void unregisterObject( object_t * obj ) = 0;

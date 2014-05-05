@@ -284,7 +284,8 @@ template < class E >
 class EventManager<E, ltsf_queue< typename E::vtime_t, const E > > : virtual public event_manager< E > {
 public:
     typedef typename event_manager< E >::event_t event_t;
-    typedef ltsf_queue< typename E::vtime_t, const E > event_set_t;
+    typedef typename event_manager< E >::vtime_t vtime_t;
+    typedef ltsf_queue< vtime_t , const E > event_set_t;
 
     EventManager() :
         m_events(),
@@ -294,7 +295,12 @@ public:
     {}
 
     bool insertEvent( const event_t * e ) {
-        return m_events.enqueue( e, e->getReceived() );
+        vtime_t t = e->getReceived();
+        return insertEventAt( e, t ); 
+    }
+
+    bool insertEventAt( const event_t * e, const vtime_t & t ) {
+        return m_events.enqueue( e, t );
     }
 
     void reset_pending() {

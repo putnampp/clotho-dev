@@ -68,11 +68,13 @@ namespace initializer {
 template < > 
 void ClothoAppInitializer::createEnvironment< SIMPLE_CENTRAL_APP_t, SIMPLE_CENTRAL_APP_t::environment_t >( SIMPLE_CENTRAL_APP_t * a, SIMPLE_CENTRAL_APP_t::environment_t * ) {
     cout << "Blocking default protocol" << endl;
-    typename SIMPLE_CENTRAL_APP_t::environment_ptr_t env = new typename SIMPLE_CENTRAL_APP_t::environment_t( a->m_sim_manager, a->m_rng );
+    typedef typename SIMPLE_CENTRAL_APP_t::environment_t environment_t;
 
-    env->setFounderSize( a->m_nFounder );
-    env->initialize();
-    a->m_objects.push_back( env->getSystemID());
+    ClothoObject * co = a->m_sim_manager->getSimulationObject();
+
+    a->m_env = new environment_t( co, a->m_rng );
+    a->m_env->setFounderSize( a->m_nFounder );
+    a->m_env->initialize();
 }
 
 template<>
@@ -83,19 +85,23 @@ void EnvironmentInitializer::createPopulation( ENV_t * env, IND_t * ind ) {
     typedef typename IND_t::properties_t::gamete_t gamete_t;
 
     for( unsigned int i = 0; i < env->m_nFounder; ++i ) {
-        system_id id = env->getIndividual();    // adds individual to pending list
+        size_t idx = env->getIndividualIndex();    // adds individual to pending list
         
-        IND_t * ind = static_cast< IND_t * >( env->m_sim_manager->getObject(id) );
+        //IND_t * ind = static_cast< IND_t * >( env->m_sim_manager->getObject(id) );
+        IND_t & ind = env->getIndividualAt( idx );
 
         gamete_t * g = new gamete_t();
-        ind->getProperties()->inheritFrom( p0, g);
+        ind.getProperties()->inheritFrom( p0, g);
 
         g = new gamete_t();
-        ind->getProperties()->inheritFrom( p0, g);
+        ind.getProperties()->inheritFrom( p0, g);
     }
 
-    BirthEvent * be = new BirthEvent( env->getCurrentTime(), env->getCurrentTime(), env, env, env->getNextEventID() );
-    env->sendEvent(be);
+    ClothoObject * co = env->m_clotho_object;
+    ClothoEvent::vtime_t ctime = co->getCurrentTime();
+
+    BirthEvent * be = new BirthEvent( ctime, ctime, co, co, co->getNextEventID() );
+    co->sendEvent(be);
 }
 }   // namespace initializer
 

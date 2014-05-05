@@ -391,16 +391,16 @@ public:
         return obj.object;
     }
 
-    void activateObject( size_t pool_idx ) {
-        updateObject( pool_idx, &m_active );
+    object_t activateObject( size_t pool_idx ) {
+        return updateObject( pool_idx, &m_active );
     }
 
-    void pendingObject( size_t pool_idx ) {
-        updateObject( pool_idx, &m_pending );
+    object_t pendingObject( size_t pool_idx ) {
+        return updateObject( pool_idx, &m_pending );
     }
 
-    void inactiveObject( size_t pool_idx ) {
-        updateObject( pool_idx, &m_inactive );
+    object_t inactiveObject( size_t pool_idx ) {
+        return updateObject( pool_idx, &m_inactive );
     }
 
     void dump( std::ostream & o ) {
@@ -472,9 +472,7 @@ public:
         size_t o = m_pending.head;
         remove_object_from_queue( o );
 
-        updateObject(o, &m_active);
-
-        return m_objects[o].object;
+        return updateObject(o, &m_active);
     }
 
     object_t inactivateNextActiveObject() {
@@ -483,9 +481,7 @@ public:
         size_t o = m_active.head;
         remove_object_from_queue( o );
 
-        updateObject(o, &m_inactive);
-
-        return m_objects[o].object;
+        return updateObject(o, &m_inactive);
     }
 
     void reset() {
@@ -501,12 +497,12 @@ public:
     }
 
 protected:
-    void updateObject( size_t obj, queue_node * nQ ) {
-        updateObject( m_objects[ obj ], nQ );
+    object_t updateObject( size_t obj, queue_node * nQ ) {
+        return updateObject( m_objects[ obj ], nQ );
     }
 
-    void updateObject( object_node & onode, queue_node * nQ ) {
-        if( onode.queue == nQ ) return;
+    object_t updateObject( object_node & onode, queue_node * nQ ) {
+        if( onode.queue == nQ ) onode.object;
 
         if( onode.queue != NULL ) {
             remove_object_from_queue( onode );
@@ -515,6 +511,8 @@ protected:
 
         insert_object_to_queue( onode, nQ );
         assert( nQ->head == onode.node_idx );
+
+        return onode.object;
     }
 
     size_t getObjectNode( ) {

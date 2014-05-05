@@ -15,12 +15,12 @@
 
 #include <iostream>
 
-template < class MGR, class ENV, class ENABLED = void >
-class ClothoApplication;
+/*template < class MGR, class ENV, class ENABLED = void >
+class ClothoApplication;*/
 
 template < class MGR, class ENV >
-class ClothoApplication< MGR, ENV,
-    typename std::enable_if< std::is_base_of< SimulationManager< ClothoEvent, ClothoObject >, MGR>::value && std::is_base_of<ClothoObject, ENV>::value >::type >
+class ClothoApplication/*< MGR, ENV,
+    typename std::enable_if< std::is_base_of< SimulationManager< ClothoEvent, ClothoObject >, MGR>::value && std::is_base_of<ClothoObject, ENV>::value >::type >*/
     : public application {
 public:
     typedef MGR     manager_t;
@@ -31,7 +31,7 @@ public:
     friend class initializer::ClothoAppInitializer;
     friend class finalizer::ClothoAppFinalizer;
 
-    typedef std::vector< system_id > sim_object_id_list_t;
+//    typedef std::vector< system_id > sim_object_id_list_t;
 
     ClothoApplication( shared_ptr< iRNG > r ) : 
         m_sim_manager( NULL ),
@@ -63,12 +63,15 @@ public:
         finalizer::ClothoAppFinalizer::finalize(this);
     }
 
-    virtual ~ClothoApplication() {}
+    virtual ~ClothoApplication() {
+        if( m_env != NULL ) delete m_env;
+    }
 
 protected:
     manager_ptr_t           m_sim_manager;
     shared_ptr< iRNG >      m_rng;
-    sim_object_id_list_t    m_objects;
+    environment_ptr_t       m_env;
+//    sim_object_id_list_t    m_objects;
     
     unsigned int            m_nFounder;
 };

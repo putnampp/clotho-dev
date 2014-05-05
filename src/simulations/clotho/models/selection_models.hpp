@@ -19,20 +19,16 @@ template < >
 class MateSelector< models::random_selection > : public RandomProcess {
 public:
 
-    template < class ENV, class ID = system_id >
-    static std::pair< ID, ID > select( ENV * env, ID * ) {
-        std::pair< ID, ID > res;
+//    template < class ENV >
+    static std::pair< size_t, size_t > select( size_t nInd ) {
+        std::pair< size_t, size_t > res;
 
-        size_t nInd = env->getActiveIndividualCount();
         size_t i0 = m_rng->nextInt( nInd );
         size_t i1 = i0;
 
         while( i1 == i0 ) {
             i1 = m_rng->nextInt( nInd );
         }
-
-        res.first = env->getActiveIndividualAt( i0 );
-        res.second = env->getActiveIndividualAt( i1 );
 
         return res;
     }

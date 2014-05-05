@@ -12,13 +12,16 @@ public:
         typedef typename IND::inherit_event_t ievent_t;
         typedef typename ievent_t::gamete_t gamete_t;
 
-        ievent_t * ie = new ievent_t( ind->getCurrentTime(), ind->getCurrentTime(), ind, ind, ind->getNextEventID(), new gamete_t(), 0 );
+        ClothoObject * co = ind->getClothoObject();
+        ClothoEvent::vtime_t ctime = co->getCurrentTime();
 
-        ind->sendEvent( ie );
+        system_id id = co->getSystemID();
 
-        ie = new ievent_t( ind->getCurrentTime(), ind->getCurrentTime(), ind, ind, ind->getNextEventID(), new gamete_t(), 1 );
+        ievent_t * ie = new ievent_t( ctime, ctime, id, id, co->getNextEventID(), new gamete_t(), 0 );
+        co->sendEvent( ie );
 
-        ind->sendEvent( ie );
+        ie = new ievent_t( ctime, ctime, id, id, co->getNextEventID(), new gamete_t(), 1 );
+        co->sendEvent( ie );
     }
 
 protected:

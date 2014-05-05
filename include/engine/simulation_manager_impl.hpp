@@ -15,9 +15,9 @@ public:
     typedef typename simulation_manager< O >::object_t object_t;
     typedef typename simulation_manager< O >::vtime_t vtime_t;
 
-    virtual const system_id getNextObjectID() {
-        return system_id( simulation_manager<O>::getManagerID(), m_next_object_id++);
-    }
+    //virtual const system_id getNextObjectID() {
+    //    return system_id( simulation_manager<O>::getManagerID(), m_next_object_id++);
+    //}
 
     virtual ~SimulationManager() { }
 protected:

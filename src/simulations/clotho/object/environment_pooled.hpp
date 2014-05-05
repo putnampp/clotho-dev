@@ -25,6 +25,7 @@
 #include <functional>
 
 #include "../active_pool.hpp"
+#include "../app_object.hpp"
 
 #include "individual2.hpp"
 
@@ -41,6 +42,7 @@ class TEnvironment;
 
 template < class LCM, class IND, class SMODEL >
 class TEnvironment < LCM, IND, SMODEL, typename std::enable_if< std::is_base_of< life_cycle::life_cycle_model, LCM >::value >::type >
+    : public AppObject
 /*    : public ClothoObject*/ {
 public:
 //    typedef typename ClothoObject::simulation_manager_t simulation_manager_t;
@@ -63,6 +65,8 @@ public:
     typedef selection::MateSelector< SMODEL > selection_model_t;
     typedef TEnvironment < LCM, IND, SMODEL > environment_t;
 
+    typedef ClothoObject::event_t event_t;
+
     friend class initializer::EnvironmentInitializer;
     friend class finalizer::EnvironmentFinalizer;
     friend class life_cycle::EnvironmentLifeCycle<LCM, environment_t, ClothoEvent>;
@@ -81,12 +85,12 @@ public:
 //        ClothoObject::setSimulationManager( manager );
 //    }
 
-    TEnvironment( ClothoObject * co, shared_ptr< iRNG > r ) :
-        m_clotho_object(co),
-        m_rng(r),
-        m_sel_param(NULL),
-        m_nFounder(0)
-    {}
+//    TEnvironment( ClothoObject * co, shared_ptr< iRNG > r ) :
+//        m_clotho_object(co),
+//        m_rng(r),
+//        m_sel_param(NULL),
+//        m_nFounder(0)
+//    {}
 
 //    TEnvironment( simulation_manager_t * manager, shared_ptr< iRNG > r,/* std::shared_ptr< variant_map_t > vmap,*/ selection_parameter_t * s ) :
 //        ClothoObject( manager ),
@@ -101,11 +105,23 @@ public:
 //    }
 
     TEnvironment( ClothoObject * co, shared_ptr< iRNG > r, selection_parameter_t * s = NULL ) :
-        m_clotho_object(co),
+        AppObject( co ),
         m_rng(r),
         m_sel_param(s),
         m_nFounder(0)
-    {}
+    {
+        if( m_clotho_object != NULL ) m_clotho_object->updatePerformer( this );
+    }
+
+    TEnvironment( const TEnvironment < LCM, IND, SMODEL > & cenv ) :
+        AppObject( cenv ),
+        m_rng( cenv.m_rng ),
+        m_sel_param( cenv.m_sel_param ),
+        m_nFounder( cenv.m_nFounder )
+    {
+        assert(false);
+        //if( m_clotho_object != NULL ) m_clotho_object->updatePerformer( this );
+    }
 
     void setFounderSize( unsigned int s ) {
         m_nFounder = s;
@@ -137,10 +153,12 @@ public:
         return m_individual_pool.getPendingNodeCount();
     }
 
-    const system_id & getActiveIndividualAt( size_t idx ) {
-        return m_individuals[m_individual_pool.getActiveObjectAt( idx )].getSystemID();
+    individual_t & getActiveIndividualAt( size_t active_offset ) {
+        size_t idx = m_individual_pool.getActiveObjectAt( active_offset );
+        return m_individuals.at( idx );
     }
 
+    
     size_t activateNextIndividual() {
         return m_individual_pool.activateNextPendingObject();
     }
@@ -166,19 +184,23 @@ protected:
 //    }
 
     
-    const system_id & getIndividual( ) {
-        return getIndividualObject().getSystemID();
-    }
+//    const system_id & getIndividual( ) {
+//        return getIndividualObject().getSystemID();
+//    }
 
     individual_t & getIndividual( system_id & id ) {
         size_t idx = m_individual_pool.getPoolObject( m_id_pool_index_map.at(id) );
         return m_individuals.at( idx );
     }
 
-    individual_t & getIndividualObject() {
-        size_t idx = getIndividualIndex();
-        return m_individuals.at(idx);
+    individual_t & getIndividualAt( size_t idx ) {
+        return m_individuals.at( idx );
     }
+
+//    individual_t & getIndividualObject() {
+//        size_t idx = getIndividualIndex();
+//        return m_individuals.at(idx);
+//    }
 
     size_t getIndividualIndex() {
         size_t idx = m_individual_pool.getInactiveObject();
@@ -186,26 +208,29 @@ protected:
             idx = m_individuals.size();
             ClothoObject * o = m_clotho_object->split();
 
-            m_individuals.push_back( individual_t(o, getSystemID() ) );
-            individual_t & ind = m_individuals.back();
+            m_individuals.push_back( individual_t(o, m_clotho_object ) );
+            //individual_t & ind = m_individuals.back();
 
-            ind.setActiveIndex( m_individual_pool.setPoolObject( idx ) ); // newly set objects are 'inactive'
+            o->setActiveIndex( m_individual_pool.setPoolObject( idx ) ); // newly set objects are 'inactive'
             m_individual_pool.pendingObject( idx ); // need to move to 'pending'
-            m_id_pool_index_map.insert( std::make_pair( ind.getSystemID(), ind.getActiveIndex() ));
+            m_id_pool_index_map.insert( std::make_pair( o->getSystemID(), o->getActiveIndex() ));
         }
 
         return idx;
     }
 
     void activateIndividual( const system_id & id, unsigned char gtype = -1 ) {
+        
         m_individual_pool.activateObject( m_id_pool_index_map[id] );
     }
 
     void deactivateIndividual( const system_id & id ) {
-        m_individual_pool.inactiveObject( m_id_pool_index_map[id] );
+        size_t pool_idx = m_id_pool_index_map[id];
+        size_t idx = m_individual_pool.inactiveObject( pool_idx );
+
+        m_individuals[idx].reset();
     }
 
-    ClothoObject *               m_clotho_object;
     shared_ptr< iRNG > m_rng;
     selection_parameter_t  *   m_sel_param;
 

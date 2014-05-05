@@ -74,11 +74,16 @@ namespace initializer {
 template < > 
 void ClothoAppInitializer::createEnvironment< SIMPLE_CENTRAL_APP_t, SIMPLE_CENTRAL_APP_t::environment_t >( SIMPLE_CENTRAL_APP_t * a, SIMPLE_CENTRAL_APP_t::environment_t * ) {
     cout << "Blocking default protocol" << endl;
-    typename SIMPLE_CENTRAL_APP_t::environment_ptr_t env = new typename SIMPLE_CENTRAL_APP_t::environment_t( a->m_sim_manager, a->m_rng );
+    //typename SIMPLE_CENTRAL_APP_t::environment_ptr_t env = new typename SIMPLE_CENTRAL_APP_t::environment_t( a->m_sim_manager, a->m_rng );
+    //
+    typedef typename SIMPLE_CENTRAL_APP_t::environment_t environment_t;
 
-    env->setFounderSize( a->m_nFounder );
-    env->initialize();
-    a->m_objects.push_back( env->getSystemID());
+    ClothoObject * co = a->m_sim_manager->getSimulationObject();
+
+    a->m_env = new environment_t( co, a->m_rng );
+    a->m_env->setFounderSize( a->m_nFounder );
+    a->m_env->initialize();
+    //a->m_objects.push_back( env->getSystemID());
 }
 }   // namespace initializer
 

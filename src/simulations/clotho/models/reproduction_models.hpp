@@ -49,7 +49,8 @@ protected:
     static void mutate_infinite( gamete_t * gm, double mu ) {
         unsigned int nMut = m_rng->nextPoisson( mu );
 
-        for( unsigned int i = 0; i < nMut; ++i ) {
+        //for( unsigned int i = 0; i < nMut; ++i ) {
+        while( nMut-- ) {
             typename variant_map_t::value_ptr_t var = getNewVariant();
             gm->addVariant( var );
         }

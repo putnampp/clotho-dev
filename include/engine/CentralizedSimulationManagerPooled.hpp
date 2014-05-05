@@ -143,7 +143,7 @@ CentralizedSimulationManager<E, O>::~CentralizedSimulationManager() {
 
 template < class E, class O >
 typename CentralizedSimulationManager< E, O>::object_t * CentralizedSimulationManager<E, O>::getSimulationObject() {
-    object_t * obj = new object_t( this, getManagerID(), m_objects.size() );
+    object_t * obj = new object_t( this, this->getManagerID(), m_objects.size() );
 
     m_objects.push_back( obj );
     registerObject( obj );

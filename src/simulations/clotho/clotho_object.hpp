@@ -21,6 +21,7 @@ public:
     typedef SimulationObject< ClothoEvent, ltsf_queue< typename ClothoEvent::vtime_t, const ClothoEvent > > base_object_t;
     typedef SimulationManager< ClothoEvent, ClothoObject > simulation_manager_t;
 
+
     ClothoObject( ) : 
         base_object_t(),
         m_sim_manager( NULL ),

@@ -3,11 +3,13 @@
 
 #include "event_interface.h"
 
-template < class EVT = event >
+template < class EVT = event, class VT = typename EVT::vtime_t >
 struct event_manager {
     typedef EVT event_t;
+    typedef VT  vtime_t;
 
-    virtual bool  insertEvent( const EVT * ) = 0;
+    virtual bool  insertEvent( const event_t * ) = 0;
+    virtual bool    insertEventAt( const event_t *, const vtime_t & ) = 0;
 
     virtual void reset_pending() = 0;
     virtual void reset_processed() = 0;
