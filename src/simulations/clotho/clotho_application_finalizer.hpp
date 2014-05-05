@@ -16,7 +16,6 @@ public:
             object * tmp_obj = app->m_sim_manager->getObject( tmp );
             if( tmp_obj ) {
                 tmp_obj->finalize();
-                delete tmp_obj;
             }
         }
     }

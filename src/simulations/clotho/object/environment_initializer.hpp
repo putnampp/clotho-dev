@@ -16,6 +16,7 @@ protected:
     template < typename E, typename IND >
     static void createPopulation( E * env, IND * ) {
         cout << "Creating founding population of " << env->m_nFounder << endl;
+        env->m_individuals.reserve( 2 * env->m_nFounder );
         for( unsigned int i = 0; i < env->m_nFounder; ++i ) {
             //system_id id = env->getIndividual();
             //object * ind = env->m_sim_manager->getObject( id );

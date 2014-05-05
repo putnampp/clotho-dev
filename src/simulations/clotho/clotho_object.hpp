@@ -27,19 +27,23 @@ public:
         m_active_idx( -1 )
     {}
 
-    ClothoObject( simulation_manager_t * manager ) : 
-        base_object_t( (typename base_object_t::event_router_t *) manager ),
-        m_sim_manager( NULL ),
+    ClothoObject( simulation_manager_t * manager, system_id::manager_id_t man, system_id::object_id_t oid ) : 
+        base_object_t( (typename base_object_t::event_router_t *) manager, man, oid ),
+        m_sim_manager( manager ),
         m_active_idx( -1 )
     {
-        setSimulationManager( manager );
+//        setSimulationManager( manager );
+    }
+
+    ClothoObject * split() {
+        return m_sim_manager->getSimulationObject();
     }
 
     virtual void initialize() {
         m_local_time = m_sim_manager->getSimulationTime();
     }
 
-    virtual void setSimulationManager( simulation_manager_t * sim ) {
+/*    virtual void setSimulationManager( simulation_manager_t * sim ) {
         if( m_sim_manager == sim ) return;
 
         if( m_sim_manager != NULL ) {
@@ -53,7 +57,7 @@ public:
         setID( m_sim_manager->getNextObjectID() );
 
         m_sim_manager->registerObject( this );
-    }
+    }*/
 
     virtual void finalize() {
         if( m_sim_manager ) {

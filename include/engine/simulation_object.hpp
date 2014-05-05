@@ -28,8 +28,8 @@ public:
         m_next_eid(0)
     {}
 
-    SimulationObject( event_router_t * router ) :
-        object( ),
+    SimulationObject( event_router_t * router, system_id::manager_id_t man, system_id::object_id_t oid ) :
+        object( man, oid ),
         m_router( router ),
         m_local_time( SystemClock::ZERO ),
         m_pool_idx(-1),

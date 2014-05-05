@@ -15,9 +15,11 @@ public:
 protected:
     template < typename APP, typename ENV >
     static void createEnvironment( APP * a, ENV * ) {
-        typename APP::environment_ptr_t env = new typename APP::environment_t( a->m_sim_manager );
+        typename APP::manager_t::object_t * cobj = a->m_sim_manager->createSimulationObject();
+
+        typename APP::environment_ptr_t env = new typename APP::environment_t( cobj );
         env->initialize();
-        a->m_objects.push_back( env->getSystemID());
+        a->m_objects.push_back( env->getSystemID() );
     }
 };
 

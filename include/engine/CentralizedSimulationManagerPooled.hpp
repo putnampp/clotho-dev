@@ -41,7 +41,9 @@ public:
     virtual const vtime_t & getSimulationTime() const;
     virtual bool  isSimulationComplete() const;
 
-    virtual const system_id getNextObjectID();
+//    virtual const system_id getNextObjectID();
+//
+    virtual object_t * getSimulationObject();
 
     virtual void registerObject( object_t * obj );
     virtual void unregisterObject( object_t * obj );
@@ -122,19 +124,31 @@ CentralizedSimulationManager<E, O>::~CentralizedSimulationManager() {
         object_t * tmp = m_objects.back();
         m_objects.pop_back();
         if( tmp ) {
-            ++nUnfinalized;
-            tmp->finalize();
+            if( tmp->getPoolIndex() != ltsf_pool_t::UNKNOWN_INDEX ) {
+                ++nUnfinalized;
+                tmp->finalize();
+            }
             delete tmp;
         }
     }
     cout << nUnfinalized << " objects were finalized AFTER simulation finalization." << endl;
 }
 
+//template < class E, class O >
+//const system_id CentralizedSimulationManager<E, O>::getNextObjectID() {
+//    system_id nid( this->getManagerID(), m_objects.size() );
+//    m_objects.push_back( (object_t *)NULL );
+//    return nid;
+//}
+
 template < class E, class O >
-const system_id CentralizedSimulationManager<E, O>::getNextObjectID() {
-    system_id nid( this->getManagerID(), m_objects.size() );
-    m_objects.push_back( (object_t *)NULL );
-    return nid;
+typename CentralizedSimulationManager< E, O>::object_t * CentralizedSimulationManager<E, O>::getSimulationObject() {
+    object_t * obj = new object_t( this, getManagerID(), m_objects.size() );
+
+    m_objects.push_back( obj );
+    registerObject( obj );
+
+    return obj;
 }
 
 template< class E, class O >
@@ -143,8 +157,8 @@ void CentralizedSimulationManager<E, O>::registerObject( object_t * obj ) {
 
     assert( obj->getSystemID() != this->m_id );
 
-    if( m_objects[ obj->getObjectID() ] == NULL ) {
-        m_objects[ obj->getObjectID() ] = obj;
+    if( m_objects[ obj->getObjectID() ]->getPoolIndex() == ltsf_pool_t::UNKNOWN_INDEX ) {
+        assert( m_objects[ obj->getObjectID() ] == obj );
         m_pooled_objects.setPoolObject( obj );
         ++m_nRegisteredObjs;
     }
@@ -155,12 +169,12 @@ void CentralizedSimulationManager<E, O>::unregisterObject( object_t * obj ) {
     ++m_nUnregisterCalls;
     if( obj == NULL ) return;
 
-    if( m_objects[ obj->getObjectID() ] != NULL ) {
+    if( m_objects[ obj->getObjectID() ]->getPoolIndex() != ltsf_pool_t::UNKNOWN_INDEX ) {
         m_nPendingEvents += obj->pendingEventCount(obj->getSystemID());
         m_nProcessedEvents += obj->processedEventCount(obj->getSystemID());
         m_pooled_objects.unsetPoolObject(obj);
 
-        m_objects[ obj->getObjectID() ] = NULL;
+//        m_objects[ obj->getObjectID() ] = NULL;
         --m_nRegisteredObjs;
     }
 }

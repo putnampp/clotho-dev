@@ -33,9 +33,9 @@ protected:
 
     object( const object & o ) : m_id( o.m_id) {}
 
-    void setID( const system_id & id ) {
-        m_id = id;
-    }
+//    void setID( const system_id & id ) {
+//        m_id = id;
+//    }
 
     system_id   m_id;
 };

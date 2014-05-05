@@ -41,9 +41,9 @@ class TEnvironment;
 
 template < class LCM, class IND, class SMODEL >
 class TEnvironment < LCM, IND, SMODEL, typename std::enable_if< std::is_base_of< life_cycle::life_cycle_model, LCM >::value >::type >
-    : public ClothoObject {
+/*    : public ClothoObject*/ {
 public:
-    typedef typename ClothoObject::simulation_manager_t simulation_manager_t;
+//    typedef typename ClothoObject::simulation_manager_t simulation_manager_t;
 
 //    typedef vector< system_id > individual_group_t;
 //    typedef std::pair< individual_group_t *, size_t > pair_individual_group_offset;
@@ -69,29 +69,43 @@ public:
 
     friend selection_model_t;
 
-    TEnvironment( simulation_manager_t * manager, shared_ptr< iRNG > r ) :
-        ClothoObject( manager ),
-        m_rng(r),
-        //m_variants( new variant_map_t(r) ),
-        m_sel_param( NULL ),
+//    TEnvironment( simulation_manager_t * manager, shared_ptr< iRNG > r ) :
+//        ClothoObject( manager ),
+//        m_rng(r),
+//        //m_variants( new variant_map_t(r) ),
+//        m_sel_param( NULL ),
 //        m_nIndAlloc(0),
-        m_nFounder(0)/*,
-        m_nMateOps(0)*/
-    {
-        ClothoObject::setSimulationManager( manager );
-    }
+//        m_nFounder(0)/*,
+//        m_nMateOps(0)*/
+//    {
+//        ClothoObject::setSimulationManager( manager );
+//    }
 
-    TEnvironment( simulation_manager_t * manager, shared_ptr< iRNG > r,/* std::shared_ptr< variant_map_t > vmap,*/ selection_parameter_t * s ) :
-        ClothoObject( manager ),
+    TEnvironment( ClothoObject * co, shared_ptr< iRNG > r ) :
+        m_clotho_object(co),
         m_rng(r),
+        m_sel_param(NULL),
+        m_nFounder(0)
+    {}
+
+//    TEnvironment( simulation_manager_t * manager, shared_ptr< iRNG > r,/* std::shared_ptr< variant_map_t > vmap,*/ selection_parameter_t * s ) :
+//        ClothoObject( manager ),
+//        m_rng(r),
 //        m_variants( vmap ),
-        m_sel_param( s ),
+//        m_sel_param( s ),
 //        m_nIndAlloc(0),
-        m_nFounder(0)/*,
-        m_nMateOps(0)*/
-    {
-        ClothoObject::setSimulationManager( manager );
-    }
+//        m_nFounder(0)/*,
+//        m_nMateOps(0)*/
+//    {
+//        ClothoObject::setSimulationManager( manager );
+//    }
+
+    TEnvironment( ClothoObject * co, shared_ptr< iRNG > r, selection_parameter_t * s = NULL ) :
+        m_clotho_object(co),
+        m_rng(r),
+        m_sel_param(s),
+        m_nFounder(0)
+    {}
 
     void setFounderSize( unsigned int s ) {
         m_nFounder = s;
@@ -112,7 +126,7 @@ public:
 
     virtual void finalize() {
         finalizer::EnvironmentFinalizer::finalize(this);
-        ClothoObject::finalize();
+        m_clotho_object->finalize();
     }
 
     size_t getActiveIndividualCount() const {
@@ -170,7 +184,9 @@ protected:
         size_t idx = m_individual_pool.getInactiveObject();
         if( idx == active_pool_t::UNKNOWN_INDEX ) {
             idx = m_individuals.size();
-            m_individuals.push_back( individual_t(m_sim_manager, getSystemID() ) );
+            ClothoObject * o = m_clotho_object->split();
+
+            m_individuals.push_back( individual_t(o, getSystemID() ) );
             individual_t & ind = m_individuals.back();
 
             ind.setActiveIndex( m_individual_pool.setPoolObject( idx ) ); // newly set objects are 'inactive'
@@ -189,25 +205,15 @@ protected:
         m_individual_pool.inactiveObject( m_id_pool_index_map[id] );
     }
 
+    ClothoObject *               m_clotho_object;
     shared_ptr< iRNG > m_rng;
-//    individual_group_t m_males, m_females;
-//    gender_group_map_t m_gender_group_map;
-//    individual_group_lookup_t m_active_individuals;
-//    deque< system_id > m_available_individuals;
-//    set< system_id > m_pending; 
-
-    //std::shared_ptr< variant_map_t >       m_variants;
     selection_parameter_t  *   m_sel_param;
 
-    
     std::vector< individual_t >  m_individuals;
     std::unordered_map< system_id, size_t > m_id_pool_index_map;
     active_pool_t       m_individual_pool;
 
-    //unsigned int        m_nIndAlloc;
     unsigned int        m_nFounder;
-
-//    unsigned int        m_nMateOps;
 };
 
-#endif  // ENVIRONMENT_HPP_
+#endif  // ENVIRONMENTPOOLED_HPP_
