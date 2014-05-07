@@ -32,8 +32,9 @@ public:
 //    typedef pair< vtime_t, object_group_t * > concurrent_group_t;
 //    typedef map< event::vtime_t, object_group_t * > ordered_object_exe_t;
 //    typedef typename ordered_object_exe_t::iterator _iterator;
-    typedef vector< object_t * > object_list_t;
-    typedef ltsf_pool< vtime_t, object_t >  ltsf_pool_t;
+    typedef std::pair< object_t *, size_t > object_pool_pair_t;
+    typedef vector< object_pool_pair_t > object_list_t;
+    typedef ltsf_pool< vtime_t, system_id::object_id_t >  ltsf_pool_t;
 
     CentralizedSimulationManager( shared_ptr< application >, system_id::manager_id_t id = 0 );
     CentralizedSimulationManager( shared_ptr< application >, shared_ptr< SimulationStats >,  system_id::manager_id_t id = 0 );
@@ -46,7 +47,9 @@ public:
     virtual object_t * getSimulationObject();
 
     virtual void registerObject( object_t * obj );
+    virtual void registerObject( size_t idx );
     virtual void unregisterObject( object_t * obj );
+    virtual void unregisterObject( size_t idx );
 
     virtual size_t getObjectCount() const;
     virtual object_t * getObject( const system_id & id ) const;
@@ -56,6 +59,7 @@ public:
     virtual void finalize();
 
     virtual void routeEvent( /*const*/ event_t * evt );
+    virtual void routeEvent( const system_id & id, event_t * evt );
     virtual void notifyNextEvent( const system_id & obj, const vtime_t & t );
 
     virtual ~CentralizedSimulationManager();
@@ -121,14 +125,15 @@ CentralizedSimulationManager<E, O>::~CentralizedSimulationManager() {
     cout << m_nUnregisterCalls << " objects unregistered BEFORE destruction" << endl;
     unsigned int nUnfinalized = 0;
     while( !m_objects.empty() ) {
-        object_t * tmp = m_objects.back();
+        //object_t * tmp = m_objects.back();
+        object_pool_pair_t tmp = m_objects.back();
         m_objects.pop_back();
-        if( tmp ) {
-            if( tmp->getPoolIndex() != ltsf_pool_t::UNKNOWN_INDEX ) {
+        if( tmp.first ) {
+            if( tmp.second != ltsf_pool_t::UNKNOWN_INDEX ) {
                 ++nUnfinalized;
-                tmp->finalize();
+                tmp.first->finalize();
             }
-            delete tmp;
+            delete tmp.first;
         }
     }
     cout << nUnfinalized << " objects were finalized AFTER simulation finalization." << endl;
@@ -143,10 +148,13 @@ CentralizedSimulationManager<E, O>::~CentralizedSimulationManager() {
 
 template < class E, class O >
 typename CentralizedSimulationManager< E, O>::object_t * CentralizedSimulationManager<E, O>::getSimulationObject() {
-    object_t * obj = new object_t( this, this->getManagerID(), m_objects.size() );
+    system_id::manager_id_t mid = this->getManagerID();
+    system_id::object_id_t oid = m_objects.size();
 
-    m_objects.push_back( obj );
-    registerObject( obj );
+    object_t * obj = new object_t( this, mid, oid );
+
+    m_objects.push_back( make_pair( obj, ltsf_pool_t::UNKNOWN_INDEX ) );
+    registerObject( oid );
 
     return obj;
 }
@@ -155,26 +163,43 @@ template< class E, class O >
 void CentralizedSimulationManager<E, O>::registerObject( object_t * obj ) {
     if( obj == NULL ) return;
 
-    assert( obj->getSystemID() != this->m_id );
+    system_id::object_id_t oid = obj->getObjectID();
+    registerObject( oid );
+}
 
-    if( m_objects[ obj->getObjectID() ]->getPoolIndex() == ltsf_pool_t::UNKNOWN_INDEX ) {
-        assert( m_objects[ obj->getObjectID() ] == obj );
-        m_pooled_objects.setPoolObject( obj );
+template< class E, class O >
+void CentralizedSimulationManager<E, O>::registerObject( size_t idx ) {
+    if( m_objects[idx].second  == ltsf_pool_t::UNKNOWN_INDEX ) {
+        size_t pool_idx = m_pooled_objects.setPoolObject( idx );
+        m_objects[idx].second = pool_idx;
+
         ++m_nRegisteredObjs;
     }
 }
 
 template< class E, class O >
 void CentralizedSimulationManager<E, O>::unregisterObject( object_t * obj ) {
-    ++m_nUnregisterCalls;
     if( obj == NULL ) return;
 
-    if( m_objects[ obj->getObjectID() ]->getPoolIndex() != ltsf_pool_t::UNKNOWN_INDEX ) {
-        m_nPendingEvents += obj->pendingEventCount(obj->getSystemID());
-        m_nProcessedEvents += obj->processedEventCount(obj->getSystemID());
-        m_pooled_objects.unsetPoolObject(obj);
+    system_id::object_id_t id = obj->getObjectID();
+    unregisterObject(id);
+}
 
-//        m_objects[ obj->getObjectID() ] = NULL;
+template < class E, class O >
+void CentralizedSimulationManager<E, O>::unregisterObject( size_t idx ) {
+    ++m_nUnregisterCalls;
+    if( m_objects[ idx ].second != ltsf_pool_t::UNKNOWN_INDEX ) {
+        object_t * obj = m_objects[idx].first;
+
+        system_id id = obj->getSystemID();
+
+        m_nPendingEvents += obj->pendingEventCount(id);
+        m_nProcessedEvents += obj->processedEventCount(id);
+
+        m_pooled_objects.unsetPoolObject(idx);
+
+        //m_objects[ idx ].first = NULL;
+        m_objects[idx].second = ltsf_pool_t::UNKNOWN_INDEX;
         --m_nRegisteredObjs;
     }
 }
@@ -187,20 +212,29 @@ size_t CentralizedSimulationManager<E, O>::getObjectCount() const {
 
 template< class E, class O >
 typename CentralizedSimulationManager<E, O>::object_t * CentralizedSimulationManager<E, O>::getObject( const system_id & id ) const {
-    return m_objects[ id.getObjectID() ];
+    return m_objects[ id.getObjectID() ].first;
 }
 
 template< class E, class O >
 void CentralizedSimulationManager<E, O>::routeEvent( /*const*/ event_t * evt ) {
-    system_id::object_id_t id = evt->getReceiver().getObjectID();
+//    system_id::object_id_t id = evt->getReceiver().getObjectID();
+//
+//    assert( id < m_objects.size() );
+//    m_objects[ id ]->receiveEvent( evt );
+    routeEvent( evt->getReceiver(), evt );
+}
 
-    assert( id < m_objects.size() );
-    m_objects[ id ]->receiveEvent( evt );
+template< class E, class O >
+void CentralizedSimulationManager<E, O>::routeEvent( const system_id & id, event_t * evt ) {
+    system_id::object_id_t oid = id.getObjectID();
+
+//    assert( oid < m_objects.size() );
+    m_objects[ oid ].first->receiveEvent( evt );
 }
 
 template< class E, class O >
 void CentralizedSimulationManager<E, O>::notifyNextEvent( const system_id & obj, const vtime_t & t ) {
-    m_pooled_objects.updateObject( m_objects[ obj.getObjectID()], t );
+    m_pooled_objects.updateObject( m_objects[ obj.getObjectID() ].second, t );
 }
 
 template< class E, class O >
@@ -218,22 +252,20 @@ void CentralizedSimulationManager<E, O>::simulate( const vtime_t & until ) {
     vtime_t timestamp = m_pooled_objects.peekNextTimestamp();
     object_t * obj;
 
-//    m_pooled_objects.dump( std::cout );
+    size_t idx;
     while( timestamp != SystemClock::POSITIVE_INFINITY && !setSimulationTime( timestamp ) ) {
-        while( (obj = m_pooled_objects.getNextObject( timestamp ) ) != NULL ) {
-        //    std::cout << "Processing concurrent events at " << timestamp << " for " << obj->getSystemID() << " (" << obj->getPoolIndex() << ")" << std::endl;
+        while( (idx = m_pooled_objects.getNextObject( timestamp ) ) != (system_id::object_id_t) ltsf_pool_t::UNKNOWN_INDEX ) {
+            obj = m_objects[ idx ].first;
             obj->updateLocalTime(timestamp);
             obj->process();
 
-            const event * e = obj->peekEvent( obj->getSystemID() );
-            if( e != NULL ) {
-//                std::cout << "Updating " << obj->getSystemID() << " (" << obj->getPoolIndex() << ") to " << e->getReceived() << std::endl;
-                m_pooled_objects.updateObject( obj, e->getReceived() );
-            }
+//            const event * e = obj->peekEvent( obj->getSystemID() );
+//            if( e != NULL ) {
+//                m_pooled_objects.updateObject( m_objects[idx].second, e->getReceived() );
+//            }
         }
 
         timestamp = m_pooled_objects.peekNextTimestamp();
-        //m_pooled_objects.dump( std::cout );
     }
 
     m_stats->stopPhase( SIMULATE_PHASE_K );

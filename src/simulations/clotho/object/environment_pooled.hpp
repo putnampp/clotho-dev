@@ -211,9 +211,10 @@ protected:
             m_individuals.push_back( individual_t(o, m_clotho_object ) );
             //individual_t & ind = m_individuals.back();
 
-            o->setActiveIndex( m_individual_pool.setPoolObject( idx ) ); // newly set objects are 'inactive'
+            //o->setActiveIndex( m_individual_pool.setPoolObject( idx ) ); // newly set objects are 'inactive'
+            size_t active_offset = m_individual_pool.setPoolObject(idx);
             m_individual_pool.pendingObject( idx ); // need to move to 'pending'
-            m_id_pool_index_map.insert( std::make_pair( o->getSystemID(), o->getActiveIndex() ));
+            m_id_pool_index_map.insert( std::make_pair( o->getSystemID(), active_offset ));
         }
 
         return idx;

@@ -2,7 +2,7 @@
 #define MATE_SELECT_EVENT_H_
 
 #include "../clotho_event.h"
-#include "../pooler.hpp"
+#include "pooler.hpp"
 
 class MateSelectEvent : public ClothoEvent {
 public:

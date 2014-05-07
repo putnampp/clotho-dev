@@ -158,8 +158,9 @@ protected:
     static void handle_mate_select( ENV * env, const ClothoEvent * ce ) {
         size_t n = env->getActiveIndividualCount();
         size_t nParents = n;
+
         ClothoEvent::vtime_t ctime = ce->getReceived();
-        ClothoObject * co = env->m_clotho_object;
+        ClothoObject * co = env->getClothoObject();
 
         system_id id = co->getSystemID();
 

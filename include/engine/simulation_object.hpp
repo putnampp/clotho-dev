@@ -7,12 +7,12 @@
 #include "event_performer.hpp"
 #include "event_transceiver.hpp"
 #include "event_router.hpp"
-#include "poolable.h"
+//#include "poolable.h"
 
 template< class E, class ES, class EM = EventManager< E, ES > >
 class SimulationObject : 
     public object,
-    public poolable,
+//    public poolable,
     public event_manager< E >,
     public event_processor,
     public event_transceiver< E >
@@ -30,7 +30,7 @@ public:
         m_router( NULL ),
         m_performer( NULL ),
         m_local_time( SystemClock::ZERO ),
-        m_pool_idx( -1 ),
+//        m_pool_idx( -1 ),
         m_next_eid(0)
     {
         m_evt_manager = new event_manager_t();
@@ -42,7 +42,7 @@ public:
         m_router( router ),
         m_performer( NULL ),
         m_local_time( SystemClock::ZERO ),
-        m_pool_idx(-1),
+//        m_pool_idx(-1),
         m_next_eid(0)
     {
         m_evt_manager = new event_manager_t();
@@ -54,12 +54,12 @@ public:
         m_router( so.m_router ),
         m_performer( so.m_performer ),
         m_local_time( so.m_local_time ),
-        m_pool_idx( so.m_pool_idx ),
+//        m_pool_idx( so.m_pool_idx ),
         m_next_eid( so.m_next_eid )
     {}
 
-    size_t getPoolIndex() const { return m_pool_idx; }
-    void setPoolIndex( size_t idx ) { m_pool_idx = idx; }
+//    size_t getPoolIndex() const { return m_pool_idx; }
+//    void setPoolIndex( size_t idx ) { m_pool_idx = idx; }
 
     virtual void process() {
         if( m_performer == NULL ) return;
@@ -86,10 +86,11 @@ public:
 //    virtual void perform_event( const event_t * e ) {}
 
     virtual void sendEvent( /*const*/ event_t * evt ) {
-        if( compareID( evt->getReceiver() ) ) {
+        system_id id = evt->getReceiver();
+        if( compareID( id ) ) {
             receiveEvent( evt );
         } else {
-            m_router->routeEvent( evt );
+            m_router->routeEvent( id, evt );
         }
     }
 
@@ -170,7 +171,7 @@ protected:
     event_router_t * m_router;
     event_performer_t * m_performer;
     vtime_t     m_local_time;
-    size_t      m_pool_idx;
+//    size_t      m_pool_idx;
 
     event::event_id_t  m_next_eid;
 };

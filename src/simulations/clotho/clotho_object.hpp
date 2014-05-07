@@ -7,14 +7,14 @@
 #include "clotho_event.h"
 #include "engine/ltsf_queue.hpp"
 
-#include "active_poolable.h"
+//#include "active_poolable.h"
 
 class ClothoObject;
 
 //class ClothoObject : public SimulationObject< ClothoEvent, std::multiset< const ClothoEvent *, ltsf_event_order > > {
 class ClothoObject :
-    public SimulationObject< ClothoEvent, ltsf_queue< typename ClothoEvent::vtime_t, /*const*/ ClothoEvent > >,
-    public active_poolable
+    public SimulationObject< ClothoEvent, ltsf_queue< typename ClothoEvent::vtime_t, /*const*/ ClothoEvent > >/*,
+    public active_poolable*/
 {
 public:
 //    typedef SimulationObject< ClothoEvent, std::multiset< const ClothoEvent * , ltsf_event_order > > base_object_t;
@@ -24,14 +24,14 @@ public:
 
     ClothoObject( ) : 
         base_object_t(),
-        m_sim_manager( NULL ),
-        m_active_idx( -1 )
+        m_sim_manager( NULL )/*,
+        m_active_idx( -1 )*/
     {}
 
     ClothoObject( simulation_manager_t * manager, system_id::manager_id_t man, system_id::object_id_t oid ) : 
         base_object_t( (typename base_object_t::event_router_t *) manager, man, oid ),
-        m_sim_manager( manager ),
-        m_active_idx( -1 )
+        m_sim_manager( manager )/*,
+        m_active_idx( -1 )*/
     {
 //        setSimulationManager( manager );
     }
@@ -66,14 +66,14 @@ public:
         }
     }
 
-    size_t getActiveIndex() const { return m_active_idx; }
-    void setActiveIndex( size_t idx ) { m_active_idx = idx; }
+//    size_t getActiveIndex() const { return m_active_idx; }
+//    void setActiveIndex( size_t idx ) { m_active_idx = idx; }
 
     virtual ~ClothoObject() {}
 
 protected:
     simulation_manager_t * m_sim_manager;
-    size_t m_active_idx;
+//    size_t m_active_idx;
 };
 
 #endif  // CLOTHO_OBJECT_HPP_

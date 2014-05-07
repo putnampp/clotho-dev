@@ -317,4 +317,311 @@ protected:
     ltsf_node * m_available;
 };
 
+template < class T >
+class ltsf_pool< T, unsigned int, void> {
+public:
+    typedef T   vtime_t;
+    typedef unsigned int object_t;
+
+    static const size_t UNKNOWN_INDEX = -1;
+
+    struct ltsf_node;
+
+    struct object_node {
+        size_t  node_idx;
+        object_t object;
+        size_t queue;
+        size_t next, prev;
+
+        object_node( size_t idx, object_t o = UNKNOWN_INDEX, size_t q = UNKNOWN_INDEX, size_t n = UNKNOWN_INDEX, size_t p = UNKNOWN_INDEX) : 
+            node_idx(idx), 
+            object(o), 
+            queue(q), 
+            next(n), 
+            prev(p) 
+        {}
+    };
+
+    struct ltsf_node {
+        vtime_t timestamp;
+
+        size_t head;
+        size_t next, prev;
+
+        ltsf_node( vtime_t t, size_t h = UNKNOWN_INDEX, size_t n = UNKNOWN_INDEX, size_t p = UNKNOWN_INDEX ) : 
+            timestamp(t), 
+            head(h), 
+            next(n), 
+            prev(p) 
+        {}
+    };
+
+    ltsf_pool() : 
+        m_unset_object(UNKNOWN_INDEX), 
+        m_root( UNKNOWN_INDEX ), 
+        m_available( UNKNOWN_INDEX ) 
+    {}
+
+    size_t getNextPoolIndex() {
+        return UNKNOWN_INDEX;
+    }
+
+    object_t getPoolObject( size_t pool_idx ) {
+        assert( pool_idx < m_objects.size() );
+        return m_objects[ pool_idx ].object;
+    }
+
+    size_t setPoolObject( object_t p ) {
+        size_t idx = getObjectNode();
+
+        m_objects[idx].object = p;
+        return idx;
+    }
+
+    bool unsetPoolObject( size_t p_idx ) {
+        object_node & obj = m_objects[ p_idx ];
+
+        obj.object = (object_t) UNKNOWN_INDEX;
+
+        if( obj.queue != UNKNOWN_INDEX ) {
+            remove_object_from_ltsf_queue( obj );
+        } else {
+            obj.prev = UNKNOWN_INDEX;
+        }
+
+        obj.next = m_unset_object;
+        m_unset_object = obj.node_idx;
+
+        return true;
+    }
+
+    void updateObject( size_t pool_idx, vtime_t t ) {
+        assert( t != (vtime_t) -1 );
+        assert( pool_idx != UNKNOWN_INDEX && pool_idx < m_objects.size() );
+        object_node & obj = m_objects[pool_idx];
+        updateObject( obj, t );
+    }
+
+    object_t getNextObject( vtime_t t ) {
+        if( m_root != UNKNOWN_INDEX ) {
+            ltsf_node & rnode = m_nodes[m_root];
+
+            if( rnode.timestamp == t ) {
+                object_node & n = m_objects[rnode.head];
+    
+                rnode.head = n.next;
+                if( rnode.head == UNKNOWN_INDEX ) {
+                    remove_ltsf_node( m_root );
+                }
+
+                n.queue = UNKNOWN_INDEX;
+                n.next = UNKNOWN_INDEX;
+                n.prev = UNKNOWN_INDEX;
+                return n.object;
+            }
+        }
+        return (object_t)UNKNOWN_INDEX;
+    }
+
+    void dump( std::ostream & o ) {
+        size_t tmp_idx = m_root;
+        if( tmp_idx != UNKNOWN_INDEX ) {
+            do {
+                ltsf_node & tmp = m_nodes[tmp_idx];
+                o << "LTSF Node: " << tmp.timestamp << "\n";
+
+                size_t obj_idx = tmp.head;
+                if( obj_idx != UNKNOWN_INDEX ) {
+                    unsigned int n = 0;
+                    do {
+                        object_node & qobj = m_objects[obj_idx];
+                        o << "\t" << ++n << ": " << qobj.node_idx << "\n";
+                        obj_idx = qobj.next;
+                    } while( obj_idx != UNKNOWN_INDEX );
+                } else {
+                    o << "\tContains no objects. THIS SHOULD NEVER HAPPEN\n";
+                    break;
+                }
+                tmp_idx = tmp.next;
+            } while( tmp_idx != UNKNOWN_INDEX );
+        } else {
+            o << "LTSF Queue empty\n";
+        }
+    }
+
+    vtime_t peekNextTimestamp() const {
+        return ((m_root != UNKNOWN_INDEX) ? m_nodes[m_root].timestamp : -1);
+    }
+
+    size_t getLTSFNodeCount() const {
+        return m_nodes.size();
+    }
+
+    virtual ~ltsf_pool() {
+//        while( !m_objects.empty() ) {
+//            object_node * tmp = m_objects.back();
+//            m_objects.pop_back();
+//            if( tmp ) delete tmp;
+//        }
+
+//        while( !m_nodes.empty() ) {
+//            ltsf_node * tmp = m_nodes.back();
+//            m_nodes.pop_back();
+
+//            if( tmp ) delete tmp;
+//        }
+        m_objects.clear();
+        m_nodes.clear();
+    }
+protected:
+    void updateObject( object_node & obj, vtime_t t ) {
+        size_t q = obj.queue;
+        if( q != UNKNOWN_INDEX ) {
+            if( m_nodes[q].timestamp <= t ) return;    // object is already in this queue at an earlier time
+
+            remove_object_from_ltsf_queue( obj );
+            assert( obj.queue == UNKNOWN_INDEX );
+        }
+
+        size_t p = UNKNOWN_INDEX;
+        q = m_root;
+
+        while( q != UNKNOWN_INDEX ) {
+            ltsf_node & qnode = m_nodes[q];
+            if( qnode.timestamp < t ) {
+                p = q;
+                q = qnode.next;
+            } else if( qnode.timestamp == t ) {
+                break;
+            } else {
+                // ltsf pool does not have node for
+                // current timestamp t, but
+                // it should be inserted after the
+                // current p
+                //
+                q = UNKNOWN_INDEX;
+                break;
+            }
+        }
+        
+        if( q == UNKNOWN_INDEX ) {
+            // there are currently no queues
+            q = getLTSFNode( t );
+
+            insert_ltsf_node_after(q, p);
+        }
+
+        insert_object_to_ltsf_node( obj, q );
+
+        assert( m_nodes[q].head == obj.node_idx );
+    }
+
+    size_t getObjectNode( ) {
+        size_t n = UNKNOWN_INDEX;
+        if( m_unset_object != UNKNOWN_INDEX ) {
+            n = m_unset_object;
+            m_unset_object = m_objects[m_unset_object].next;
+        } else {
+            n = m_objects.size();
+            m_objects.push_back( object_node( n ));
+        }
+        return n;
+    }
+
+    size_t getLTSFNode( vtime_t t ) {
+        size_t q = UNKNOWN_INDEX;
+        if( m_available != UNKNOWN_INDEX ) {
+            // reuse existing node
+            q = m_available;
+            m_available = m_nodes[m_available].next;
+            m_nodes[q].timestamp = t;
+        } else {
+            q = m_nodes.size();
+            m_nodes.push_back( ltsf_node(t) );
+        }
+        return q;
+    }
+
+    void remove_object_from_ltsf_queue( object_node & obj ) {
+        // object is current in another queue
+        // remove it from its current queue
+        //
+        if( obj.next != UNKNOWN_INDEX ) {
+            m_objects[obj.next].prev = obj.prev;
+        }
+
+        if( obj.prev != UNKNOWN_INDEX ) {
+            m_objects[obj.prev].next = obj.next;
+        } else {
+            // head of ltsf queue
+            m_nodes[obj.queue].head = obj.next;
+        }
+
+        obj.next = UNKNOWN_INDEX;
+        obj.prev = UNKNOWN_INDEX;
+        obj.queue = UNKNOWN_INDEX;
+    }
+
+    void insert_object_to_ltsf_node( object_node & o, size_t q_idx ) {
+        ltsf_node & q = m_nodes[q_idx];
+        o.next = q.head;
+
+        if( q.head != UNKNOWN_INDEX  ) {
+            object_node & q_head = m_objects[q.head];
+            o.prev = q_head.prev;
+            q_head.prev = o.node_idx;
+        } else {
+            o.prev = UNKNOWN_INDEX;
+        }
+
+        q.head = o.node_idx;
+        o.queue = q_idx;
+    };
+
+    void insert_ltsf_node_after( size_t nn, size_t p ) {
+        assert( nn != UNKNOWN_INDEX );
+
+        ltsf_node & nnode = m_nodes[nn];
+        nnode.prev = p;
+
+        if( p == UNKNOWN_INDEX ) {
+            // insert nn at root of ltsf queue
+            nnode.next = m_root;
+            m_root = nn;
+        } else {
+            ltsf_node & pnode = m_nodes[p];
+            nnode.next = pnode.next;
+            pnode.next = nn;
+        }
+        if( nnode.next != UNKNOWN_INDEX ) {
+            assert( m_nodes[nnode.next].prev == p );
+            m_nodes[nnode.next].prev = nn;
+        }
+    }
+
+    void remove_ltsf_node( size_t n_idx ) {
+        ltsf_node & n = m_nodes[n_idx];
+        if( n.next != UNKNOWN_INDEX ) {
+            m_nodes[n.next].prev = n.prev;
+        }
+
+        if( n.prev != UNKNOWN_INDEX) {
+            m_nodes[n.prev].next = n.next;
+        } else {
+            m_root = n.next;
+        }
+
+        n.prev = UNKNOWN_INDEX;
+        n.next = m_available;
+        m_available = n_idx;
+    }
+
+    std::vector< object_node > m_objects;
+    std::vector< ltsf_node > m_nodes;
+
+    size_t m_unset_object;
+    size_t m_root;
+    size_t m_available;
+};
+
 #endif  // LTSF_POOL_HPP_

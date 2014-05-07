@@ -2,7 +2,7 @@
 #define MATURITY_EVENT_H_
 
 #include "../clotho_event.h"
-#include "../pooler.hpp"
+#include "pooler.hpp"
 
 class MaturityEvent : public ClothoEvent {
 public:

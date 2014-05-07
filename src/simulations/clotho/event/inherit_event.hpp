@@ -2,7 +2,7 @@
 #define INHERIT_EVENT_HPP_
 
 #include "../clotho_event.h"
-#include "../pooler.hpp"
+#include "pooler.hpp"
 
 template < class GM >
 class InheritEvent : public ClothoEvent {

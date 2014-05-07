@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "gamete_base.h"
+#include "pooler.hpp"
 
 /*
  * A gamete is a logical unit of population genetic simulation
@@ -27,12 +28,22 @@ public:
 
     gamete( ) : gamete_base(0) {}
     gamete( gamete_source_t s, gamete_type_t t ) : gamete_base(s, t) {}
-    gamete( const gamete & z ) : gamete_base( z.m_id ), m_vars(z.m_vars)  {}
+    gamete( const gamete< VS > & z ) : gamete_base( z.m_id ), m_vars(z.m_vars)  {}
+
+    static gamete< VS > * getOrCreate() {
+        return gamete< VS >::m_pool->getOrCreate();
+    }
     
     virtual gamete<VS> * clone() const {
-        gamete<VS> * child = new gamete<VS>( *this );
-
+    //    gamete<VS> * child = new gamete<VS>( *this );
+        gamete< VS > * child = gamete< VS >::getOrCreate();
+        child->init( *this );
         return child;
+    }
+
+    void init( const gamete< VS > & z ) {
+        m_id = z.m_id;
+        m_vars = z.m_vars;
     }
 
     void addVariant( typename variant_set_t::key_type v ) {
@@ -53,7 +64,6 @@ public:
         for( typename variant_set_t::iterator it = m_vars.begin(); it != m_vars.end(); it++ ) {
             (*it)->decrementPenetrance();
         }
-
     }
 
     size_t size() const {
@@ -64,11 +74,20 @@ public:
         o << "{" << (int) m_id.id_component.source << ", " << (int) m_id.id_component.type << "}";
     }
 
+    void release() {
+        m_pool->release( this );
+    }
+
     virtual ~gamete() {
         m_vars.clear();
     }
 protected:
     variant_set_t   m_vars;
+
+    static shared_ptr< Pooler< gamete< VS > > > m_pool;
 };
+
+template < class VS >
+shared_ptr< Pooler< gamete< VS > > > gamete< VS >::m_pool( new Pooler< gamete<VS> >() );
 
 #endif  // GAMETE_HPP_

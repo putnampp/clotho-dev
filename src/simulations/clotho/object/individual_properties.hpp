@@ -76,7 +76,9 @@ public:
     void reset() {
         died();
         if(p0) {
-            delete p0;
+            //delete p0;
+            //p0 = NULL;
+            p0->release();
             p0 = NULL;
         }
     }
@@ -175,12 +177,16 @@ public:
     void reset() {
         died();
         if( p0 ) {
-            delete p0;
+        //    delete p0;
+        //    p0 = NULL;
+            p0->release();
             p0 = NULL;
         }
 
         if( p1 ) {
-            delete p1;
+            //delete p1;
+            //p1 = NULL;
+            p1->release();
             p1 = NULL;
         }
     }
