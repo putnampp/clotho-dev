@@ -64,7 +64,7 @@ public:
     virtual void process() {
         if( m_performer == NULL ) return;
 
-        const event_t * tmp = peekEvent( m_id );
+        /*const*/ event_t * tmp = peekEvent( m_id );
 
         // while there are concurrent events
         while( tmp != NULL && tmp->isReceivedAt( m_local_time ) ) {
@@ -85,7 +85,7 @@ public:
 
 //    virtual void perform_event( const event_t * e ) {}
 
-    virtual void sendEvent( const event_t * evt ) {
+    virtual void sendEvent( /*const*/ event_t * evt ) {
         if( compareID( evt->getReceiver() ) ) {
             receiveEvent( evt );
         } else {
@@ -93,7 +93,7 @@ public:
         }
     }
 
-    virtual void receiveEvent( const event_t * evt ) {
+    virtual void receiveEvent( /*const*/ event_t * evt ) {
         vtime_t t = evt->getReceived();
         if( insertEventAt( evt, t ) ) {
             m_router->notifyNextEvent(m_id, t );
@@ -117,11 +117,11 @@ public:
     }
 
     // event_manager interface
-    inline bool  insertEvent( const event_t * e) {
+    inline bool  insertEvent( /*const*/ event_t * e) {
         return m_evt_manager->insertEvent( e );
     }
 
-    bool insertEventAt( const event_t * e, const vtime_t & t ) {
+    bool insertEventAt( /*const*/ event_t * e, const vtime_t & t ) {
         return m_evt_manager->insertEventAt( e, t );
     }
 
@@ -133,11 +133,11 @@ public:
         m_evt_manager->reset_processed();
     }
 
-    inline const event_t * getEvent( const system_id & id) {
+    inline /*const*/ event_t * getEvent( const system_id & id) {
         return m_evt_manager->getEvent( id );
     }
 
-    inline const event_t * peekEvent( const system_id & id ) const {
+    inline /*const*/ event_t * peekEvent( const system_id & id ) const {
         return m_evt_manager->peekEvent( id );
     }
 

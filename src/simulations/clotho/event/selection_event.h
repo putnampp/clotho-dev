@@ -19,6 +19,8 @@ public:
     Sex getSex() const;
     system_id getOffspring() const;
 
+    void release() {}
+
     virtual ~SelectionEvent() {}
 
 protected:

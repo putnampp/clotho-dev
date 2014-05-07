@@ -14,7 +14,7 @@
 #include "../event/inherit_event.hpp"
 #include "../event/maturity_event.h"
 #include "../event/mate_select_event.h"
-#include "../event/mate_event2.h"
+#include "../event/mate_event.h"
 #include "../event/signal_mate_event.h"
 #include "../event/selection_event.h"
 #include "../event/environment_snapshot_event.h"

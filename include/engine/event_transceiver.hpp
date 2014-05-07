@@ -3,8 +3,8 @@
 
 template < class E >
 struct event_transceiver {
-    virtual void sendEvent( const E * ) = 0;
-    virtual void receiveEvent( const E * ) = 0;
+    virtual void sendEvent( /*const*/ E * ) = 0;
+    virtual void receiveEvent( /*const*/ E * ) = 0;
 
     virtual ~event_transceiver() {}
 };

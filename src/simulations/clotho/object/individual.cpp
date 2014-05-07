@@ -73,7 +73,8 @@ void Individual::handle_birth( const ClothoEvent * evt ) {
     //
     m_prop->setDOB( evt->getReceived() );
 
-    BirthEvent * be = new BirthEvent( getCurrentTime(), evt->getReceived(), this->getSystemID(), m_env_id, getNextEventID(), m_prop->getSex() );
+    BirthEvent * be = BirthEvent::getOrCreate();
+    be->init( getCurrentTime(), evt->getReceived(), this->getSystemID(), m_env_id, getNextEventID(), m_prop->getSex() );
     sendEvent( be );
 }
 
@@ -81,7 +82,8 @@ void Individual::handle_death( const ClothoEvent * evt ) {
     // notify environment of death
     m_prop->setEOL( evt->getReceived() );
 
-    DeathEvent * de = new DeathEvent( getCurrentTime(), evt->getReceived(), this->getSystemID(), m_env_id, getNextEventID());
+    DeathEvent * de = DeathEvent::getOrCreate();
+    de->init( getCurrentTime(), evt->getReceived(), this->getSystemID(), m_env_id, getNextEventID());
     sendEvent( de );
 }
 
@@ -98,7 +100,8 @@ void Individual::handle_inherit( const ClothoEvent * evt ) {
         event::vtime_t bday = evt->getReceived();
         bday = ((bday / LIFE_CYCLE_PADDING) + 1) * LIFE_CYCLE_PADDING;
 
-        BirthEvent * be = new BirthEvent( getCurrentTime(), bday, this->getSystemID(), this->getSystemID(), getNextEventID(), m_prop->getSex() );
+        BirthEvent * be = BirthEvent::getOrCreate();
+        be->init( getCurrentTime(), bday, this->getSystemID(), this->getSystemID(), getNextEventID(), m_prop->getSex() );
 //        handle_birth( evt );
         sendEvent( be );
     }
@@ -117,6 +120,7 @@ void Individual::handle_mate( const ClothoEvent * evt ) {
 
 void Individual::handle_maturity( const ClothoEvent * evt ) {
 //    MaturityEvent * me = new MaturityEvent( getCurrentTime(), getCurrentTime(), this->getSystemID(), m_env_id, getNextEventID(), m_prop->getSex());
-    MaturityEvent * me = new MaturityEvent( getCurrentTime(), getCurrentTime(), this->getSystemID(), m_env_id, getNextEventID(), this->getSystemID(), m_prop->getSex());
+    MaturityEvent * me = MaturityEvent::getOrCreate();
+    me->init( getCurrentTime(), getCurrentTime(), this->getSystemID(), m_env_id, getNextEventID(), this->getSystemID(), m_prop->getSex());
     sendEvent( me );
 }

@@ -17,10 +17,12 @@ public:
 
         system_id id = co->getSystemID();
 
-        ievent_t * ie = new ievent_t( ctime, ctime, id, id, co->getNextEventID(), new gamete_t(), 0 );
+        ievent_t * ie = ievent_t::getOrCreate();
+        ie->init( ctime, ctime, id, id, co->getNextEventID(), new gamete_t(), 0 );
         co->sendEvent( ie );
 
-        ie = new ievent_t( ctime, ctime, id, id, co->getNextEventID(), new gamete_t(), 1 );
+        ie = ievent_t::getOrCreate();
+        ie->init( ctime, ctime, id, id, co->getNextEventID(), new gamete_t(), 1 );
         co->sendEvent( ie );
     }
 

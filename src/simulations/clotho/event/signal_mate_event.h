@@ -21,6 +21,8 @@ public:
 
     system_id   getOffspring() const;
 
+    void release() {}
+
     virtual ~SignalMateEvent() {}
 protected:
     Sex             m_sex;

@@ -99,10 +99,12 @@ void DistributedEnvironment::handle_birth( const ClothoEvent * ce ) {
     const BirthEvent * be = static_cast< const BirthEvent * >( ce );
 
 //    MaturityEvent * me = new MaturityEvent( getCurrentTime(), getCurrentTime() + 1, getSystemID(), ce->getSender(), getNextEventID() , be->getSex() );
-    MaturityEvent * me = new MaturityEvent( getCurrentTime(), getCurrentTime() + 1, getSystemID(), getSystemID(), getNextEventID() , be->getSender(), be->getSex() );
+    MaturityEvent * me = MaturityEvent::getOrCreate();
+    me->init( getCurrentTime(), getCurrentTime() + 1, getSystemID(), getSystemID(), getNextEventID() , be->getSender(), be->getSex() );
     sendEvent( me );
 
-    DeathEvent * de = new DeathEvent( getCurrentTime(), getCurrentTime() + 3, getSystemID(), ce->getSender(), getNextEventID() );
+    DeathEvent * de = DeathEvent::getOrCreate();
+    de->init( getCurrentTime(), getCurrentTime() + 3, getSystemID(), ce->getSender(), getNextEventID() );
     sendEvent(de);
 
     m_pending.erase( be->getSender() );
@@ -128,7 +130,8 @@ void DistributedEnvironment::handle_maturity( const ClothoEvent * ce ) {
 
     system_id offspring_id = getIndividual();
 
-    MateEvent * me0 = new MateEvent( getCurrentTime(), getCurrentTime() + 1, getSystemID(), ce->getSender(), getNextEventID(), offspring_id );
+    MateEvent * me0 = MateEvent::getOrCreate();
+    me0->init( getCurrentTime(), getCurrentTime() + 1, getSystemID(), ce->getSender(), getNextEventID(), offspring_id );
     sendEvent( me0 );
 
     SelectionEvent * se = new SelectionEvent( getCurrentTime(), getCurrentTime(), getSystemID(), m_global_env, getNextEventID(), me->getSex(), offspring_id );
@@ -165,7 +168,8 @@ void DistributedEnvironment::handle_signal_mate( const ClothoEvent * ce ) {
         mate_id = m_males[ sme->getIndex() % m_males.size() ];
     }
 
-    MateEvent * me1 = new MateEvent( getCurrentTime(), getCurrentTime() + 1, getSystemID(), mate_id, getNextEventID(), sme->getOffspring() );
+    MateEvent * me1 = MateEvent::getOrCreate();
+    me1->init( getCurrentTime(), getCurrentTime() + 1, getSystemID(), mate_id, getNextEventID(), sme->getOffspring() );
     sendEvent( me1 );
 }
 

@@ -55,7 +55,7 @@ public:
     virtual void simulate( const vtime_t & until );
     virtual void finalize();
 
-    virtual void routeEvent( const event_t * evt );
+    virtual void routeEvent( /*const*/ event_t * evt );
     virtual void notifyNextEvent( const system_id & obj, const vtime_t & t );
 
     virtual ~CentralizedSimulationManager();
@@ -191,7 +191,7 @@ typename CentralizedSimulationManager<E, O>::object_t * CentralizedSimulationMan
 }
 
 template< class E, class O >
-void CentralizedSimulationManager<E, O>::routeEvent( const event_t * evt ) {
+void CentralizedSimulationManager<E, O>::routeEvent( /*const*/ event_t * evt ) {
     system_id::object_id_t id = evt->getReceiver().getObjectID();
 
     assert( id < m_objects.size() );
@@ -221,7 +221,7 @@ void CentralizedSimulationManager<E, O>::simulate( const vtime_t & until ) {
 //    m_pooled_objects.dump( std::cout );
     while( timestamp != SystemClock::POSITIVE_INFINITY && !setSimulationTime( timestamp ) ) {
         while( (obj = m_pooled_objects.getNextObject( timestamp ) ) != NULL ) {
-//            std::cout << "Processing concurrent events at " << timestamp << " for " << obj->getSystemID() << " (" << obj->getPoolIndex() << ")" << std::endl;
+        //    std::cout << "Processing concurrent events at " << timestamp << " for " << obj->getSystemID() << " (" << obj->getPoolIndex() << ")" << std::endl;
             obj->updateLocalTime(timestamp);
             obj->process();
 
@@ -233,7 +233,7 @@ void CentralizedSimulationManager<E, O>::simulate( const vtime_t & until ) {
         }
 
         timestamp = m_pooled_objects.peekNextTimestamp();
-//        m_pooled_objects.dump( std::cout );
+        //m_pooled_objects.dump( std::cout );
     }
 
     m_stats->stopPhase( SIMULATE_PHASE_K );

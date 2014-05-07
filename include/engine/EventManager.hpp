@@ -281,11 +281,11 @@ protected:
 };
 
 template < class E >
-class EventManager<E, ltsf_queue< typename E::vtime_t, const E > > : virtual public event_manager< E > {
+class EventManager<E, ltsf_queue< typename E::vtime_t, E > > : virtual public event_manager< E > {
 public:
     typedef typename event_manager< E >::event_t event_t;
     typedef typename event_manager< E >::vtime_t vtime_t;
-    typedef ltsf_queue< vtime_t , const E > event_set_t;
+    typedef ltsf_queue< vtime_t , /*const*/ E > event_set_t;
 
     EventManager() :
         m_events(),
@@ -294,20 +294,21 @@ public:
         m_nCanceled(0)
     {}
 
-    bool insertEvent( const event_t * e ) {
+    bool insertEvent( event_t * e ) {
         vtime_t t = e->getReceived();
         return insertEventAt( e, t ); 
     }
 
-    bool insertEventAt( const event_t * e, const vtime_t & t ) {
+    bool insertEventAt( event_t * e, const vtime_t & t ) {
         return m_events.enqueue( e, t );
     }
 
     void reset_pending() {
         while(!m_events.empty() ) {
-            const event_t * e = m_events.dequeue();
+            event_t * e = m_events.dequeue();
             if( e ) {
-                delete e;
+                //delete e;
+                e->release();
                 ++m_nCanceled;
             }
         }
@@ -315,21 +316,24 @@ public:
 
     void reset_processed() {
         while( !m_processed.empty() ) {
-            const event * t = m_processed.back();
+            event_t * t = m_processed.back();
             m_processed.pop_back();
-            if( t ) delete t;
+            if( t ) { 
+            //    delete t;
+                t->release();
+            }
             ++m_nProcessed;
         }
     }
 
-    const event_t * getEvent( const system_id & ) {
-        const event_t * t = m_events.dequeue();
+    event_t * getEvent( const system_id & ) {
+        event_t * t = m_events.dequeue();
         if( t != NULL )
             m_processed.push_back(t);
         return t;
     }
 
-    const event_t * peekEvent( const system_id & ) const {
+    event_t * peekEvent( const system_id & ) const {
         return m_events.peek();
     }
 
@@ -352,7 +356,7 @@ public:
 protected:
     event_set_t m_events;
 
-    std::deque< const event_t * > m_processed;
+    std::deque< event_t * > m_processed;
     size_t  m_nProcessed, m_nCanceled;
 };
 

@@ -13,12 +13,12 @@ class ClothoObject;
 
 //class ClothoObject : public SimulationObject< ClothoEvent, std::multiset< const ClothoEvent *, ltsf_event_order > > {
 class ClothoObject :
-    public SimulationObject< ClothoEvent, ltsf_queue< typename ClothoEvent::vtime_t, const ClothoEvent > >,
+    public SimulationObject< ClothoEvent, ltsf_queue< typename ClothoEvent::vtime_t, /*const*/ ClothoEvent > >,
     public active_poolable
 {
 public:
 //    typedef SimulationObject< ClothoEvent, std::multiset< const ClothoEvent * , ltsf_event_order > > base_object_t;
-    typedef SimulationObject< ClothoEvent, ltsf_queue< typename ClothoEvent::vtime_t, const ClothoEvent > > base_object_t;
+    typedef SimulationObject< ClothoEvent, ltsf_queue< typename ClothoEvent::vtime_t, /*const*/ ClothoEvent > > base_object_t;
     typedef SimulationManager< ClothoEvent, ClothoObject > simulation_manager_t;
 
 

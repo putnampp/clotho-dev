@@ -138,11 +138,13 @@ protected:
         ClothoObject * co = env->getClothoObject();
 
         if( env->getActiveIndividualCount() == 0 ) {
-            MateSelectEvent * mse = new MateSelectEvent( ctime, ctime + opt_default_life_cycle::MATE_OFFSET, env_id, env_id, co->getNextEventID() );
+            MateSelectEvent * mse = MateSelectEvent::getOrCreate();
+            mse->init( ctime, ctime + opt_default_life_cycle::MATE_OFFSET, env_id, env_id, co->getNextEventID() );
             co->sendEvent(mse);
         }
 
-        DeathEvent * de = new DeathEvent( ctime, ctime + opt_default_life_cycle::DEATH_OFFSET, env_id, sender, co->getNextEventID() );
+        DeathEvent * de = DeathEvent::getOrCreate();
+        de->init( ctime, ctime + opt_default_life_cycle::DEATH_OFFSET, env_id, sender, co->getNextEventID() );
         co->sendEvent(de);
 
         env->activateIndividual( sender );
@@ -173,8 +175,10 @@ protected:
             system_id p1 = env->getActiveIndividualAt( parents.second ).getClothoObject()->getSystemID();
             system_id child = env->getIndividualAt( offspring_idx ).getClothoObject()->getSystemID();
 
-            MateEvent * me0 = new MateEvent( ctime, ctime, id, p0, co->getNextEventID(), child );
-            MateEvent * me1 = new MateEvent( ctime, ctime, id, p1, co->getNextEventID(), child );
+            MateEvent * me0 = MateEvent::getOrCreate();
+            me0->init( ctime, ctime, id, p0, co->getNextEventID(), child );
+            MateEvent * me1 = MateEvent::getOrCreate();
+            me1->init( ctime, ctime, id, p1, co->getNextEventID(), child );
 
             co->sendEvent( me0 );
             co->sendEvent( me1 );
@@ -226,7 +230,8 @@ protected:
 
         ClothoObject * co = ind->getClothoObject();
 
-        BirthEvent * be = new BirthEvent( ctime, ctime, co, ind->m_env, co->getNextEventID() );
+        BirthEvent * be = BirthEvent::getOrCreate();
+        be->init( ctime, ctime, co, ind->m_env, co->getNextEventID() );
         co->sendEvent( be );
     }
 
@@ -252,7 +257,8 @@ protected:
         ClothoEvent::vtime_t ctime = evt->getReceived();
         ClothoObject * co = ind->getClothoObject();
 
-        ievent_t * ie = new ievent_t( ctime, ctime, co->getSystemID(), me->getOffspringID(), co->getNextEventID(), z );
+        ievent_t * ie = ievent_t::getOrCreate();
+        ie->init( ctime, ctime, co->getSystemID(), me->getOffspringID(), co->getNextEventID(), z );
         co->sendEvent( ie );
     }
 
@@ -275,7 +281,9 @@ protected:
             ind->getProperties()->setDOB(bday);
             ClothoObject * co = ind->getClothoObject();
 
-            BirthEvent * be = new BirthEvent( ctime, bday, co, ind->m_env, co->getNextEventID());
+            BirthEvent * be = BirthEvent::getOrCreate();
+            be->init( ctime, bday, co, ind->m_env, co->getNextEventID());
+
             co->sendEvent(be);
         }
     }
@@ -287,7 +295,8 @@ protected:
         ClothoEvent::vtime_t ctime = evt->getReceived();
         ClothoObject * co = ind->getClothoObject();
 
-        DeathEvent * de = new DeathEvent( ctime, ctime, co, ind->m_env, co->getNextEventID());
+        DeathEvent * de = DeathEvent::getOrCreate();
+        de->init( ctime, ctime, co, ind->m_env, co->getNextEventID());
         co->sendEvent( de );
     }
 };

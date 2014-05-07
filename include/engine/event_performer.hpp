@@ -3,7 +3,7 @@
 
 template < class E >
 struct event_performer {
-    virtual void perform_event( const E * ) = 0;
+    virtual void perform_event( /*const*/ E * ) = 0;
     virtual ~event_performer() {}
 };
 

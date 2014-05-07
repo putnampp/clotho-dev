@@ -502,7 +502,7 @@ protected:
     }
 
     object_t updateObject( object_node & onode, queue_node * nQ ) {
-        if( onode.queue == nQ ) onode.object;
+        if( onode.queue == nQ ) return onode.object;
 
         if( onode.queue != NULL ) {
             remove_object_from_queue( onode );

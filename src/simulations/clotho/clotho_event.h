@@ -41,10 +41,13 @@ public:
     }
 
     virtual event_type_t getEventType() const = 0;
-//    virtual void release_for_reuse() = 0;
+
+    virtual void release() = 0;
 
     virtual ~ClothoEvent() {}
 protected:
+    ClothoEvent() {}
+
     ClothoEvent(  const vtime_t & tSent, const vtime_t & tRecv,
                     const system_id & sender, const system_id & receiver,
                     event_id_t eid ) :
@@ -60,6 +63,24 @@ protected:
         ClothoEvent( tSent, tRecv, sender->getSystemID(), receiver->getSystemID(), eid )
     {}
 
+    void init(  const vtime_t & tSent, const vtime_t & tRecv,
+                const system_id & sender, const system_id & receiver,
+                event_id_t eid ) {
+        m_sent = tSent;
+        m_recv = tRecv;
+        m_sender = sender;
+        m_receiver = receiver;
+        m_eid = eid;
+    }
+
+    void init( const vtime_t & tSent, const vtime_t & tRecv,
+               const system_object * sender, const system_object * receiver, event_id_t eid ) {
+        m_sent = tSent;
+        m_recv = tRecv;
+        m_sender = sender->getSystemID();
+        m_receiver = receiver->getSystemID();
+        m_eid = eid;
+    }
     vtime_t       m_sent, m_recv;
     system_id     m_sender, m_receiver;
     event_id_t    m_eid;

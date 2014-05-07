@@ -124,10 +124,12 @@ protected:
 
         system_id env_id = ce->getReceiver();
 
-        MaturityEvent * me = new MaturityEvent( ctime, ctime + def_life_cycle::MATURITY_OFFSET, env_id, sender_id, co->getNextEventID(), sender_id );
+        MaturityEvent * me = MaturityEvent::getOrCreate();
+        me->init( ctime, ctime + def_life_cycle::MATURITY_OFFSET, env_id, sender_id, co->getNextEventID(), sender_id );
         co->sendEvent( me );
 
-        DeathEvent * de = new DeathEvent( ctime, ctime + def_life_cycle::DEATH_OFFSET, env_id, sender_id, co->getNextEventID() );
+        DeathEvent * de = DeathEvent::getOrCreate();
+        de->init( ctime, ctime + def_life_cycle::DEATH_OFFSET, env_id, sender_id, co->getNextEventID() );
         co->sendEvent(de);
     }
 
@@ -135,7 +137,8 @@ protected:
         ClothoEvent::vtime_t ctime = ce->getReceived();
         ClothoObject * co = env->getClothoObject();
 
-        MateSelectEvent * mse = new MateSelectEvent( ctime, ctime + def_life_cycle::MATE_OFFSET, co, co, co->getNextEventID() );
+        MateSelectEvent * mse = MateSelectEvent::getOrCreate();
+        mse->init( ctime, ctime + def_life_cycle::MATE_OFFSET, co, co, co->getNextEventID() );
         co->sendEvent( mse );
     }
 
@@ -159,11 +162,13 @@ protected:
 
         system_id env_id = co->getSystemID();
 
-        MateEvent * me0 = new MateEvent( ctime, ctime, env_id, p0->getSystemID(), co->getNextEventID(), o_id );
-        MateEvent * me1 = new MateEvent( ctime, ctime, env_id, p1->getSystemID(), co->getNextEventID(), o_id );
+        MateEvent * me0 = MateEvent::getOrCreate();
+        me0->init( ctime, ctime, env_id, p0->getSystemID(), co->getNextEventID(), o_id );
+
+        MateEvent * me1 = MateEvent::getOrCreate();
+        me1->init( ctime, ctime, env_id, p1->getSystemID(), co->getNextEventID(), o_id );
 
 //        std::cout << parents.first << " + " << parents.second << " = " << offspring_id << std::endl;
-
         co->sendEvent( me0 );
         co->sendEvent( me1 );
     }
@@ -208,7 +213,8 @@ protected:
 
         ClothoObject * co = ind->getClothoObject();
         
-        BirthEvent * be = new BirthEvent( ctime, ctime, co, ind->m_env, co->getNextEventID() );
+        BirthEvent * be = BirthEvent::getOrCreate();
+        be->init( ctime, ctime, co, ind->m_env, co->getNextEventID() );
         co->sendEvent( be );
     }
 
@@ -217,7 +223,9 @@ protected:
         ClothoEvent::vtime_t ctime = evt->getReceived();
         ClothoObject * co = ind->getClothoObject();
 
-        MaturityEvent * me = new MaturityEvent( ctime, ctime, co, ind->m_env, co->getNextEventID(), co->getSystemID() );
+        MaturityEvent * me = MaturityEvent::getOrCreate();
+        me->init( ctime, ctime, co, ind->m_env, co->getNextEventID(), co->getSystemID() );
+
         co->sendEvent( me );
     }
 
@@ -233,7 +241,8 @@ protected:
         ClothoEvent::vtime_t ctime = evt->getReceived();
         ClothoObject * co = ind->getClothoObject();
 
-        ievent_t * ie = new ievent_t( ctime, ctime, co->getSystemID(), me->getOffspringID(), co->getNextEventID(), z );
+        ievent_t * ie = ievent_t::getOrCreate();
+        ie->init( ctime, ctime, co->getSystemID(), me->getOffspringID(), co->getNextEventID(), z );
         co->sendEvent( ie );
     }
 
@@ -253,7 +262,11 @@ protected:
             ClothoEvent::vtime_t bday = def_life_cycle::nextGeneration( ctime );
 
             ClothoObject * co = ind->getClothoObject();
-            BirthEvent * be = new BirthEvent( ctime, bday, co, co, co->getNextEventID() );
+            system_id id = co->getSystemID();
+
+            BirthEvent * be = BirthEvent::getOrCreate();
+            be->init( ctime, bday, id, id, co->getNextEventID() );
+
             co->sendEvent( be );
         }
     }
@@ -265,7 +278,9 @@ protected:
         ClothoEvent::vtime_t ctime = evt->getReceived();
         ClothoObject * co = ind->getClothoObject();
 
-        DeathEvent * de = new DeathEvent( ctime, ctime, co, ind->m_env, co->getNextEventID());
+        DeathEvent * de = DeathEvent::getOrCreate();
+        de->init( ctime, ctime, co, ind->m_env, co->getNextEventID());
+
         co->sendEvent( de );
     }
 };

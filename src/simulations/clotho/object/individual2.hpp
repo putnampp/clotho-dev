@@ -68,7 +68,7 @@ public:
         initializer::IndividualInitializer::init( this );
     }
 
-    virtual void perform_event( const event_t * e) {
+    virtual void perform_event( /*const*/ event_t * e) {
         life_cycle::IndividualLifeCycle<LCM>::handle_event( this, e );
     }
 

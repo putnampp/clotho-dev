@@ -21,6 +21,8 @@ public:
 
     const EnvironmentSnapshot & getSnapshot() const;
 
+    void release() {}
+
     virtual ~EnvironmentSnapshotEvent() {}
 
 protected:
