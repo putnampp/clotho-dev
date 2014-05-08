@@ -12,7 +12,7 @@
 
 #include "event_functor.h"
 
-#include "ltsf_queue.hpp"
+#include "ltsf_queue.2.hpp"
 
 using std::list;
 using std::vector;
@@ -304,7 +304,7 @@ public:
     }
 
     void reset_pending() {
-        while(!m_events.empty() ) {
+        while(m_events.size() != 0 ) {
             event_t * e = m_events.dequeue();
             if( e ) {
                 //delete e;
@@ -356,7 +356,7 @@ public:
 protected:
     event_set_t m_events;
 
-    std::deque< event_t * > m_processed;
+    std::vector< event_t * > m_processed;
     size_t  m_nProcessed, m_nCanceled;
 };
 

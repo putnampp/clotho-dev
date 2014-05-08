@@ -16,16 +16,13 @@ public:
         _node( event_t * _e = NULL, size_t n = UNKNOWN_INDEX ) : e(_e), next(n) {}
     };
 
-    Pooler( size_t r = 10 ) :
+    Pooler( ) :
         m_unused( UNKNOWN_INDEX ),
         m_free_node( UNKNOWN_INDEX )    
-    {
-        m_nodes.reserve( r );
-    }
+    { }
 
     event_t * getOrCreate() {
         event_t * res = NULL;
-        //std::cout << "Attempting to create an event: " << E::TYPE_ID << std::endl;
         if( m_unused == UNKNOWN_INDEX ) {
             res = new event_t();
         } else {

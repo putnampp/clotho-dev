@@ -4,7 +4,8 @@
 template < class E >
 struct event_transceiver {
     virtual void sendEvent( /*const*/ E * ) = 0;
-    virtual void receiveEvent( /*const*/ E * ) = 0;
+    virtual bool receiveEvent( /*const*/ E * ) = 0;
+    virtual bool receiveEvent( E *, const typename E::vtime_t & ) = 0;
 
     virtual ~event_transceiver() {}
 };

@@ -87,18 +87,23 @@ public:
 
     virtual void sendEvent( /*const*/ event_t * evt ) {
         system_id id = evt->getReceiver();
-        if( compareID( id ) ) {
-            receiveEvent( evt );
-        } else {
+//        if( compareID( id ) ) {
+//            receiveEvent( evt );
+//        } else {
             m_router->routeEvent( id, evt );
-        }
+//        }
     }
 
-    virtual void receiveEvent( /*const*/ event_t * evt ) {
+    virtual bool receiveEvent( /*const*/ event_t * evt ) {
         vtime_t t = evt->getReceived();
-        if( insertEventAt( evt, t ) ) {
-            m_router->notifyNextEvent(m_id, t );
-        }
+//        if( insertEventAt( evt, t ) ) {
+//            m_router->notifyNextEvent(m_id, t );
+//        }
+        return receiveEvent(evt, t );
+    }
+
+    virtual bool receiveEvent( event_t * evt, const vtime_t & t ) {
+        return insertEventAt(evt, t );
     }
 
     virtual void updateLocalTime( const vtime_t & t ) {

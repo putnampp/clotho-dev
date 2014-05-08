@@ -5,7 +5,7 @@
 #include "engine/simulation_object.hpp"
 #include "engine/simulation_manager_impl.hpp"
 #include "clotho_event.h"
-#include "engine/ltsf_queue.hpp"
+#include "engine/ltsf_queue.2.hpp"
 
 //#include "active_poolable.h"
 

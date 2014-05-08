@@ -227,9 +227,11 @@ void CentralizedSimulationManager<E, O>::routeEvent( /*const*/ event_t * evt ) {
 template< class E, class O >
 void CentralizedSimulationManager<E, O>::routeEvent( const system_id & id, event_t * evt ) {
     system_id::object_id_t oid = id.getObjectID();
-
+    vtime_t t = evt->getReceived();
 //    assert( oid < m_objects.size() );
-    m_objects[ oid ].first->receiveEvent( evt );
+    if( m_objects[ oid ].first->receiveEvent( evt, t ) ) {
+        notifyNextEvent( id, t);
+    }
 }
 
 template< class E, class O >
