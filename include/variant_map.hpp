@@ -29,6 +29,8 @@ public:
     typedef std::unordered_map< key_t, size_t, std::hash< key_t >, equal_eps< key_t > > lookup_map_t;
     typedef std::vector< value_ptr_t >   value_list_t;
 
+    typedef typename value_list_t::const_iterator const_iterator;
+
     struct vt_comparator {
         bool operator()( const value_ptr_t l, const value_ptr_t r ) const {
             return (( l != r ) && ( *l < *r ));
@@ -102,11 +104,11 @@ public:
         return m_variants.size();
     }
 
-    typename value_list_t::const_iterator begin() const {
+    const_iterator begin() const {
         return m_variants.begin();
     }
 
-    typename value_list_t::const_iterator end() const {
+    const_iterator end() const {
         return m_variants.end();
     }
 

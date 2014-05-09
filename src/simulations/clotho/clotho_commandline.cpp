@@ -18,6 +18,10 @@ const string TCENSM_K = "threaded-centralized";
 
 const string DISTRIBUTED_ENV_K = "dist-env";
 const string FOUNDER_SIZE_K = "founder-size";
+const string MUTATION_RATE_K = "mu";
+const string RECOMBINATION_RATE_K = "rho";
+
+const string VARIANT_POOL_SIZE_K = "variant-pool-size";
 
 bool parse_commandline( int argc, char ** argv, po::variables_map & vm ) {
     po::options_description gen( "General" );
@@ -40,6 +44,9 @@ bool parse_commandline( int argc, char ** argv, po::variables_map & vm ) {
     ( GENERATIONS_K.c_str(), po::value<unsigned int>()->default_value(-1), "Simulate a number of generations.")
     ( DISTRIBUTED_ENV_K.c_str(), po::value< unsigned int >()->default_value( 1 ), "Number of environment partitions; Thread aware simulation managers will partition the environment into the max of the number of partitions and thread count" )
     ( FOUNDER_SIZE_K.c_str(), po::value< unsigned int >()->default_value(10000), "Founding population size" )
+    ( MUTATION_RATE_K.c_str(), po::value< double >()->default_value( 0.0001), "Mutation rate" )
+    ( RECOMBINATION_RATE_K.c_str(), po::value< double>()->default_value( 0.0001 ), "Recombination rate" )
+    ( VARIANT_POOL_SIZE_K.c_str(), po::value< unsigned int >()->default_value( -1 ), "Maximum variant pool size; Variable length gamete model will be used with infinite variants (-1), fixed length other wise")
     ;
 
     po::options_description cmdline;

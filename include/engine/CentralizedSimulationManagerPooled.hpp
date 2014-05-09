@@ -60,6 +60,7 @@ public:
 
     virtual void routeEvent( /*const*/ event_t * evt );
     virtual void routeEvent( const system_id & id, event_t * evt );
+    virtual void routeEvent( event_t * evt, const system_id & id, const vtime_t & t );
     virtual void notifyNextEvent( const system_id & obj, const vtime_t & t );
 
     virtual ~CentralizedSimulationManager();
@@ -217,22 +218,34 @@ typename CentralizedSimulationManager<E, O>::object_t * CentralizedSimulationMan
 
 template< class E, class O >
 void CentralizedSimulationManager<E, O>::routeEvent( /*const*/ event_t * evt ) {
-//    system_id::object_id_t id = evt->getReceiver().getObjectID();
-//
-//    assert( id < m_objects.size() );
-//    m_objects[ id ]->receiveEvent( evt );
-    routeEvent( evt->getReceiver(), evt );
+    routeEvent( evt, evt->getReceiver(), evt->getReceived() );
 }
 
 template< class E, class O >
 void CentralizedSimulationManager<E, O>::routeEvent( const system_id & id, event_t * evt ) {
     system_id::object_id_t oid = id.getObjectID();
     vtime_t t = evt->getReceived();
+
 //    assert( oid < m_objects.size() );
     if( m_objects[ oid ].first->receiveEvent( evt, t ) ) {
         notifyNextEvent( id, t);
     }
 }
+
+template < class E, class O >
+void CentralizedSimulationManager<E, O>::routeEvent( event_t * evt, const system_id & recv_id, const vtime_t & rt ) {
+    system_id::object_id_t oid = recv_id.getObjectID();
+
+//    if( m_objects[ oid ].first->receiveEvent( evt, t ) ) {
+//        notifyNextEvent( id, t);
+//    }
+    object_pool_pair_t & obj = m_objects[oid];
+    if( obj.first->receiveEvent(evt, rt ) ) {
+        m_pooled_objects.updateObject( obj.second, rt );
+    }
+    //m_objects[oid].first->receiveEvent(evt, rt );
+}
+
 
 template< class E, class O >
 void CentralizedSimulationManager<E, O>::notifyNextEvent( const system_id & obj, const vtime_t & t ) {

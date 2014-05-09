@@ -2,6 +2,7 @@
 #define VARIANT_BASE_H_
 
 #include "genetic_region.h"
+#include <ostream>
 
 enum variant_flags { NEUTRAL = 1 };
 
@@ -18,6 +19,8 @@ public:
 
     virtual void incrementPenetrance();
     virtual void decrementPenetrance();
+
+    virtual void print( std::ostream & out );
 
     virtual ~variant_base();
 

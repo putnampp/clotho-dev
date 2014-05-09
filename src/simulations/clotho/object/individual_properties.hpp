@@ -167,9 +167,9 @@ public:
 
     gamete_t * cloneGamete( unsigned char gamete_idx ) const {
         if( gamete_idx == 0 && p0 ) {
-            return p0->clone();
+            return p0->copy();
         } else if( gamete_idx == 1 && p1 ) {
-            return p1->clone();
+            return p1->copy();
         }
         return new gamete_t();
     }

@@ -26,12 +26,17 @@ class gamete : public gamete_base {
 public:
     typedef VS  variant_set_t;
 
-    gamete( ) : gamete_base(0) {}
-    gamete( gamete_source_t s, gamete_type_t t ) : gamete_base(s, t) {}
-    gamete( const gamete< VS > & z ) : gamete_base( z.m_id ), m_vars(z.m_vars)  {}
+    gamete( ) : gamete_base(0), m_active_count(1) {}
+    gamete( gamete_source_t s, gamete_type_t t ) : gamete_base(s, t), m_active_count(1) {}
+    gamete( const gamete< VS > & z ) : gamete_base( z.m_id ), m_vars(z.m_vars), m_active_count(z.m_active_count ) {}
 
     static gamete< VS > * getOrCreate() {
         return gamete< VS >::m_pool->getOrCreate();
+    }
+
+    virtual gamete<VS> * copy() {
+        ++m_active_count;
+        return this;
     }
     
     virtual gamete<VS> * clone() const {
@@ -44,6 +49,7 @@ public:
     void init( const gamete< VS > & z ) {
         m_id = z.m_id;
         m_vars = z.m_vars;
+        m_active_count = 1;
     }
 
     void addVariant( typename variant_set_t::key_type v ) {
@@ -75,7 +81,16 @@ public:
     }
 
     void release() {
-        m_pool->release( this );
+        if( --m_active_count == 0 )
+            m_pool->release( this );
+    }
+
+    void print( std::ostream & out ) {
+        out << "{";
+        for( typename variant_set_t::iterator it = m_vars.begin(); it != m_vars.end(); it++ ) {
+            (*it)->print(out);
+        }
+        out << "}\n";
     }
 
     virtual ~gamete() {
@@ -83,7 +98,7 @@ public:
     }
 protected:
     variant_set_t   m_vars;
-
+    size_t          m_active_count;
     static shared_ptr< Pooler< gamete< VS > > > m_pool;
 };
 

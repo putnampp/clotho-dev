@@ -3,6 +3,8 @@
 
 #include "reproduction.hpp"
 
+#include <iostream>
+
 #include "../clotho.h"
 #include "variant_map.hpp"
 
@@ -33,47 +35,52 @@ public:
         return m_variants;
     }
 
-    static void mutate( gamete_t * gm ) {
-        mutate( gm, m_mu, m_bFixed );
+    static gamete_t * mutate( gamete_t * gm ) {
+        return mutate( gm, m_mu, m_bFixed );
     }
 
-    static void mutate( gamete_t * gm, double mu, bool bFixed ) {
+    static gamete_t * mutate( gamete_t * gm, double mu, bool bFixed ) {
         if( !bFixed ) {
-            mutate_infinite(gm, mu);
+            return mutate_infinite(gm, mu);
         } else {
-            mutate_fixed(gm, mu);
+            return mutate_fixed(gm, mu);
         }
     }
 
 protected:
-    static void mutate_infinite( gamete_t * gm, double mu ) {
+    static gamete_t * mutate_infinite( gamete_t * gm, double mu ) {
         unsigned int nMut = m_rng->nextPoisson( mu );
-
-        //for( unsigned int i = 0; i < nMut; ++i ) {
-        while( nMut-- ) {
-            typename variant_map_t::value_ptr_t var = getNewVariant();
-            gm->addVariant( var );
+        gamete_t * res = gm;
+        if( nMut > 0) {
+            res = gm->clone();
+            gm->release();
+            do {
+                typename variant_map_t::value_ptr_t var = getNewVariant();
+                res->addVariant( var );
+            } while( --nMut );
         }
+        return res;
     }
 
-    static void mutate_fixed( gamete_t * g, double mu ) {
-
-        if( g->size() >= m_variants->size() ) return; // no sites available for novel mutation
+    static gamete_t * mutate_fixed( gamete_t * g, double mu ) {
+        if( g->size() >= m_variants->size() ) return g; // no sites available for novel mutation
 
         unsigned int nMut = m_rng->nextPoisson( mu );   // how many mutations should occur
+        gamete_t * res = g;
         if( nMut ) {
 
 //            if( 2 * g->size() <= m_variants->size() ) {
                 // if less than half of the fixed sites are mutated
-
+                res = g->clone();
+                g->release();
                 while( nMut-- ) {
                     unsigned int idx = m_rng->nextInt( m_variants->size() );
-                    while( (*g)[(*m_variants)[idx] ] ) {
+                    while( (*res)[(*m_variants)[idx] ] ) {
                         // random site already mutated. check another
                         idx = m_rng->nextInt( m_variants->size() );
                     }
 
-                    g->addVariant( (*m_variants)[idx] );   // site is unmutated. mutate it
+                    res->addVariant( (*m_variants)[idx] );   // site is unmutated. mutate it
                 }
 /*            } else {
                 // attempt to improve performance by reducing
@@ -106,6 +113,7 @@ protected:
                 }
             }*/
         }
+        return res;
     }
 
     static typename variant_map_t::value_ptr_t getNewVariant( ) {
@@ -159,6 +167,15 @@ template < class IP, class GM >
 GM * no_recomb< 2 >::recombine( IP * ind, GM * ) {
     return ind->cloneGamete( (m_rng->nextBool() ? 1 : 0) );
 }
+
+class basic_recomb : public RandomProcess {
+public:
+    template < class IP, class GM >
+    static GM * recombine( IP * ind, double r, GM * ) {
+        //GM * g = ind->cloneGamete( m_rng->nextInt( P ) );
+        //return g;
+    }
+};
 
 }   // namespace recombination
 }   // namespace models

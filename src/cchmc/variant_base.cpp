@@ -33,4 +33,12 @@ void variant_base::decrementPenetrance() {
     --m_penetrance;
 }
 
+void variant_base::print( std::ostream & out ) {
+    out << "[ " <<  m_key 
+        << ", " << m_coeff_selection 
+        << ", " << m_coeff_dominance
+        << ", " << m_penetrance
+        << "]\n";
+}
+
 variant_base::~variant_base() {}

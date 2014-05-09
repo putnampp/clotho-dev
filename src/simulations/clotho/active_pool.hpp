@@ -37,7 +37,7 @@ public:
         queue_node( ) : head(NULL), size(0) {}
     };
 
-    active_pool() : m_unset_object(NULL) {}
+    active_pool() : m_unset_object(NULL)  {}
 
     size_t getNextPoolIndex() {
         return UNKNOWN_INDEX;
@@ -341,11 +341,7 @@ public:
         queue_node( ) : head(UNKNOWN_INDEX), size(0) {}
     };
 
-    active_pool() {}
-
-    size_t getNextPoolIndex() {
-        return UNKNOWN_INDEX;
-    }
+    active_pool() : bIsLookupSorted(false) {}
 
     object_t getPoolObject( size_t pool_idx ) const {
         assert( pool_idx < m_objects.size() );
@@ -378,6 +374,7 @@ public:
 
         insert_object_to_queue( obj, &m_unset_object );
 
+        bIsLookupSorted = false;
         return true;
     }
 
@@ -392,6 +389,7 @@ public:
     }
 
     object_t activateObject( size_t pool_idx ) {
+        bIsLookupSorted = false;
         return updateObject( pool_idx, &m_active );
     }
 
@@ -400,6 +398,7 @@ public:
     }
 
     object_t inactiveObject( size_t pool_idx ) {
+        bIsLookupSorted = false;
         return updateObject( pool_idx, &m_inactive );
     }
 
@@ -430,14 +429,19 @@ public:
         }
     }
 
-    object_t getActiveObjectAt( size_t index ) const {
-        size_t idx = m_active.head;
+    object_t getActiveObjectAt( size_t index ) {
+        if( !bIsLookupSorted ) {
+            size_t idx = m_active.head;
 
-        while( idx != UNKNOWN_INDEX && index > 0) { idx = m_objects[idx].next; --index; }
+            vector< object_t >::iterator it = m_lookup.begin();
+            while( idx != UNKNOWN_INDEX ) {
+                (*it++) = m_objects[idx].object;
+                idx = m_objects[idx].next;
+            }
+            bIsLookupSorted = true;
+        }
 
-        assert( idx != UNKNOWN_INDEX && index == 0 );
-
-        return m_objects[idx].object;
+        return m_lookup[index];
     }
 
     unsigned int printQueue( std::ostream & o, size_t qobj ) {
@@ -472,6 +476,7 @@ public:
         size_t o = m_pending.head;
         remove_object_from_queue( o );
 
+        bIsLookupSorted = false;
         return updateObject(o, &m_active);
     }
 
@@ -522,6 +527,7 @@ protected:
             idx = m_unset_object.head;
             remove_object_from_queue( idx );
         } else {
+            m_lookup.push_back( 0 );
             idx = m_objects.size();
             m_objects.push_back( object_node( idx ) );
         }
@@ -575,9 +581,12 @@ protected:
         q->size++;
     };
 
+    std::vector< object_t >       m_lookup;
     std::vector< object_node > m_objects;
 
     queue_node m_unset_object;
     queue_node m_active, m_inactive, m_pending;
+
+    bool bIsLookupSorted;
 };
 #endif  // ACTIVE_POOL_HPP_

@@ -23,11 +23,11 @@ public:
     static std::pair< size_t, size_t > select( size_t nInd ) {
         std::pair< size_t, size_t > res;
 
-        size_t i0 = m_rng->nextInt( nInd );
-        size_t i1 = i0;
+        res.first = m_rng->nextInt( nInd );
+        res.second = res.first;
 
-        while( i1 == i0 ) {
-            i1 = m_rng->nextInt( nInd );
+        while( res.second  == res.first ) {
+            res.second = m_rng->nextInt( nInd );
         }
 
         return res;

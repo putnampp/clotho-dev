@@ -7,10 +7,12 @@
 struct event {
     typedef unsigned int            event_id_t;
     typedef SystemClock::vtime_t    vtime_t;
+    typedef system_id               receiver_t;
+    typedef system_id               sender_t;
 
     virtual const event_id_t &  getEventID()    const = 0;
-    virtual const system_id &   getSender()     const = 0;
-    virtual const system_id &   getReceiver()   const = 0;
+    virtual const sender_t &   getSender()     const = 0;
+    virtual const receiver_t &   getReceiver()   const = 0;
 
     virtual const vtime_t &  getSent()       const = 0;
     virtual const vtime_t &  getReceived()   const = 0;

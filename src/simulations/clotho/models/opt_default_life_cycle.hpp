@@ -139,13 +139,17 @@ protected:
 
         if( env->getActiveIndividualCount() == 0 ) {
             MateSelectEvent * mse = MateSelectEvent::getOrCreate();
-            mse->init( ctime, ctime + opt_default_life_cycle::MATE_OFFSET, env_id, env_id, co->getNextEventID() );
-            co->sendEvent(mse);
+            ClothoEvent::vtime_t mtime = ctime + opt_default_life_cycle::MATE_OFFSET;
+            mse->init( ctime, mtime, env_id, env_id, co->getNextEventID() );
+
+            co->sendEvent(mse, env_id, mtime);
         }
 
         DeathEvent * de = DeathEvent::getOrCreate();
-        de->init( ctime, ctime + opt_default_life_cycle::DEATH_OFFSET, env_id, sender, co->getNextEventID() );
-        co->sendEvent(de);
+        ClothoEvent::vtime_t dtime = ctime + opt_default_life_cycle::DEATH_OFFSET;
+
+        de->init( ctime, dtime, env_id, sender, co->getNextEventID() );
+        co->sendEvent(de, sender, dtime );
 
         env->activateIndividual( sender );
     }
@@ -259,8 +263,9 @@ protected:
         ClothoObject * co = ind->getClothoObject();
 
         ievent_t * ie = ievent_t::getOrCreate();
-        ie->init( ctime, ctime, co->getSystemID(), me->getOffspringID(), co->getNextEventID(), z );
-        co->sendEvent( ie );
+        system_id o_id = me->getOffspringID();
+        ie->init( ctime, ctime, co->getSystemID(), o_id, co->getNextEventID(), z );
+        co->sendEvent( ie, o_id, ctime );
     }
 
     template < typename IND >
@@ -285,7 +290,7 @@ protected:
             BirthEvent * be = BirthEvent::getOrCreate();
             be->init( ctime, bday, co, ind->m_env, co->getNextEventID());
 
-            co->sendEvent(be);
+            co->sendEvent(be, ind->m_env->getSystemID(), bday);
         }
     }
 
@@ -298,7 +303,7 @@ protected:
 
         DeathEvent * de = DeathEvent::getOrCreate();
         de->init( ctime, ctime, co, ind->m_env, co->getNextEventID());
-        co->sendEvent( de );
+        co->sendEvent( de, ind->m_env->getSystemID(), ctime );
     }
 };
 

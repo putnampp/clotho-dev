@@ -362,10 +362,6 @@ public:
         m_available( UNKNOWN_INDEX ) 
     {}
 
-    size_t getNextPoolIndex() {
-        return UNKNOWN_INDEX;
-    }
-
     object_t getPoolObject( size_t pool_idx ) {
         assert( pool_idx < m_objects.size() );
         return m_objects[ pool_idx ].object;

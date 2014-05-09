@@ -102,7 +102,7 @@ int main( int argc, char ** argv ) {
     unsigned int nGen = vm[ GENERATIONS_K ].as< unsigned int >();
 
     if( nGen != (unsigned int) -1 ) {
-        tUntil = LCM_t::convertGenerationsToVTime( nGen );
+        tUntil = LCM_t::convertGenerationsToVTime( nGen ) + 1;
     }
 
     cout << "Simulate until: " << tUntil << endl;
@@ -110,8 +110,26 @@ int main( int argc, char ** argv ) {
     shared_ptr< iRNG > rng( new GSL_RNG());
     cout << "RNG: " <<  rng->getType() << "; seed: " << rng->getSeed() << endl;
 
+    double mu = vm[ MUTATION_RATE_K].as<double>();
+    cout << "Mutation rate: " << mu << endl;
+
+    double rho = vm[ RECOMBINATION_RATE_K].as<double>();
+    cout << "Recombination rate: " << rho << endl;
+
+    unsigned int max_variants = vm[ VARIANT_POOL_SIZE_K ].as< unsigned int >();
+
+    bool bFixed =  max_variants != (unsigned int) -1;
+
     RandomProcess::initialize( rng );
-    mutation_model_t::initialize();
+    mutation_model_t::initialize(mu, bFixed);
+
+    if( bFixed ) {
+        cout << "Creating static variant pool of size " << max_variants << endl;
+        const double dMaxVariants = (double) max_variants;
+        for( double i = 0.0; i < dMaxVariants; i += 1.0 ) {
+            mutation_model_t::getVariantMap()->createVariant( i / dMaxVariants);
+        }
+    }
 
     shared_ptr< application > app;
     shared_ptr< SimulationStats > stats( new SimulationStats() );
@@ -156,6 +174,14 @@ int main( int argc, char ** argv ) {
 
     sim->simulate( tUntil );
 
+    unsigned int prevalent_mutations = 0;
+    for( variant_map_t::const_iterator it = mutation_model_t::getVariantMap()->begin(); it != mutation_model_t::getVariantMap()->end(); it++ ) {
+        (*it)->print( std::cout );
+        if( (*it)->getPenetrance() > 0 ) {
+            ++prevalent_mutations;
+        }
+    }
+
     sim->finalize();
     
     stats->stopPhase( RUNTIME_K );
@@ -163,6 +189,8 @@ int main( int argc, char ** argv ) {
     cout << *stats;
 
     cout << "Created " << mutation_model_t::getVariantMap()->size() << " variants" << std::endl;
+
+    std::cout << "Prevalent Mutations within population: " << prevalent_mutations << std::endl;
 
     delete sim;
 
