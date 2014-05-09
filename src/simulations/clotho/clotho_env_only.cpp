@@ -100,7 +100,8 @@ void EnvironmentInitializer::createPopulation( ENV_t * env, IND_t * ind ) {
     ClothoObject * co = env->m_clotho_object;
     ClothoEvent::vtime_t ctime = co->getCurrentTime();
 
-    BirthEvent * be = new BirthEvent( ctime, ctime, co, co, co->getNextEventID() );
+    BirthEvent * be = BirthEvent::getOrCreate();
+    be->init( ctime, ctime, co, co, co->getNextEventID() );
     co->sendEvent(be);
 }
 }   // namespace initializer

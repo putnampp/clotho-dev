@@ -46,7 +46,8 @@ public:
         {}
     };
 
-    ltsf_queue( ) : 
+    ltsf_queue( ) :
+        m_head(NULL),
         m_unset_object(UNKNOWN_INDEX), 
         m_root( UNKNOWN_INDEX ), 
         m_available( UNKNOWN_INDEX ),
@@ -68,21 +69,25 @@ public:
         updateObject( onode, t );
 
         ++m_nEnqueued;
+
+        m_head = m_objects[m_nodes[m_root].head].object;
         // return true when enqueued object is inserted
         // at the head of the queue
         return croot != m_root;
     }
 
     object_ptr peek() const {
-        if( m_root == UNKNOWN_INDEX ) return NULL;
+        //if( m_root == UNKNOWN_INDEX ) return NULL;
 
         // if the root node is defined then it must have a head object
         //
-        const ltsf_node & qnode =  m_nodes[m_root];
-        return m_objects[ qnode.head ].object;
+        //const ltsf_node & qnode =  m_nodes[m_root];
+        //return m_objects[ qnode.head ].object;
+        return m_head;
     }
 
     object_ptr dequeue( ) {
+        object_ptr res = m_head;
         if( m_root != UNKNOWN_INDEX ) {
             ltsf_node & rnode = m_nodes[ m_root ];
             size_t o_idx = rnode.head;
@@ -101,9 +106,14 @@ public:
 
             n.prev = UNKNOWN_INDEX;
             --m_nEnqueued;
-            return n.object;
+
+            if( m_root != UNKNOWN_INDEX ) {
+                m_head = m_objects[m_nodes[m_root].head].object;
+            } else {
+                m_head = NULL;
+            }
         }
-        return NULL;
+        return res;
     }
 
     void updateObject( size_t pool_idx, vtime_t t ) {
@@ -322,6 +332,7 @@ protected:
     std::vector< object_node > m_objects;
     std::vector< ltsf_node > m_nodes;
 
+    object_ptr m_head;
     size_t m_unset_object;      // object_node index
     size_t m_root, m_available; // ltsf_node index
     size_t m_nEnqueued;

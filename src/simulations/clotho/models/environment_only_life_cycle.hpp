@@ -84,7 +84,8 @@ protected:
         }
 
         ClothoObject * co = env->m_clotho_object;
-        MateSelectEvent * mse = new MateSelectEvent( ctime, ctime + environment_only_life_cycle::MATE_OFFSET, co, co, co->getNextEventID() );
+        MateSelectEvent * mse = MateSelectEvent::getOrCreate();
+        mse->init( ctime, ctime + environment_only_life_cycle::MATE_OFFSET, co, co, co->getNextEventID() );
         co->sendEvent(mse);
     }
 
@@ -114,9 +115,10 @@ protected:
         }
 
         ClothoEvent::vtime_t ctime = ce->getReceived();
-        ClothoObject * co = env->m_clotho_object;
+        ClothoObject * co = env->getClothoObject();
 
-        DeathEvent * de = new DeathEvent( ctime, ctime + environment_only_life_cycle::DEATH_OFFSET, co, co, co->getNextEventID() );
+        DeathEvent * de = DeathEvent::getOrCreate();
+        de->init( ctime, ctime + environment_only_life_cycle::DEATH_OFFSET, co, co, co->getNextEventID() );
         co->sendEvent(de);
     }
 
@@ -136,8 +138,9 @@ protected:
         ClothoEvent::vtime_t ctime = ce->getReceived();
         event::vtime_t bday = environment_only_life_cycle::nextGeneration( ctime );
 
-        ClothoObject * co = env->m_clotho_object;
-        BirthEvent * be = new BirthEvent(ctime, bday, co, co, co->getNextEventID() );
+        ClothoObject * co = env->getClothoObject();
+        BirthEvent * be = BirthEvent::getOrCreate();
+        be->init(ctime, bday, co, co, co->getNextEventID() );
         co->sendEvent( be );
     }
 };
