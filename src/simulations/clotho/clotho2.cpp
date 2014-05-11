@@ -102,7 +102,7 @@ int main( int argc, char ** argv ) {
     unsigned int nGen = vm[ GENERATIONS_K ].as< unsigned int >();
 
     if( nGen != (unsigned int) -1 ) {
-        tUntil = LCM_t::convertGenerationsToVTime( nGen ) + 1;
+        tUntil = LCM_t::convertGenerationsToVTime( nGen ) /* + 1*/;
     }
 
     cout << "Simulate until: " << tUntil << endl;
@@ -174,13 +174,13 @@ int main( int argc, char ** argv ) {
 
     sim->simulate( tUntil );
 
-    unsigned int prevalent_mutations = 0;
-    for( variant_map_t::const_iterator it = mutation_model_t::getVariantMap()->begin(); it != mutation_model_t::getVariantMap()->end(); it++ ) {
-        (*it)->print( std::cout );
-        if( (*it)->getPenetrance() > 0 ) {
-            ++prevalent_mutations;
-        }
-    }
+    //unsigned int prevalent_mutations = 0;
+    //for( variant_map_t::const_iterator it = mutation_model_t::getVariantMap()->begin(); it != mutation_model_t::getVariantMap()->end(); it++ ) {
+    //    (*it)->print( std::cout );
+    //    if( (*it)->getPenetrance() > 0 ) {
+    //        ++prevalent_mutations;
+    //    }
+    //}
 
     sim->finalize();
     
@@ -190,7 +190,7 @@ int main( int argc, char ** argv ) {
 
     cout << "Created " << mutation_model_t::getVariantMap()->size() << " variants" << std::endl;
 
-    std::cout << "Prevalent Mutations within population: " << prevalent_mutations << std::endl;
+    //std::cout << "Prevalent Mutations within population: " << prevalent_mutations << std::endl;
 
     delete sim;
 
