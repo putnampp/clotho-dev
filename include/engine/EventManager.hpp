@@ -289,7 +289,7 @@ public:
 
     EventManager() :
         m_events(),
-        m_processed(),
+//        m_processed(),
         m_nProcessed(0),
         m_nCanceled(0)
     {}
@@ -315,21 +315,23 @@ public:
     }
 
     void reset_processed() {
-        while( !m_processed.empty() ) {
-            event_t * t = m_processed.back();
-            m_processed.pop_back();
-            if( t ) { 
-            //    delete t;
-                t->release();
-            }
-            ++m_nProcessed;
-        }
+//        while( !m_processed.empty() ) {
+//            event_t * t = m_processed.back();
+//            m_processed.pop_back();
+//            if( t ) { 
+//            //    delete t;
+//               t->release();
+//            }
+//            ++m_nProcessed;
+//        }
     }
 
     event_t * getEvent( const system_id & ) {
         event_t * t = m_events.dequeue();
-        if( t != NULL )
-            m_processed.push_back(t);
+        if( t != NULL ) {
+        //    m_processed.push_back(t);
+            ++m_nProcessed;
+        }
         return t;
     }
 
@@ -342,7 +344,7 @@ public:
     }
 
     size_t processedEventCount( const system_id & ) const {
-        return m_nProcessed + m_processed.size();
+        return m_nProcessed /* + m_processed.size()*/;
     }
 
     size_t  canceledEventCount( const system_id & ) const {
@@ -351,12 +353,12 @@ public:
 
     virtual ~EventManager() {
         reset_pending();
-        reset_processed();
+        //reset_processed();
     }
 protected:
     event_set_t m_events;
 
-    std::vector< event_t * > m_processed;
+    //std::vector< event_t * > m_processed;
     size_t  m_nProcessed, m_nCanceled;
 };
 

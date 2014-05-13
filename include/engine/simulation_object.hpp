@@ -67,10 +67,11 @@ public:
 
             m_performer->perform_event( tmp );
 
+            tmp->release();
             tmp = peekEvent( m_id );
         }
 
-        reset_processed();
+//        reset_processed();
 
         if( tmp != NULL ) {
             vtime_t t = tmp->getReceived();

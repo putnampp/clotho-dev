@@ -1,26 +1,25 @@
-#ifndef LTSF_QUEUE_HPP_
-#define LTSF_QUEUE_HPP_
+#ifndef LTSF_POOL2_HPP_
+#define LTSF_POOL2_HPP_
 
-#include <type_traits>
 #include <vector>
 
-#include <iostream>
+template < class T, class OBJ, class E = void >
+class ltsf_pool;
 
-template< class T, class OBJ >
-class ltsf_queue {
+template < class T >
+class ltsf_pool< T, unsigned int, void> {
 public:
     typedef T   vtime_t;
-    typedef OBJ object_t;
-    typedef object_t * object_ptr;
+    typedef unsigned int object_t;
 
     static const size_t UNKNOWN_INDEX = -1;
 
     struct _node {
         union d {
             struct o {
-                object_ptr  object;
+                object_t  object;
                 size_t      queue;
-                o() : object(NULL), queue(UNKNOWN_INDEX) {}
+                o() : object((object_t)UNKNOWN_INDEX), queue(UNKNOWN_INDEX) {}
             } _object;
             struct {
                 vtime_t     timestamp;
@@ -28,112 +27,99 @@ public:
             } _ltsf;
 
             d( ) : _object() {}
-                
+
         } _data;
         size_t  next, prev;
         _node() :
             _data(),
             next( UNKNOWN_INDEX ),
-            prev( UNKNOWN_INDEX )
-        {}
+            prev( UNKNOWN_INDEX ) {
+        }
     };
 
-    ltsf_queue( ) :
-        m_head(NULL),
-//        m_available_node( UNKNOWN_INDEX ),
-        //m_unset_object(UNKNOWN_INDEX), 
-        m_root( UNKNOWN_INDEX ), 
-        //m_available( UNKNOWN_INDEX ),
-        m_nEnqueued(0)
-    { }
+    ltsf_pool() :
+        m_unset_node(UNKNOWN_INDEX),
+        m_root( UNKNOWN_INDEX )/*,
+        m_available( UNKNOWN_INDEX ) */
+    {}
 
-    object_ptr getPoolObject( size_t pool_idx ) {
+    object_t getPoolObject( size_t pool_idx ) {
         assert( pool_idx < m_nodes.size() );
         return m_nodes[ pool_idx ]._data._object.object;
     }
 
-    bool enqueue( object_ptr o, vtime_t t ) {
-        size_t o_idx = getObjectNode( o );
-
-        size_t croot = m_root;
-        updateObject( o_idx, t );
-
-        ++m_nEnqueued;
-
-        m_head = m_nodes[ m_nodes[ m_root ]._data._ltsf.head ]._data._object.object;
-        // return true when enqueued object is inserted
-        // at the head of the queue
-        return croot != m_root;
+    size_t setPoolObject( object_t p ) {
+        size_t idx = getObjectNode(p);
+        return idx;
     }
 
-    object_ptr peek() const {
-        //if( m_root == UNKNOWN_INDEX ) return NULL;
+    bool unsetPoolObject( size_t p_idx ) {
+        _node & obj = m_nodes[ p_idx ];
 
-        // if the root node is defined then it must have a head object
-        //
-        //const ltsf_node & qnode =  m_nodes[m_root];
-        //return m_objects[ qnode.head ].object;
-        return m_head;
+        obj._data._object.object = (object_t) UNKNOWN_INDEX;
+
+        if( obj._data._object.queue != UNKNOWN_INDEX ) {
+            remove_object_from_ltsf_queue( obj );
+        } else {
+            obj.prev = UNKNOWN_INDEX;
+        }
+
+        obj.next = m_unset_node;
+        m_unset_node = p_idx;
+
+        return true;
     }
 
-    object_ptr dequeue( ) {
-        object_ptr res = m_head;
-        if( res != NULL ) {
+    object_t getNextObject( vtime_t t ) {
+        if( m_root != UNKNOWN_INDEX ) {
+            _node & rnode = m_nodes[m_root];
+
+            if( rnode._data._ltsf.timestamp == t ) {
+                _node & n = m_nodes[rnode._data._ltsf.head];
+
+                rnode._data._ltsf.head = n.next;
+                if( n.next == UNKNOWN_INDEX ) {
+                    remove_ltsf_node( m_root );
+                }
+
+                n._data._object.queue = UNKNOWN_INDEX;
+                n.next = UNKNOWN_INDEX;
+                n.prev = UNKNOWN_INDEX;
+                return n._data._object.object;
+            }
+        }
+        return (object_t)UNKNOWN_INDEX;
+    }
+
+    vtime_t peekTime() const {
+        return m_active_timestamp;
+    }
+
+    object_t dequeue( const vtime_t & t ) {
+        if( m_active_timestamp != t ) {
             _node & rnode = m_nodes[ m_root ];
 
             size_t o_idx = rnode._data._ltsf.head;
-            _node & n = m_nodes[o_idx];
-
-//            std::cout   << rnode._data._ltsf.timestamp
-//                        << "," << m_root
-//                        << "," << rnode._data._ltsf.head
-//                        << "," << (long)rnode.next
-//                        << "," << (long)n.next
-//                        << "\n";
+            _node & n = m_nodes[ o_idx ];
 
             rnode._data._ltsf.head = n.next;
             if( n.next == UNKNOWN_INDEX ) {
                 remove_ltsf_node( m_root );
+                if( m_root != UNKNOWN_INDEX ) {
+                    m_active_timestamp = m_nodes[m_root]._data._ltsf.timestamp;
+                } else {
+                    m_active_timestamp = (vtime_t) -1;
+                }
             }
 
             n._data._object.queue = UNKNOWN_INDEX;
-
-            // add the node to the unused list
-            n.next = m_available_node;
-            m_available_node = o_idx;
-
+            n.next = UNKNOWN_INDEX;
             n.prev = UNKNOWN_INDEX;
-            --m_nEnqueued;
 
-            if( m_root != UNKNOWN_INDEX ) {
-                m_head = m_nodes[m_nodes[m_root]._data._ltsf.head]._data._object.object;
-            } else {
-                m_head = NULL;
-            }
+            return n._data._object.object;
         }
-        return res;
+        return (object_t)UNKNOWN_INDEX;
     }
-
-/*    object_ptr getNextObject( vtime_t t ) {
-        if( m_root != UNKNOWN_INDEX ) {
-            ltsf_node & rnode = m_nodes[m_root];
-
-            if( rnode.timestamp == t ) {
-                _object & n = m_objects[rnode.head];
-    
-                rnode.head = n.next;
-                if( rnode.head == UNKNOWN_INDEX ) {
-                    remove_ltsf_node( m_root );
-                }
-
-                n.queue = UNKNOWN_INDEX;
-                n.next = UNKNOWN_INDEX;
-                n.prev = UNKNOWN_INDEX;
-                return n.object;
-            }
-        }
-        return NULL;
-    }*/
 
     void dump( std::ostream & o ) {
         size_t tmp_idx = m_root;
@@ -162,21 +148,7 @@ public:
     }
 
     vtime_t peekNextTimestamp() const {
-//        return ((m_root != UNKNOWN_INDEX) ? m_nodes[m_root].timestamp : -1);
-        return ((m_root != UNKNOWN_INDEX ) ? m_nodes[m_root]._data._ltsf.timestamp : -1 );
-    }
-
-//    size_t getLTSFNodeCount() const {
-//        return m_nodes.size();
-//    }
-
-    size_t size() const {
-        return m_nEnqueued;
-    }
-
-    virtual ~ltsf_queue() {
-//        m_objects.clear();
-//        m_nodes.clear();
+        return ((m_root != UNKNOWN_INDEX) ? m_nodes[m_root]._data._ltsf.timestamp : -1);
     }
 
     void updateObject( size_t o_idx, vtime_t t ) {
@@ -191,7 +163,8 @@ public:
         }
 
         size_t p = UNKNOWN_INDEX;
-        q = m_root;
+        size_t croot = m_root;
+        q = croot;
 
         while( q != UNKNOWN_INDEX ) {
             _node & qnode = m_nodes[q];
@@ -212,7 +185,7 @@ public:
                 break;
             }
         }
-        
+
         if( q == UNKNOWN_INDEX ) {
             // there are currently no queues
             q = getLTSFNode( t );
@@ -223,49 +196,21 @@ public:
         insert_object_to_ltsf_node( o_idx, q );
 
         assert( m_nodes[q]._data._ltsf.head == o_idx );
+        if( croot != m_root ) {
+            // root changed as a result of this update
+            m_active_timestamp = m_nodes[ m_root ]._data._ltsf.timestamp;
+        }
     }
 
+    virtual ~ltsf_pool() {
+        m_nodes.clear();
+    }
 protected:
-
-    size_t findLTSFNode( vtime_t t ) {
-        size_t p = UNKNOWN_INDEX;
-        q = m_root;
-
-        while( q != UNKNOWN_INDEX ) {
-            _node & qnode = m_nodes[q];
-            vtime_t ts = qnode._data._ltsf.timestamp;
-
-            if( ts < t ) {
-                p = q;
-                q = qnode.next;
-            } else if( ts == t ) {
-                break;
-            } else {
-                // ltsf pool does not have node for
-                // current timestamp t, but
-                // it should be inserted after the
-                // current p
-                //
-                q = UNKNOWN_INDEX;
-                break;
-            }
-        }
-        
-        if( q == UNKNOWN_INDEX ) {
-            // there are currently no queues
-            q = getLTSFNode( t );
-
-            insert_ltsf_node_after(q, p);
-        }
-
-        return q;
-    }
-
-    size_t getNode( ) {
+    size_t getNode() {
         size_t n = UNKNOWN_INDEX;
-        if( m_available_node != UNKNOWN_INDEX ) {
-            n = m_available_node;
-            m_available_node = m_nodes[ m_available_node ].next;
+        if( m_unset_node != UNKNOWN_INDEX ) {
+            n = m_unset_node;
+            m_unset_node = m_nodes[m_unset_node].next;
         } else {
             n = m_nodes.size();
             m_nodes.push_back( _node( ));
@@ -273,7 +218,7 @@ protected:
         return n;
     }
 
-    size_t getObjectNode( object_ptr o ) {
+    size_t getObjectNode( object_t o ) {
         size_t n = getNode();
         _node & tmp = m_nodes[n];
         tmp._data._object.object = o;
@@ -304,17 +249,17 @@ protected:
             m_nodes[obj._data._object.queue]._data._ltsf.head = obj.next;
         }
 
+        obj._data._object.queue = UNKNOWN_INDEX;
         obj.next = UNKNOWN_INDEX;
         obj.prev = UNKNOWN_INDEX;
     }
 
     void insert_object_to_ltsf_node( size_t o_idx, size_t q_idx ) {
-        _node & o = m_nodes[ o_idx ];
+        _node & o = m_nodes[o_idx];
         _node & q = m_nodes[q_idx];
         o.next = q._data._ltsf.head;
 
-        //if( q.head != UNKNOWN_INDEX  ) {
-        if( o.next != UNKNOWN_INDEX ) {
+        if( o.next != UNKNOWN_INDEX  ) {
             _node & q_head = m_nodes[o.next];
             o.prev = q_head.prev;
             q_head.prev = o_idx;
@@ -360,22 +305,15 @@ protected:
         }
 
         n.prev = UNKNOWN_INDEX;
-        n.next = m_available_node;
-        m_available_node = n_idx;
+        n.next = m_unset_node;
+        m_unset_node = n_idx;
     }
 
-    object_ptr m_head;
-    size_t m_root; 
-    size_t m_nEnqueued;
+    std::vector< _node > m_nodes;
 
-    static std::vector< _node > m_nodes;
-    static size_t m_available_node;
+    vtime_t m_active_timestamp;
+    size_t m_unset_node;
+    size_t m_root;
 };
 
-template< class T, class OBJ >
-std::vector< typename ltsf_queue<T,OBJ>::_node > ltsf_queue<T,OBJ>::m_nodes;
-
-template< class T, class OBJ >
-size_t ltsf_queue<T,OBJ>::m_available_node = ltsf_queue<T,OBJ>::UNKNOWN_INDEX;
-
-#endif  // LTSF_QUEUE_HPP_
+#endif  // LTSF_POOL2_HPP_

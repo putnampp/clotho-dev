@@ -185,8 +185,8 @@ protected:
             MateEvent * me1 = MateEvent::getOrCreate();
             me1->init( ctime, ctime, id, p1, co->getNextEventID(), child );
 
-            co->sendEvent( me0 );
-            co->sendEvent( me1 );
+            co->sendEvent( me0, p0, ctime );
+            co->sendEvent( me1, p1, ctime );
         }
     }
 
@@ -237,7 +237,7 @@ protected:
 
         BirthEvent * be = BirthEvent::getOrCreate();
         be->init( ctime, ctime, co, ind->m_env, co->getNextEventID() );
-        co->sendEvent( be );
+        co->sendEvent( be, ind->m_env->getSystemID(), ctime );
     }
 
     template < typename IND >
@@ -246,7 +246,7 @@ protected:
         ClothoObject * co = ind->getClothoObject();
 
         MaturityEvent * me = new MaturityEvent( ctime, ctime, co, ind->m_env, co->getNextEventID(), co->getSystemID() );
-        co->sendEvent( me );
+        co->sendEvent( me, ind->m_env->getSystemID(), ctime );
     }
 
     template < typename IND >

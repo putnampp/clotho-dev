@@ -10,7 +10,7 @@
 #include <map>
 #include <deque>
 
-#include "ltsf_pool.hpp"
+#include "ltsf_pool.2.hpp"
 
 using std::deque;
 using std::map;

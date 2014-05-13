@@ -435,8 +435,9 @@ public:
 
             vector< object_t >::iterator it = m_lookup.begin();
             while( idx != UNKNOWN_INDEX ) {
-                (*it++) = m_objects[idx].object;
-                idx = m_objects[idx].next;
+                object_node & onode = m_objects[idx];
+                (*it++) = onode.object;
+                idx = onode.next;
             }
             bIsLookupSorted = true;
         }
