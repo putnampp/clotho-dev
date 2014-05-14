@@ -53,10 +53,16 @@ public:
     }
 
     bool enqueue( object_ptr o, vtime_t t ) {
+        size_t croot = m_root;
+
+        size_t q_idx = findLTSFNode( t );
         size_t o_idx = getObjectNode( o );
 
-        size_t croot = m_root;
-        updateObject( o_idx, t );
+        //updateObject( o_idx, t );
+
+        insert_object_to_ltsf_node( o_idx, q_idx );
+
+        assert( m_nodes[q_idx]._data._ltsf.head == o_idx );
 
         ++m_nEnqueued;
 
@@ -84,12 +90,12 @@ public:
             size_t o_idx = rnode._data._ltsf.head;
             _node & n = m_nodes[o_idx];
 
-//            std::cout   << rnode._data._ltsf.timestamp
-//                        << "," << m_root
-//                        << "," << rnode._data._ltsf.head
-//                        << "," << (long)rnode.next
-//                        << "," << (long)n.next
-//                        << "\n";
+            std::cout   << rnode._data._ltsf.timestamp
+                        << "," << m_root
+                        << "," << rnode._data._ltsf.head
+                        << "," << (long)rnode.next
+                        << "," << (long)n.next
+                        << "\n";
 
             rnode._data._ltsf.head = n.next;
             if( n.next == UNKNOWN_INDEX ) {
@@ -190,7 +196,7 @@ public:
             assert( obj._data._object.queue == UNKNOWN_INDEX );
         }
 
-        size_t p = UNKNOWN_INDEX;
+/*        size_t p = UNKNOWN_INDEX;
         q = m_root;
 
         while( q != UNKNOWN_INDEX ) {
@@ -218,7 +224,7 @@ public:
             q = getLTSFNode( t );
 
             insert_ltsf_node_after(q, p);
-        }
+        }*/
 
         insert_object_to_ltsf_node( o_idx, q );
 
@@ -229,7 +235,7 @@ protected:
 
     size_t findLTSFNode( vtime_t t ) {
         size_t p = UNKNOWN_INDEX;
-        q = m_root;
+        size_t q = m_root;
 
         while( q != UNKNOWN_INDEX ) {
             _node & qnode = m_nodes[q];
