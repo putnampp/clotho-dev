@@ -3,8 +3,17 @@
 
 #include "memory_page.h"
 
+#include "event_page_walker.hpp"
+
 #include <ostream>
 
+// PAGE_SIZE == 4096
+// HEADER_SIZE == 24 ( next pointer + free_start pointer + free_end pointer)
+// BLOCK_SIZE = PAGE_SIZE - HEADER_SIZE
+//
+// E[ events/object ] = 251 => Max 1 object/page;
+// ...
+// E[ event/object ] = 1 => Max 126 object/page;
 template < class EVT, class OBJ >
 class EventPage {
 public:
@@ -13,17 +22,16 @@ public:
 
     struct event_node {
         event_t *   p_event;
-//        offset_t    next;
         event_node * next;
     };
 
     struct object_node {
         object_t object_id;
-//        offset_t event_offset;
         event_node * enode;
     };
 
-    typedef std::pair< object_node *, event_node * > next_event_t;
+    typedef EventPageWalker<  EventPage< EVT, OBJ > > iterator;
+    friend iterator;
 
     EventPage() {}
 
@@ -76,6 +84,14 @@ public:
         return res;
     }
 
+    iterator begin() {
+        if( head_object() == end_object() ) return iterator( NULL );
+        return iterator( this );
+    }
+    iterator end() {
+        return iterator(NULL);
+    }
+
     void reset() {
         m_page.clear();
     }
@@ -84,48 +100,59 @@ public:
         out << "Object Node Size: " << sizeof(object_node) << "\n";
         out << "Event Node Size: " << sizeof(event_node) << "\n";
 
-        if( m_page.header.free_start != m_page.block ) {
-            object_node * onode = reinterpret_cast< object_node * >( m_page.block );
-            void * stop = m_page.header.free_start;
-            do {
-                out << onode->object_id << ":\n";
-
-                if( onode->enode != NULL ) {
-                    event_node * enode = onode->enode;
-                    do {
-                        out << ((unsigned long) enode) << ":" << *(enode->p_event) << ",";
-                        enode = enode->next;
-                    } while( enode != NULL );
+        iterator s = begin();
+        iterator e = end();
+        if( s != e ) {
+            do { 
+                if( s.HasObjectChanged() ) {
                     out << "\n";
-                } else {
-                    out << "Has no events\n";
+                    out << s.getObjectID();
+                    out << "\n";
                 }
-                onode++;
-            } while( onode < stop );
+                out << (s.getEvent()) << ",";
+            } while( ++s != e );
+            out << "\n";
         } else {
-            out << "Page is empty\n";
+            out << "Empty Event Page\n";
         }
     }
 
+    virtual ~EventPage() { }
+
 protected:
+
+    // returns NULL if object does not exist in object list
     object_node * findObject( const object_t & object_id ) {
-        if( m_page.header.free_start != m_page.block ) {
-            object_node * obj = reinterpret_cast< object_node *>(m_page.block);
+        object_node * obj = head_object();
+        if( obj != end_object() ) {
             object_node * stop = reinterpret_cast< object_node *>( m_page.header.free_start);
             do {
                 if( obj->object_id == object_id ) {
                     // consider swapping obj with start of the object node list
-                    return obj;
+                    // alternatively, splay tree of objects may be advantageous
+                    // if events/object is small (E[ X < 7 ] => >32 object/page )
+                    // assuming sequential event generation per object
+                    //return obj;
+                    break;
                 }
-                obj++;
-            } while( obj < stop );
-
+            } while( ++obj < stop );
+            if( obj >= stop ) {
+                obj = NULL;
+            }
+        } else {
+            obj = NULL;
         }
-        return NULL;
+        return obj;
+    }
+
+    object_node * head_object( ) {
+        return reinterpret_cast< object_node * >( m_page.block );
+    }
+
+    object_node * end_object() {
+        return reinterpret_cast< object_node * >( m_page.header.free_start );
     }
 
     memory_page m_page;
-
-    std::pair< object_node *, event_node * > m_cur_pair;
 };
 #endif  // EVENT_PAGE_HPP_
