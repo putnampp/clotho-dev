@@ -5,8 +5,6 @@
 
 #include <ostream>
 
-// BLOCK_SIZE == 4084 (4096-12) => Max unique objects == 127 / page
-
 template < class EVT, class OBJ >
 class EventPage {
 public:
@@ -14,34 +12,35 @@ public:
     typedef OBJ object_t;
 
     struct event_node {
-        event_t *       p_event;
-        event_node *    next;
-        event_node( event_t * e = NULL, event_node * n = NULL ) : p_event(e), next(n) {}
+        event_t *   p_event;
+//        offset_t    next;
+        event_node * next;
     };
 
     struct object_node {
-        object_t        object_id;
-        event_node *    enode;
+        object_t object_id;
+//        offset_t event_offset;
+        event_node * enode;
     };
 
     typedef std::pair< object_node *, event_node * > next_event_t;
 
     EventPage() {}
 
-    unsigned short getFreeSpace() const {
+    size_t getFreeSpace() const {
         return (m_page.header.free_end - m_page.header.free_start);
     }
 
     bool isFull() const {
-        static const offset_t buffer_zone_size = sizeof(object_node) + sizeof( event_node );
+        static const size_t buffer_zone_size = sizeof(object_node) + sizeof( event_node );
         return getFreeSpace() < buffer_zone_size;
     }
 
-    bool addEvent( const event_t * e, const object_t & object_id ) {
-        offset_t n_free_start = m_page.header.free_start;
-        offset_t n_free_end = m_page.header.free_end - sizeof( event_node );
+    bool addEvent( event_t * e, const object_t & object_id ) {
+        if( isFull() ) return false;  // page full
 
-        if( n_free_start >= n_free_end ) return false;  // page full
+        char * n_free_start = m_page.header.free_start;
+        char * n_free_end = m_page.header.free_end - sizeof( event_node );
 
         object_node * obj = findObject( object_id );
 
@@ -54,22 +53,21 @@ public:
         if( res ) {
             // sufficient space to add event to page
             
-            event_node * nevt = reinterpret_cast< event_node * >(&m_page.block[ n_free_end ]);
+            event_node * nevt = reinterpret_cast< event_node * >(n_free_end);
             nevt->p_event = e;
 
             if( obj == NULL ) {
-                obj = reinterpret_cast< object_node * >(&m_page.block[m_page.header.free_start]);
+                obj = reinterpret_cast< object_node * >(m_page.header.free_start);
 
                 obj->object_id = object_id;
-                m_page.header.free_start = n_free_start;
 
-                nevt->next = BLOCK_SIZE;
+                nevt->next = NULL;
             } else {
                 // object already exists
                 //
-                nevt->next = obj->event_offset;
+                nevt->next = obj->enode;
             }
-            obj->event_offset = n_free_end;
+            obj->enode = nevt;
             
             m_page.header.free_start = n_free_start;
             m_page.header.free_end = n_free_end;
@@ -79,24 +77,48 @@ public:
     }
 
     void reset() {
-        m_page.header.free_start = 0;
-        m_page.header.free_end = BLOCK_SIZE;
+        m_page.clear();
     }
 
-    void dump( std::ostream & out ) {}
+    void dump( std::ostream & out ) {
+        out << "Object Node Size: " << sizeof(object_node) << "\n";
+        out << "Event Node Size: " << sizeof(event_node) << "\n";
+
+        if( m_page.header.free_start != m_page.block ) {
+            object_node * onode = reinterpret_cast< object_node * >( m_page.block );
+            void * stop = m_page.header.free_start;
+            do {
+                out << onode->object_id << ":\n";
+
+                if( onode->enode != NULL ) {
+                    event_node * enode = onode->enode;
+                    do {
+                        out << ((unsigned long) enode) << ":" << *(enode->p_event) << ",";
+                        enode = enode->next;
+                    } while( enode != NULL );
+                    out << "\n";
+                } else {
+                    out << "Has no events\n";
+                }
+                onode++;
+            } while( onode < stop );
+        } else {
+            out << "Page is empty\n";
+        }
+    }
 
 protected:
     object_node * findObject( const object_t & object_id ) {
-        if( m_page.header.free_start != 0 ) {
-            object_node * fstart = reinterpret_cast< object_node *>( &m_page.block[m_page.header.free_start]);
+        if( m_page.header.free_start != m_page.block ) {
             object_node * obj = reinterpret_cast< object_node *>(m_page.block);
+            object_node * stop = reinterpret_cast< object_node *>( m_page.header.free_start);
             do {
                 if( obj->object_id == object_id ) {
                     // consider swapping obj with start of the object node list
                     return obj;
                 }
                 obj++;
-            } while( obj < fstart );
+            } while( obj < stop );
 
         }
         return NULL;
