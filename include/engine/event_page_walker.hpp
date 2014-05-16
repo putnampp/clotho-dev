@@ -23,7 +23,7 @@ public:
         m_page(page),
         m_obj( ((page != NULL) ? page->head_object() : NULL ) ),
         m_stop_obj( ((page != NULL) ? page->end_object() : NULL ) ),
-        m_en( ((m_obj != NULL )? m_obj->enode : NULL )),
+        m_en( ((m_obj != NULL )? m_obj->head : NULL )),
         m_bObjectChange(m_obj != m_stop_obj)
     { }
 
@@ -39,13 +39,13 @@ public:
         if( m_page != NULL ) {
             if( m_en->next == NULL ) {  // transition to next object with an event
                 do {
-                    if( ++m_obj > m_stop_obj ) {
+                    if( ++m_obj >= m_stop_obj ) {
                         m_en = NULL;
                         m_page = NULL;
                         m_obj = NULL;
                         break;
                     }
-                    m_en = m_obj->enode;
+                    m_en = m_obj->head;
                 } while( m_en == NULL );
                 m_bObjectChange = true;
             } else {
