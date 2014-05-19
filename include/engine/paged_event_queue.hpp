@@ -47,19 +47,20 @@ public:
     }
 
     event_t * peek() {
-        if( !updateReadFrame() ) {
+        if( !updateReadPage() ) {
             return NULL;
         }
         
         return m_next_evt;
     }
 
-    event_t * next() {
-        if( !updateReadFrame() ) {
+    event_t * next( ) {
+        if( !updateReadPage() ) {
             return NULL;
         }
         
         event_t * tmp = m_next_evt;
+
         ++m_read_it;
         --m_nSize;
 
@@ -94,7 +95,7 @@ public:
         m_read = NULL;
     }
 protected:
-    bool updateReadFrame() {
+    bool updateReadPage() {
         assert( m_read != NULL );
         if( m_read_it == m_read->end() ) {
             if( m_read->getNextPage() == m_tail && m_tail->isEmpty() ) return false;

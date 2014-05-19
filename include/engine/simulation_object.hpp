@@ -79,6 +79,10 @@ public:
         }
     }
 
+    event_performer_t * getEventPerformer() {
+        return m_performer;
+    }
+
     virtual void sendEvent( /*const*/ event_t * evt ) {
         m_router->routeEvent( evt );
     }

@@ -4,7 +4,8 @@
 //#include "SequentialSimulationManager.hpp"
 //#include "CentralizedSimulationManager.hpp"
 //#include "CentralizedSimulationManager2.hpp"
-#include "CentralizedSimulationManagerPooled.hpp"
+//#include "CentralizedSimulationManagerPooled.hpp"
+#include "CentralizedSimulationManagerPaged.hpp"
 //#include "ThreadedCentralizedSimulationManager.hpp"
 
 #include "simulation_stats.h"
