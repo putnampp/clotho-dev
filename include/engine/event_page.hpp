@@ -33,25 +33,46 @@ public:
         event_node * head, * tail;
     };
 
+    struct event_page_header : public memory_page_header {
+        EventPage< EVT, OBJ > * next;
+        size_t      m_nObjects;
+        size_t      m_nEvents;
+
+        event_page_header( EventPage<EVT,OBJ> * n = NULL,  char * s = NULL, char * e = NULL ) : 
+            memory_page_header(s, e),
+            next(n),
+            m_nObjects(0),
+            m_nEvents(0)
+        {}
+    };
+
+    enum { BLOCK_SIZE = PAGE_SIZE - sizeof( event_page_header ) - sizeof( void * ) };   // additional pointer for template overhead
+
     typedef EventPageWalker<  EventPage< EVT, OBJ > > iterator;
     friend iterator;
 
-    EventPage() : m_nObjects(0), m_nEvents(0) {}
+    EventPage( EventPage< EVT, OBJ > * n = NULL ) : m_header( n, block, block + BLOCK_SIZE ) {}
 
     size_t getFreeSpace() const {
-        return (m_page.header.free_end - m_page.header.free_start);
+        return (m_header.free_end - m_header.free_start);
     }
 
     bool isFull() const {
         static const size_t buffer_zone_size = sizeof(object_node) + sizeof( event_node );
-        return getFreeSpace() < buffer_zone_size;
+        return getFreeSpace() <= buffer_zone_size;
+    }
+
+    bool isEmpty() const {
+        return (m_header.free_start == block);
     }
 
     bool addEvent( event_t * e, const object_t & object_id ) {
-        if( isFull() ) return false;  // page full
+        if( isFull() ) { 
+            return false;  // page full
+        }
 
-        char * n_free_start = m_page.header.free_start + sizeof(event_node);
-        char * n_free_end = m_page.header.free_end;
+        char * n_free_start = m_header.free_start + sizeof(event_node);
+        char * n_free_end = m_header.free_end;
 
         object_node * obj = findObject( object_id );
 
@@ -64,7 +85,7 @@ public:
         if( res ) {
             // sufficient space to add event to page
             
-            event_node * nevt = reinterpret_cast< event_node * >(m_page.header.free_start);
+            event_node * nevt = reinterpret_cast< event_node * >(m_header.free_start);
             nevt->p_event = e;
             nevt->next = NULL;
 
@@ -73,7 +94,7 @@ public:
                 obj->object_id = object_id;
                 obj->head = nevt;
 
-                ++m_nObjects;
+                ++m_header.m_nObjects;
             } else {
                 // object already exists
                 //
@@ -83,9 +104,11 @@ public:
             }
             obj->tail = nevt;
             
-            m_page.header.free_start = n_free_start;
-            m_page.header.free_end = n_free_end;
-            ++m_nEvents;
+            m_header.free_start = n_free_start;
+            m_header.free_end = n_free_end;
+            ++m_header.m_nEvents;
+        } else {
+
         }
 
         return res;
@@ -95,29 +118,32 @@ public:
         if( head_object() == end_object() ) return iterator( NULL );
         return iterator( this );
     }
+
     iterator end() {
         return iterator(NULL);
     }
 
     unsigned int getObjectCount() const {
-        return m_nObjects;
+        return m_header.m_nObjects;
     }
     unsigned int getEventCount() const {
-        return m_nEvents;
+        return m_header.m_nEvents;
     }
 
     void reset() {
-        m_page.clear();
-        m_nObjects = 0;
-        m_nEvents = 0;
+        m_header.next = NULL;
+        m_header.free_start = block;
+        m_header.free_end = block + BLOCK_SIZE;
+        m_header.m_nObjects = 0;
+        m_header.m_nEvents = 0;
     }
 
     void dump( std::ostream & out ) {
         out << "Object Node Size: " << sizeof(object_node) << "\n";
         out << "Event Node Size: " << sizeof(event_node) << "\n";
 
-        out << "Object Count: " << m_nObjects << "\n";
-        out << "Event Count: " << m_nEvents << "\n";
+        out << "Object Count: " << m_header.m_nObjects << "\n";
+        out << "Event Count: " << m_header.m_nEvents << "\n";
 
         out << "Head Object: " << head_object() << "\n";
         out << "End Object: " << end_object() << "\n";
@@ -140,6 +166,14 @@ public:
         } else {
             out << "Empty Event Page\n";
         }
+    }
+
+    EventPage< EVT, OBJ > * getNextPage() {
+        return m_header.next;
+    }
+
+    void setNextPage( EventPage< EVT, OBJ > * n ) {
+        m_header.next = n;
     }
 
     virtual ~EventPage() { }
@@ -166,15 +200,18 @@ protected:
     }
 
     object_node * head_object( ) {
-        return reinterpret_cast< object_node * >(m_page.header.free_end );  // free space ends at the start of object list
+        return reinterpret_cast< object_node * >(m_header.free_end );  // free space ends at the start of object list
     }
 
     object_node * end_object() {
-        return reinterpret_cast< object_node * >( m_page.block + BLOCK_SIZE );
+        return reinterpret_cast< object_node * >( block + BLOCK_SIZE );
     }
 
-    memory_page m_page;
-    size_t      m_nObjects;
-    size_t      m_nEvents;
+    //memory_page m_page;
+    //size_t      m_nObjects;
+    //size_t      m_nEvents;
+
+    event_page_header m_header;
+    char          block[ BLOCK_SIZE ];
 };
 #endif  // EVENT_PAGE_HPP_

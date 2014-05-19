@@ -24,9 +24,8 @@ struct memory_page_header {
     memory_page_header( char * s = NULL, char * e = NULL ) : free_start(s), free_end(e) {}
 };
 
-static const unsigned short BLOCK_SIZE = PAGE_SIZE - sizeof( memory_page_header ) - sizeof( void * );
-
 struct memory_page {
+    static const unsigned short BLOCK_SIZE = PAGE_SIZE - sizeof( memory_page_header ) - sizeof( void * );
     memory_page * next;
     memory_page_header header;
 
