@@ -1,6 +1,9 @@
 #ifndef EVENT_PAGE_WALKER_HPP_
 #define EVENT_PAGE_WALKER_HPP_
 
+#include <cassert>
+#include <iostream>
+
 // Forward Iterator for walking events in page relative object order
 //
 template < class EP >
@@ -79,7 +82,8 @@ public:
         return *(this);
     }
 
-    event_reference getEvent() { return *(m_en->p_event); }
+    event_pointer getEvent() { return m_en->p_event; }
+//    event_reference getEvent() { assert(m_en != NULL); return *(m_en->p_event); }
 
     object_reference getObjectID() { return m_obj->object_id; }
 

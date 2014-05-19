@@ -36,7 +36,7 @@ public:
     typedef EventPageWalker<  EventPage< EVT, OBJ > > iterator;
     friend iterator;
 
-    EventPage() {}
+    EventPage() : m_nObjects(0), m_nEvents(0) {}
 
     size_t getFreeSpace() const {
         return (m_page.header.free_end - m_page.header.free_start);
@@ -64,7 +64,7 @@ public:
         if( res ) {
             // sufficient space to add event to page
             
-            event_node * nevt = reinterpret_cast< event_node * >(n_free_start);
+            event_node * nevt = reinterpret_cast< event_node * >(m_page.header.free_start);
             nevt->p_event = e;
             nevt->next = NULL;
 
@@ -73,17 +73,19 @@ public:
                 obj->object_id = object_id;
                 obj->head = nevt;
 
-                std::cout << "New Object Node: " << object_id << std::endl;
+                ++m_nObjects;
             } else {
                 // object already exists
                 //
                 //nevt->next = obj->head;
+                assert( object_id == obj->object_id );
                 obj->tail->next = nevt;
             }
             obj->tail = nevt;
             
             m_page.header.free_start = n_free_start;
             m_page.header.free_end = n_free_end;
+            ++m_nEvents;
         }
 
         return res;
@@ -97,13 +99,31 @@ public:
         return iterator(NULL);
     }
 
+    unsigned int getObjectCount() const {
+        return m_nObjects;
+    }
+    unsigned int getEventCount() const {
+        return m_nEvents;
+    }
+
     void reset() {
         m_page.clear();
+        m_nObjects = 0;
+        m_nEvents = 0;
     }
 
     void dump( std::ostream & out ) {
         out << "Object Node Size: " << sizeof(object_node) << "\n";
         out << "Event Node Size: " << sizeof(event_node) << "\n";
+
+        out << "Object Count: " << m_nObjects << "\n";
+        out << "Event Count: " << m_nEvents << "\n";
+
+        out << "Head Object: " << head_object() << "\n";
+        out << "End Object: " << end_object() << "\n";
+
+        size_t dist = end_object() - head_object();
+        out << "Calculated Object count: " << ( dist ) << "\n";
 
         iterator s = begin();
         iterator e = end();
@@ -114,7 +134,7 @@ public:
                     out << s.getObjectID();
                     out << "\n";
                 }
-                out << (s.getEvent()) << ",";
+                out << *(s.getEvent()) << ",";
             } while( ++s != e );
             out << "\n";
         } else {
@@ -154,5 +174,7 @@ protected:
     }
 
     memory_page m_page;
+    size_t      m_nObjects;
+    size_t      m_nEvents;
 };
 #endif  // EVENT_PAGE_HPP_
