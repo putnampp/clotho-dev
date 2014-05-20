@@ -11,7 +11,7 @@
 
 #include "paged_event_queue.hpp"
 
-using std::deque;
+//using std::deque;
 using std::map;
 using std::pair;
 using std::make_pair;
@@ -26,7 +26,6 @@ public:
 
     typedef std::pair< object_t *, bool > object_pool_pair_t;
     typedef vector< object_pool_pair_t > object_list_t;
-//    typedef ltsf_pool< vtime_t, system_id::object_id_t >  ltsf_pool_t;
 
     typedef PagedEventQueue< event_t, system_id > paged_event_pool_t;
     typedef typename paged_event_pool_t::event_page_manager_t page_manager_t;
@@ -62,12 +61,8 @@ public:
     virtual ~CentralizedSimulationManager();
 protected:
 
-//    virtual concurrent_group_t getNextObjectGroup();
-
     virtual bool setSimulationTime( const vtime_t & t );
     virtual void setSimulateUntil( const vtime_t & t );
-
-//    void moveObject( object_t * obj, vtime_t t );
 
     shared_ptr< application >   m_app;
 
@@ -76,7 +71,6 @@ protected:
     bool m_sim_complete;
 
     object_list_t   m_objects;
-//    ltsf_pool_t     m_pooled_objects;
     ltsf_pool_t     m_pooled_events;
 
     unsigned int    m_nPendingEvents, m_nProcessedEvents;
@@ -265,10 +259,11 @@ void CentralizedSimulationManager<E, O>::simulate( const vtime_t & until ) {
 
     m_stats->startPhase( SIMULATE_PHASE_K );
 //    vtime_t timestamp = m_pooled_objects.peekNextTimestamp();
-    vtime_t timestamp = ((m_pooled_events.empty() ) ? SystemClock::POSITIVE_INFINITY : m_pooled_events.begin()->first);
+    typename ltsf_pool_t::iterator it = m_pooled_events.begin();
+    vtime_t timestamp = (( it == m_pooled_events.end() ) ? SystemClock::POSITIVE_INFINITY : it->first);
 
     while( timestamp != SystemClock::POSITIVE_INFINITY && !setSimulationTime( timestamp ) ) {
-        paged_event_pool_t * tmp_evts = m_pooled_events.begin()->second;
+        paged_event_pool_t * tmp_evts = it->second;
 
         object_t * obj = NULL;
         event_t * evt = NULL;
@@ -285,11 +280,11 @@ void CentralizedSimulationManager<E, O>::simulate( const vtime_t & until ) {
         }
 
         assert( tmp_evts->size() == 0 );
-        assert( timestamp == m_pooled_events.begin()->first );
 
-        m_pooled_events.erase( m_pooled_events.begin() );
+        m_pooled_events.erase( it );
 
-        timestamp = ((m_pooled_events.empty() ) ? SystemClock::POSITIVE_INFINITY : m_pooled_events.begin()->first );
+        it = m_pooled_events.begin();
+        timestamp = (( it == m_pooled_events.end() ) ? SystemClock::POSITIVE_INFINITY : it->first );
     }
 
     m_stats->stopPhase( SIMULATE_PHASE_K );

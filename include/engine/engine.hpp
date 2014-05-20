@@ -7,6 +7,7 @@
 //#include "CentralizedSimulationManagerPooled.hpp"
 #include "CentralizedSimulationManagerPaged.hpp"
 //#include "ThreadedCentralizedSimulationManager.hpp"
+#include "ThreadedCentralizedSimulationManager.2.hpp"
 
 #include "simulation_stats.h"
 

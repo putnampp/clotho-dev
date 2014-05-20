@@ -23,18 +23,16 @@ public:
         m_next_evt( NULL ),
         m_read_it(NULL),
         m_nSize(0)
-    {}
+    {
+        m_read = m_page_manager->getOrCreate();
+        m_tail = m_page_manager->getOrCreate();
+        m_read->setNextPage( m_tail );
+
+        m_read_it = m_read->end();
+    }
 
     void append( event_t * evt, const object_t & obj ) {
-        if( m_tail == NULL ) {
-            //std::cout << "Creating new page" << std::endl;
-            assert( m_read == NULL );
-            m_tail = m_page_manager->getOrCreate();
-            m_read = m_page_manager->getOrCreate();
-            m_read->setNextPage( m_tail );
-
-            m_read_it = m_read->end();
-        } else if( m_tail->isFull() ) {
+        if( m_tail->isFull() ) {
             //std::cout << "Page full " << m_tail->getEventCount() << " allocating new page " << std::endl;
             event_page_t * tmp = m_page_manager->getOrCreate();
             m_tail->setNextPage(tmp);
@@ -79,7 +77,11 @@ public:
             m_page_manager->release( tmp );
         }
 
-        m_tail = NULL;
+        m_read = m_page_manager->getOrCreate();
+        m_tail = m_page_manager->getOrCreate();
+        m_read->setNextPage( m_tail );
+
+        m_read_it = m_read->end();
 
         m_nSize = 0;
     }

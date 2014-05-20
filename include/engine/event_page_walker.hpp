@@ -22,10 +22,10 @@ public:
 
     typedef object_t object_reference;
 
-    EventPageWalker( event_page_t * page = NULL ) : 
+    EventPageWalker( event_page_t * page = NULL, object_node_t * s = NULL, object_node_t * e = NULL) : 
         m_page(page),
-        m_obj( ((page != NULL) ? page->head_object() : NULL ) ),
-        m_stop_obj( ((page != NULL) ? page->end_object() : NULL ) ),
+        m_obj( ((s == NULL )? ((page != NULL) ? page->head_object() : NULL ) : s) ),
+        m_stop_obj( ((e == NULL ) ? ((page != NULL) ? page->end_object() : NULL ) : e) ),
         m_en( ((m_obj != NULL )? m_obj->head : NULL )),
         m_bObjectChange(m_obj != m_stop_obj)
     { }

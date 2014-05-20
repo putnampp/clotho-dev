@@ -51,6 +51,8 @@ public:
     typedef EventPageWalker<  EventPage< EVT, OBJ > > iterator;
     friend iterator;
 
+    typedef std::pair< iterator, iterator > iterator_range;
+
     EventPage( EventPage< EVT, OBJ > * n = NULL ) : m_header( n, block, block + BLOCK_SIZE ) {}
 
     size_t getFreeSpace() const {
@@ -123,9 +125,23 @@ public:
         return iterator(NULL);
     }
 
+    iterator getEventsByObjectIndex( size_t idx ) {
+        if( idx < getObjectCount() ) {
+            object_node * s = head_object();
+            while( idx-- ) { s++; }
+
+            object_node * e = s;
+            ++e;
+            return iterator(this, s, e);
+        }
+
+        return iterator(NULL);
+    }
+
     unsigned int getObjectCount() const {
         return m_header.m_nObjects;
     }
+
     unsigned int getEventCount() const {
         return m_header.m_nEvents;
     }

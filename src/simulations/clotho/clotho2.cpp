@@ -67,6 +67,9 @@ typedef TEnvironment< LCM_t, /*VT_t,*/ IND_t, selection_model_t > ENV_t;
 typedef CentralizedSimulationManager< ClothoEvent, ClothoObject >  CENTRAL_MGR_t;
 typedef ClothoApplication< CENTRAL_MGR_t, ENV_t > SIMPLE_CENTRAL_APP_t;
 
+typedef ThreadedCentralizedSimulationManager< ClothoEvent, ClothoObject >  THREADED_CENTRAL_MGR_t;
+typedef ClothoApplication< THREADED_CENTRAL_MGR_t, ENV_t > THREADED_CENTRAL_APP_t;
+
 typedef SimulationManager< ClothoEvent, ClothoObject > simulation_manager_t;
 
 namespace initializer {
@@ -85,6 +88,20 @@ void ClothoAppInitializer::createEnvironment< SIMPLE_CENTRAL_APP_t, SIMPLE_CENTR
     a->m_env->initialize();
     //a->m_objects.push_back( env->getSystemID());
 }
+
+template <>
+void ClothoAppInitializer::createEnvironment< THREADED_CENTRAL_APP_t, THREADED_CENTRAL_APP_t::environment_t >( THREADED_CENTRAL_APP_t * a, THREADED_CENTRAL_APP_t::environment_t * ) {
+    cout << "Blocking default protocol" << endl;
+    //
+    typedef typename THREADED_CENTRAL_APP_t::environment_t environment_t;
+
+    ClothoObject * co = a->m_sim_manager->getSimulationObject();
+
+    a->m_env = new environment_t( co, a->m_rng );
+    a->m_env->setFounderSize( a->m_nFounder );
+    a->m_env->initialize();
+}
+
 }   // namespace initializer
 
 
@@ -147,20 +164,20 @@ int main( int argc, char ** argv ) {
         tmp->setSimulationManager( tmgr );
         tmp->setFounderSize( vm[ FOUNDER_SIZE_K ].as<unsigned int>() );
         sim = tmgr;
-    } /*else if( vm.count( TCENSM_K ) ) {
+    } else if( vm.count( TCENSM_K ) ) {
         unsigned int tc = vm[ THREAD_COUNT_K ].as< unsigned int >();
 
         assert( 0 < tc && tc <= MAX_THREADS );
         cout << "Using a Threaded Centralized Simulation Manager with " << tc << " threads" << endl;
 
-        if( tc > vm[ DISTRIBUTED_ENV_K ].as< unsigned int >() ) {
-            app.reset( new ClothoApplication( clotho_config, rng, tc ) );
-        } else {
-            app.reset( new ClothoApplication( clotho_config, rng, vm[ DISTRIBUTED_ENV_K ].as< unsigned int >() ) );
-        }
-        sim = new ThreadedCentralizedSimulationManager< ClothoEventSet >( app, stats, tc );
+        THREADED_CENTRAL_APP_t * tmp = new THREADED_CENTRAL_APP_t( rng );
+        app.reset(tmp);
 
-    } else {
+        THREADED_CENTRAL_MGR_t * tmgr = new THREADED_CENTRAL_MGR_t(app, stats, tc );
+        tmp->setSimulationManager( tmgr );
+        tmp->setFounderSize( vm[ FOUNDER_SIZE_K ].as<unsigned int>() );
+        sim = tmgr;
+    } /*else {
         cout << "Using a Sequential Simulation Manager" << endl;
         app.reset( new ClothoApplication( clotho_config, rng, vm[ DISTRIBUTED_ENV_K ].as< unsigned int >() ) );
         sim = new SequentialSimulationManager< ClothoEventSet >( app, stats );
@@ -196,41 +213,3 @@ int main( int argc, char ** argv ) {
 
     return 0;
 }
-
-/*
-bool parse_commandline( int argc, char ** argv, po::variables_map & vm ) {
-    po::options_description gen( "General" );
-    gen.add_options()
-    ( (HELP_K + ",h").c_str(), "Print this" )
-    ( (VERSION_K + ",v").c_str(), "Version" )
-    ;
-
-    po::options_description simulation( "Simulation Parameters" );
-    simulation.add_options()
-    ( SIM_UNTIL_K.c_str(), po::value<SystemClock::vtime_t>()->default_value( SystemClock::POSITIVE_INFINITY ), "Simulate until time. Default value is positive infinity.")
-    ( THREAD_COUNT_K.c_str(), po::value< unsigned int >()->default_value( 4 ), "Thread count for thread aware simulation managers are used. Does not apply when --sequential, or --centralized flags are used")
-    ( SEQSM_K.c_str(), "Run the simulation with the sequential simulation manager" )
-    ( CENSM_K.c_str(), "Run the simulation with the centralized simulation manager" )
-    ( TCENSM_K.c_str(), "Run the simulation with the centralized simulation manager (thread aware)")
-    ;
-
-    po::options_description clotho_app( "Clotho Application Parameters" );
-    clotho_app.add_options()
-    ( GENERATIONS_K.c_str(), po::value<unsigned int>()->default_value(-1), "Simulate a number of generations.")
-    ( DISTRIBUTED_ENV_K.c_str(), po::value< unsigned int >()->default_value( 1 ), "Number of environment partitions; Thread aware simulation managers will partition the environment into the max of the number of partitions and thread count" )
-    ( FOUNDER_SIZE_K.c_str(), po::value< unsigned int >()->default_value(10000), "Founding population size" )
-    ;
-
-    po::options_description cmdline;
-
-    cmdline.add(gen).add(simulation).add( clotho_app );
-    po::store( po::command_line_parser( argc, argv ).options( cmdline ).run(), vm );
-
-    bool res = true;
-    if( vm.count( HELP_K ) ) {
-        cout << cmdline << endl;
-        res = false;
-    }
-
-    return res;
-}*/
