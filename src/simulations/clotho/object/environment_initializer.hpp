@@ -1,5 +1,5 @@
 #ifndef ENVIRONMENT_INITIALIZER_HPP_
-#define ENVIRONMNET_INITIALIZER_HPP_
+#define ENVIRONMENT_INITIALIZER_HPP_
 
 #include "../initializer.hpp"
 
