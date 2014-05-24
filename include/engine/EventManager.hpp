@@ -307,8 +307,8 @@ public:
         while(m_events.size() != 0 ) {
             event_t * e = m_events.dequeue();
             if( e ) {
-                //delete e;
-                e->release();
+                delete e;
+                //e->release();
                 ++m_nCanceled;
             }
         }

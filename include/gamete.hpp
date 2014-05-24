@@ -4,7 +4,7 @@
 #include <iostream>
 
 #include "gamete_base.h"
-#include "pooler.hpp"
+//#include "pooler.hpp"
 
 /*
  * A gamete is a logical unit of population genetic simulation
@@ -30,9 +30,9 @@ public:
     gamete( gamete_source_t s, gamete_type_t t ) : gamete_base(s, t), m_active_count(1) {}
     gamete( const gamete< VS > & z ) : gamete_base( z.m_id ), m_vars(z.m_vars), m_active_count(z.m_active_count ) {}
 
-    static gamete< VS > * getOrCreate() {
-        return gamete< VS >::m_pool->getOrCreate();
-    }
+    //static gamete< VS > * getOrCreate() {
+    //    return gamete< VS >::m_pool->getOrCreate();
+    //}
 
     virtual gamete<VS> * copy() {
         ++m_active_count;
@@ -40,8 +40,8 @@ public:
     }
     
     virtual gamete<VS> * clone() const {
-    //    gamete<VS> * child = new gamete<VS>( *this );
-        gamete< VS > * child = gamete< VS >::getOrCreate();
+        gamete<VS> * child = new gamete<VS>( *this );
+        //gamete< VS > * child = gamete< VS >::getOrCreate();
         child->init( *this );
         return child;
     }
@@ -80,9 +80,8 @@ public:
         o << "{" << (int) m_id.id_component.source << ", " << (int) m_id.id_component.type << "}";
     }
 
-    void release() {
-        if( --m_active_count == 0 )
-            m_pool->release( this );
+    bool release() {
+        return (--m_active_count == 0 );
     }
 
     void print( std::ostream & out ) {
@@ -99,10 +98,10 @@ public:
 protected:
     variant_set_t   m_vars;
     size_t          m_active_count;
-    static shared_ptr< Pooler< gamete< VS > > > m_pool;
+//    static shared_ptr< Pooler< gamete< VS > > > m_pool;
 };
 
-template < class VS >
-shared_ptr< Pooler< gamete< VS > > > gamete< VS >::m_pool( new Pooler< gamete<VS> >() );
+//template < class VS >
+//shared_ptr< Pooler< gamete< VS > > > gamete< VS >::m_pool( new Pooler< gamete<VS> >() );
 
 #endif  // GAMETE_HPP_

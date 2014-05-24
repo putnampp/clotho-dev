@@ -17,6 +17,7 @@ public:
     typedef SM simulation_manager_t;
 
     typedef EventPage< E, O > event_page_t;
+   
 
 //    PageWorkerThread( simulation_manager_t * sm, unsigned int id, unsigned int pool_size );
     PageWorkerThread( simulation_manager_t * sm, unsigned int id, unsigned int pool_size );
@@ -163,8 +164,11 @@ void PageWorkerThread<E,O,SM>::run() {
                     obj->updateLocalTime( m_cur_time );
                     do {
                         event_t * e = it.getEvent();
-                        obj->getEventPerformer()->perform_event(e);
-                        ++m_nProcessed;
+                        if( e != NULL ) {
+                            obj->getEventPerformer()->perform_event(e);
+                            ++m_nProcessed;
+                            delete e;
+                        }
                     } while( ++it != m_cur_objs->end());
                 }
             }

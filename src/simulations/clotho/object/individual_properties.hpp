@@ -167,9 +167,9 @@ public:
 
     gamete_t * cloneGamete( unsigned char gamete_idx ) const {
         if( gamete_idx == 0 && p0 ) {
-            return p0->copy();
+            return p0->clone();
         } else if( gamete_idx == 1 && p1 ) {
-            return p1->copy();
+            return p1->clone();
         }
         return new gamete_t();
     }
@@ -177,16 +177,18 @@ public:
     void reset() {
         died();
         if( p0 ) {
-        //    delete p0;
-        //    p0 = NULL;
-            p0->release();
+            //delete p0;
+            //if( p0->release() ) {
+                delete p0;
+            //}
             p0 = NULL;
         }
 
         if( p1 ) {
             //delete p1;
-            //p1 = NULL;
-            p1->release();
+            //if( p1->release() ) {
+                delete p1;
+            //}
             p1 = NULL;
         }
     }

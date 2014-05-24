@@ -1,6 +1,8 @@
 #include "mate_event.h"
 
-shared_ptr< Pooler< MateEvent> > MateEvent::m_pool( new Pooler< MateEvent >() );
+//shared_ptr< Pooler< MateEvent> > MateEvent::m_pool( new Pooler< MateEvent >() );
+//
+boost::object_pool< MateEvent > MateEvent::m_pool;
 
 MateEvent::MateEvent( const vtime_t & tSent, const vtime_t & tRecv,
                 const system_id & sender, const system_id & receiver,
@@ -34,6 +36,7 @@ const system_id & MateEvent::getOffspringID() const {
     return m_offspring;
 }
 
+/*
 void MateEvent::release() {
     m_pool->release(this);
-}
+}*/

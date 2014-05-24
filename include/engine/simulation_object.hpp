@@ -24,6 +24,8 @@ public:
     typedef event_router< E >   event_router_t;
     typedef event_performer< E > event_performer_t;
 
+    typedef typename event_t::event_id_t event_id_t;
+
     SimulationObject( ) : 
         object( ),
         m_evt_manager( NULL ),
@@ -67,7 +69,8 @@ public:
 
             m_performer->perform_event( tmp );
 
-            tmp->release();
+            //tmp->release();
+        //    delete tmp;
             tmp = peekEvent( m_id );
         }
 
@@ -153,8 +156,10 @@ public:
         return m_evt_manager->canceledEventCount(id);
     }
 
-    event::event_id_t getNextEventID() {
-        return m_next_eid++;
+    event_id_t getNextEventID( unsigned int offset = 1) {
+//        return m_next_eid++;
+        event_id_t tmp = __sync_fetch_and_add( &m_next_eid, offset );
+        return tmp;
     }
 
     virtual ~SimulationObject() {
@@ -172,7 +177,7 @@ protected:
     vtime_t     m_local_time;
 //    size_t      m_pool_idx;
 
-    event::event_id_t  m_next_eid;
+    event_id_t  m_next_eid;
 };
 
 #endif  // SIMULATION_OBJECT_HPP_

@@ -2,7 +2,7 @@
 #define INHERIT_EVENT_HPP_
 
 #include "../clotho_event.h"
-#include "pooler.hpp"
+//#include "pooler.hpp"
 
 template < class GM >
 class InheritEvent : public ClothoEvent {
@@ -11,11 +11,11 @@ public:
     static const event_type_t TYPE_ID = 4;
     typedef GM gamete_t;
 
-    friend class Pooler< InheritEvent< GM > >;
+//    friend class Pooler< InheritEvent< GM > >;
 
-    static InheritEvent< GM > * getOrCreate() {
-        return m_pool->getOrCreate();
-    }
+//    static InheritEvent< GM > * getOrCreate() {
+//        return m_pool->getOrCreate();
+//    }
 
     // by default gamete index is unknown (-1)
     // gamete index can be used to identify which "source" ("parent")
@@ -41,12 +41,25 @@ public:
     unsigned char getParentIndex() const { return m_gidx; }
     gamete_t * getGamete() const { return m_gamete; }
 
-    void release() {
-        m_pool->release(this);
+    static void * operator new( size_t s ) {
+//        static shared_ptr< Pager< InheritEvent< GM > > > pages( new Pager< InheritEvent< GM > >() );
+
+//        void * res = pages->malloc();
+        void * res = m_pool.malloc();
+        return res;
     }
 
+    static void operator delete( void * ptr ) {
+//        Pager< InheritEvent<GM> >::release( ( InheritEvent< GM > * )ptr );
+        m_pool.free( (InheritEvent< GM > *) ptr );
+    }
+//    void release() {
+//        m_pool->release(this);
+//    }
+
     virtual ~InheritEvent() {}
-protected:
+//protected:
+
     InheritEvent() {}
 
     // by default gamete index is unknown (-1)
@@ -68,13 +81,17 @@ protected:
         m_gamete( z )
     {}
 
+protected:
     unsigned char   m_gidx;
     gamete_t *      m_gamete;
 
-    static shared_ptr< Pooler< InheritEvent< GM > > > m_pool;
+//    static shared_ptr< Pooler< InheritEvent< GM > > > m_pool;
+    static boost::object_pool< InheritEvent< GM > > m_pool;
 };
 
 template < class GM >
-shared_ptr< Pooler< InheritEvent< GM > > > InheritEvent<GM>::m_pool( new Pooler< InheritEvent< GM > >() );
+boost::object_pool< InheritEvent< GM > > InheritEvent<GM>::m_pool;
+//template < class GM >
+//shared_ptr< Pooler< InheritEvent< GM > > > InheritEvent<GM>::m_pool( new Pooler< InheritEvent< GM > >() );
 
 #endif  // INHERIT_EVENT_HPP_

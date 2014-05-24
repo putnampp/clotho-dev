@@ -35,7 +35,7 @@ public:
 
     friend class initializer::IndividualInitializer;
     friend class finalizer::IndividualFinalizer;
-    friend class life_cycle::IndividualLifeCycle<LCM>;
+    friend class life_cycle::IndividualLifeCycle<LCM, TIndividual< LCM, IP, RMODEL>, ClothoEvent>;
 
     friend reproduction_model_t;
 

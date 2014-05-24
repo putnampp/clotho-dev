@@ -41,7 +41,7 @@
 
 #include "rng/rng.hpp"
 //#include "models/default_life_cycle.h"
-#include "models/default_life_cycle.hpp"
+//#include "models/default_life_cycle.hpp"
 #include "models/opt_default_life_cycle.hpp"
 #include "models/selection_models.hpp"
 #include "models/reproduction_models.hpp"
@@ -137,23 +137,15 @@ int main( int argc, char ** argv ) {
 
     bool bFixed =  max_variants != (unsigned int) -1;
 
-    RandomProcess::initialize( rng );
-    mutation_model_t::initialize(mu, bFixed);
-
-    if( bFixed ) {
-        cout << "Creating static variant pool of size " << max_variants << endl;
-        const double dMaxVariants = (double) max_variants;
-        for( double i = 0.0; i < dMaxVariants; i += 1.0 ) {
-            mutation_model_t::getVariantMap()->createVariant( i / dMaxVariants);
-        }
-    }
-
     shared_ptr< application > app;
     shared_ptr< SimulationStats > stats( new SimulationStats() );
 
     simulation_manager_t * sim = NULL;
 
     if( vm.count( CENSM_K ) ) {
+        RandomProcess::initialize( rng );
+        mutation_model_t::initialize(mu, bFixed);
+
         cout << "Using a Centralized Simulation Manager" << endl;
 
         SIMPLE_CENTRAL_APP_t * tmp = new SIMPLE_CENTRAL_APP_t( rng );
@@ -165,6 +157,10 @@ int main( int argc, char ** argv ) {
         tmp->setFounderSize( vm[ FOUNDER_SIZE_K ].as<unsigned int>() );
         sim = tmgr;
     } else if( vm.count( TCENSM_K ) ) {
+        shared_ptr< iRNG > trng( new ThreadedRNG( rng ) );
+
+        RandomProcess::initialize( trng );
+        mutation_model_t::initialize(mu, bFixed);
         unsigned int tc = vm[ THREAD_COUNT_K ].as< unsigned int >();
 
         assert( 0 < tc && tc <= MAX_THREADS );
@@ -182,6 +178,14 @@ int main( int argc, char ** argv ) {
         app.reset( new ClothoApplication( clotho_config, rng, vm[ DISTRIBUTED_ENV_K ].as< unsigned int >() ) );
         sim = new SequentialSimulationManager< ClothoEventSet >( app, stats );
     }*/
+
+    if( bFixed ) {
+        cout << "Creating static variant pool of size " << max_variants << endl;
+        const double dMaxVariants = (double) max_variants;
+        for( double i = 0.0; i < dMaxVariants; i += 1.0 ) {
+            mutation_model_t::getVariantMap()->createVariant( i / dMaxVariants);
+        }
+    }
 
     assert( sim != NULL );
 

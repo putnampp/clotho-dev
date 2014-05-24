@@ -1,6 +1,8 @@
 #include "maturity_event.h"
 
-shared_ptr< Pooler< MaturityEvent > > MaturityEvent::m_pool( new Pooler< MaturityEvent >());
+//shared_ptr< Pooler< MaturityEvent > > MaturityEvent::m_pool( new Pooler< MaturityEvent >());
+
+boost::object_pool< MaturityEvent > MaturityEvent::m_pool;
 
 MaturityEvent::MaturityEvent( const vtime_t & tSent, const vtime_t & tRecv,
                 const system_id & sender, const system_id & receiver,
@@ -42,6 +44,6 @@ Sex MaturityEvent::getSex() const {
     return m_sex;
 }
 
-void MaturityEvent::release() {
-    m_pool->release(this);
-}
+//void MaturityEvent::release() {
+//    m_pool->release(this);
+//}

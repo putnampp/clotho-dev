@@ -17,12 +17,14 @@ public:
 
         system_id id = co->getSystemID();
 
-        ievent_t * ie = ievent_t::getOrCreate();
-        ie->init( ctime, ctime, id, id, co->getNextEventID(), new gamete_t(), 0 );
+        ClothoObject::event_id_t n_eid = co->getNextEventID(2);
+        gamete_t * ngamete = new gamete_t();
+        //ievent_t * ie = ievent_t::getOrCreate();
+        ievent_t * ie = new ievent_t( ctime, ctime, id, id, n_eid++, ngamete, 0 );
         co->sendEvent( ie );
 
-        ie = ievent_t::getOrCreate();
-        ie->init( ctime, ctime, id, id, co->getNextEventID(), new gamete_t(), 1 );
+        //ie = ievent_t::getOrCreate();
+        ie = new ievent_t( ctime, ctime, id, id, n_eid, new gamete_t(), 1 );
         co->sendEvent( ie );
     }
 

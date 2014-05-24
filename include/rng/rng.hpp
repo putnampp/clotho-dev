@@ -5,4 +5,6 @@
 
 #include "rng_gsl.hpp"
 
+#include "threaded_rng.hpp"
+
 #endif  // RNG_HPP_

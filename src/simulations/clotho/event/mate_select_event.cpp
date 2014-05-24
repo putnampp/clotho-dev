@@ -1,10 +1,12 @@
 #include "mate_select_event.h"
 
-shared_ptr< Pooler< MateSelectEvent > > MateSelectEvent::m_pool( new Pooler< MateSelectEvent >() );
+//shared_ptr< Pooler< MateSelectEvent > > MateSelectEvent::m_pool( new Pooler< MateSelectEvent >() );
 
-MateSelectEvent * MateSelectEvent::getOrCreate() {
-    return MateSelectEvent::m_pool->getOrCreate();
-}
+//MateSelectEvent * MateSelectEvent::getOrCreate() {
+//    return MateSelectEvent::m_pool->getOrCreate();
+//}
+
+boost::object_pool< MateSelectEvent > MateSelectEvent::m_pool;
 
 MateSelectEvent::MateSelectEvent( const vtime_t & tSent, const vtime_t & tRecv,
                 const system_id & sender, const system_id & receiver,
@@ -30,6 +32,7 @@ void MateSelectEvent::init( const vtime_t & tSent, const vtime_t & tRecv,
     ClothoEvent::init( tSent, tRecv, sender, receiver, eid );
 }
 
+/*
 void MateSelectEvent::release() {
     m_pool->release( this );
-}
+}*/

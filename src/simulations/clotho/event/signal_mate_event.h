@@ -7,6 +7,7 @@ class SignalMateEvent : public ClothoEvent {
 public:
     static const event_type_t TYPE_ID = 9;
 
+    SignalMateEvent() {}
     SignalMateEvent( const vtime_t & tSent, const vtime_t & tRecv,
                 const system_id & sender, const system_id & receiver,
                 event_id_t eid, Sex s, unsigned int idx, const system_id & offspring );
@@ -21,13 +22,27 @@ public:
 
     system_id   getOffspring() const;
 
-    void release() {}
+    static void * operator new( size_t s ) {
+//        static shared_ptr< Pager< SignalMateEvent > > pages( new Pager< SignalMateEvent >() );
+
+//        void * res = pages->malloc();
+        void * res = m_pool.malloc();
+        return res;
+    }
+
+    static void operator delete( void * ptr ) {
+//        Pager< SignalMateEvent >::release( ( SignalMateEvent * )ptr );
+        m_pool.free( (SignalMateEvent *) ptr );
+    }
+//    void release() {}
 
     virtual ~SignalMateEvent() {}
 protected:
     Sex             m_sex;
     unsigned int    m_index;
     system_id       m_offspring;
+
+    static boost::object_pool< SignalMateEvent > m_pool;
 };
 
 #endif  // SIGNAL_MATE_EVENT_H_

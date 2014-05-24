@@ -1,6 +1,7 @@
 #include "death_event.h"
 
-shared_ptr< Pooler< DeathEvent > > DeathEvent::m_pool( new Pooler< DeathEvent >() );
+//shared_ptr< Pooler< DeathEvent > > DeathEvent::m_pool( new Pooler< DeathEvent >() );
+boost::object_pool< DeathEvent > DeathEvent::m_pool;
 
 DeathEvent::DeathEvent( const vtime_t & tSent, const vtime_t & tRecv,
                 const system_id & sender, const system_id & receiver,
@@ -27,6 +28,6 @@ void DeathEvent::init( const vtime_t & tSent, const vtime_t & tRecv,
     ClothoEvent::init( tSent, tRecv, sender, receiver, eid );
 }
 
-void DeathEvent::release() {
-    m_pool->release(this);
-}
+//void DeathEvent::release() {
+//    m_pool->release(this);
+//}

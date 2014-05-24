@@ -20,7 +20,7 @@ public:
     Sex getParentSex() const;
     gamete * getGamete() const;
 
-    void release() {}
+//    void release() {}
 
     virtual ~InheritEvent() {}
 protected:

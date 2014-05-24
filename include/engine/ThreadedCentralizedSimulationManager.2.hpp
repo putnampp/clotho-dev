@@ -34,7 +34,7 @@ public:
     typedef ThreadedPagedEventQueue< event_t, system_id > paged_event_pool_t;
     typedef PageWorkerThread< event_t, system_id, ThreadedCentralizedSimulationManager<E,O> > worker_thread_t;
 
-    typedef typename paged_event_pool_t::event_page_manager_t page_manager_t;
+//    typedef typename paged_event_pool_t::event_page_manager_t page_manager_t;
 
     typedef std::map< vtime_t, paged_event_pool_t * > ltsf_pool_t;
 
@@ -88,7 +88,7 @@ protected:
     unsigned int    m_nUnregisterCalls;
 
     shared_ptr< SimulationStats > m_stats;
-    page_manager_t  m_page_manager;
+//    page_manager_t  m_page_manager;
 
     unsigned int m_nThreads;
     unsigned int m_tid;
@@ -96,7 +96,7 @@ protected:
     worker_thread_t **  m_workers;
 
     pthread_barrier_t   m_syncpoint;
-    pthread_mutex_t     m_mutObjID;
+    pthread_mutex_t     m_mutObjID, m_mutEventPool;
 };
 
 //
@@ -123,6 +123,7 @@ ThreadedCentralizedSimulationManager< E, O >::ThreadedCentralizedSimulationManag
 
     pthread_barrier_init( &m_syncpoint, NULL, m_nThreads + 1 );
     pthread_mutex_init( &m_mutObjID, NULL );
+    pthread_mutex_init( &m_mutEventPool, NULL );
 
     pthread_once( &common_key_once, make_thread_key );
     pthread_setspecific( common_thread_key, (void *) &m_tid );
@@ -150,6 +151,7 @@ ThreadedCentralizedSimulationManager< E, O >::ThreadedCentralizedSimulationManag
 
     pthread_barrier_init( &m_syncpoint, NULL, m_nThreads + 1 ); // + 1 for simulation manager thread
     pthread_mutex_init( &m_mutObjID, NULL );
+    pthread_mutex_init( &m_mutEventPool, NULL );
 
     pthread_once( &common_key_once, make_thread_key );
     pthread_setspecific( common_thread_key, (void *) &m_tid );
@@ -266,6 +268,9 @@ void ThreadedCentralizedSimulationManager<E,O>::simulate( const vtime_t & until 
             }
 
             sync();
+
+        //    m_page_manager->release( ep );
+            delete ep;
         }
 
         m_pooled_events.erase(it);
@@ -297,17 +302,23 @@ template < class E, class O >
 void ThreadedCentralizedSimulationManager< E, O >::routeEvent( event_t * evt, const system_id & id, const vtime_t & rt ) {
     unsigned int tid = *((unsigned int * ) pthread_getspecific(common_thread_key) );
     
+    pthread_mutex_lock( &m_mutEventPool );
     typename ltsf_pool_t::iterator it = m_pooled_events.find( rt );
     if( it == m_pooled_events.end() ) {
         // sufficient to only lock this block
+    //    pthread_mutex_lock( &m_mutEventPool );
+
         std::pair< typename ltsf_pool_t::iterator, bool > res = m_pooled_events.insert( make_pair( rt, (paged_event_pool_t * )NULL ));
         it = res.first;
         if( res.second ) {
             // delay allocation as long as possible
-            it->second = new paged_event_pool_t( &m_page_manager, m_nThreads + 1 );
+            it->second = new paged_event_pool_t( m_nThreads + 1 );
         }
-    }
 
+     //   pthread_mutex_unlock( &m_mutEventPool );
+    }
+    pthread_mutex_unlock( &m_mutEventPool );
+    
     it->second->append( evt, id, tid );
 }
 

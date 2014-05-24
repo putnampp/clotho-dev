@@ -36,9 +36,11 @@ public:
     typedef typename ClothoObject::simulation_manager_t simulation_manager_t;
     typedef ClothoObject::event_t event_t;
 
+    typedef life_cycle::IndividualLifeCycle<LCM, TIndividual<LCM, IP, RMODEL>, ClothoEvent> life_cycle_t;
+
     friend class initializer::IndividualInitializer;
     friend class finalizer::IndividualFinalizer;
-    friend class life_cycle::IndividualLifeCycle<LCM>;
+    friend life_cycle_t;
 
     friend reproduction_model_t;
 
@@ -69,7 +71,7 @@ public:
     }
 
     virtual void perform_event( /*const*/ event_t * e) {
-        life_cycle::IndividualLifeCycle<LCM>::handle_event( this, e );
+        life_cycle_t::handle_event( this, e );
     }
 
     virtual void finalize() {

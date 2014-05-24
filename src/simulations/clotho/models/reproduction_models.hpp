@@ -52,8 +52,8 @@ protected:
         unsigned int nMut = m_rng->nextPoisson( mu );
         gamete_t * res = gm;
         if( nMut > 0) {
-            res = gm->clone();
-            gm->release();
+            //res = gm->clone();
+            //gm->release();
             do {
                 typename variant_map_t::value_ptr_t var = getNewVariant();
                 res->addVariant( var );
@@ -71,8 +71,8 @@ protected:
 
 //            if( 2 * g->size() <= m_variants->size() ) {
                 // if less than half of the fixed sites are mutated
-                res = g->clone();
-                g->release();
+                //res = g->clone();
+                //g->release();
                 while( nMut-- ) {
                     unsigned int idx = m_rng->nextInt( m_variants->size() );
                     while( (*res)[(*m_variants)[idx] ] ) {
