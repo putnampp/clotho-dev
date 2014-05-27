@@ -52,7 +52,8 @@ public:
                 event_id_t eid );
 
 //    static shared_ptr< Pooler< DeathEvent > > m_pool;
-    static boost::object_pool< DeathEvent > m_pool;
+//    static boost::object_pool< DeathEvent > m_pool;
+    static ObjectManager< DeathEvent > m_pool;
 };
 
 #endif  // DEATH_EVENT_H_

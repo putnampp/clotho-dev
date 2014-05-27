@@ -9,6 +9,7 @@
 #include "ider.h"
 
 #include <boost/pool/object_pool.hpp>
+#include "engine/object_manager.hpp"
 
 #include <ostream>
 

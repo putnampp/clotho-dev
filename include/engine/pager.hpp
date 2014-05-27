@@ -10,25 +10,14 @@ public:
     typedef T             object_t;
     typedef unsigned short offset_t;
 
-    union index_t {
-        unsigned int value;
-        struct k {
-            offset_t id, fl_offset;
-            k( offset_t _id, offset_t _off ): id(_id), fl_offset(_off) {}
-        } key;
-        index_t(unsigned int v = 0) : value(v) {}
-        index_t( offset_t _id, offset_t _off ) : key(_id, _off) {}
+    struct index_t {
+        offset_t id, fl_offset;
+        index_t( offset_t _id = 0, offset_t _off = 0 ) : id(_id), fl_offset(_off) {}
     };
 
-    union free_list_t {
-        unsigned int block;
-        struct s {
-            offset_t free_count, available;
-            s( offset_t n, offset_t a ) : free_count(n), available(a) {}
-        } stats;
-
-        free_list_t( unsigned int b = 0 ) : block(b) {}
-        free_list_t( offset_t c, offset_t a ) : stats(c, a) {}
+    struct free_list_t {
+        offset_t free_count, available;
+        free_list_t( offset_t c = 0, offset_t a  = 0) : free_count(c), available(a) {}
     };
 
     struct Header {
@@ -52,23 +41,25 @@ public:
     Header      header;
     _node       objects[ COUNT ];
 
-    Pager( Pager< T, S > * n = NULL ) : header(n, COUNT, 0) {
-//        memset( objects, 0, COUNT * sizeof( _node ) );
-        offset_t id = 0;
-        _node * tmp = objects;
+    static const Pager< T, S > TEMPLATE;
 
-        while( id < COUNT ) {
-            tmp->idx.key.id = id++;
-            tmp->idx.key.fl_offset = id;
-            ++tmp;
-        }
+    Pager( Pager< T, S > * n ) : 
+        header( n, COUNT, 0 ) 
+    {
+        memcpy( objects, n->objects, sizeof(_node) * COUNT );
+    }
+
+    Pager< T, S > * clone() {
+        Pager< T, S > * res = new Pager< T, S >( this );
+
+        return res;
     }
 
     object_t * malloc() {
         object_t * res = NULL;
         Pager< T, S > * tmp = this;
         do {
-            if( tmp->header.free_list.stats.free_count == 0 ) {
+            if( tmp->header.free_list.free_count == 0 ) {
                 tmp = tmp->header.next;
             } else {
                 res = tmp->getNextAvailable();
@@ -84,7 +75,6 @@ public:
             assert( res != NULL );
         }
 
-//        std::cout << "Allocated: " << (void *)res << std::endl;
         return res;
     }
 
@@ -102,26 +92,24 @@ public:
             assert( idx->key.id >= SET_INUSE );
 
             idx->key.id &= (UNSET_INUSE);
-            idx->key.fl_offset = header.free_list.stats.available;
-            header.free_list.stats.available = idx->key.id;
-            ++header.free_list.stats.free_count;
+            idx->key.fl_offset = header.free_list.available;
+            header.free_list.available = idx->key.id;
+            ++header.free_list.free_count;
         } else {
             std::cout << "object not found in space" << std::endl;
         }
     }
 
     static void release( object_t * obj ) {
-//        std::cout << "Releasing: " << (void *)obj << std::endl;
         index_t * idx = reinterpret_cast< index_t * >( reinterpret_cast< char * >(obj) - IDX_OFFSET );
-//        std::cout << "found node id: " << (void *) idx << " - "<< idx->key.id << "," << idx->key.fl_offset << std::endl;
         assert( idx->key.id >= SET_INUSE );
         idx->key.id &= (UNSET_INUSE);
 
         Header * header = reinterpret_cast< Header * >( reinterpret_cast< char * >(idx) - sizeof( _node ) * idx->key.id - sizeof(Header));
 
-        idx->key.fl_offset = header->free_list.stats.available;
-        header->free_list.stats.available = idx->key.id;
-        ++header->free_list.stats.free_count;
+        idx->key.fl_offset = header->free_list.available;
+        header->free_list.available = idx->key.id;
+        ++header->free_list.free_count;
     }
 
     virtual ~Pager() {
@@ -132,29 +120,37 @@ public:
     }
 protected:
     object_t * getNextAvailable() {
-        if( header.free_list.stats.free_count == 0 ) return NULL;
+        if( header.free_list.free_count == 0 ) return NULL;
 
         object_t * rval = NULL;
-        offset_t avail = header.free_list.stats.available;
-//        _node & onode = objects[ avail ];
+        offset_t avail = header.free_list.available;
         _node * onode = &objects[avail];
-        if( onode->idx.key.id < SET_INUSE ) {
-//            std::cout << "updating key id: " << &onode->idx << " - " << onode->idx.key.id << std::endl;
-            onode->idx.key.id |= SET_INUSE;
-//            std::cout << "updated key id: " << onode->idx.key.id << std::endl;
+        if( onode->idx.id < SET_INUSE ) {
+            onode->idx.id |= SET_INUSE;
             rval = &onode->obj;
-            if( --header.free_list.stats.free_count > 0 ) {
-                assert( onode->idx.key.fl_offset != COUNT );
-                header.free_list.stats.available = onode->idx.key.fl_offset;
+            if( --header.free_list.free_count > 0 ) {
+                assert( onode->idx.fl_offset != COUNT );
+                header.free_list.available = onode->idx.fl_offset;
             } else {
-                header.free_list.stats.available = COUNT;
+                header.free_list.available = COUNT;
             }
         } else {
-            std::cout << "Attempted to get object which is still in use: " << avail << ", " << onode->idx.key.id << std::endl;
+            std::cout << "Attempted to get object which is still in use: " << avail << ", " << onode->idx.id << std::endl;
             assert(false);
         }
 
         return rval;
+    }
+
+    Pager( ) : header(NULL, COUNT, 0) {
+        offset_t id = 0;
+        _node * tmp = objects;
+
+        while( id < COUNT ) {
+            tmp->idx.id = id++;
+            tmp->idx.fl_offset = id;
+            ++tmp;
+        }
     }
 };
 

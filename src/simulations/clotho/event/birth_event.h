@@ -54,7 +54,8 @@ protected:
     Sex m_sex;
 
     //static shared_ptr< Pooler< BirthEvent > > m_pool;
-    static boost::object_pool< BirthEvent > m_pool;
+//    static boost::object_pool< BirthEvent > m_pool;
+    static ObjectManager< BirthEvent > m_pool;
 };
 
 #endif  // BIRTH_EVENT_H_

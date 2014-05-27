@@ -53,7 +53,8 @@ protected:
     system_id   m_offspring;
 
 //    static shared_ptr< Pooler< MateEvent > > m_pool;
-    static boost::object_pool< MateEvent > m_pool;
+//    static boost::object_pool< MateEvent > m_pool;
+    static ObjectManager< MateEvent > m_pool;
 };
 
 #endif  // MATE_EVENT_H_

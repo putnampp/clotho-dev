@@ -86,11 +86,13 @@ protected:
     gamete_t *      m_gamete;
 
 //    static shared_ptr< Pooler< InheritEvent< GM > > > m_pool;
-    static boost::object_pool< InheritEvent< GM > > m_pool;
+//    static boost::object_pool< InheritEvent< GM > > m_pool;
+    static ObjectManager< InheritEvent< GM > > m_pool;
 };
 
 template < class GM >
-boost::object_pool< InheritEvent< GM > > InheritEvent<GM>::m_pool;
+ObjectManager< InheritEvent< GM > > InheritEvent<GM>::m_pool;
+//boost::object_pool< InheritEvent< GM > > InheritEvent<GM>::m_pool;
 //template < class GM >
 //shared_ptr< Pooler< InheritEvent< GM > > > InheritEvent<GM>::m_pool( new Pooler< InheritEvent< GM > >() );
 

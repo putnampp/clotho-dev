@@ -48,7 +48,8 @@ public:
                 event_id_t eid );
 
 //    static shared_ptr< Pooler< MateSelectEvent > > m_pool;
-    static boost::object_pool< MateSelectEvent > m_pool;
+//    static boost::object_pool< MateSelectEvent > m_pool;
+    static ObjectManager< MateSelectEvent > m_pool;
 };
 
 #endif  // MATE_SELECT_EVENT_H_

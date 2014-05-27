@@ -2,7 +2,8 @@
 
 //shared_ptr< Pooler< MateEvent> > MateEvent::m_pool( new Pooler< MateEvent >() );
 //
-boost::object_pool< MateEvent > MateEvent::m_pool;
+//boost::object_pool< MateEvent > MateEvent::m_pool;
+ObjectManager< MateEvent > MateEvent::m_pool;
 
 MateEvent::MateEvent( const vtime_t & tSent, const vtime_t & tRecv,
                 const system_id & sender, const system_id & receiver,
