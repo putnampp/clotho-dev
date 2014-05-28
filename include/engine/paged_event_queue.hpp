@@ -54,6 +54,7 @@ public:
 
     event_t * next( ) {
         if( !updateReadPage() ) {
+            std::cout << "No more events" << std::endl;
             return NULL;
         }
         
@@ -92,6 +93,8 @@ public:
             event_page_t * tmp = page;
             page = page->getNextPage();
 
+            tmp->reset();
+
             m_page_manager->release(tmp);
         }
         m_read = NULL;
@@ -100,7 +103,10 @@ protected:
     bool updateReadPage() {
         assert( m_read != NULL );
         if( m_read_it == m_read->end() ) {
-            if( m_read->getNextPage() == m_tail && m_tail->isEmpty() ) return false;
+            if( m_read->getNextPage() == m_tail && m_tail->isEmpty() ) {
+                std::cout << "next page is tail. and tail is empty" << std::endl;
+                return false;
+            }
 
             event_page_t * tmp = m_read;
             m_read = m_read->getNextPage();

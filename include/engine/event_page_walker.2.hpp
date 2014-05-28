@@ -1,5 +1,5 @@
-#ifndef EVENT_PAGE_WALKER_HPP_
-#define EVENT_PAGE_WALKER_HPP_
+#ifndef EVENT_PAGE_WALKER_2_HPP_
+#define EVENT_PAGE_WALKER_2_HPP_
 
 #include <cassert>
 #include <iostream>
@@ -26,7 +26,7 @@ public:
         m_page(page),
         m_obj( ((s == NULL )? ((page != NULL) ? page->head_object() : NULL ) : s) ),
         m_stop_obj( ((e == NULL ) ? ((page != NULL) ? page->end_object() : NULL ) : e) ),
-        m_en( ((m_obj != NULL )? m_obj->head : NULL )),
+        m_en( ((m_obj != NULL )? &m_obj->events : NULL )),
         m_bObjectChange(m_obj != m_stop_obj)
     { }
 
@@ -51,7 +51,7 @@ public:
                         break;
                     }
 //                    std::cout << " to " << m_obj->object_id << std::endl;
-                    m_en = m_obj->head;
+                    m_en = &m_obj->events;
                 } while( m_en == NULL );
 //                std::cout << "Change complete" << std::endl;
                 m_bObjectChange = true;
@@ -101,4 +101,4 @@ protected:
     bool    m_bObjectChange;
 };
 
-#endif  // EVENT_PAGE_WALKER_HPP_
+#endif  // EVENT_PAGE_WALKER_2_HPP_

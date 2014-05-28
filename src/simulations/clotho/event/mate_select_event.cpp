@@ -1,14 +1,6 @@
 #include "mate_select_event.h"
 
-//shared_ptr< Pooler< MateSelectEvent > > MateSelectEvent::m_pool( new Pooler< MateSelectEvent >() );
-
-//MateSelectEvent * MateSelectEvent::getOrCreate() {
-//    return MateSelectEvent::m_pool->getOrCreate();
-//}
-
-//boost::object_pool< MateSelectEvent > MateSelectEvent::m_pool;
-
-ObjectManager< MateSelectEvent > MateSelectEvent::m_pool;
+MateSelectEvent::object_manager_t MateSelectEvent::m_pool;
 
 MateSelectEvent::MateSelectEvent( const vtime_t & tSent, const vtime_t & tRecv,
                 const system_id & sender, const system_id & receiver,

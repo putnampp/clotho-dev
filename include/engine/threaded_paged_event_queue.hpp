@@ -9,7 +9,7 @@
 #include <utility>
 #include <cstring>
 
-#include "event_page.hpp"
+#include "event_page.h"
 
 template < class EVT, class OBJ >
 class ThreadedPagedEventQueue {

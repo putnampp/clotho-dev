@@ -1,8 +1,6 @@
 #include "birth_event.h"
 
-//shared_ptr< Pooler< BirthEvent > > BirthEvent::m_pool( new Pooler< BirthEvent >() );
-//boost::object_pool< BirthEvent > BirthEvent::m_pool;
-ObjectManager< BirthEvent > BirthEvent::m_pool;
+BirthEvent::object_manager_t BirthEvent::m_pool;
 
 BirthEvent::BirthEvent( const vtime_t & tSent, const vtime_t & tRecv,
                 const system_id & sender, const system_id & receiver,
@@ -35,7 +33,3 @@ void BirthEvent::init( const vtime_t & tSent, const vtime_t & tRecv,
 Sex BirthEvent::getSex() const {
     return m_sex;
 }
-
-/*void BirthEvent::release() {
-    m_pool->release( this );   
-}*/

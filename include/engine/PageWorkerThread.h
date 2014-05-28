@@ -7,7 +7,7 @@
 
 #include "common_thread.h"
 #include "synchronizer.h"
-#include "event_page.hpp"
+#include "event_page.h"
 
 template < class E, class O, class SM >
 class PageWorkerThread {

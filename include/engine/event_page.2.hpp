@@ -1,12 +1,13 @@
-#ifndef EVENT_PAGE_HPP_
-#define EVENT_PAGE_HPP_
+#ifndef EVENT_PAGE_2_HPP_
+#define EVENT_PAGE_2_HPP_
 
 #include "memory_page.h"
 
-#include "event_page_walker.hpp"
+#include "event_page_walker.2.hpp"
 
 #include <ostream>
 #include <iostream>
+#include <cstring>
 
 #include <boost/pool/object_pool.hpp>
 
@@ -30,11 +31,13 @@ public:
     struct event_node {
         event_t *   p_event;
         event_node * next;
+        event_node( event_t * e, event_node * n = NULL ) : p_event(e), next(n) {}
     };
 
     struct object_node {
         object_t object_id;
-        event_node * head, * tail;
+        event_node events;
+        object_node( object_t id, event_t * e, event_node * n = NULL ) : object_id(id), events(e,n) {}
     };
 
     struct event_page_header : public memory_page_header {
@@ -77,47 +80,39 @@ public:
             return false;  // page full
         }
 
-        char * n_free_start = m_header.free_start + sizeof(event_node);
-        char * n_free_end = m_header.free_end;
-
         object_node * obj = findObject( object_id );
 
         if( obj == NULL ) {
             // object does not exist on current page
-            n_free_end -= sizeof( object_node );
-        }
+            char * n_free_end = m_header.free_end - sizeof(object_node);
 
-        bool res = (n_free_start < n_free_end); // is there sufficient space to schedule event?
-        if( res ) {
-            // sufficient space to add event to page
-            
-            event_node * nevt = reinterpret_cast< event_node * >(m_header.free_start);
-            nevt->p_event = e;
-            nevt->next = NULL;
+            if( m_header.free_start >= n_free_end ) return false;   // insufficient space
 
-            if( obj == NULL ) {
-                obj = reinterpret_cast< object_node * >( n_free_end );
-                obj->object_id = object_id;
-                obj->head = nevt;
+            obj = reinterpret_cast< object_node * >(n_free_end);
+            obj->object_id = object_id;
+            obj->events.p_event = e;
+            obj->events.next = NULL;
+    
+            ++m_header.m_nObjects;
 
-                ++m_header.m_nObjects;
-            } else {
-                // object already exists
-                //
-                //nevt->next = obj->head;
-                assert( object_id == obj->object_id );
-                obj->tail->next = nevt;
-            }
-            obj->tail = nevt;
-            
-            m_header.free_start = n_free_start;
             m_header.free_end = n_free_end;
-            ++m_header.m_nEvents;
-        } else {
+        } else if( m_header.free_start + sizeof(event_node) < m_header.free_end ) {
+            assert( object_id == obj->object_id );
 
+            event_node * tmp = reinterpret_cast< event_node * >(m_header.free_start);
+            tmp->p_event = e;
+            tmp->next = obj->events.next;
+            obj->events.next = tmp;
+
+            m_header.free_start += sizeof(event_node);
+        } else {
+            // insufficient space
+            return false;
         }
 
-        return res;
+        ++m_header.m_nEvents;
+
+        return true;
     }
 
     iterator begin() {
@@ -237,6 +232,10 @@ protected:
         return reinterpret_cast< object_node * >( block + BLOCK_SIZE );
     }
 
+    //memory_page m_page;
+    //size_t      m_nObjects;
+    //size_t      m_nEvents;
+
     event_page_header m_header;
     char          block[ BLOCK_SIZE ];
 
@@ -245,5 +244,4 @@ protected:
 
 template < class EVT, class OBJ >
 typename EventPage< EVT, OBJ >::manager_t EventPage< EVT, OBJ >::m_pool;
-
-#endif  // EVENT_PAGE_HPP_
+#endif  // EVENT_PAGE_2_HPP_

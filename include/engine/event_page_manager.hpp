@@ -1,7 +1,7 @@
 #ifndef EVENT_PAGE_MANAGER_H_
 #define EVENT_PAGE_MANAGER_H_
 
-#include "event_page.hpp"
+#include "event_page.h"
 
 template < class EVT, class OBJ >
 class EventPageManager {

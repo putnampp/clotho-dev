@@ -37,15 +37,9 @@ public:
             COUNT = page_t::COUNT
          };
 
-    ObjectManager( ) : m_free_objs(0) {
- //       m_root = m_base.clone();
-    }
+    ObjectManager( ) : m_free_objs(0) { }
 
     object_t * malloc() {
-//        if( m_root->header.free_count == 0 ) {
-//            page_t * tmp = m_base.clone();
-//            insertPage(tmp);
-//        }
         container_node_t * fpage = m_pages.getRoot();
         page_t * tmp = NULL;
 
@@ -53,26 +47,24 @@ public:
             free_page_t k( page_t::COUNT, NULL );
             fpage = m_pages.insert(k);
 
-            tmp = page_t::TEMPLATE.clone( fpage );
-            //std::cout << "Allocated new page: " << tmp  << " [" << tmp->header.parent << "]" << std::endl;
-            assert( fpage->key.first == tmp->header.free_count );
-            assert( tmp->header.parent == fpage );
+            tmp = page_t::TEMPLATE.clone();
+            tmp->setContainerNode(fpage);
 
             fpage->key.second = tmp;
             m_free_objs += page_t::COUNT;
         } else {
             if( fpage->key.first == 0 ) {
-            fpage = m_pages.find( &has_free_objects );
-            assert( fpage != NULL );
+                fpage = m_pages.find( &has_free_objects );
+                assert( fpage != NULL );
             }
             tmp = (page_t*) fpage->key.second;
         }
 
         object_t * obj = tmp->getNextAvailable();
         assert( obj != NULL );
+
         --fpage->key.first;
         --m_free_objs;
-//        m_pages.splay( fpage );
         return obj;
     }
 
@@ -83,12 +75,9 @@ public:
     void free( object_t * ptr ) {
         container_node_t * p = page_t::release( ptr );
 
-//        rebalancePage( p );
         if( p ) {
-//            std::cout << "released object from: " << p << std::endl;
             ++p->key.first;
             ++m_free_objs;
-            m_pages.splay( p );
         }
     }
 
@@ -103,9 +92,6 @@ public:
     }
 
 protected:
-
-//    page_t m_base;
-//    page_t * m_root;
     splay_tree_t m_pages;
     size_t       m_free_objs;
 };

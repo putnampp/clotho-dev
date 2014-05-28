@@ -1,8 +1,6 @@
 #include "maturity_event.h"
 
-//shared_ptr< Pooler< MaturityEvent > > MaturityEvent::m_pool( new Pooler< MaturityEvent >());
-
-boost::object_pool< MaturityEvent > MaturityEvent::m_pool;
+MaturityEvent::object_manager_t MaturityEvent::m_pool;
 
 MaturityEvent::MaturityEvent( const vtime_t & tSent, const vtime_t & tRecv,
                 const system_id & sender, const system_id & receiver,

@@ -7,6 +7,8 @@ class SelectionEvent : public ClothoEvent {
 public:
     static const event_type_t TYPE_ID = 8;
 
+    typedef ObjectManager< SelectionEvent, EVENT_PAGE_SIZE > object_manager_t;
+
     SelectionEvent() {}
 
     SelectionEvent( const vtime_t & tSent, const vtime_t & tRecv,
@@ -22,18 +24,13 @@ public:
     system_id getOffspring() const;
 
     static void * operator new( size_t s ) {
-//        static shared_ptr< Pager< SelectionEvent > > pages( new Pager< SelectionEvent >() );
-
-//        void * res = pages->malloc();
         void * res = m_pool.malloc();
         return res;
     }
 
     static void operator delete( void * ptr ) {
-//        Pager< SelectionEvent >::release( ( SelectionEvent * )ptr );
         m_pool.free( (SelectionEvent *) ptr );
     }
-//    void release() {}
 
     virtual ~SelectionEvent() {}
 
@@ -41,7 +38,7 @@ protected:
     Sex m_sex;
     system_id   m_offspring;
 
-    static boost::object_pool< SelectionEvent > m_pool;
+    static object_manager_t m_pool;
 };
 
 #endif  // SELECTION_EVENT_H_

@@ -1,6 +1,6 @@
 #include "selection_event.h"
 
-boost::object_pool< SelectionEvent > SelectionEvent::m_pool;
+SelectionEvent::object_manager_t SelectionEvent::m_pool;
 
 SelectionEvent::SelectionEvent( const vtime_t & tSent, const vtime_t & tRecv,
                 const system_id & sender, const system_id & receiver,

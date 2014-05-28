@@ -9,9 +9,12 @@
 #include "ider.h"
 
 #include <boost/pool/object_pool.hpp>
-#include "engine/object_manager.hpp"
+//#include "engine/object_manager.hpp"
+#include "engine/object_manager.2.hpp"
 
 #include <ostream>
+
+static const unsigned int EVENT_PAGE_SIZE = (1 << 14);
 
 //typedef std::string event_type_t;
 typedef unsigned int event_type_t;

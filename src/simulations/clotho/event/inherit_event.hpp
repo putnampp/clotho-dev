@@ -2,7 +2,6 @@
 #define INHERIT_EVENT_HPP_
 
 #include "../clotho_event.h"
-//#include "pooler.hpp"
 
 template < class GM >
 class InheritEvent : public ClothoEvent {
@@ -11,11 +10,7 @@ public:
     static const event_type_t TYPE_ID = 4;
     typedef GM gamete_t;
 
-//    friend class Pooler< InheritEvent< GM > >;
-
-//    static InheritEvent< GM > * getOrCreate() {
-//        return m_pool->getOrCreate();
-//    }
+    typedef ObjectManager< InheritEvent<GM>, EVENT_PAGE_SIZE > object_manager_t;
 
     // by default gamete index is unknown (-1)
     // gamete index can be used to identify which "source" ("parent")
@@ -42,20 +37,13 @@ public:
     gamete_t * getGamete() const { return m_gamete; }
 
     static void * operator new( size_t s ) {
-//        static shared_ptr< Pager< InheritEvent< GM > > > pages( new Pager< InheritEvent< GM > >() );
-
-//        void * res = pages->malloc();
         void * res = m_pool.malloc();
         return res;
     }
 
     static void operator delete( void * ptr ) {
-//        Pager< InheritEvent<GM> >::release( ( InheritEvent< GM > * )ptr );
         m_pool.free( (InheritEvent< GM > *) ptr );
     }
-//    void release() {
-//        m_pool->release(this);
-//    }
 
     virtual ~InheritEvent() {}
 //protected:
@@ -85,15 +73,10 @@ protected:
     unsigned char   m_gidx;
     gamete_t *      m_gamete;
 
-//    static shared_ptr< Pooler< InheritEvent< GM > > > m_pool;
-//    static boost::object_pool< InheritEvent< GM > > m_pool;
-    static ObjectManager< InheritEvent< GM > > m_pool;
+    static object_manager_t m_pool;
 };
 
 template < class GM >
-ObjectManager< InheritEvent< GM > > InheritEvent<GM>::m_pool;
-//boost::object_pool< InheritEvent< GM > > InheritEvent<GM>::m_pool;
-//template < class GM >
-//shared_ptr< Pooler< InheritEvent< GM > > > InheritEvent<GM>::m_pool( new Pooler< InheritEvent< GM > >() );
+typename InheritEvent< GM >::object_manager_t InheritEvent<GM>::m_pool;
 
 #endif  // INHERIT_EVENT_HPP_

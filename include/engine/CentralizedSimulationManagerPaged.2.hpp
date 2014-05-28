@@ -9,7 +9,7 @@
 #include "simulation_stats.h"
 #include <map>
 
-#include "paged_event_queue.hpp"
+#include "paged_event_queue.2.hpp"
 
 //using std::deque;
 using std::map;
@@ -28,7 +28,7 @@ public:
     typedef vector< object_pool_pair_t > object_list_t;
 
     typedef PagedEventQueue< event_t, system_id > paged_event_pool_t;
-    typedef typename paged_event_pool_t::event_page_manager_t page_manager_t;
+//    typedef typename paged_event_pool_t::event_page_manager_t page_manager_t;
 
     typedef std::map< vtime_t, paged_event_pool_t * > ltsf_pool_t;
 
@@ -78,7 +78,7 @@ protected:
     unsigned int    m_nUnregisterCalls;
 
     shared_ptr< SimulationStats > m_stats;
-    page_manager_t  m_page_manager;
+    //page_manager_t  m_page_manager;
 };
 
 //
@@ -230,7 +230,8 @@ template < class E, class O >
 void CentralizedSimulationManager<E, O>::routeEvent( event_t * evt, const system_id & recv_id, const vtime_t & rt ) {
     typename ltsf_pool_t::iterator it = m_pooled_events.find(rt);
     if( it == m_pooled_events.end() ) {
-        paged_event_pool_t * tmp = new paged_event_pool_t( & m_page_manager );
+//        paged_event_pool_t * tmp = new paged_event_pool_t( & m_page_manager );
+        paged_event_pool_t * tmp = new paged_event_pool_t();
         std::pair< typename ltsf_pool_t::iterator, bool > res = m_pooled_events.insert( std::make_pair( rt, tmp ) );
         assert( res.second );
 
@@ -263,24 +264,33 @@ void CentralizedSimulationManager<E, O>::simulate( const vtime_t & until ) {
     vtime_t timestamp = (( it == m_pooled_events.end() ) ? SystemClock::POSITIVE_INFINITY : it->first);
 
     while( timestamp != SystemClock::POSITIVE_INFINITY && !setSimulationTime( timestamp ) ) {
-        std::cout << "Simulation time: " << timestamp << std::endl;
+//        std::cout << "Simulation time: " << timestamp << std::endl;
         paged_event_pool_t * tmp_evts = it->second;
+        typename paged_event_pool_t::event_page_t * pg = tmp_evts->getReadPage();
+    
+        while( pg != NULL ) {
+            object_t * obj = NULL;
+            typename paged_event_pool_t::iterator pg_it = pg->begin();
 
-        object_t * obj = NULL;
-        event_t * evt = NULL;
-        while( (evt = tmp_evts->next( ) ) != NULL ) {
-            if( obj == NULL || obj->getSystemID() != evt->getReceiver() ) {
-                system_id::object_id_t oid = evt->getReceiver().getObjectID();
-                obj = m_objects[ oid ].first;
-                obj->updateLocalTime(timestamp);
-                assert( obj->getEventPerformer() != NULL );              
+            while( pg_it != pg->end() ) {
+                
+//                if( obj == NULL || obj->getSystemID() != evt->getReceiver() ) {
+                event_t * evt = pg_it.getEvent();
+                if( obj == NULL || pg_it.HasObjectChanged() ) {
+                    system_id::object_id_t oid = evt->getReceiver().getObjectID();
+                    obj = m_objects[ oid ].first;
+                    obj->updateLocalTime(timestamp);
+                    assert( obj->getEventPerformer() != NULL );              
+                }
+
+                obj->getEventPerformer()->perform_event( evt );
+                ++m_nProcessedEvents;
+                ++pg_it;
             }
 
-            obj->getEventPerformer()->perform_event( evt );
-            ++m_nProcessedEvents;
+            delete pg;
+            pg = tmp_evts->getReadPage();
         }
-
-        assert( tmp_evts->size() == 0 );
 
         m_pooled_events.erase( it );
 

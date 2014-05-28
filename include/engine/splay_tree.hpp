@@ -50,7 +50,6 @@ private:
         x->parent = y;
     }
 
-public:
     void splay( node *x ) {
         while( x->parent ) {
             if( !x->parent->parent ) {
@@ -72,7 +71,6 @@ public:
         }
     }
 
-private:
     void replace( node *u, node *v ) {
         if( !u->parent ) root = v;
         else if( u == u->parent->left ) u->parent->left = v;

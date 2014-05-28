@@ -5,7 +5,8 @@
 //#include "CentralizedSimulationManager.hpp"
 //#include "CentralizedSimulationManager2.hpp"
 //#include "CentralizedSimulationManagerPooled.hpp"
-#include "CentralizedSimulationManagerPaged.hpp"
+//#include "CentralizedSimulationManagerPaged.hpp"
+#include "CentralizedSimulationManagerPaged.2.hpp"
 //#include "ThreadedCentralizedSimulationManager.hpp"
 #include "ThreadedCentralizedSimulationManager.2.hpp"
 

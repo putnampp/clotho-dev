@@ -41,15 +41,19 @@ public:
 
     static const ManagedPage< N, O, S> TEMPLATE;
 
-    ManagedPage( container_node_t * p, const ManagedPage< N, O, S > & src ) : 
-        header(p, COUNT, 0) 
+    ManagedPage( const ManagedPage< N, O, S > & src ) : 
+        header(NULL, COUNT, 0) 
     {
         memcpy( objects, src.objects, sizeof( _node ) * COUNT );
     }
 
-    ManagedPage< N, O, S > * clone( container_node_t * p) const {
-        ManagedPage< N, O, S > * cl = new ManagedPage<N, O,S >(p, *this );
+    ManagedPage< N, O, S > * clone() const {
+        ManagedPage< N, O, S > * cl = new ManagedPage<N, O,S >(*this );
         return cl;
+    }
+
+    inline void setContainerNode( container_node_t * n ) {
+        header.parent = n;
     }
 
     object_t * getNextAvailable() {
