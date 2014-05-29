@@ -3,14 +3,17 @@
 
 #include "../clotho_event.h"
 
+template < class GM, class E = void >
+class InheritEvent;
+
 template < class GM >
-class InheritEvent : public ClothoEvent {
+class InheritEvent< GM, void > : public ClothoEvent {
 public:
 
     static const event_type_t TYPE_ID = 4;
     typedef GM gamete_t;
 
-    typedef ObjectManager< InheritEvent<GM>, EVENT_PAGE_SIZE > object_manager_t;
+    typedef ObjectManager< InheritEvent<GM, void>, EVENT_PAGE_SIZE > object_manager_t;
 
     // by default gamete index is unknown (-1)
     // gamete index can be used to identify which "source" ("parent")

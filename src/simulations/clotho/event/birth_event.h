@@ -2,7 +2,7 @@
 #define BIRTH_EVENT_H_
 
 #include "../clotho_event.h"
-#include "engine/pager.hpp"
+//#include "engine/pager.hpp"
 
 class BirthEvent : public ClothoEvent {
 public:

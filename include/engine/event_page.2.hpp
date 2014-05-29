@@ -43,17 +43,9 @@ public:
 
     struct object_node {
         object_t object_id;
-        event_node events;
-        object_node( ) : object_id(), events() {}
-        object_node(object_t id, event_t * e, event_node * n = NULL ) : object_id(id), events(e,n) {}
+        event_node * events;
+        object_node(object_t id = object_t(), event_node * n = NULL ) : object_id(id), events(n) {}
         object_node( const object_node & onode ) : object_id( onode.object_id ), events( onode.events ) {}
-
-//        void merge( const event_node *enode ) {
-//            event_node * tmp = enode;
-//            while( tmp->next != NULL ) { tmp = tmp->next; }
-//            tmp->next = events.next;
-//            events.next = enode;
-//        }
 
         object_node & operator=( const object_node & rhs ) {
             object_id = rhs.object_id;
@@ -92,9 +84,7 @@ public:
         }
     };
 
-//    enum { BLOCK_SIZE = PAGE_SIZE - sizeof( event_page_header ) - sizeof( void * ) };   // additional pointer for template overhead and root object_node
-
-    enum {  HEADER_SIZE = sizeof( event_page_header ) + sizeof( void * ),
+    enum {  HEADER_SIZE = sizeof( event_page_header ) + sizeof( void * ), // additional pointer for virtual table
             BLOCK_SIZE = PAGE_SIZE - HEADER_SIZE,
             EXP_EVENTS_PER_NODE = 3,
             OBJECT_COUNT = (BLOCK_SIZE) / (sizeof(rb_node) + (EXP_EVENTS_PER_NODE - 1) * sizeof(event_node) ),
@@ -108,18 +98,31 @@ public:
 
     EventPage( EventPage< EVT, OBJ > * n = NULL ) : m_header( n ) {}
 
+    bool hasFreeObjects() {
+        return m_header.m_nObjects < OBJECT_COUNT;
+    }
+
     bool isFull() const {
-        return (m_header.m_nObjects >= OBJECT_COUNT && getEventCount() == EVENT_COUNT);
+        return (m_header.m_nEvents >= EVENT_COUNT);
     }
 
     bool isEmpty() const {
-        return (getEventCount() == 0);
+        return (m_header.m_nEvents == 0);
     }
 
     bool addEvent( event_t * e, const object_t & object_id ) {
-        object_node onode( object_id, e );
+        if( m_header.m_nEvents >= EVENT_COUNT ) return false;
 
-        return insert( onode );
+        event_node * enode = &event_space[ m_header.m_nEvents++ ];
+        enode->p_event = e;
+
+        object_node onode( object_id, enode );
+
+        if( !insert( onode ) ) {
+            m_header.m_nEvents--;
+            return false;
+        }
+        return true;
     }
 
     iterator begin() {
@@ -217,19 +220,27 @@ protected:
         while( x != NULL ) {
             y = x;
             if( x->onode.object_id == onode.object_id ) {
-                if( m_header.m_nEvents >= EVENT_COUNT ) return false;
-
-                event_node * enode = &event_space[ m_header.m_nEvents++ ];
-                enode->p_event = onode.events.p_event;
-                enode->next = x->onode.events.next;
-                x->onode.events.next = enode;
+//                std::cout << "Extending list of: " << onode.object_id << std::endl;
+                onode.events->next = x->onode.events;
+                x->onode.events = onode.events;
                 return true;
             } else if( x->onode.object_id < onode.object_id ) {
+//                std::cout << "Traversing From " << x->onode.object_id << " R ";
                 add_right = true;
                 x = x->right;
+//                if( x != NULL ) {
+//                    std::cout << x->onode.object_id << std::endl;
+//                } else {
+//                    std::cout << "NULL" << std::endl;
+//                }
             } else {
+//                std::cout << "Traversing From " << x->onode.object_id << " L ";
                 add_right = false;
                 x = x->left;
+//                if( x != NULL )
+//                    std::cout <<  x->onode.object_id << std::endl;
+//                else
+//                    std::cout << "NULL" << std::endl;
             }
         }
 
@@ -243,24 +254,26 @@ protected:
         z->state = RED;
         z->onode = onode;
 
+//        std::cout << "Adding new object: ";
         if( y == NULL ) {
+//            std::cout << "{" << z->onode.object_id << ",NULL,NULL}" << std::endl;
             m_header.m_root = z;
         } else if( !add_right ) {
-            std::cout << "{" <<y->onode.object_id << ", ";
-            if( y->right == NULL ) {
-                std::cout << "NULL}" << std::endl;
-            } else {
-                std::cout << y->right->onode.object_id << "}" << std::endl;
-            }
+//            std::cout << "{" <<y->onode.object_id << ", ";
+//            if( y->right == NULL ) {
+//                std::cout << "NULL}" << std::endl;
+//            } else {
+//                std::cout << y->right->onode.object_id << "}" << std::endl;
+ //           }
             y->left = z;
         } else {
-            std::cout << "{" << y->onode.object_id << ", ";
-            if( y->left == NULL ) {
-                std::cout << "NULL"; 
-            } else {
-                std::cout << y->left->onode.object_id;
-            }
-            std::cout << ", " << z->onode.object_id << "}" << std::endl;
+//            std::cout << "{" << y->onode.object_id << ", ";
+//            if( y->left == NULL ) {
+//                std::cout << "NULL"; 
+//            } else {
+//                std::cout << y->left->onode.object_id;
+//            }
+//            std::cout << ", " << z->onode.object_id << "}" << std::endl;
             y->right = z;
         }
 
@@ -289,13 +302,12 @@ protected:
 
         t->parent = z->parent;
 
-        if( z->parent == NULL ) m_header.m_root = t;
-        else {
-            if( z == z->parent->left) {
-                z->parent->left = t;
-            } else {
-                z->parent->right = t;
-            }
+        if( z->parent == NULL ) {
+            m_header.m_root = t;
+        } else if( z == z->parent->left) {
+            z->parent->left = t;
+        } else {
+            z->parent->right = t;
         }
 
         t->right = z;
@@ -309,13 +321,12 @@ protected:
         if( t->left != NULL ) t->left->parent=z;
 
         t->parent = z->parent;
-        if( t->parent == NULL ) m_header.m_root = t;
-        else {
-            if( z == z->parent->left ) {
-                z->parent->left = t;
-            } else {
-                z->parent->right = t;
-            }
+        if( z->parent == NULL ) {
+            m_header.m_root = t;
+        } else if( z == z->parent->left ) {
+            z->parent->left = t;
+        } else {
+            z->parent->right = t;
         }
         t->left = z;
         z->parent = t;
@@ -328,7 +339,6 @@ protected:
             return;
         }
 
-        x->state = RED;
         while( (x != m_header.m_root ) && (x->parent->state == RED )) {
             if( x->parent == x->parent->parent->left ) {
                 rb_node * y = x->parent->parent->right;

@@ -264,11 +264,11 @@ void CentralizedSimulationManager<E, O>::simulate( const vtime_t & until ) {
     vtime_t timestamp = (( it == m_pooled_events.end() ) ? SystemClock::POSITIVE_INFINITY : it->first);
 
     while( timestamp != SystemClock::POSITIVE_INFINITY && !setSimulationTime( timestamp ) ) {
-//        std::cout << "Simulation time: " << timestamp << std::endl;
+        //std::cout << "Simulation time: " << timestamp << std::endl;
         paged_event_pool_t * tmp_evts = it->second;
         typename paged_event_pool_t::event_page_t * pg = tmp_evts->getReadPage();
     
-        pg->dump(std::cout);
+//        pg->dump(std::cout);
         while( pg != NULL ) {
             object_t * obj = NULL;
             typename paged_event_pool_t::iterator pg_it = pg->begin();

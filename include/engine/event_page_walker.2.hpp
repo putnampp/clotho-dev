@@ -26,7 +26,7 @@ public:
         m_page(page),
         m_obj( ((s == NULL )? ((page != NULL) ? page->head_object() : NULL ) : s) ),
         m_stop_obj( ((e == NULL ) ? ((page != NULL) ? page->end_object() : NULL ) : e) ),
-        m_en( ((m_obj != NULL )? &m_obj->onode.events : NULL )),
+        m_en( ((m_obj != NULL )? m_obj->onode.events : NULL )),
         m_bObjectChange(m_obj != m_stop_obj)
     { }
 
@@ -48,7 +48,7 @@ public:
                         m_obj = NULL;
                         break;
                     }
-                    m_en = &m_obj->onode.events;
+                    m_en = m_obj->onode.events;
                 } while( m_en == NULL );
                 m_bObjectChange = true;
             } else {

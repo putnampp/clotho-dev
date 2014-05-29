@@ -25,6 +25,8 @@ public:
     void append( event_t * evt, const object_t & obj ) {
         if( m_tail == NULL ) {
             m_tail = new event_page_t();
+
+            assert( m_tail->addEvent(evt, obj));
         } else if( m_tail->isFull() ) {
             //std::cout << "Page full " << m_tail->getEventCount() << " allocating new page " << std::endl;
             event_page_t * tmp = new event_page_t();
