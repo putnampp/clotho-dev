@@ -31,88 +31,95 @@ public:
     struct event_node {
         event_t *   p_event;
         event_node * next;
-        event_node( event_t * e, event_node * n = NULL ) : p_event(e), next(n) {}
+        event_node( event_t * e = NULL, event_node * n = NULL ) : p_event(e), next(n) {}
+        event_node( const event_node & en ) : p_event(en.p_event), next( en.next ) {}
+
+        event_node & operator=( const event_node & en ) {
+            p_event = en.p_event;
+            next = en.next;
+            return *this;
+        }
     };
 
     struct object_node {
         object_t object_id;
         event_node events;
-        object_node( object_t id, event_t * e, event_node * n = NULL ) : object_id(id), events(e,n) {}
+        object_node( ) : object_id(), events() {}
+        object_node(object_t id, event_t * e, event_node * n = NULL ) : object_id(id), events(e,n) {}
+        object_node( const object_node & onode ) : object_id( onode.object_id ), events( onode.events ) {}
+
+//        void merge( const event_node *enode ) {
+//            event_node * tmp = enode;
+//            while( tmp->next != NULL ) { tmp = tmp->next; }
+//            tmp->next = events.next;
+//            events.next = enode;
+//        }
+
+        object_node & operator=( const object_node & rhs ) {
+            object_id = rhs.object_id;
+            events = rhs.events;
+            return *this;
+        }
     };
 
-    struct event_page_header : public memory_page_header {
+
+    enum rb_state { RED, BLACK };
+
+    struct rb_node {
+        rb_node * parent, * left, * right;
+        object_node onode;
+        rb_state state;
+
+        rb_node( rb_node * p = NULL, rb_node * l = NULL, rb_node * r = NULL, object_node o = object_node() ) :
+            parent(p),
+            left(l),
+            right(r),
+            onode(o),
+            state(RED) {
+        }
+    };
+
+    struct event_page_header {
         EventPage< EVT, OBJ > * next;
-        size_t      m_nObjects;
-        size_t      m_nEvents;
+        rb_node     *m_root;
+        size_t      m_nObjects, m_nEvents;
 
-        event_page_header( EventPage<EVT,OBJ> * n = NULL,  char * s = NULL, char * e = NULL ) : 
-            memory_page_header(s, e),
+        event_page_header( EventPage<EVT,OBJ> * n = NULL, rb_node * r = NULL ) :
             next(n),
+            m_root(r),
             m_nObjects(0),
-            m_nEvents(0)
-        {}
+            m_nEvents(0) {
+        }
     };
 
-    enum { BLOCK_SIZE = PAGE_SIZE - sizeof( event_page_header ) - sizeof( void * ) };   // additional pointer for template overhead
+//    enum { BLOCK_SIZE = PAGE_SIZE - sizeof( event_page_header ) - sizeof( void * ) };   // additional pointer for template overhead and root object_node
+
+    enum {  HEADER_SIZE = sizeof( event_page_header ) + sizeof( void * ),
+            BLOCK_SIZE = PAGE_SIZE - HEADER_SIZE,
+            EXP_EVENTS_PER_NODE = 3,
+            OBJECT_COUNT = (BLOCK_SIZE) / (sizeof(rb_node) + (EXP_EVENTS_PER_NODE - 1) * sizeof(event_node) ),
+            EVENT_COUNT = OBJECT_COUNT * (EXP_EVENTS_PER_NODE - 1)
+         };
 
     typedef EventPageWalker<  EventPage< EVT, OBJ > > iterator;
     friend iterator;
 
     typedef std::pair< iterator, iterator > iterator_range;
 
-    EventPage( EventPage< EVT, OBJ > * n = NULL ) : m_header( n, block, block + BLOCK_SIZE ) {}
-
-    size_t getFreeSpace() const {
-        return (m_header.free_end - m_header.free_start);
-    }
+    EventPage( EventPage< EVT, OBJ > * n = NULL ) : m_header( n ) {}
 
     bool isFull() const {
-        static const size_t buffer_zone_size = sizeof(object_node) + sizeof( event_node );
-        return getFreeSpace() <= buffer_zone_size;
+        return (m_header.m_nObjects >= OBJECT_COUNT && getEventCount() == EVENT_COUNT);
     }
 
     bool isEmpty() const {
-        return (m_header.free_start == block);
+        return (getEventCount() == 0);
     }
 
     bool addEvent( event_t * e, const object_t & object_id ) {
-        if( isFull() ) { 
-            return false;  // page full
-        }
+        object_node onode( object_id, e );
 
-        object_node * obj = findObject( object_id );
-
-        if( obj == NULL ) {
-            // object does not exist on current page
-            char * n_free_end = m_header.free_end - sizeof(object_node);
-
-            if( m_header.free_start >= n_free_end ) return false;   // insufficient space
-
-            obj = reinterpret_cast< object_node * >(n_free_end);
-            obj->object_id = object_id;
-            obj->events.p_event = e;
-            obj->events.next = NULL;
-    
-            ++m_header.m_nObjects;
-
-            m_header.free_end = n_free_end;
-        } else if( m_header.free_start + sizeof(event_node) < m_header.free_end ) {
-            assert( object_id == obj->object_id );
-
-            event_node * tmp = reinterpret_cast< event_node * >(m_header.free_start);
-            tmp->p_event = e;
-            tmp->next = obj->events.next;
-            obj->events.next = tmp;
-
-            m_header.free_start += sizeof(event_node);
-        } else {
-            // insufficient space
-            return false;
-        }
-
-        ++m_header.m_nEvents;
-
-        return true;
+        return insert( onode );
     }
 
     iterator begin() {
@@ -126,11 +133,8 @@ public:
 
     iterator getEventsByObjectIndex( size_t idx ) {
         if( idx < getObjectCount() ) {
-            object_node * s = head_object();
-            while( idx-- ) { s++; }
-
-            object_node * e = s;
-            ++e;
+            rb_node * s = &node_space[ idx++ ];
+            rb_node * e = &node_space[ idx ];
             return iterator(this, s, e);
         }
 
@@ -142,7 +146,7 @@ public:
     }
 
     unsigned int getEventCount() const {
-        return m_header.m_nEvents;
+        return m_header.m_nEvents + m_header.m_nObjects;
     }
 
     static void * operator new( size_t s ) {
@@ -157,8 +161,8 @@ public:
 
     void reset() {
         m_header.next = NULL;
-        m_header.free_start = block;
-        m_header.free_end = block + BLOCK_SIZE;
+//        m_header.free_start = block;
+//        m_header.free_end = block + BLOCK_SIZE;
         m_header.m_nObjects = 0;
         m_header.m_nEvents = 0;
     }
@@ -179,7 +183,7 @@ public:
         iterator s = begin();
         iterator e = end();
         if( s != e ) {
-            do { 
+            do {
                 if( s.HasObjectChanged() ) {
                     out << "\n";
                     out << s.getObjectID();
@@ -205,39 +209,227 @@ public:
 
 protected:
 
-    // returns NULL if object does not exist in object list
-    object_node * findObject( const object_t & object_id ) {
-        object_node * obj = head_object();
-        object_node * e = end_object();
-        while ( obj < e ) {
-            if( obj->object_id == object_id ) {
-                // consider swapping obj with start of the object node list
-                // alternatively, splay tree of objects may be advantageous
-                // if events/object is small (E[ X < 7 ] => >32 object/page )
-                // assuming sequential event generation per object
+    bool insert( const object_node & onode ) {
+        rb_node * y = NULL;
+        rb_node * x = m_header.m_root;
 
-                break;
+        bool add_right = false;
+        while( x != NULL ) {
+            y = x;
+            if( x->onode.object_id == onode.object_id ) {
+                if( m_header.m_nEvents >= EVENT_COUNT ) return false;
+
+                event_node * enode = &event_space[ m_header.m_nEvents++ ];
+                enode->p_event = onode.events.p_event;
+                enode->next = x->onode.events.next;
+                x->onode.events.next = enode;
+                return true;
+            } else if( x->onode.object_id < onode.object_id ) {
+                add_right = true;
+                x = x->right;
+            } else {
+                add_right = false;
+                x = x->left;
             }
-            ++obj;
         }
 
-        return (( obj >= e ) ? NULL : obj);
+        if( m_header.m_nObjects >= OBJECT_COUNT ) return false;
+
+        rb_node * z = & node_space[ m_header.m_nObjects++ ];
+
+        z->parent = y;
+        z->left = NULL;
+        z->right = NULL;
+        z->state = RED;
+        z->onode = onode;
+
+        if( y == NULL ) {
+            m_header.m_root = z;
+        } else if( !add_right ) {
+            std::cout << "{" <<y->onode.object_id << ", ";
+            if( y->right == NULL ) {
+                std::cout << "NULL}" << std::endl;
+            } else {
+                std::cout << y->right->onode.object_id << "}" << std::endl;
+            }
+            y->left = z;
+        } else {
+            std::cout << "{" << y->onode.object_id << ", ";
+            if( y->left == NULL ) {
+                std::cout << "NULL"; 
+            } else {
+                std::cout << y->left->onode.object_id;
+            }
+            std::cout << ", " << z->onode.object_id << "}" << std::endl;
+            y->right = z;
+        }
+
+        balance( z );
+        return true;
     }
 
-    object_node * head_object( ) {
-        return reinterpret_cast< object_node * >(m_header.free_end );  // free space ends at the start of object list
+    inline rb_node * grandparent( rb_node * z ) {
+        return (((z == NULL) || (z->parent == NULL )) ? NULL : z->parent->parent);
     }
 
-    object_node * end_object() {
-        return reinterpret_cast< object_node * >( block + BLOCK_SIZE );
+    inline rb_node * uncle( rb_node * z ) {
+        rb_node * g = grandparent(z);
+        return ((z == NULL) ? NULL : ((g->left == z->parent) ? g->right :g->left));
     }
 
-    //memory_page m_page;
-    //size_t      m_nObjects;
-    //size_t      m_nEvents;
+    inline rb_node * other_sibling( rb_node * parent, rb_node * sib0 ) {
+        return ((parent == NULL) ? NULL : ((parent->left == sib0) ? parent->right : parent->left));
+    }
+
+    inline void rotate_right( rb_node * z ) {
+        rb_node * t = z->left;
+        z->left = t->right;
+
+        if( t->right != NULL ) t->right->parent=z;
+
+        t->parent = z->parent;
+
+        if( z->parent == NULL ) m_header.m_root = t;
+        else {
+            if( z == z->parent->left) {
+                z->parent->left = t;
+            } else {
+                z->parent->right = t;
+            }
+        }
+
+        t->right = z;
+        z->parent = t;
+    }
+
+    inline void rotate_left( rb_node * z ) {
+        rb_node * t = z->right;
+        z->right = t->left;
+
+        if( t->left != NULL ) t->left->parent=z;
+
+        t->parent = z->parent;
+        if( t->parent == NULL ) m_header.m_root = t;
+        else {
+            if( z == z->parent->left ) {
+                z->parent->left = t;
+            } else {
+                z->parent->right = t;
+            }
+        }
+        t->left = z;
+        z->parent = t;
+    }
+
+
+    void balance( rb_node * x ) {
+        if( x->parent == NULL ) {
+            x->state = BLACK;
+            return;
+        }
+
+        x->state = RED;
+        while( (x != m_header.m_root ) && (x->parent->state == RED )) {
+            if( x->parent == x->parent->parent->left ) {
+                rb_node * y = x->parent->parent->right;
+                if( y != NULL && y->state == RED ) {
+                    x->parent->state = BLACK;
+                    y->state = BLACK;
+                    x->parent->parent->state = RED;
+
+                    x = x->parent->parent;
+                } else {
+                    if ( x == x->parent->right ) {
+                        x = x->parent;
+                        rotate_left( x );
+                    }
+
+                    x->parent->state = BLACK;
+                    x->parent->parent->state = RED;
+
+                    rotate_right( x->parent->parent );
+                }
+            } else {
+                rb_node * y = x->parent->parent->left;
+                if( y != NULL &&  y->state == RED ) {
+                    x->parent->state = BLACK;
+                    y->state = BLACK;
+
+                    x->parent->parent->state = RED;
+                    x = x->parent->parent;
+                } else {
+                    if( x == x->parent->left ) {
+                        x = x->parent;
+                        rotate_right(x);
+                    }
+
+                    x->parent->state = BLACK;
+                    x->parent->parent->state = RED;
+                    rotate_left( x->parent->parent );
+                }
+            }
+        }
+        m_header.m_root->state=BLACK;
+    }
+
+    /*    void balance( rb_node * z ) {
+            if( z->parent == NULL ) {
+                std::cout << "setting root to black" << std::endl;
+                z->state = BLACK;   // root node is always black
+            } else if( z->parent->state != BLACK ) {
+                rb_node * g = grandparent(z);
+                rb_node * u = other_sibling(g, z->parent);
+                if( u != NULL && u->state == RED ) {
+                    z->parent->state = BLACK;
+                    u->state = BLACK;
+                    g->state = RED;
+
+                    balance(g);
+                } else {
+                    std::cout << "no uncle or uncle properly colored" << std::endl;
+                    if( z == z->parent->right && z->parent == g->left ) {
+                        rotate_left( z->parent );
+                        z = z->left;
+                    } else if( z == z->parent->left && z->parent == g->right ) {
+                        rotate_right( z->parent );
+                        z = z->right;
+                    }
+
+                    g = grandparent(z);
+                    z->parent->state = BLACK;
+                    g->state = RED;
+
+                    if( z == z->parent->left ) {
+                        std::cout << "Rotating grandparent right" << std::endl;
+                        rotate_right(g);
+                    } else {
+                        std::cout << "Rotating grandparent left" << std::endl;
+                        rotate_left( g );
+                    }
+                }
+            }
+        }*/
+
+
+    /*    object_node * head_object( ) {
+            return reinterpret_cast< object_node * >(m_header.free_end );  // free space ends at the start of object list
+        }
+
+        object_node * end_object() {
+            return reinterpret_cast< object_node * >( block + BLOCK_SIZE );
+        }*/
+
+    rb_node * head_object() {
+        return node_space;
+    }
+
+    rb_node * end_object() {
+        return node_space + m_header.m_nObjects;
+    }
 
     event_page_header m_header;
-    char          block[ BLOCK_SIZE ];
+    rb_node         node_space[ OBJECT_COUNT ];
+    event_node      event_space[ EVENT_COUNT ];
 
     static manager_t m_pool;
 };

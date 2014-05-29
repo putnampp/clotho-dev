@@ -33,10 +33,16 @@ public:
                 m_read = m_tail;
             }
             m_tail = tmp;
+            assert( m_tail->addEvent( evt, obj ) );
+        } else if( !m_tail->addEvent( evt, obj ) ) {
+            event_page_t * tmp = new event_page_t();
+            m_tail->setNextPage(tmp);
+            if( m_read == NULL ) {
+                m_read = m_tail;
+            }
+            m_tail = tmp;
+            assert( m_tail->addEvent( evt, obj ) );
         }
-
-        assert( m_tail->addEvent( evt, obj ) );
-
         ++m_nSize;
     }
 

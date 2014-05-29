@@ -11,8 +11,8 @@ class EventPageWalker {
 public:
     typedef EP event_page_t;
 
-    typedef typename event_page_t::event_node event_node_t;
-    typedef typename event_page_t::object_node object_node_t;
+    typedef typename event_page_t::event_node   event_node_t;
+    typedef typename event_page_t::rb_node      object_node_t;
 
     typedef typename event_page_t::event_t event_t;
     typedef typename event_page_t::object_t object_t;
@@ -26,7 +26,7 @@ public:
         m_page(page),
         m_obj( ((s == NULL )? ((page != NULL) ? page->head_object() : NULL ) : s) ),
         m_stop_obj( ((e == NULL ) ? ((page != NULL) ? page->end_object() : NULL ) : e) ),
-        m_en( ((m_obj != NULL )? &m_obj->events : NULL )),
+        m_en( ((m_obj != NULL )? &m_obj->onode.events : NULL )),
         m_bObjectChange(m_obj != m_stop_obj)
     { }
 
@@ -42,21 +42,16 @@ public:
         if( m_page != NULL ) {
             if( m_en->next == NULL ) {  // transition to next object with an event
                 do {
-//                    std::cout << "Moving from " << m_obj->object_id;
                     if( ++m_obj >= m_stop_obj ) {
-//                        std::cout << " to EOL" << std::endl;
                         m_en = NULL;
                         m_page = NULL;
                         m_obj = NULL;
                         break;
                     }
-//                    std::cout << " to " << m_obj->object_id << std::endl;
-                    m_en = &m_obj->events;
+                    m_en = &m_obj->onode.events;
                 } while( m_en == NULL );
-//                std::cout << "Change complete" << std::endl;
                 m_bObjectChange = true;
             } else {
-//                std::cout << m_obj->object_id << " has another event" << std::endl;
                 m_en = m_en->next;
                 m_bObjectChange = false;
             }
@@ -90,7 +85,7 @@ public:
     event_pointer getEvent() { return m_en->p_event; }
 //    event_reference getEvent() { assert(m_en != NULL); return *(m_en->p_event); }
 
-    object_reference getObjectID() { return m_obj->object_id; }
+    object_reference getObjectID() { return m_obj->onode.object_id; }
 
     virtual ~EventPageWalker() {    }
 protected:

@@ -268,6 +268,7 @@ void CentralizedSimulationManager<E, O>::simulate( const vtime_t & until ) {
         paged_event_pool_t * tmp_evts = it->second;
         typename paged_event_pool_t::event_page_t * pg = tmp_evts->getReadPage();
     
+        pg->dump(std::cout);
         while( pg != NULL ) {
             object_t * obj = NULL;
             typename paged_event_pool_t::iterator pg_it = pg->begin();
