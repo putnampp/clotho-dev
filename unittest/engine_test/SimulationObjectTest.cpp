@@ -38,9 +38,9 @@ BOOST_AUTO_TEST_SUITE( test_simulation_object )
 BOOST_AUTO_TEST_CASE( create_test_so ) {
     MyTestSO so;
 
-    system_id expected_id(0);
+    system_id expected_id;
 
-    BOOST_REQUIRE_MESSAGE( so.getSystemID() == expected_id, "Unexpected object id: " << so.getSystemID() << " != " << expected_id );
+    BOOST_REQUIRE_MESSAGE( expected_id == so.getSystemID(), "Unexpected object id: " << so.getSystemID() << " != " << expected_id );
 }
 
 BOOST_AUTO_TEST_CASE( create_test_so2 ) {

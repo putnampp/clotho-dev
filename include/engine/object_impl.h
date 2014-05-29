@@ -99,7 +99,7 @@ public:
 
 protected:
     Object( ) :
-        m_id(0),
+        m_id(),
         m_sim_manager( NULL ),
         m_local_time( SystemClock::ZERO ),
         m_next_eid( 0 )
@@ -107,7 +107,7 @@ protected:
 
 
     Object( simulation_manager * manager ) :
-        m_id(0),
+        m_id(),
         m_sim_manager( NULL ),
         m_local_time( SystemClock::ZERO ),
         m_next_eid(0)

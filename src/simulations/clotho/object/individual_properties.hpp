@@ -36,7 +36,7 @@ public:
     enum { GAMETE_COUNT = 1 };
 
     individual_props() :
-        p0_id( 0 ),
+        p0_id( ),
         p0( NULL )
     {}
 
@@ -102,8 +102,8 @@ public:
 
     individual_props() :
         m_dob( SystemClock::POSITIVE_INFINITY ),
-        p0_id(0),
-        p1_id(0),
+        p0_id(),
+        p1_id(),
         p0( NULL ), 
         p1( NULL )
     {}

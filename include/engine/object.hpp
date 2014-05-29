@@ -28,7 +28,7 @@ public:
     }
     virtual ~object() {}
 protected:
-    object( ) : m_id(0) {}
+    object( ) : m_id() {}
     object( system_id::manager_id_t man_id, system_id::object_id_t obj_id ) : m_id( man_id, obj_id ) {}
 
     object( const object & o ) : m_id( o.m_id) {}

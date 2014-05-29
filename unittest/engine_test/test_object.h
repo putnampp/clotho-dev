@@ -11,9 +11,9 @@ using std::list;
 
 class TestObject : public object {
 public:
-    TestObject( ) : m_id(0), m_time(0), m_sim(NULL) { }
+    TestObject( ) : m_id(), m_time(0), m_sim(NULL) { }
 
-    TestObject( simulation_manager * simman ) : m_id(0), m_time(0), m_sim(NULL) {
+    TestObject( simulation_manager * simman ) : m_id(), m_time(0), m_sim(NULL) {
         setSimulationManager(simman);
     }
 

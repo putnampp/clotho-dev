@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE( create_id_test ) {
     system_id::object_id_t obj_id =  0x00000020;
     system_id::system_key_t test_key = 0x0000000100000020;
 
-    system_id sid( test_key );
+    system_id sid( man_id, obj_id );
 
     BOOST_REQUIRE_MESSAGE( sid.getKey() == test_key, "Unexpected key mismatch of system_id::system_key: " << std::hex << sid.getKey() << " != " << test_key );
 

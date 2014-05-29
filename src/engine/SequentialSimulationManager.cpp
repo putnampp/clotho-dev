@@ -81,7 +81,7 @@ void SequentialSimulationManager::registerObject( object * obj ) {
     } else {
         // update object pointer, and reset next event time
         m_objects[ obj->getObjectID() ].first = obj;
-        notifyNextEvent( obj->getObjectID(), SystemClock::POSITIVE_INFINITY );
+        notifyNextEvent( obj->getSystemID(), SystemClock::POSITIVE_INFINITY );
     }
 }
 
