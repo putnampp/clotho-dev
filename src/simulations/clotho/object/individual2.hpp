@@ -10,7 +10,8 @@
 
 #include "../clotho_event.h"
 
-#include "../event/inherit_event.hpp"
+//#include "../event/inherit_event.hpp"
+#include "../event/inherit_event.2.h"
 
 #include "reproduction.hpp"   // from libcchmc
 
@@ -29,7 +30,9 @@ class TIndividual< LCM, IP, RMODEL, typename std::enable_if< std::is_base_of< li
  {
 public:
     typedef IP properties_t;
-    typedef InheritEvent< typename properties_t::gamete_t > inherit_event_t;
+//    typedef InheritEvent< typename properties_t::gamete_t > inherit_event_t;
+    typedef typename properties_t::gamete_t gamete_t;
+    typedef InheritEvent inherit_event_t;
 
     typedef RMODEL reproduction_model_t;
 

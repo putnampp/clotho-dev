@@ -299,12 +299,13 @@ protected:
         //typedef typename IND::inherit_event_t ievent_t;
         //const ievent_t * ie = static_cast< const ievent_t * >( evt );
 
+        typedef typename IND::gamete_t   gamete_t;
         typename IND::properties_t * props = ind->getProperties();
         // assert that alive individual is not inheriting
         // new genetic material
         assert( !props->isAlive() );
 
-        props->inheritFrom( ie->getSender(), ie->getGamete(), ie->getParentIndex() );
+        props->inheritFrom( ie->getSender(),(gamete_t * ) ie->getGamete(), ie->getParentIndex() );
 
         if( props->hasSourceGametes() ) {
             ClothoEvent::vtime_t ctime = ie->getReceived();

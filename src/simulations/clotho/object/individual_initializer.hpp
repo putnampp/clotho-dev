@@ -10,7 +10,7 @@ public:
     template < typename IND >
     static void init( IND * ind ) {
         typedef typename IND::inherit_event_t ievent_t;
-        typedef typename ievent_t::gamete_t gamete_t;
+        typedef typename IND::gamete_t gamete_t;
 
         ClothoObject * co = ind->getClothoObject();
         ClothoEvent::vtime_t ctime = co->getCurrentTime();
@@ -24,7 +24,8 @@ public:
         co->sendEvent( ie );
 
         //ie = ievent_t::getOrCreate();
-        ie = new ievent_t( ctime, ctime, id, id, n_eid, new gamete_t(), 1 );
+        ngamete = new gamete_t();
+        ie = new ievent_t( ctime, ctime, id, id, n_eid, ngamete, 1 );
         co->sendEvent( ie );
     }
 
