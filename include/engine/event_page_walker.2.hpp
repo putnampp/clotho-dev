@@ -83,7 +83,6 @@ public:
     }
 
     event_pointer getEvent() { return m_en->p_event; }
-//    event_reference getEvent() { assert(m_en != NULL); return *(m_en->p_event); }
 
     object_reference getObjectID() { return m_obj->onode.object_id; }
 

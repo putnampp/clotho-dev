@@ -1,9 +1,8 @@
-#ifndef PAGED_EVENT_STACK_HPP_
-#define PAGED_EVENT_STACK_HPP_
+#ifndef PAGED_EVENT_QUEUE_HPP_
+#define PAGED_EVENT_QUEUE_HPP_
 
 #include <iostream>
 
-//#include "event_page_manager.hpp"
 #include "event_page.h"
 #include <utility>
 
@@ -28,7 +27,6 @@ public:
 
             assert( m_tail->addEvent(evt, obj));
         } else if( m_tail->isFull() ) {
-            //std::cout << "Page full " << m_tail->getEventCount() << " allocating new page " << std::endl;
             event_page_t * tmp = new event_page_t();
             m_tail->setNextPage(tmp);
             if( m_read == NULL ) {
@@ -102,4 +100,4 @@ protected:
     size_t                  m_nSize;
 };
 
-#endif  // PAGED_EVENT_STACK_HPP_
+#endif  // PAGED_EVENT_QUEUE_HPP_

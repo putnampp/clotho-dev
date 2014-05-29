@@ -259,23 +259,19 @@ void CentralizedSimulationManager<E, O>::simulate( const vtime_t & until ) {
     setSimulateUntil( until );
 
     m_stats->startPhase( SIMULATE_PHASE_K );
-//    vtime_t timestamp = m_pooled_objects.peekNextTimestamp();
     typename ltsf_pool_t::iterator it = m_pooled_events.begin();
     vtime_t timestamp = (( it == m_pooled_events.end() ) ? SystemClock::POSITIVE_INFINITY : it->first);
 
     while( timestamp != SystemClock::POSITIVE_INFINITY && !setSimulationTime( timestamp ) ) {
-        //std::cout << "Simulation time: " << timestamp << std::endl;
         paged_event_pool_t * tmp_evts = it->second;
         typename paged_event_pool_t::event_page_t * pg = tmp_evts->getReadPage();
     
-//        pg->dump(std::cout);
         while( pg != NULL ) {
             object_t * obj = NULL;
             typename paged_event_pool_t::iterator pg_it = pg->begin();
 
             while( pg_it != pg->end() ) {
                 
-//                if( obj == NULL || obj->getSystemID() != evt->getReceiver() ) {
                 event_t * evt = pg_it.getEvent();
                 if( obj == NULL || pg_it.HasObjectChanged() ) {
                     system_id::object_id_t oid = evt->getReceiver().getObjectID();

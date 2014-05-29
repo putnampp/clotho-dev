@@ -164,8 +164,6 @@ public:
 
     void reset() {
         m_header.next = NULL;
-//        m_header.free_start = block;
-//        m_header.free_end = block + BLOCK_SIZE;
         m_header.m_nObjects = 0;
         m_header.m_nEvents = 0;
     }
@@ -220,27 +218,13 @@ protected:
         while( x != NULL ) {
             y = x;
             if( x->onode.object_id == onode.object_id ) {
-//                std::cout << "Extending list of: " << onode.object_id << std::endl;
                 onode.events->next = x->onode.events;
                 x->onode.events = onode.events;
                 return true;
-            } else if( x->onode.object_id < onode.object_id ) {
-//                std::cout << "Traversing From " << x->onode.object_id << " R ";
-                add_right = true;
+            } else if( (add_right = (x->onode.object_id < onode.object_id)) ) {
                 x = x->right;
-//                if( x != NULL ) {
-//                    std::cout << x->onode.object_id << std::endl;
-//                } else {
-//                    std::cout << "NULL" << std::endl;
-//                }
             } else {
-//                std::cout << "Traversing From " << x->onode.object_id << " L ";
-                add_right = false;
                 x = x->left;
-//                if( x != NULL )
-//                    std::cout <<  x->onode.object_id << std::endl;
-//                else
-//                    std::cout << "NULL" << std::endl;
             }
         }
 
@@ -254,26 +238,11 @@ protected:
         z->state = RED;
         z->onode = onode;
 
-//        std::cout << "Adding new object: ";
         if( y == NULL ) {
-//            std::cout << "{" << z->onode.object_id << ",NULL,NULL}" << std::endl;
             m_header.m_root = z;
         } else if( !add_right ) {
-//            std::cout << "{" <<y->onode.object_id << ", ";
-//            if( y->right == NULL ) {
-//                std::cout << "NULL}" << std::endl;
-//            } else {
-//                std::cout << y->right->onode.object_id << "}" << std::endl;
- //           }
             y->left = z;
         } else {
-//            std::cout << "{" << y->onode.object_id << ", ";
-//            if( y->left == NULL ) {
-//                std::cout << "NULL"; 
-//            } else {
-//                std::cout << y->left->onode.object_id;
-//            }
-//            std::cout << ", " << z->onode.object_id << "}" << std::endl;
             y->right = z;
         }
 
@@ -381,53 +350,6 @@ protected:
         }
         m_header.m_root->state=BLACK;
     }
-
-    /*    void balance( rb_node * z ) {
-            if( z->parent == NULL ) {
-                std::cout << "setting root to black" << std::endl;
-                z->state = BLACK;   // root node is always black
-            } else if( z->parent->state != BLACK ) {
-                rb_node * g = grandparent(z);
-                rb_node * u = other_sibling(g, z->parent);
-                if( u != NULL && u->state == RED ) {
-                    z->parent->state = BLACK;
-                    u->state = BLACK;
-                    g->state = RED;
-
-                    balance(g);
-                } else {
-                    std::cout << "no uncle or uncle properly colored" << std::endl;
-                    if( z == z->parent->right && z->parent == g->left ) {
-                        rotate_left( z->parent );
-                        z = z->left;
-                    } else if( z == z->parent->left && z->parent == g->right ) {
-                        rotate_right( z->parent );
-                        z = z->right;
-                    }
-
-                    g = grandparent(z);
-                    z->parent->state = BLACK;
-                    g->state = RED;
-
-                    if( z == z->parent->left ) {
-                        std::cout << "Rotating grandparent right" << std::endl;
-                        rotate_right(g);
-                    } else {
-                        std::cout << "Rotating grandparent left" << std::endl;
-                        rotate_left( g );
-                    }
-                }
-            }
-        }*/
-
-
-    /*    object_node * head_object( ) {
-            return reinterpret_cast< object_node * >(m_header.free_end );  // free space ends at the start of object list
-        }
-
-        object_node * end_object() {
-            return reinterpret_cast< object_node * >( block + BLOCK_SIZE );
-        }*/
 
     rb_node * head_object() {
         return node_space;
