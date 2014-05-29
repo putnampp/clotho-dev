@@ -1,8 +1,6 @@
 #ifndef EVENT_PAGE_2_HPP_
 #define EVENT_PAGE_2_HPP_
 
-#include "memory_page.h"
-
 #include "event_page_walker.2.hpp"
 
 #include <ostream>
@@ -84,11 +82,12 @@ public:
         }
     };
 
-    enum {  HEADER_SIZE = sizeof( event_page_header ) + sizeof( void * ), // additional pointer for virtual table
-            BLOCK_SIZE = PAGE_SIZE - HEADER_SIZE,
+    enum { // HEADER_SIZE = sizeof( event_page_header ) + sizeof( void * ), // additional pointer for virtual table
+//            BLOCK_SIZE = PAGE_SIZE - HEADER_SIZE,
             EXP_EVENTS_PER_NODE = 3,
-            OBJECT_COUNT = (BLOCK_SIZE) / (sizeof(rb_node) + (EXP_EVENTS_PER_NODE - 1) * sizeof(event_node) ),
-            EVENT_COUNT = OBJECT_COUNT * (EXP_EVENTS_PER_NODE - 1)
+            OBJECT_COUNT = 50,
+//            OBJECT_COUNT = (BLOCK_SIZE) / (sizeof(rb_node) + (EXP_EVENTS_PER_NODE - 1) * sizeof(event_node) ),
+            EVENT_COUNT = OBJECT_COUNT * EXP_EVENTS_PER_NODE
          };
 
     typedef EventPageWalker<  EventPage< EVT, OBJ > > iterator;
