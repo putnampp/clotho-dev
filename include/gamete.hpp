@@ -25,22 +25,21 @@ template < class VS >
 class gamete : public gamete_base {
 public:
     typedef VS  variant_set_t;
+    typedef shared_ptr< gamete< VS > > pointer;
+    typedef typename variant_set_t::iterator var_iterator;
 
+protected:
     gamete( ) : gamete_base(0), m_active_count(1) {}
     gamete( gamete_source_t s, gamete_type_t t ) : gamete_base(s, t), m_active_count(1) {}
     gamete( const gamete< VS > & z ) : gamete_base( z.m_id ), m_vars(z.m_vars), m_active_count(z.m_active_count ) {}
 
-    //static gamete< VS > * getOrCreate() {
-    //    return gamete< VS >::m_pool->getOrCreate();
-    //}
-
-    virtual gamete<VS> * copy() {
-        ++m_active_count;
-        return this;
+public:
+    static pointer create() {
+        return pointer( new gamete< VS >() );
     }
-    
-    virtual gamete<VS> * clone() const {
-        gamete<VS> * child = new gamete<VS>( *this );
+
+    virtual pointer clone() const {
+        pointer child( new gamete<VS>( *this ) );
         //gamete< VS > * child = gamete< VS >::getOrCreate();
         child->init( *this );
         return child;
@@ -61,13 +60,13 @@ public:
     }
 
     void increasePenetrance() {
-        for( typename variant_set_t::iterator it = m_vars.begin(); it != m_vars.end(); it++ ) {
+        for( var_iterator it = begin(); it != end(); it++ ) {
             (*it)->incrementPenetrance();
         }
     }
 
     void decreasePenetrance() {
-        for( typename variant_set_t::iterator it = m_vars.begin(); it != m_vars.end(); it++ ) {
+        for( var_iterator it = begin(); it != end(); it++ ) {
             (*it)->decrementPenetrance();
         }
     }
@@ -84,9 +83,12 @@ public:
         return (--m_active_count == 0 );
     }
 
+    var_iterator begin() { return m_vars.begin(); }
+    var_iterator end() { return m_vars.end(); }
+
     void print( std::ostream & out ) {
         out << "{";
-        for( typename variant_set_t::iterator it = m_vars.begin(); it != m_vars.end(); it++ ) {
+        for( var_iterator it = begin(); it != end(); it++ ) {
             (*it)->print(out);
         }
         out << "}\n";
@@ -98,10 +100,6 @@ public:
 protected:
     variant_set_t   m_vars;
     size_t          m_active_count;
-//    static shared_ptr< Pooler< gamete< VS > > > m_pool;
 };
-
-//template < class VS >
-//shared_ptr< Pooler< gamete< VS > > > gamete< VS >::m_pool( new Pooler< gamete<VS> >() );
 
 #endif  // GAMETE_HPP_

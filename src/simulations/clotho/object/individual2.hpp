@@ -10,8 +10,8 @@
 
 #include "../clotho_event.h"
 
-//#include "../event/inherit_event.hpp"
-#include "../event/inherit_event.2.h"
+#include "../event/inherit_event.hpp"
+//#include "../event/inherit_event.2.h"
 
 #include "reproduction.hpp"   // from libcchmc
 
@@ -30,9 +30,9 @@ class TIndividual< LCM, IP, RMODEL, typename std::enable_if< std::is_base_of< li
  {
 public:
     typedef IP properties_t;
-//    typedef InheritEvent< typename properties_t::gamete_t > inherit_event_t;
     typedef typename properties_t::gamete_t gamete_t;
-    typedef InheritEvent inherit_event_t;
+    typedef InheritEvent< gamete_t > inherit_event_t;
+//    typedef InheritEvent inherit_event_t;
 
     typedef RMODEL reproduction_model_t;
 
@@ -56,6 +56,7 @@ public:
     TIndividual( ClothoObject * co, ClothoObject * env ) :
         AppObject( co ),
         m_env(env),
+        m_env_id( env->getSystemID() ),
         m_prop()
     {
         if( m_clotho_object != NULL ) m_clotho_object->updatePerformer(this);
@@ -64,6 +65,7 @@ public:
     TIndividual( const TIndividual< LCM, IP, RMODEL> & ind ) :
         AppObject( ind ),
         m_env( ind.m_env ),
+        m_env_id( ind.m_env_id ),
         m_prop( ind.m_prop )
     {
         if( m_clotho_object != NULL ) m_clotho_object->updatePerformer(this);
@@ -90,11 +92,16 @@ public:
         return &m_prop;
     }
 
+    system_id getEnvironmentID() const {
+        return m_env_id;
+    }
+
     virtual ~TIndividual() { }
 protected:
 //    ClothoObject *  m_clotho_object;
 //    system_id       m_env_id;
     ClothoObject *  m_env;
+    system_id       m_env_id;
     properties_t    m_prop;
 };
 

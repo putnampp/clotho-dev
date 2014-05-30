@@ -223,23 +223,23 @@ public:
         handle_event( ind, evt );
     }
 
-    static void handle_event( IND * ind, const ClothoEvent * evt ) {
+    static void handle_event( IND * ind, ClothoEvent * evt ) {
         event_type_t e_id = evt->getEventType();
         if( e_id == BirthEvent::TYPE_ID ) {
-            handle_birth( ind, (const BirthEvent * )evt );
+            handle_birth( ind, (BirthEvent * )evt );
         } else if( e_id == DeathEvent::TYPE_ID ) {
-           handle_death(ind, (const DeathEvent * )evt );
+           handle_death(ind, (DeathEvent * )evt );
         } else if( e_id == IND::inherit_event_t::TYPE_ID ) {
-            handle_inherit(ind, (const ievent_t * )evt );
+            handle_inherit(ind, (ievent_t * )evt );
         } else if( e_id == MateEvent::TYPE_ID ) {
-            handle_mate(ind, (const MateEvent * ) evt );
+            handle_mate(ind, (MateEvent * ) evt );
         //} else if( evt->getEventType() == MATURITY_EVENT_K ) {
         //    handle_maturity(ind, evt );
         }
     }
 
 protected:
-    static void handle_birth( IND * ind, const ClothoEvent * evt ){
+    static void handle_birth( IND * ind, BirthEvent * evt ){
         ClothoEvent::vtime_t ctime = evt->getReceived();
 
         ind->getProperties()->setDOB( ctime );
@@ -248,64 +248,69 @@ protected:
 
         //BirthEvent * be = BirthEvent::getOrCreate();
         system_id obj_id = co->getSystemID();
-        system_id env_id = ind->m_env->getSystemID();
+        system_id env_id = ind->getEnvironmentID();
 
         typename ClothoObject::event_id_t n_eid = co->getNextEventID();
 
-        BirthEvent * be = new BirthEvent( ctime, ctime, obj_id, env_id, n_eid );
-        co->sendEvent( be, env_id, ctime );
+//        BirthEvent * be = new BirthEvent( ctime, ctime, obj_id, env_id, n_eid );
 
-        delete evt;
+        // re-purpose the event
+        evt->init( ctime, ctime, obj_id, env_id, n_eid );
+        co->sendEvent( evt, env_id, ctime );
+
+//        delete evt;
     }
 
-    static void handle_maturity( IND * ind, const MaturityEvent * evt ) {
+    static void handle_maturity( IND * ind, MaturityEvent * evt ) {
         ClothoEvent::vtime_t ctime = evt->getReceived();
         ClothoObject * co = ind->getClothoObject();
 
         system_id obj_id = co->getSystemID();
-        system_id env_id = ind->m_env->getSystemID();
+        system_id env_id = ind->getEnvironmentID();
         ClothoObject::event_id_t n_eid = co->getNextEventID();
 
-        MaturityEvent * me = new MaturityEvent( ctime, ctime, obj_id, env_id, n_eid, obj_id );
-        co->sendEvent( me, env_id, ctime );
+//        MaturityEvent * me = new MaturityEvent( ctime, ctime, obj_id, env_id, n_eid, obj_id );
+
+        // re-purpose the event
+        evt->init( ctime, ctime, obj_id, env_id, n_eid, obj_id );
+        co->sendEvent( evt, env_id, ctime );
 
         delete evt;
     }
 
-    static void handle_mate( IND * ind, const MateEvent * me ) {
-//        const MateEvent * me  = static_cast< const MateEvent * >( evt );
-
+    static void handle_mate( IND * ind, MateEvent * me ) {
         typedef typename IND::properties_t::gamete_t   gamete_t;
+        typedef typename gamete_t::pointer gamete_ptr;
         
-        gamete_t * z = IND::reproduction_model_t::reproduce( ind, (gamete_t *) NULL );
+        gamete_ptr z = IND::reproduction_model_t::reproduce( ind, (gamete_t *) NULL );
 
         typedef typename IND::inherit_event_t ievent_t;
 
         ClothoEvent::vtime_t ctime = me->getReceived();
         ClothoObject * co = ind->getClothoObject();
 
-//        ievent_t * ie = ievent_t::getOrCreate();
         system_id o_id = me->getOffspringID();
         ClothoObject::event_id_t n_eid = co->getNextEventID();
+
         ievent_t * ie = new ievent_t( ctime, ctime, co->getSystemID(), o_id, n_eid, z );
         co->sendEvent( ie, o_id, ctime );
 
         delete me;
     }
 
-    static void  handle_inherit( IND * ind, const ievent_t * ie ) {
-//    static void handle_inherit( IND * ind, const ClothoEvent * evt ) {
+    static void  handle_inherit( IND * ind, ievent_t * ie ) {
 
-        //typedef typename IND::inherit_event_t ievent_t;
         //const ievent_t * ie = static_cast< const ievent_t * >( evt );
 
         typedef typename IND::gamete_t   gamete_t;
+        typedef typename gamete_t::pointer gamete_ptr;
+
         typename IND::properties_t * props = ind->getProperties();
         // assert that alive individual is not inheriting
         // new genetic material
         assert( !props->isAlive() );
 
-        props->inheritFrom( ie->getSender(),(gamete_t * ) ie->getGamete(), ie->getParentIndex() );
+        props->inheritFrom( ie->getSender(), (gamete_ptr) ie->getGamete(), ie->getParentIndex() );
 
         if( props->hasSourceGametes() ) {
             ClothoEvent::vtime_t ctime = ie->getReceived();
@@ -315,7 +320,7 @@ protected:
             ClothoObject * co = ind->getClothoObject();
 
 //            BirthEvent * be = BirthEvent::getOrCreate();
-            system_id env_id = ind->m_env->getSystemID();
+            system_id env_id = ind->getEnvironmentID();
             system_id obj_id = co->getSystemID();
             ClothoObject::event_id_t n_eid = co->getNextEventID();
 
@@ -328,7 +333,7 @@ protected:
     }
 
 //    template < typename IND >
-    static void handle_death( IND * ind, const DeathEvent * evt ) {
+    static void handle_death( IND * ind, DeathEvent * evt ) {
         ind->getProperties()->died();
 
         ClothoEvent::vtime_t ctime = evt->getReceived();
@@ -336,15 +341,15 @@ protected:
 
 //        DeathEvent * de = DeathEvent::getOrCreate();
         system_id obj_id = co->getSystemID();
-        system_id env_id = ind->m_env->getSystemID();
+        system_id env_id = ind->getEnvironmentID();
 
         ClothoObject::event_id_t n_eid = co->getNextEventID();
         
-        DeathEvent * de = new DeathEvent( ctime, ctime, obj_id, env_id, n_eid);
-        
-        co->sendEvent( de, env_id, ctime );
+//        DeathEvent * de = new DeathEvent( ctime, ctime, obj_id, env_id, n_eid);
 
-        delete evt;
+        //re-purpose the event
+        evt->init( ctime, ctime, obj_id, env_id, n_eid );      
+        co->sendEvent( evt, env_id, ctime );
     }
 };
 

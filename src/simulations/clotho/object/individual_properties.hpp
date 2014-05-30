@@ -32,6 +32,7 @@ class individual_props< /*VT,*/ G, 1 > {
 public:
 //    typedef VT variant_t;
     typedef G gamete_t;
+    typedef typename gamete_t::pointer gamete_ptr;
 
     enum { GAMETE_COUNT = 1 };
 
@@ -51,8 +52,8 @@ public:
             } else {
                 p0->decreasePenetrance();
             }
+            m_dob = d;
         }
-        m_dob = d;
     }
     
     bool isAlive() const { return m_dob != SystemClock::POSITIVE_INFINITY; }
@@ -65,21 +66,17 @@ public:
         p0 = g;
     }
 
-    gamete_t * cloneGamete( unsigned char ) const {
+    gamete_t * getGamete( unsigned char ) const {
         if( p0 ) {
-            gamete_t * tmp = new gamete_t(p0->begin(), p0->end());
-            return tmp;
+            return p0;
         }
-        return new gamete_t();
+        return gamete_t::create();
     }
 
     void reset() {
         died();
         if(p0) {
-            //delete p0;
-            //p0 = NULL;
-            p0->release();
-            p0 = NULL;
+            p0.reset();
         }
     }
 
@@ -89,7 +86,7 @@ public:
 protected:
     SystemClock::vtime_t       m_dob;
     system_id     p0_id;
-    gamete_t *    p0;
+    gamete_ptr    p0;
 };
 
 template < /*class VT,*/ class G >
@@ -97,6 +94,7 @@ class individual_props< /*VT,*/ G, 2 > {
 public:
 //    typedef VT  variant_t;
     typedef G   gamete_t;
+    typedef typename gamete_t::pointer gamete_ptr;
 
     enum { GAMETE_COUNT = 2 };
 
@@ -104,8 +102,8 @@ public:
         m_dob( SystemClock::POSITIVE_INFINITY ),
         p0_id(),
         p1_id(),
-        p0( NULL ), 
-        p1( NULL )
+        p0( ), 
+        p1( )
     {}
 
     individual_props( const individual_props< G, 2> & ip ) :
@@ -129,17 +127,19 @@ public:
                 p0->decreasePenetrance();
                 p1->decreasePenetrance();
             }
+            m_dob = d;
         }
-        m_dob = d;
     }
 
     bool isAlive() const {
         return (m_dob != SystemClock::POSITIVE_INFINITY);
     }
 
+    bool hasSameGamates() const { return p0 == p1; }
+
     bool hasSourceGametes() const { return (p0 != NULL && p1 != NULL); }
 
-    void inheritFrom( const system_id & p_id, gamete_t * g, unsigned char gidx = UNKNOWN_GAMETE_INDEX) {
+    void inheritFrom( const system_id & p_id, gamete_ptr g, unsigned char gidx = UNKNOWN_GAMETE_INDEX) {
         if( gidx == UNKNOWN_GAMETE_INDEX) {
             if( !p0 ) {
                 p0_id = p_id;
@@ -165,31 +165,23 @@ public:
         }
     }
 
-    gamete_t * cloneGamete( unsigned char gamete_idx ) const {
+    gamete_ptr getGamete( unsigned char gamete_idx ) const {
         if( gamete_idx == 0 && p0 ) {
-            return p0->clone();
-        } else if( gamete_idx == 1 && p1 ) {
-            return p1->clone();
+            return p0;
+        } else if( p1 ) {
+            return p1;
         }
-        return new gamete_t();
+        return gamete_t::create();
     }
 
     void reset() {
         died();
         if( p0 ) {
-            //delete p0;
-            //if( p0->release() ) {
-                delete p0;
-            //}
-            p0 = NULL;
+            p0.reset();
         }
 
         if( p1 ) {
-            //delete p1;
-            //if( p1->release() ) {
-                delete p1;
-            //}
-            p1 = NULL;
+            p1.reset();
         }
     }
 
@@ -199,7 +191,7 @@ public:
 protected:
     SystemClock::vtime_t         m_dob;
     system_id     p0_id, p1_id;
-    gamete_t      * p0, * p1;
+    gamete_ptr    p0, p1;
 };
 
 #endif  // INDIVIDUAL_PROPERTIES_HPP_

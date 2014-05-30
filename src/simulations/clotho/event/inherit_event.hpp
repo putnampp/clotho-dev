@@ -12,6 +12,7 @@ public:
 
     static const event_type_t TYPE_ID = 4;
     typedef GM gamete_t;
+    typedef typename GM::pointer gamete_ptr;
 
     typedef ObjectManager< InheritEvent<GM, void>, EVENT_PAGE_SIZE > object_manager_t;
 
@@ -20,7 +21,7 @@ public:
     // a gamete was inherited from (ie. source gender)
     void init( const vtime_t & tSent, const vtime_t & tRecv,
                 const system_object * sender, const system_object * receiver,
-                event_id_t eid, gamete_t * z, unsigned char gidx = -1) {
+                event_id_t eid, gamete_ptr z, unsigned char gidx = -1) {
         ClothoEvent::init( tSent, tRecv, sender, receiver, eid );
         m_gidx = gidx;
         m_gamete = z;
@@ -28,7 +29,7 @@ public:
 
     void init( const vtime_t & tSent, const vtime_t & tRecv,
                 const system_id & sender, const system_id & receiver,
-                event_id_t eid, gamete_t * z, unsigned char gidx = -1) {
+                event_id_t eid, gamete_ptr z, unsigned char gidx = -1) {
         ClothoEvent::init( tSent, tRecv, sender, receiver, eid );
         m_gidx = gidx;
         m_gamete = z;
@@ -37,7 +38,7 @@ public:
     inline event_type_t getEventType() const { return TYPE_ID; }
 
     unsigned char getParentIndex() const { return m_gidx; }
-    gamete_t * getGamete() const { return m_gamete; }
+    gamete_ptr getGamete() const { return m_gamete; }
 
     static void * operator new( size_t s ) {
         void * res = m_pool.malloc();
@@ -58,7 +59,7 @@ public:
     // a gamete was inherited from (ie. source gender)
     InheritEvent( const vtime_t & tSent, const vtime_t & tRecv,
                 const system_object * sender, const system_object * receiver,
-                event_id_t eid, gamete_t * z, unsigned char gidx = -1) :
+                event_id_t eid, gamete_ptr z, unsigned char gidx = -1) :
         ClothoEvent( tSent, tRecv, sender, receiver, eid ),
         m_gidx( gidx ),
         m_gamete( z )
@@ -66,7 +67,7 @@ public:
 
     InheritEvent( const vtime_t & tSent, const vtime_t & tRecv,
                 const system_id & sender, const system_id & receiver,
-                event_id_t eid, gamete_t * z, unsigned char gidx = -1) :
+                event_id_t eid, gamete_ptr z, unsigned char gidx = -1) :
         ClothoEvent( tSent, tRecv, sender, receiver, eid ),
         m_gidx( gidx ),
         m_gamete( z )
@@ -74,7 +75,7 @@ public:
 
 protected:
     unsigned char   m_gidx;
-    gamete_t *      m_gamete;
+    gamete_ptr      m_gamete;
 
     static object_manager_t m_pool;
 };

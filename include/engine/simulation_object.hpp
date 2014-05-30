@@ -157,9 +157,9 @@ public:
     }
 
     event_id_t getNextEventID( unsigned int offset = 1) {
-//        return m_next_eid++;
-        event_id_t tmp = __sync_fetch_and_add( &m_next_eid, offset );
-        return tmp;
+        return m_next_eid++;
+//        event_id_t tmp = __sync_fetch_and_add( &m_next_eid, offset );
+//        return tmp;
     }
 
     virtual ~SimulationObject() {

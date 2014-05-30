@@ -25,14 +25,14 @@ double variant_base::getSelection() const { return m_coeff_selection; }
 double variant_base::getDominance() const { return m_coeff_dominance; }
 
 void variant_base::incrementPenetrance() {
-//    ++m_penetrance;
-    __sync_add_and_fetch( &m_penetrance, 1 );
+    ++m_penetrance;
+//    __sync_add_and_fetch( &m_penetrance, 1 );
 }
 
 void variant_base::decrementPenetrance() {
     assert( m_penetrance > 0);
-//    --m_penetrance;
-    __sync_sub_and_fetch( &m_penetrance, 1 );
+    --m_penetrance;
+//    __sync_sub_and_fetch( &m_penetrance, 1 );
 }
 
 void variant_base::print( std::ostream & out ) {

@@ -13,6 +13,7 @@
 #include <iostream>
 #include <algorithm>
 #include <deque>
+#include <vector>
 
 namespace reproduction {
 namespace models {
@@ -24,6 +25,7 @@ public:
     typedef V   variant_type;
     typedef VM  variant_map_t;
     typedef GM  gamete_t;
+    typedef typename GM::pointer gamete_ptr;
 
     static void initialize( double mu = 0.0001, bool bFixed = false ) {
         m_variants.reset( new variant_map_t() );
@@ -35,11 +37,11 @@ public:
         return m_variants;
     }
 
-    static gamete_t * mutate( gamete_t * gm ) {
+    static gamete_ptr mutate( gamete_ptr gm ) {
         return mutate( gm, m_mu, m_bFixed );
     }
 
-    static gamete_t * mutate( gamete_t * gm, double mu, bool bFixed ) {
+    static gamete_ptr mutate( gamete_ptr gm, double mu, bool bFixed ) {
         if( !bFixed ) {
             return mutate_infinite(gm, mu);
         } else {
@@ -48,12 +50,12 @@ public:
     }
 
 protected:
-    static gamete_t * mutate_infinite( gamete_t * gm, double mu ) {
+    static gamete_ptr mutate_infinite( gamete_ptr gm, double mu ) {
         unsigned int nMut = m_rng->nextPoisson( mu );
-        gamete_t * res = gm;
+        gamete_ptr res = gm;
         if( nMut > 0) {
-            //res = gm->clone();
-            //gm->release();
+            res = gm->clone();
+            gm.reset();
             do {
                 typename variant_map_t::value_ptr_t var = getNewVariant();
                 res->addVariant( var );
@@ -62,13 +64,14 @@ protected:
         return res;
     }
 
-    static gamete_t * mutate_fixed( gamete_t * g, double mu ) {
+    static gamete_ptr mutate_fixed( gamete_ptr g, double mu ) {
         if( g->size() >= m_variants->size() ) return g; // no sites available for novel mutation
 
         unsigned int nMut = m_rng->nextPoisson( mu );   // how many mutations should occur
-        gamete_t * res = g;
+        gamete_ptr res = g;
         if( nMut ) {
-
+            res = g->clone();
+            g.reset();
 //            if( 2 * g->size() <= m_variants->size() ) {
                 // if less than half of the fixed sites are mutated
                 //res = g->clone();
@@ -147,38 +150,16 @@ bool mutate_site< V, VM, GM>::m_bFixed = false;
 namespace recombination {
 
 template < unsigned char P >
-class no_recomb : public RandomProcess {
-public:
-    template < class IP, class GM >
-    static GM * recombine( IP * ind, GM * ) {
-        GM * g = ind->cloneGamete( m_rng->nextInt( P ) );
-        return g;
-    }
-};
+class no_recomb;
 
-template <>
 template < class IP, class GM >
-GM * no_recomb< 1 >::recombine( IP * ind, GM * ) {
-    return ind->cloneGamete( 0 );
-}
-
-template <>
-template < class IP, class GM >
-GM * no_recomb< 2 >::recombine( IP * ind, GM * ) {
-    return ind->cloneGamete( (m_rng->nextBool() ? 1 : 0) );
-}
-
-class basic_recomb : public RandomProcess {
-public:
-    template < class IP, class GM >
-    static GM * recombine( IP * ind, double r, GM * ) {
-        //GM * g = ind->cloneGamete( m_rng->nextInt( P ) );
-        //return g;
-    }
-};
+class basic_recomb;
 
 }   // namespace recombination
 }   // namespace models
 }   // namespace reproduction
 
 #endif  // REPRODUCTION_MODELS_HPP_
+
+#include "no_recombination.tcc"
+#include "basic_recombination.tcc"

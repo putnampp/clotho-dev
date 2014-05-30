@@ -59,6 +59,7 @@ typedef reproduction::models::recombination::no_recomb< 2 >     recombination_mo
 
 typedef typename mutation_model_t::variant_map_t variant_map_t;
 typedef typename mutation_model_t::gamete_t gamete_t;
+typedef typename gamete_t::pointer gamete_ptr;
 
 typedef reproduction::IndividualReproduction< mutation_model_t, recombination_model_t > reproduction_model_t;
 
@@ -131,13 +132,13 @@ int main( int argc, char ** argv ) {
     environment_t population;
     environment_t buffer;
 
-    system_id blank_id = 0;
+    system_id blank_id;
 
     stats->startPhase( "PopInit" );
     for( unsigned int i = 0; i < vm[ FOUNDER_SIZE_K ].as< unsigned int >(); ++i) {
         population.push_back( new individual_t() );
-        population.back()->getProperties()->inheritFrom( blank_id,  new gamete_t() );
-        population.back()->getProperties()->inheritFrom( blank_id,  new gamete_t() );
+        population.back()->getProperties()->inheritFrom( blank_id,  gamete_t::create() );
+        population.back()->getProperties()->inheritFrom( blank_id,  gamete_t::create() );
 
         buffer.push_back( new individual_t() );
     }
@@ -155,12 +156,12 @@ int main( int argc, char ** argv ) {
             (*child)[child_idx]->reset();
 
             std::pair< individual_t *, individual_t * > mate_pair = selector_t::select( parent );
-            gamete_t * g = reproduction_model_t::reproduce( mate_pair.first, (gamete_t *) NULL);
+            gamete_ptr g = reproduction_model_t::reproduce( mate_pair.first, (gamete_t *) NULL);
             (*child)[child_idx]->getProperties()->inheritFrom(blank_id, g);
 
-            g = reproduction_model_t::reproduce( mate_pair.second, (gamete_t *) NULL);
+            gamete_ptr g1 = reproduction_model_t::reproduce( mate_pair.second, (gamete_t *) NULL);
             
-            (*child)[child_idx]->getProperties()->inheritFrom(blank_id, g);
+            (*child)[child_idx]->getProperties()->inheritFrom(blank_id, g1);
             (*child)[child_idx++]->getProperties()->setDOB( i );
         }
 
