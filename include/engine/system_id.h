@@ -52,12 +52,12 @@ public:
 
     inline bool operator==( const system_id & rhs ) const {
 //        return m_id.key == rhs.m_id.key;
-        return manager_id == rhs.manager_id && object_id == rhs.object_id;
+        return object_id == rhs.object_id && manager_id == rhs.manager_id;
     }
 
     inline bool operator!=( const system_id & rhs ) const {
 //        return m_id.key != rhs.m_id.key;
-        return manager_id != rhs.manager_id || object_id != rhs.object_id;
+        return object_id != rhs.object_id || manager_id != rhs.manager_id;
     }
 
     virtual ~system_id() {}

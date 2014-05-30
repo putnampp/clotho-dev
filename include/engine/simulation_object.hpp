@@ -104,10 +104,10 @@ public:
     }
 
     virtual void updateLocalTime( const vtime_t & t ) {
-        assert( m_local_time <= t );
-
-        if( m_local_time < t ) {
+        if( m_local_time <= t ) {
             m_local_time = t;
+        } else {
+            assert(false);
         }
     }
 
