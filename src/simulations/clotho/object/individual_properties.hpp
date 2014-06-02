@@ -76,7 +76,9 @@ public:
     void reset() {
         died();
         if(p0) {
-            delete p0;
+        //    delete p0;
+            p0->~gamete_t();
+            p0 = NULL;
         }
     }
 
@@ -177,12 +179,14 @@ public:
     void reset() {
         died();
         if( p0 ) {
-            delete p0;
+//            delete p0;
+            p0->~gamete_t();
             p0 = NULL;
         }
 
         if( p1 ) {
-            delete p1;
+//            delete p1;
+            p1->~gamete_t();
             p1 = NULL;
         }
     }

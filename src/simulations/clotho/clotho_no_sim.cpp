@@ -136,6 +136,7 @@ int main( int argc, char ** argv ) {
     system_id blank_id;
 
     stats->startPhase( "PopInit" );
+
     for( unsigned int i = 0; i < vm[ FOUNDER_SIZE_K ].as< unsigned int >(); ++i) {
         population.push_back( new individual_t() );
 

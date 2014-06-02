@@ -6,7 +6,7 @@ Gamete Gamete::EMPTY_GAMETE;
 
 Gamete::object_manager_t Gamete::m_pool;
 
-Gamete::Gamete() : m_variants( NULL ), m_nActive( 1 ), m_bDirty(false) {}
+Gamete::Gamete() : m_variants( NULL ), m_nActive( 1 ), m_bDirty(false) { }
 
 Gamete::pointer Gamete::copy() {
     ++m_nActive;
@@ -14,26 +14,27 @@ Gamete::pointer Gamete::copy() {
 }
 
 Gamete::pointer Gamete::clone() {
-    pointer g = m_pool.malloc();
-    
-    if( g->m_variants != NULL ) 
-        g->m_variants->clear();
-    else {
-        g->m_variants = new variant_set_t();
-    }
+//    pointer g = m_pool.malloc();
+//    
+//    if( g->m_variants != NULL ) 
+//        g->m_variants->clear();
+//    else {
+//        g->m_variants = new variant_set_t();
+//    }
+//   g->m_nActive = 1;
+//
+    std::cout << "Cloning gamete: " << this << std::endl;
+    pointer g = new Gamete();
 
-    g->m_nActive = 1;
-
-    std::cout << "Cloned gamete: " << std::endl;
-    assert( g->m_variants != NULL );
     if( this->m_variants != NULL ) {
-        g->m_variants->insert(g->m_variants->begin(),this->m_variants->begin(), this->m_variants->end());
+        g->m_variants = new variant_set_t(this->m_variants->begin(), this->m_variants->end());
         g->m_bDirty = this->m_bDirty;
     } else {
-        g->m_variants->clear();
+        g->m_variants = new variant_set_t();
         g->m_bDirty = false;
     }
 
+    std::cout << "Allocated vector: " << g->m_variants << std::endl;
     return g;
 }
 
@@ -59,37 +60,28 @@ bool Gamete::operator[]( variant_base * vptr ) {
 void * Gamete::operator new( size_t  s) {
     Gamete::pointer res = m_pool.malloc();
 
-    if( res->m_variants != NULL ) {
-        std::cout << "Re-using existing variant set" << std::endl;
-        res->m_variants->clear();
-    } else {
-        std::cout << "Should be getting here" << std::endl;
-        res->m_variants = new variant_set_t();
+    assert( res->m_variants == NULL );
 
-        assert( res->m_variants != NULL );
-    }
-
+    std::cout << "allocated: " << res << std::endl;
     return res;
 }
 
 void Gamete::operator delete( void * ptr ) {
-//    Gamete::pointer g = (Gamete::pointer) ptr;
-//
-//    if( g->m_nActive == 0 ) {
-//        std::cout << "Freeing: " << this << std::endl;
-//        m_pool.free( (Gamete::pointer) ptr );
-//    }
+    Gamete::pointer g = (Gamete::pointer) ptr;
+
+    std::cout << "Freeing: " << g << std::endl;
+    m_pool.free( g );
 }
 
 void Gamete::print( std::ostream & o ) const {}
 
 Gamete::~Gamete() {
-//    assert(false);
-    if( --m_nActive == 0 && m_variants != NULL ) {
+    if( --m_nActive == 0 ) {
         std::cout << "Deleting: " << this  << std::endl;
+        std::cout << "Deleting vector: " << m_variants << std::endl;
         delete m_variants;
         m_variants = NULL;
 
-        m_pool.free( this );
+        delete this;
     }
 }
