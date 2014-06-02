@@ -136,19 +136,11 @@ int main( int argc, char ** argv ) {
     system_id blank_id;
 
     stats->startPhase( "PopInit" );
-    gamete_ptr gptr = new gamete_t();
-
-    population.push_back( new individual_t() );
-    population.back()->getProperties()->inheritFrom( blank_id,  gptr );
-    population.back()->getProperties()->inheritFrom( blank_id,  gptr->copy() );
-
-    buffer.push_back( new individual_t() );
-
-    for( unsigned int i = 1; i < vm[ FOUNDER_SIZE_K ].as< unsigned int >(); ++i) {
+    for( unsigned int i = 0; i < vm[ FOUNDER_SIZE_K ].as< unsigned int >(); ++i) {
         population.push_back( new individual_t() );
 
-        population.back()->getProperties()->inheritFrom( blank_id,  gptr->copy() );
-        population.back()->getProperties()->inheritFrom( blank_id,  gptr->copy() );
+        population.back()->getProperties()->inheritFrom( blank_id,  gamete_t::EMPTY_GAMETE.copy() );
+        population.back()->getProperties()->inheritFrom( blank_id,  gamete_t::EMPTY_GAMETE.copy() );
 
         buffer.push_back( new individual_t() );
     }
