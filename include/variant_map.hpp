@@ -16,6 +16,8 @@
 
 #include "gamete.hpp"
 
+#include "engine/object_manager.2.hpp"
+
 template < class VT, class E = void >
 class variant_map;
 

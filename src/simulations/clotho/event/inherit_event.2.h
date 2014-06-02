@@ -1,13 +1,15 @@
-#ifndef INHERIT_EVENT_HPP_
-#define INHERIT_EVENT_HPP_
+#ifndef INHERIT_EVENT_2_HPP_
+#define INHERIT_EVENT_2_HPP_
 
 #include "../clotho_event.h"
+
+#include "gamete.h"
 
 class InheritEvent : public ClothoEvent {
 public:
 
     static const event_type_t TYPE_ID = 4;
-    typedef void * gamete_ptr_t;
+    typedef Gamete::pointer gamete_ptr_t;
 
     typedef ObjectManager< InheritEvent, EVENT_PAGE_SIZE > object_manager_t;
 
@@ -75,4 +77,4 @@ protected:
     static object_manager_t m_pool;
 };
 
-#endif  // INHERIT_EVENT_HPP_
+#endif  // INHERIT_EVENT_2_HPP_

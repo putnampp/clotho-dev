@@ -8,9 +8,8 @@
 #include "clotho.h"
 #include "ider.h"
 
-#include <boost/pool/object_pool.hpp>
-//#include "engine/object_manager.hpp"
-#include "engine/object_manager.2.hpp"
+//#include <boost/pool/object_pool.hpp>
+#include "engine/object_manager.h"
 
 #include <ostream>
 

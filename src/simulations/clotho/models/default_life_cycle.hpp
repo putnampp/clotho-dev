@@ -9,15 +9,16 @@
 #include <iostream>
 
 #include "../clotho_event.h"
-#include "../event/birth_event.h"
-#include "../event/death_event.h"
-#include "../event/inherit_event.hpp"
-#include "../event/maturity_event.h"
-#include "../event/mate_select_event.h"
-#include "../event/mate_event.h"
-#include "../event/signal_mate_event.h"
-#include "../event/selection_event.h"
-#include "../event/environment_snapshot_event.h"
+#include "../event/events.h"
+//#include "../event/birth_event.h"
+//#include "../event/death_event.h"
+//#include "../event/inherit_event.hpp"
+//#include "../event/maturity_event.h"
+//#include "../event/mate_select_event.h"
+//#include "../event/mate_event.h"
+//#include "../event/signal_mate_event.h"
+//#include "../event/selection_event.h"
+//#include "../event/environment_snapshot_event.h"
 
 namespace life_cycle {
 

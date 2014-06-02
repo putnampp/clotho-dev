@@ -1,5 +1,7 @@
 #include "variant_base.h"
 
+variant_base::object_manager_t variant_base::m_pool;
+
 variant_base::variant_base( const key_t & k, double cSelection, double cDominance, variant_flags f ) :
     genetic_region( k ),
     m_penetrance(0),
@@ -41,6 +43,15 @@ void variant_base::print( std::ostream & out ) {
         << ", " << m_coeff_dominance
         << ", " << m_penetrance
         << "]\n";
+}
+
+void * variant_base::operator new( size_t s ) {
+    void * res = m_pool.malloc();
+    return res;
+}
+
+void variant_base::operator delete( void * ptr ) {
+    m_pool.free( (variant_base *) ptr );
 }
 
 variant_base::~variant_base() {}

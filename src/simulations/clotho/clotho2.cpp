@@ -46,17 +46,20 @@
 #include "models/selection_models.hpp"
 #include "models/reproduction_models.hpp"
 
+#include "basic_variant_map.h"
+#include "gamete.h"
+
 const unsigned int MAX_THREADS = 24;
 
 //typedef life_cycle::def_life_cycle    LCM_t;
 typedef life_cycle::opt_default_life_cycle    LCM_t;
 typedef variant_base      VT_t;
 
-typedef reproduction::models::mutation::mutate_site< VT_t >   mutation_model_t;
-typedef reproduction::models::recombination::no_recomb< 2 >     recombination_model_t;
+typedef basic_variant_map variant_map_t;
+typedef Gamete gamete_t;
 
-typedef typename mutation_model_t::variant_map_t variant_map_t;
-typedef typename mutation_model_t::gamete_t gamete_t;
+typedef reproduction::models::mutation::mutate_site< VT_t, variant_map_t, gamete_t  >   mutation_model_t;
+typedef reproduction::models::recombination::no_recomb< 2 >     recombination_model_t;
 
 typedef reproduction::IndividualReproduction< mutation_model_t, recombination_model_t > reproduction_model_t;
 typedef selection::models::random_selection selection_model_t;
@@ -181,9 +184,11 @@ int main( int argc, char ** argv ) {
 
     if( bFixed ) {
         cout << "Creating static variant pool of size " << max_variants << endl;
-        const double dMaxVariants = (double) max_variants;
-        for( double i = 0.0; i < dMaxVariants; i += 1.0 ) {
-            mutation_model_t::getVariantMap()->createVariant( i / dMaxVariants);
+//        const double dMaxVariants = (double) max_variants;
+//        for( double i = 0.0; i < dMaxVariants; i += 1.0 ) {
+        //    mutation_model_t::getVariantMap()->createVariant( i / dMaxVariants);
+        for( unsigned int i = 0; i < max_variants; ++i ) {
+            mutation_model_t::getVariantMap()->createNewVariant();
         }
     }
 

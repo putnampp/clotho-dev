@@ -41,7 +41,8 @@
 #include "object/individual2.hpp"
 
 #include "variant_base.h"
-#include "variant_map.hpp"
+#include "basic_variant_map.h"
+#include "gamete.h"
 #include "fixed_length_gamete.hpp"
 
 #include "rng/rng.hpp"
@@ -54,12 +55,12 @@ using std::shared_ptr;
 typedef life_cycle::def_life_cycle    LCM_t;
 typedef variant_base      VT_t;
 
-typedef reproduction::models::mutation::mutate_site< VT_t >   mutation_model_t;
-typedef reproduction::models::recombination::no_recomb< 2 >     recombination_model_t;
-
-typedef typename mutation_model_t::variant_map_t variant_map_t;
-typedef typename mutation_model_t::gamete_t gamete_t;
+typedef basic_variant_map variant_map_t;
+typedef Gamete gamete_t;
 typedef typename gamete_t::pointer gamete_ptr;
+
+typedef reproduction::models::mutation::mutate_site< VT_t, variant_map_t, gamete_t >   mutation_model_t;
+typedef reproduction::models::recombination::no_recomb< 2 >     recombination_model_t;
 
 typedef reproduction::IndividualReproduction< mutation_model_t, recombination_model_t > reproduction_model_t;
 
@@ -135,10 +136,19 @@ int main( int argc, char ** argv ) {
     system_id blank_id;
 
     stats->startPhase( "PopInit" );
-    for( unsigned int i = 0; i < vm[ FOUNDER_SIZE_K ].as< unsigned int >(); ++i) {
+    gamete_ptr gptr = new gamete_t();
+
+    population.push_back( new individual_t() );
+    population.back()->getProperties()->inheritFrom( blank_id,  gptr );
+    population.back()->getProperties()->inheritFrom( blank_id,  gptr->copy() );
+
+    buffer.push_back( new individual_t() );
+
+    for( unsigned int i = 1; i < vm[ FOUNDER_SIZE_K ].as< unsigned int >(); ++i) {
         population.push_back( new individual_t() );
-        population.back()->getProperties()->inheritFrom( blank_id,  gamete_t::create() );
-        population.back()->getProperties()->inheritFrom( blank_id,  gamete_t::create() );
+
+        population.back()->getProperties()->inheritFrom( blank_id,  gptr->copy() );
+        population.back()->getProperties()->inheritFrom( blank_id,  gptr->copy() );
 
         buffer.push_back( new individual_t() );
     }
@@ -150,6 +160,7 @@ int main( int argc, char ** argv ) {
     stats->startPhase( "Sim" );
     for( SystemClock::vtime_t i = 0; i < tUntil; ++i ) {
 
+        std::cout << "Generation: " << i << std::endl;
         // mate
         unsigned int child_idx = 0;
         while( child_idx < child->size()) {

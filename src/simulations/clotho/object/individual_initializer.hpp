@@ -19,13 +19,13 @@ public:
         system_id id = co->getSystemID();
 
         ClothoObject::event_id_t n_eid = co->getNextEventID(2);
-        gamete_ptr ngamete = gamete_t::create();
-        ievent_t * ie = new ievent_t( ctime, ctime, id, id, n_eid++, ngamete, 0 );
+        //gamete_ptr ngamete = new gamete_t();
+        ievent_t * ie = new ievent_t( ctime, ctime, id, id, n_eid++, gamete_t::EMPTY_GAMETE.copy(), 0 );
         co->sendEvent( ie, id, ctime );
 
         //ie = ievent_t::getOrCreate();
-        gamete_ptr ngamete1 = gamete_t::create();
-        ie = new ievent_t( ctime, ctime, id, id, n_eid, ngamete1, 1 );
+        //gamete_ptr ngamete1 = new gamete_t();
+        ie = new ievent_t( ctime, ctime, id, id, n_eid, gamete_t::EMPTY_GAMETE.copy(), 1 );
         co->sendEvent( ie, id, ctime );
     }
 

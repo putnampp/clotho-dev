@@ -5,7 +5,7 @@ namespace reproduction {
 namespace models {
 namespace recombination {
 
-template < class IP, class GM >
+template < class IP, class GM = typename IP::gamete_t >
 class basic_recomb : public RandomProcess {
 public:
     typedef IP individual_properties_t;

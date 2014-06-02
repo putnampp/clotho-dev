@@ -6,7 +6,7 @@
 #include <iostream>
 
 #include "../clotho.h"
-#include "variant_map.hpp"
+#include "gamete.h"
 
 #include "rng/random_process.hpp"
 
@@ -19,7 +19,7 @@ namespace reproduction {
 namespace models {
 namespace mutation {
 
-template < class V, class VM = variant_map< V >, class GM = typename VM::gamete_t >
+template < class V, class VM, class GM >
 class mutate_site : public RandomProcess {
 public:
     typedef V   variant_type;
@@ -52,82 +52,51 @@ public:
 protected:
     static gamete_ptr mutate_infinite( gamete_ptr gm, double mu ) {
         unsigned int nMut = m_rng->nextPoisson( mu );
-        gamete_ptr res = gm;
         if( nMut > 0) {
-            res = gm->clone();
-            gm.reset();
+            gamete_ptr res = gm->clone();
             do {
                 typename variant_map_t::value_ptr_t var = getNewVariant();
                 res->addVariant( var );
             } while( --nMut );
-        }
-        return res;
+
+            return res;
+        } 
+        return gm->copy();
     }
 
     static gamete_ptr mutate_fixed( gamete_ptr g, double mu ) {
         if( g->size() >= m_variants->size() ) return g; // no sites available for novel mutation
 
         unsigned int nMut = m_rng->nextPoisson( mu );   // how many mutations should occur
-        gamete_ptr res = g;
         if( nMut ) {
-            res = g->clone();
-            g.reset();
-//            if( 2 * g->size() <= m_variants->size() ) {
-                // if less than half of the fixed sites are mutated
-                //res = g->clone();
-                //g->release();
-                while( nMut-- ) {
-                    unsigned int idx = m_rng->nextInt( m_variants->size() );
-                    while( (*res)[(*m_variants)[idx] ] ) {
-                        // random site already mutated. check another
-                        idx = m_rng->nextInt( m_variants->size() );
-                    }
+            gamete_ptr res = (( g != NULL ) ? g->clone() : gamete_t::EMPTY_GAMETE.clone());
+            while( nMut-- ) {
+                unsigned int idx = m_rng->nextInt( m_variants->size() );
+                typename variant_map_t::value_ptr_t vptr = (*m_variants)[idx];
 
-                    res->addVariant( (*m_variants)[idx] );   // site is unmutated. mutate it
-                }
-/*            } else {
-                // attempt to improve performance by reducing
-                // the number of random numbers necessary to generate
-                // mutations
-                //
-                // more than half the sites have been mutated.
-                //
-                // randomly guessing a site index to mutate will
-                // fail half the time.
-                //
-                // determine the unmutated sites. Linear scan 
-                // is potentially costly
-                std::vector< variant_map_t::value_ptr_t > unmutated;
-                for( typename variant_map_t::value_list_t::const_iterator it = m_variants->begin(); it != m_variants->end(); it++ ) {
-                    if(! (*g)[ *it ] ) {
-                        unmutated.push_back( *it );
-                    }
+                while( (*res)[vptr] ) {
+                    // random site already mutated. check another
+                    idx = m_rng->nextInt( m_variants->size() );
+                    vptr = (*m_variants)[idx];
                 }
 
-                while( nMut-- && !unmutated.empty() ) {
-                    unsigned int idx = m_rng->nextInt( unmutated.size() );
-                    if( idx != unmutated.size() - 1 ) {
-                        std::swap( unmutated.back(), unmutated.at(idx) );
-                    }
-
-                    g->addVariant(unmutated.back());
-                    unmutated.pop_back();
-                    --nMut;
-                }
-            }*/
+                res->addVariant( vptr );   // site is unmutated. mutate it
+            }
+            return res;
         }
-        return res;
+        return g->copy();
     }
 
     static typename variant_map_t::value_ptr_t getNewVariant( ) {
-        typename variant_type::key_t k;
+//        typename variant_type::key_t k;
+//
+//        do {
+//            k = m_rng->nextUniform();
+//        } while( m_variants->is_known( k ) );
+//
+//        typename variant_map_t::value_ptr_t vptr = m_variants->createVariant( k );
 
-        do {
-            k = m_rng->nextUniform();
-        } while( m_variants->is_known( k ) );
-
-        typename variant_map_t::value_ptr_t vptr = m_variants->createVariant( k );
-
+        typename variant_map_t::value_ptr_t vptr = m_variants->createNewVariant();
         return vptr;
     }
 

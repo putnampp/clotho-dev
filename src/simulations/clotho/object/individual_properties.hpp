@@ -76,7 +76,7 @@ public:
     void reset() {
         died();
         if(p0) {
-            p0.reset();
+            delete p0;
         }
     }
 
@@ -120,13 +120,13 @@ public:
 
     void setDOB( SystemClock::vtime_t d ) {
         if( m_dob != d ) {
-            if( d != SystemClock::POSITIVE_INFINITY ) {
-                p0->increasePenetrance();
-                p1->increasePenetrance();
-            } else {
-                p0->decreasePenetrance();
-                p1->decreasePenetrance();
-            }
+            //if( d != SystemClock::POSITIVE_INFINITY ) {
+            //    p0->increasePenetrance();
+            //    p1->increasePenetrance();
+            //} else {
+            //    p0->decreasePenetrance();
+            //    p1->decreasePenetrance();
+            //}
             m_dob = d;
         }
     }
@@ -166,22 +166,24 @@ public:
     }
 
     gamete_ptr getGamete( unsigned char gamete_idx ) const {
-        if( gamete_idx == 0 && p0 ) {
+        if( gamete_idx == 0 && p0 != NULL ) {
             return p0;
-        } else if( p1 ) {
+        } else /*if( p1 != NULL )*/ {
             return p1;
         }
-        return gamete_t::create();
+//        return new gamete_t();
     }
 
     void reset() {
         died();
         if( p0 ) {
-            p0.reset();
+            delete p0;
+            p0 = NULL;
         }
 
         if( p1 ) {
-            p1.reset();
+            delete p1;
+            p1 = NULL;
         }
     }
 

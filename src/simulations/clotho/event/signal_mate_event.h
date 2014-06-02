@@ -7,6 +7,8 @@ class SignalMateEvent : public ClothoEvent {
 public:
     static const event_type_t TYPE_ID = 9;
 
+    typedef ObjectManager< SignalMateEvent, EVENT_PAGE_SIZE > object_manager_t;
+
     SignalMateEvent() {}
     SignalMateEvent( const vtime_t & tSent, const vtime_t & tRecv,
                 const system_id & sender, const system_id & receiver,
@@ -42,7 +44,8 @@ protected:
     unsigned int    m_index;
     system_id       m_offspring;
 
-    static boost::object_pool< SignalMateEvent > m_pool;
+    //static boost::object_pool< SignalMateEvent > m_pool;
+    static object_manager_t m_pool;
 };
 
 #endif  // SIGNAL_MATE_EVENT_H_

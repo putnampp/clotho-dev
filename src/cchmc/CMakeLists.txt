@@ -53,5 +53,6 @@ LIST( APPEND CCHMC_SRCS genetic_mapping.cpp )
 LIST( APPEND CCHMC_SRCS genetic_region.cpp )
 LIST( APPEND CCHMC_SRCS variant_base.cpp )
 LIST( APPEND CCHMC_SRCS random_process.cpp)
+LIST( APPEND CCHMC_SRCS basic_gamete.cpp)
 
 ADD_LIBRARY(cchmc SHARED ${CCHMC_SRCS})
