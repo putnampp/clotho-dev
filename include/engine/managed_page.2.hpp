@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <cassert>
 #include <cstring>
+#include <iostream>
 
 template < class H, class O, unsigned int S >
 class ManagedPage {
@@ -67,9 +68,11 @@ public:
         assert( pidx->id >= SET_INUSE );
         pidx->id &= (UNSET_INUSE);
 
-        header_t * header = reinterpret_cast< header_t * >( reinterpret_cast< char * >(pidx) - sizeof( _node ) * pidx->id - sizeof(header_t *));
+        ManagedPage< H, O, S > * pg = reinterpret_cast< ManagedPage< H, O, S > * >( reinterpret_cast< char * >(pidx) - sizeof( _node ) * pidx->id - 2 * sizeof( void * ));
 
-        pred( header, pidx );
+//        std::cout << pidx << ";" << pg << "; " << obj << " [" << pidx->id << "]" << std::endl;
+
+        pred( pg->header, pidx );
     }
 
     virtual ~ManagedPage() { }

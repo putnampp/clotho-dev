@@ -9,11 +9,13 @@ Gamete::object_manager_t Gamete::m_pool;
 Gamete::Gamete() : m_variants( NULL ), m_nActive( 1 ), m_bDirty(false) { }
 
 Gamete::pointer Gamete::copy() {
+//    if( this != &EMPTY_GAMETE )
+//        std::cout << "Copying: " << this << "; [" << m_nActive << ", " << m_variants << "]" << std::endl;
     ++m_nActive;
     return this;
 }
 
-Gamete::pointer Gamete::clone() {
+Gamete::pointer Gamete::clone() const {
 //    pointer g = m_pool.malloc();
 //    
 //    if( g->m_variants != NULL ) 
@@ -23,7 +25,7 @@ Gamete::pointer Gamete::clone() {
 //    }
 //   g->m_nActive = 1;
 //
-    std::cout << "Cloning gamete: " << this << std::endl;
+//    std::cout << "Cloning gamete: " << this << "; [" << m_nActive << ", " << m_variants << "]" << std::endl;
     pointer g = new Gamete();
 
     if( this->m_variants != NULL ) {
@@ -34,7 +36,7 @@ Gamete::pointer Gamete::clone() {
         g->m_bDirty = false;
     }
 
-    std::cout << "Allocated vector: " << g->m_variants << std::endl;
+//    std::cout << "Allocated vector: " << g->m_variants << "; cloned from: " << this->m_variants << std::endl;
     return g;
 }
 
@@ -62,26 +64,40 @@ void * Gamete::operator new( size_t  s) {
 
     assert( res->m_variants == NULL );
 
-    std::cout << "allocated: " << res << std::endl;
+//    std::cout << "allocated: " << res << std::endl;
     return res;
 }
 
 void Gamete::operator delete( void * ptr ) {
-    Gamete::pointer g = (Gamete::pointer) ptr;
-
-    std::cout << "Freeing: " << g << std::endl;
-    m_pool.free( g );
+//    Gamete::pointer g = (Gamete::pointer) ptr;
+//
+//    std::cout << "Freeing: " << g << std::endl;
+//    m_pool.free( g );
 }
 
 void Gamete::print( std::ostream & o ) const {}
 
 Gamete::~Gamete() {
+//    if( this != &EMPTY_GAMETE )
+//        std::cout << "Deconstructing: " << this << "; [" << m_nActive << ", " << m_variants << "]" << std::endl;
+    
     if( --m_nActive == 0 ) {
-        std::cout << "Deleting: " << this  << std::endl;
-        std::cout << "Deleting vector: " << m_variants << std::endl;
+//        std::cout << "<DUMPING OBJECT MANAGER before_free>" << std::endl;
+//        m_pool.dump(std::cout);
+//        std::cout << "</DUMPING OBJECT MANAGER>\n" << std::endl;
+
+//        std::cout << "Deleting: " << this  << std::endl;
+//        std::cout << "Deleting vector: " << m_variants << std::endl;
+        if( this == &EMPTY_GAMETE ) return;
+
         delete m_variants;
         m_variants = NULL;
 
-        delete this;
+    //    delete this;
+        m_pool.free( this );
+
+//        std::cout << "<DUMPING OBJECT MANAGER after_free>" << std::endl;
+//        m_pool.dump(std::cout);
+//        std::cout << "</DUMPING OBJECT MANAGER>\n" << std::endl;
     }
 }

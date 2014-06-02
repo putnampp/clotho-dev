@@ -178,14 +178,17 @@ public:
 
     void reset() {
         died();
+        //std::cout << "Resetting individual properties" << std::endl;
         if( p0 ) {
 //            delete p0;
+       //     std::cout << "Deconstructing P0: " << p0 << std::endl;
             p0->~gamete_t();
             p0 = NULL;
         }
 
         if( p1 ) {
 //            delete p1;
+       //     std::cout << "Deconstructing P1: " << p1 << std::endl;
             p1->~gamete_t();
             p1 = NULL;
         }

@@ -153,7 +153,7 @@ int main( int argc, char ** argv ) {
     stats->startPhase( "Sim" );
     for( SystemClock::vtime_t i = 0; i < tUntil; ++i ) {
 
-        std::cout << "Generation: " << i << std::endl;
+//        std::cout << "Generation: " << i << std::endl;
         // mate
         unsigned int child_idx = 0;
         while( child_idx < child->size()) {

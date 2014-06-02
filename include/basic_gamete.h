@@ -21,7 +21,7 @@ public:
 
     Gamete();
  
-    pointer clone();
+    pointer clone() const;
     pointer copy();
 
     size_t size() const;

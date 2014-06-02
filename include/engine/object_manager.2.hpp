@@ -68,9 +68,11 @@ public:
     struct update_header_on_release {
         void operator()( header_t * h, typename page_t::index_t * idx ) {
             page_header * ph = &h->key;
+//            std::cout << "Current Header: " << *ph << std::endl;
             idx->fl_offset = ph->available;
             ph->available = idx->id;
             ++ph->free_count;
+//            std::cout << "Updated Header: " << *ph << std::endl;
         }
     };
 
@@ -111,6 +113,7 @@ public:
     }
 
     void free( object_t * ptr ) {
+//        std::cout << "Manager Freeing: " << ptr << std::endl;
         page_t::template release< update_header_on_release >( ptr );
     }
 
