@@ -65,7 +65,9 @@ public:
         static FNC pred;
         index_t * pidx = reinterpret_cast< index_t * >( reinterpret_cast< char * >(obj) - IDX_OFFSET );
 
-        assert( pidx->id >= SET_INUSE );
+        if( pidx->id < SET_INUSE ) return;
+
+//        assert( pidx->id >= SET_INUSE );
         pidx->id &= (UNSET_INUSE);
 
         ManagedPage< H, O, S > * pg = reinterpret_cast< ManagedPage< H, O, S > * >( reinterpret_cast< char * >(pidx) - sizeof( _node ) * pidx->id - 2 * sizeof( void * ));
