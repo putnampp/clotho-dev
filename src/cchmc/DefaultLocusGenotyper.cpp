@@ -27,8 +27,8 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#include "DefaultLocusGenotyper.h"
-#include "DefaultAllelicEffect.h"
+#include "cchmc/DefaultLocusGenotyper.h"
+#include "cchmc/DefaultAllelicEffect.h"
 
 DefaultLocusGenotyper::DefaultLocusGenotyper( Locus::Ptr lp ) :
     LocusGenotyper( new DefaultAllelicEffect( lp ) ) {}

@@ -9,7 +9,7 @@
 #include "engine/event_functor.h"
 #include "common_strings.h"
 #include "sex.h"
-#include "AlleleTuple.h"
+//#include "AlleleTuple.h"
 
 //#include "engine/FSBAllocator.hh"
 

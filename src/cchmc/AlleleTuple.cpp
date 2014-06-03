@@ -27,7 +27,7 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#include "AlleleTuple.h"
+#include "cchmc/AlleleTuple.h"
 
 #include <iostream>
 #include <cstring>

@@ -27,7 +27,7 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#include "DefaultAllelicEffect.h"
+#include "cchmc/DefaultAllelicEffect.h"
 
 DefaultAllelicEffect::DefaultAllelicEffect( Locus::Ptr lp ) : AllelicEffect( lp ) {
 }

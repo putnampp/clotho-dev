@@ -24,7 +24,7 @@
 #include <type_traits>
 #include <functional>
 
-#include "../active_pool.hpp"
+#include "utility/pool/active_pool.hpp"
 #include "../app_object.hpp"
 
 #include "individual2.hpp"

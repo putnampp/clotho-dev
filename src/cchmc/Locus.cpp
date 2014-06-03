@@ -27,7 +27,7 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#include "Locus.h"
+#include "cchmc/Locus.h"
 
 #include <sstream>
 using std::stringstream;

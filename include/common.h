@@ -43,7 +43,7 @@
 using std::shared_ptr;
 using std::static_pointer_cast;
 
-#include "Allele.h"
+#include "cchmc/Allele.h"
 
 using std::string;
 

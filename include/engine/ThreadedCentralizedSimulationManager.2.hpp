@@ -9,7 +9,7 @@
 
 #include "synchronizer.h"
 
-#include "threaded_paged_event_queue.hpp"
+#include "utility/memory/threaded_paged_event_queue.hpp"
 #include "PageWorkerThread.h"
 #include "common_thread.h"
 

@@ -27,7 +27,7 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#include "GeneticMap.h"
+#include "cchmc/GeneticMap.h"
 
 GeneticMap::GeneticMap() :
     m_loci( new Loci() ),

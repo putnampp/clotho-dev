@@ -26,7 +26,7 @@
  * of the authors and should not be interpreted as representing official policies,
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
-#include "DefaultTrait.h"
+#include "cchmc/DefaultTrait.h"
 
 DefaultTrait::DefaultTrait( const string & name ) : 
     Trait( name ), 

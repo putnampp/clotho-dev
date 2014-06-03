@@ -27,7 +27,7 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
-#include "pword_allele_masks.hpp"
+#include "cchmc/pword_allele_masks.hpp"
 
 const unsigned long pword_allele_mask< unsigned long, unsigned char, 2 >::pword_masks[ 256 ] = {
 0x0000000000000000,

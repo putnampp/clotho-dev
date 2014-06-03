@@ -9,7 +9,7 @@
 #include "simulation_stats.h"
 #include <map>
 
-#include "paged_event_queue.2.hpp"
+#include "utility/memory/paged_event_queue.h"
 
 //using std::deque;
 using std::map;
