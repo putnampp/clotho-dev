@@ -1,4 +1,4 @@
-#include "variant_base.h"
+#include "genetics/variant_base.h"
 
 variant_base::object_manager_t variant_base::m_pool;
 

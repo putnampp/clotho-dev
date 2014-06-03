@@ -1,4 +1,4 @@
-#include "genetic_region.h"
+#include "genetics/genetic_region.h"
 
 #include <limits>
 #include <cmath>

@@ -1,12 +1,12 @@
 #ifndef REPRODUCTION_MODELS_HPP_
 #define REPRODUCTION_MODELS_HPP_
 
-#include "reproduction.hpp"
+#include "genetics/reproduction.hpp"
 
 #include <iostream>
 
 #include "../clotho.h"
-#include "gamete.h"
+#include "genetics/gamete.h"
 
 #include "rng/random_process.hpp"
 

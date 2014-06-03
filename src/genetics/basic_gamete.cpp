@@ -1,4 +1,4 @@
-#include "basic_gamete.h"
+#include "genetics/basic_gamete.h"
 
 #include <algorithm>
 

@@ -3,7 +3,7 @@
 
 #include "../clotho_event.h"
 
-#include "gamete.h"
+#include "genetics/gamete.h"
 
 class InheritEvent : public ClothoEvent {
 public:

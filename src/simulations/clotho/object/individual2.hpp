@@ -13,7 +13,7 @@
 //#include "../event/inherit_event.hpp"
 #include "../event/inherit_event.2.h"
 
-#include "reproduction.hpp"   // from libcchmc
+#include "genetics/reproduction.hpp"   // from libcchmc
 
 #include "individual_properties.hpp"
 

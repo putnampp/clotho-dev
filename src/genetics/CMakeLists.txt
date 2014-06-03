@@ -26,14 +26,12 @@
 # of the authors and should not be interpreted as representing official policies,
 # either expressed or implied, of the FreeBSD Project.
 ################################################################################
-#SET( DIRS sandbox )
+INCLUDE_DIRECTORIES( ${${PROJECT_NAME}_INCLUDE_DIR} )
 
-LIST(APPEND DIRS cchmc)
-LIST(APPEND DIRS genetics)
-LIST(APPEND DIRS engine)
-LIST(APPEND DIRS simulations)
-LIST(APPEND DIRS time)
+LIST( APPEND CCHMC_SRCS genetic_mapping.cpp )
+LIST( APPEND CCHMC_SRCS genetic_region.cpp )
+LIST( APPEND CCHMC_SRCS variant_base.cpp )
+LIST( APPEND CCHMC_SRCS random_process.cpp)
+LIST( APPEND CCHMC_SRCS basic_gamete.cpp)
 
-FOREACH( D ${DIRS} )
-    ADD_SUBDIRECTORY( ${D} )
-ENDFOREACH( D )
+ADD_LIBRARY(genetics SHARED ${CCHMC_SRCS})

@@ -1,7 +1,7 @@
 #ifndef SELECTION_MODELS_HPP_
 #define SELECTION_MODELS_HPP_
 
-#include "selection.hpp"
+#include "genetics/selection.hpp"
 #include "../clotho.h"
 
 #include <utility>

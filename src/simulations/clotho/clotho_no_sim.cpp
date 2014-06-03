@@ -35,15 +35,13 @@
 #include <vector>
 #include <memory>
 
-//#include "clotho_application.hpp"
-//#include "engine/engine.hpp"
 #include "engine/simulation_stats.h"
 #include "object/individual2.hpp"
 
-#include "variant_base.h"
-#include "basic_variant_map.h"
-#include "gamete.h"
-#include "fixed_length_gamete.hpp"
+#include "genetics/variant_base.h"
+#include "genetics/basic_variant_map.h"
+#include "genetics/gamete.h"
+//#include "genetics/fixed_length_gamete.hpp"
 
 #include "rng/rng.hpp"
 #include "models/default_life_cycle.hpp"

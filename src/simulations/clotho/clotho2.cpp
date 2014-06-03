@@ -34,11 +34,6 @@
 #include "clotho_commandline.h"
 #include "engine/engine.hpp"
 
-//#include "selection.hpp"
-//#include "reproduction.hpp"
-
-#include "variant_base.h"
-
 #include "rng/rng.hpp"
 //#include "models/default_life_cycle.h"
 //#include "models/default_life_cycle.hpp"
@@ -46,8 +41,9 @@
 #include "models/selection_models.hpp"
 #include "models/reproduction_models.hpp"
 
-#include "basic_variant_map.h"
-#include "gamete.h"
+#include "genetics/basic_variant_map.h"
+#include "genetics/gamete.h"
+#include "genetics/variant_base.h"
 
 const unsigned int MAX_THREADS = 24;
 

@@ -1,4 +1,4 @@
-#include "genetic_mapping.h"
+#include "genetics/genetic_mapping.h"
 #include <cassert>
 
 const double genetic_mapping::MAX_CHROM_LENGTH = 3.0e8;

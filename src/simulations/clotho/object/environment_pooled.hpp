@@ -11,10 +11,10 @@
 #include "environment_life_cycle.hpp"
 #include "environment_finalizer.hpp"
 
-#include "variant_map.hpp"
+//#include "variant_map.hpp"
 
-#include "selection.hpp"
-#include "reproduction.hpp"   // from libcchmc
+#include "genetics/selection.hpp"
+#include "genetics/reproduction.hpp"   // from libcchmc
 
 #include <deque>
 #include <vector>
