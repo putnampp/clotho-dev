@@ -1,20 +1,12 @@
 #ifndef OBJECT_MANAGER_HPP_
 #define OBJECT_MANAGER_HPP_
 
-//#include "pager.2.hpp"
-#include "managed_page.2.hpp"
-#include "splay_tree.hpp"
+#include "utility/memory/managed_page.h"
+#include "utility/splay_tree.hpp"
 
 #include <utility>
 #include <ostream>
 
-//typedef std::pair< unsigned short, void * > free_page_t;
-//struct free_page_comp { 
-//    bool operator()( const free_page_t & lhs, const free_page_t & rhs ) {
-//        return lhs.first > rhs.first;
-//    }
-//};
-//
 struct page_header {
     unsigned short free_count, available;
     void * page;
@@ -68,11 +60,9 @@ public:
     struct update_header_on_release {
         void operator()( header_t * h, typename page_t::index_t * idx ) {
             page_header * ph = &h->key;
-//            std::cout << "Current Header: " << *ph << std::endl;
             idx->fl_offset = ph->available;
             ph->available = idx->id;
             ++ph->free_count;
-//            std::cout << "Updated Header: " << *ph << std::endl;
         }
     };
 
@@ -101,7 +91,6 @@ public:
         }
 
         assert( fpage != NULL && fpage->key.available < page_t::COUNT );
-//        object_t * obj = tmp->template getObject<update_header_on_get>( fpage );
         page_t * tmp = reinterpret_cast< page_t * >( fpage->key.page );
         object_t * obj = tmp->template getObject<update_header_on_get>(fpage);
         --m_free_objs;
@@ -113,7 +102,6 @@ public:
     }
 
     void free( object_t * ptr ) {
-//        std::cout << "Manager Freeing: " << ptr << std::endl;
         page_t::template release< update_header_on_release >( ptr );
     }
 

@@ -35,7 +35,7 @@
 #include <vector>
 #include <memory>
 
-#include "engine/simulation_stats.h"
+#include "utility/simulation_stats.h"
 #include "object/individual2.hpp"
 
 #include "genetics/variant_base.h"

@@ -1,7 +1,7 @@
 #ifndef TEST_SIMULATION_OBJECT_H_
 #define TEST_SIMULATION_OBJECT_H_
 
-#include "simulation_object.h"
+#include "object/simulation_object.h"
 #include <list>
 #include <iostream>
 

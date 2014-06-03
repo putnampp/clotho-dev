@@ -28,7 +28,7 @@
  ******************************************************************************/
 
 #include <boost/test/unit_test.hpp>
-#include "SequentialSimulationManager.h"
+#include "manager/SequentialSimulationManager.h"
 
 #include "test_application.h"
 #include "test_object.h"

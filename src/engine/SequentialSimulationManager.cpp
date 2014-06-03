@@ -1,4 +1,4 @@
-#include "SequentialSimulationManager.h"
+#include "manager/SequentialSimulationManager.h"
 #include <cassert>
 
 #include <algorithm>

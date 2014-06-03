@@ -3,7 +3,7 @@
 
 #include "clotho.h"
 #include "engine/application.h"
-#include "engine/simulation_manager_impl.hpp"
+#include "engine/manager/simulation_manager_impl.hpp"
 
 #include "clotho_application_initializer.hpp"
 #include "clotho_application_finalizer.hpp"

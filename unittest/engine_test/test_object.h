@@ -1,7 +1,7 @@
 #ifndef TEST_OBJECT_H_
 #define TEST_OBJECT_H_
 
-#include "object.h"
+#include "object/object.h"
 
 #include <ostream>
 #include <list>

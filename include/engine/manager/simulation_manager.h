@@ -1,10 +1,10 @@
 #ifndef SIMULATIONMANAGER_H_
 #define SIMULATIONMANAGER_H_
 
-#include "system_id.h"
-#include "object.h"
-#include "event_manager.h"
-#include "event_router.h"
+#include "../system_id.h"
+#include "../object/object.h"
+#include "../event_manager.h"
+#include "../event_router.h"
 
 struct simulation_manager : 
     virtual public system_object,

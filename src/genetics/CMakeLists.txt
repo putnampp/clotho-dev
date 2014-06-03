@@ -28,10 +28,10 @@
 ################################################################################
 INCLUDE_DIRECTORIES( ${${PROJECT_NAME}_INCLUDE_DIR} )
 
-LIST( APPEND CCHMC_SRCS genetic_mapping.cpp )
-LIST( APPEND CCHMC_SRCS genetic_region.cpp )
-LIST( APPEND CCHMC_SRCS variant_base.cpp )
-LIST( APPEND CCHMC_SRCS random_process.cpp)
-LIST( APPEND CCHMC_SRCS basic_gamete.cpp)
+LIST( APPEND GENETICS_SRCS genetic_mapping.cpp )
+LIST( APPEND GENETICS_SRCS genetic_region.cpp )
+LIST( APPEND GENETICS_SRCS variant_base.cpp )
+LIST( APPEND GENETICS_SRCS random_process.cpp)
+LIST( APPEND GENETICS_SRCS basic_gamete.cpp)
 
-ADD_LIBRARY(genetics SHARED ${CCHMC_SRCS})
+ADD_LIBRARY(${PROJECT_NAME}_genetics SHARED ${GENETICS_SRCS})

@@ -1,7 +1,7 @@
 #ifndef SIMULATIONMANAGER_HPP_
 #define SIMULATIONMANAGER_HPP_
 
-#include "object.hpp"
+#include "../object/object.hpp"
 
 template < class OBJ >
 class simulation_manager : public object {

@@ -3,13 +3,13 @@
 
 //#include "engine/default_event.h"
 #include "engine/event_interface.h"
-#include "engine/system_object.h"
+#include "engine/object/system_object.h"
 //#include "engine/pager.hpp"
 #include "clotho.h"
 #include "ider.h"
 
 //#include <boost/pool/object_pool.hpp>
-#include "engine/object_manager.h"
+#include "utility/pool/object_manager.h"
 
 #include <ostream>
 

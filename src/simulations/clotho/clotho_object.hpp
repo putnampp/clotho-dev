@@ -2,8 +2,8 @@
 #define CLOTHO_OBJECT_HPP_
 
 #include "clotho.h"
-#include "engine/simulation_object.hpp"
-#include "engine/simulation_manager_impl.hpp"
+#include "engine/object/simulation_object.hpp"
+#include "engine/manager/simulation_manager_impl.hpp"
 #include "clotho_event.h"
 #include "engine/ltsf_queue.3.hpp"
 

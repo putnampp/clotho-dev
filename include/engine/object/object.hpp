@@ -1,7 +1,7 @@
 #ifndef _OBJECT_HPP_
 #define _OBJECT_HPP_
 
-#include "engine.h"
+#include "../engine.h"
 
 #include "system_object.h"
 /*#include "event_interface.h"

@@ -2,10 +2,10 @@
 #define THREADED_CENTRALIZED_SIMULATION_MANAGER2_HPP_
 
 #include "simulation_manager_impl.hpp"
-#include "application.h"
+#include "../application.h"
 
-#include "common_engine_strings.h"
-#include "simulation_stats.h"
+#include "../common_engine_strings.h"
+#include "utility/simulation_stats.h"
 
 #include "synchronizer.h"
 

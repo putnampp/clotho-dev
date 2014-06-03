@@ -2,7 +2,7 @@
 #define DEFAULT_EVENT_H_
 
 #include "event_interface.h"
-#include "system_object.h"
+#include "object/system_object.h"
 
 class default_event : public event {
 public:

@@ -37,4 +37,4 @@ ENDFOREACH( D )
 
 ADD_EXECUTABLE(test_main test_main.cpp)
 #TARGET_LINK_LIBRARIES( test_main ${Boost_LIBRARIES} cchmc cchmc_test engine_test)
-TARGET_LINK_LIBRARIES( test_main ${COMMON_LIBRARIES} cchmc engine timer engine_test)
+TARGET_LINK_LIBRARIES( test_main ${COMMON_LIBRARIES} cchmc engine ${PROJECT_NAME}_utility timer engine_test)

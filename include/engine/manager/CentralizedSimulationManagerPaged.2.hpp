@@ -2,11 +2,11 @@
 #define CENTRALIZEDSIMULATIONMANAGERPAGED_HPP_
 
 #include "simulation_manager_impl.hpp"
-#include "application.h"
+#include "../application.h"
 
-#include "common_engine_strings.h"
+#include "../common_engine_strings.h"
 
-#include "simulation_stats.h"
+#include "utility/simulation_stats.h"
 #include <map>
 
 #include "utility/memory/paged_event_queue.h"

@@ -4,7 +4,7 @@
 #include "genetic_region.h"
 #include <ostream>
 
-#include "engine/object_manager.h"
+#include "utility/pool/object_manager.h"
 
 enum variant_flags { NEUTRAL = 1 };
 

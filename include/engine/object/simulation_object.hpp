@@ -2,11 +2,11 @@
 #define SIMULATION_OBJECT_HPP_
 
 #include "object.hpp"
-#include "EventManager.hpp"
-#include "event_processor.hpp"
-#include "event_performer.hpp"
-#include "event_transceiver.hpp"
-#include "event_router.hpp"
+#include "../EventManager.hpp"
+#include "../event_processor.hpp"
+#include "../event_performer.hpp"
+#include "../event_transceiver.hpp"
+#include "../event_router.hpp"
 //#include "poolable.h"
 
 template< class E, class ES, class EM = EventManager< E, ES > >

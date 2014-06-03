@@ -30,7 +30,7 @@
 #include <boost/test/unit_test.hpp>
 #include "test_simulation_object.h"
 
-#include "SequentialSimulationManager.h"
+#include "manager/SequentialSimulationManager.h"
 #include "test_application.h"
 
 BOOST_AUTO_TEST_SUITE( test_simulation_object )

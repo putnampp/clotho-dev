@@ -30,6 +30,7 @@
 
 LIST(APPEND DIRS cchmc)
 LIST(APPEND DIRS genetics)
+LIST(APPEND DIRS utility)
 LIST(APPEND DIRS engine)
 LIST(APPEND DIRS simulations)
 LIST(APPEND DIRS time)

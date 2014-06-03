@@ -27,11 +27,8 @@
 # either expressed or implied, of the FreeBSD Project.
 ################################################################################
 INCLUDE_DIRECTORIES( ${${PROJECT_NAME}_INCLUDE_DIR} )
-INCLUDE_DIRECTORIES( ${${PROJECT_NAME}_INCLUDE_DIR}/engine )
+INCLUDE_DIRECTORIES( ${${PROJECT_NAME}_INCLUDE_DIR}/utility )
 
-LIST( APPEND ENGINE_SRCS system_clock.cpp )
-LIST( APPEND ENGINE_SRCS common_engine_strings.cpp )
-LIST( APPEND ENGINE_SRCS event_interface.cpp )
-LIST( APPEND ENGINE_SRCS SequentialSimulationManager.cpp)
+LIST( APPEND UTILITY_SRCS simulation_stats.cpp )
 
-ADD_LIBRARY(engine SHARED ${ENGINE_SRCS})
+ADD_LIBRARY(${PROJECT_NAME}_utility SHARED ${UTILITY_SRCS})

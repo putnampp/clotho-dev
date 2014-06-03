@@ -1,7 +1,7 @@
 #ifndef SYSTEM_OBJECT_H_
 #define SYSTEM_OBJECT_H_
 
-#include "system_id.h"
+#include "../system_id.h"
 
 struct system_object {
     virtual const system_id &       getSystemID() const = 0;

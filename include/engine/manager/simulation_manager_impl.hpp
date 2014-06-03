@@ -3,7 +3,7 @@
 
 #include "simulation_manager.hpp"
 //#include "simulation_manager_event_manager.h"
-#include "event_router.hpp"
+#include "../event_router.hpp"
 
 template < class E, class O >
 class SimulationManager : 
