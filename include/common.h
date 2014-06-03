@@ -31,27 +31,31 @@
 
 #include "config.h"
 
-#include <string>
 #include <stdint.h>
 #include <cassert>
 
-//#include <boost/smart_ptr.hpp>
-//#include <boost/scoped_ptr.hpp>
-//
-#include <memory>
+#ifdef USE_BOOST_SMART_PTR
 
+#include <boost/smart_ptr.hpp>
+#include <boost/scoped_ptr.hpp>
+using boost::shared_ptr;
+using boost::scoped_ptr;
+
+#else // ! USE_BOOST_SMART_PTR
+
+#include <memory>
 using std::shared_ptr;
 using std::static_pointer_cast;
 
+#endif // USE_BOOST_SMART_PTR
+
 #include "cchmc/Allele.h"
 
+#include <string>
 using std::string;
 
 typedef unsigned char   byte_t;
 typedef unsigned int    pos_t;
-
-//using boost::shared_ptr;
-//using boost::scoped_ptr;
 
 typedef unsigned char   chromid_t;
 
