@@ -54,6 +54,7 @@ protected:
         unsigned int nMut = m_rng->nextPoisson( mu );
         if( nMut > 0) {
             gamete_ptr res = gm->clone();
+            
             do {
                 typename variant_map_t::value_ptr_t var = getNewVariant();
                 res->addVariant( var );

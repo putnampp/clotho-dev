@@ -14,6 +14,7 @@ class Gamete {
 public:
     typedef vector< variant_base * > variant_set_t;
     typedef Gamete * pointer;
+    typedef typename variant_set_t::const_iterator var_iterator;
 
     typedef ObjectManager< Gamete > object_manager_t;
 
@@ -32,6 +33,9 @@ public:
 
     static void * operator new( size_t );
     static void operator delete( void * );
+
+    var_iterator begin() const;
+    var_iterator end() const;
 
     virtual void print( std::ostream & o ) const;
 

@@ -11,6 +11,7 @@ enum variant_flags { NEUTRAL = 1 };
 class variant_base : public genetic_region {
 public:
     typedef ObjectManager< variant_base > object_manager_t;
+    typedef variant_base * pointer;
     
     variant_base() : genetic_region(0) {}
     variant_base( const key_t & k, double cSelection, double cDominance, variant_flags f);
@@ -24,6 +25,8 @@ public:
 
     virtual void incrementPenetrance();
     virtual void decrementPenetrance();
+
+    void setPenetrance( unsigned int p );
 
     static void * operator new( size_t );
     static void operator delete( void *  );

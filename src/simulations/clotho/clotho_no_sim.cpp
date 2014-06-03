@@ -67,6 +67,35 @@ typedef reproduction::IndividualReproduction< mutation_model_t, recombination_mo
 typedef TIndividual< LCM_t, individual_props< /*VT_t,*/ gamete_t, 2 >, reproduction_model_t > individual_t;
 typedef std::vector< individual_t * > environment_t;
 
+class DiscreteSelector {
+public:
+    DiscreteSelector( gsl_rng * r, double * fitnesses, size_t s ) :
+        m_rng( r ),
+        m_lookup( NULL ) 
+    {
+        m_lookup = gsl_ran_discrete_preproc( s, fitnesses );
+    }
+
+    size_t operator()() {
+        return gsl_ran_discrete( m_rng, m_lookup );
+    }
+
+    std::pair< individual_t * , individual_t * > operator()( environment_t * env, double f = 1.0 ) {
+        size_t i0 = gsl_ran_discrete( m_rng, m_lookup );
+        size_t i1 = ((gsl_rng_uniform(m_rng) <= f ) ? i0 : gsl_ran_discrete( m_rng, m_lookup ));
+
+        std::pair< individual_t *, individual_t * > res = make_pair( env->at(i0), env->at(i1));
+
+        return res;
+    }
+
+    virtual ~DiscreteSelector() {
+        delete m_lookup;
+    }
+protected:
+    gsl_rng * m_rng;
+    gsl_ran_discrete_t * m_lookup;
+};
 
 class SimpleSelector : public RandomProcess {
 public:
@@ -91,6 +120,74 @@ public:
 
 typedef SimpleSelector selector_t;
 
+struct het_fitness {
+    inline void operator()( double & f, VT_t::pointer v ) {
+        f *= (1. + v->getDominance() * v->getSelection());
+    }
+};
+
+struct hom_fitness {
+    hom_fitness( double s = 1. ) : m_scaling(1.) {}
+    inline void operator()( double & f, VT_t::pointer v ) {
+        f *= (1. + v->getSelection() * m_scaling);
+    }
+    double m_scaling;
+};
+
+template < class het_policy, class hom_policy >
+class fitness_multiplicative {
+public:
+//    typedef void (*update_policy)( double & f, VT_t::pointer v );
+//
+    fitness_multiplicative() {}
+
+    fitness_multiplicative( het_policy & het, hom_policy & hom ) : 
+        m_het_case(het), 
+        m_hom_case(hom) 
+    {}
+
+    double operator()( double f, individual_t * ind ) {
+        return (*this)(f, ind->getProperties()->getGamete(0), ind->getProperties()->getGamete(1) );
+    }
+
+    double operator()( double f, gamete_t::pointer g1, gamete_t::pointer g2 ) {
+        double res = f;
+        if( g1 == g2 ) return res;
+
+        unsigned int s = g1->size() + g2->size();
+        if( s == 0 ) return res;
+
+        gamete_t::var_iterator g1_it = g1->begin(), g1_e = g1->end();
+        gamete_t::var_iterator g2_it = g2->begin(), g2_e = g2->end();
+
+        while( g1_it != g1_e && g2_it != g2_e ) {
+            if( *g1_it == *g2_it )  {
+                m_hom_case( res, *g1_it++);
+                g2_it++;
+            } else if( (*g1_it)->getKey() < (*g2_it)->getKey() ) {
+                m_het_case( res, *g1_it++);
+            } else {
+                m_het_case( res, *g2_it++);
+            }
+        }
+        while( g1_it != g1_e ) {
+            m_het_case(res, *g1_it++);
+        }
+
+        while( g2_it != g2_e ) {
+            m_het_case(res, *g2_it++);
+        }
+
+        return res;
+    }
+
+    virtual ~fitness_multiplicative() {}
+protected:
+    het_policy m_het_case;
+    hom_policy m_hom_case;
+
+};
+
 int main( int argc, char ** argv ) {
 
     po::variables_map vm;
@@ -110,23 +207,22 @@ int main( int argc, char ** argv ) {
 
     cout << "Simulate until: " << tUntil << endl;
 
-    shared_ptr< iRNG > rng( new GSL_RNG());
+    gsl_rng_env_setup();
+    const gsl_rng_type * T = gsl_rng_default;
+    string m_type = T->name;
+    unsigned int m_seed = gsl_rng_default_seed;
+
+    gsl_rng * my_rng = gsl_rng_alloc( T );
+    gsl_rng_set( my_rng, m_seed );
+
+    shared_ptr< iRNG > rng( new GSL_RNG( my_rng, m_type, m_seed ));
     cout << "RNG: " <<  rng->getType() << "; seed: " << rng->getSeed() << endl;
 
     mutation_model_t::initialize( 0.0001, false);
     
-/*    const double dMaxVariants = 10000.0;
-    for( double i = 0.0; i < dMaxVariants; i += 1.0 ) {
-        mutation_model_t::getVariantMap()->createVariant( i / dMaxVariants);
-    }
-
-    assert(mutation_model_t::getVariantMap()->size() == dMaxVariants);*/
-
     RandomProcess::initialize( rng );
 
-    //shared_ptr< application > app;
     shared_ptr< SimulationStats > stats( new SimulationStats() );
-
 
     stats->startPhase( RUNTIME_K );
 
@@ -136,6 +232,8 @@ int main( int argc, char ** argv ) {
     system_id blank_id;
 
     stats->startPhase( "PopInit" );
+
+    fitness_multiplicative< het_fitness, hom_fitness > fmult;
 
     for( unsigned int i = 0; i < vm[ FOUNDER_SIZE_K ].as< unsigned int >(); ++i) {
         population.push_back( new individual_t() );
@@ -150,16 +248,43 @@ int main( int argc, char ** argv ) {
 
     environment_t * parent = &population, * child = &buffer;
 
+    unsigned int fitness_size = 0;
+    double * fitness = NULL;
+
     stats->startPhase( "Sim" );
     for( SystemClock::vtime_t i = 0; i < tUntil; ++i ) {
 
+        if( fitness_size < parent->size() ) {
+            if( fitness != NULL ) {
+                delete [] fitness;
+            }
+            fitness_size = parent->size();
+            fitness = new double[ fitness_size ];
+        }
+
+        memset( fitness, 0, sizeof(double) * fitness_size );
+
 //        std::cout << "Generation: " << i << std::endl;
+        // measure fitness of parent population
+        //
+        double * tmp = fitness;
+//        double e_fitness = 0.0;
+        for( environment_t::iterator it = parent->begin(); it != parent->end(); it++ ) {
+            (*tmp) = fmult( (*tmp), (*it) );
+            //e_fitness += (*tmp++);
+            ++tmp;
+        }
+        //e_fitness /= (double)parent->size();
         // mate
+        //
+        //
+        DiscreteSelector ds( my_rng, fitness, parent->size() );
         unsigned int child_idx = 0;
         while( child_idx < child->size()) {
             (*child)[child_idx]->reset();
 
-            std::pair< individual_t *, individual_t * > mate_pair = selector_t::select( parent );
+            //std::pair< individual_t *, individual_t * > mate_pair = selector_t::select( parent );
+            std::pair< individual_t *, individual_t * > mate_pair = ds( parent );
             gamete_ptr g = reproduction_model_t::reproduce( mate_pair.first, (gamete_t *) NULL);
             (*child)[child_idx]->getProperties()->inheritFrom(blank_id, g);
 
@@ -197,6 +322,8 @@ int main( int argc, char ** argv ) {
     cout << *stats;
 
     cout << "Created " << mutation_model_t::getVariantMap()->size() << " variants" << std::endl;
+
+    delete [] fitness;
 
     return 0;
 }

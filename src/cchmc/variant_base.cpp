@@ -32,9 +32,14 @@ void variant_base::incrementPenetrance() {
 }
 
 void variant_base::decrementPenetrance() {
-    assert( m_penetrance > 0);
-    --m_penetrance;
+//    assert( m_penetrance > 0);
+    if( m_penetrance > 0 )
+        --m_penetrance;
 //    __sync_sub_and_fetch( &m_penetrance, 1 );
+}
+
+void variant_base::setPenetrance( unsigned int p ) {
+    m_penetrance = 0;
 }
 
 void variant_base::print( std::ostream & out ) {

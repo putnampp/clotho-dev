@@ -38,6 +38,12 @@ public:
         initialize();
     }
 
+    RNG( gsl_rng * r, const type_t & t, seed_t s ) : 
+        m_rng( r ),
+        m_type(t),
+        m_seed(s)
+    {}
+
     shared_ptr< iRNG > split() {
         seed_t r = this->nextInt();
 

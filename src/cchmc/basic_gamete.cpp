@@ -12,6 +12,12 @@ Gamete::pointer Gamete::copy() {
 //    if( this != &EMPTY_GAMETE )
 //        std::cout << "Copying: " << this << "; [" << m_nActive << ", " << m_variants << "]" << std::endl;
     ++m_nActive;
+
+    if( m_variants != NULL ) {
+        for( variant_set_t::iterator it = m_variants->begin(); it != m_variants->end(); )
+            (*it++)->incrementPenetrance();
+    }
+
     return this;
 }
 
@@ -36,6 +42,9 @@ Gamete::pointer Gamete::clone() const {
         g->m_bDirty = false;
     }
 
+    for( variant_set_t::iterator it =g->m_variants->begin(); it != g->m_variants->end(); )
+        (*it++)->incrementPenetrance();
+
 //    std::cout << "Allocated vector: " << g->m_variants << "; cloned from: " << this->m_variants << std::endl;
     return g;
 }
@@ -47,7 +56,7 @@ void Gamete::addVariant( variant_base * vptr ) {
 }
 
 size_t Gamete::size() const {
-    return m_variants->size();
+    return ((m_variants != NULL ) ? m_variants->size() : 0);
 }
 
 bool Gamete::operator[]( variant_base * vptr ) {
@@ -75,11 +84,24 @@ void Gamete::operator delete( void * ptr ) {
 //    m_pool.free( g );
 }
 
+Gamete::var_iterator Gamete::begin() const {
+    return ((m_variants != NULL )? m_variants->begin() : var_iterator());
+}
+
+Gamete::var_iterator Gamete::end() const {
+    return ((m_variants != NULL ) ? m_variants->end() : var_iterator() );
+}
+
 void Gamete::print( std::ostream & o ) const {}
 
 Gamete::~Gamete() {
 //    if( this != &EMPTY_GAMETE )
 //        std::cout << "Deconstructing: " << this << "; [" << m_nActive << ", " << m_variants << "]" << std::endl;
+//
+    if( m_variants != NULL ) {
+        for( variant_set_t::iterator it = m_variants->begin(); it != m_variants->end(); )
+            (*it++)->decrementPenetrance();
+    }
     
     if( --m_nActive == 0 ) {
 //        std::cout << "<DUMPING OBJECT MANAGER before_free>" << std::endl;
