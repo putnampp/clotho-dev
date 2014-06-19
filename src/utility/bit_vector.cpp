@@ -177,7 +177,7 @@ void bit_vector::operator=( const bit_vector & bv ) {
 
 bool bit_vector::operator[]( size_t idx ) const {
 //    assert( idx < BPB * m_blocks );
-    assert ( idx < BPB * m_bits.size() );
+//    assert ( idx < BPB * m_bits.size() );
 //    return ((( m_blocks > 1 ) ? m_bits.ptr[ idx / BPB ] : m_bits.b) & m_masks[idx & INDEX_MASK]);
     return !!(m_bits[ idx / BPB ] & m_masks[idx & INDEX_MASK]);
 }
