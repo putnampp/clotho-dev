@@ -3,21 +3,35 @@
 
 #include <vector>
 
-#include "variant_db.h"
 #include "locus.h"
+#include "allele.h"
 #include "utility/bit_vector.h"
+
+#include <boost/bimap.hpp>
+#include <boost/dynamic_bitset.hpp>
 
 class PopulationAlphabet {
 public:
-    typedef locus i         locus_t;
-    typedef locus::allele_t allele_t;
-    typedef VariantDB< locus_t, allele_t > variant_db_t;
+    typedef Locus           locus_t;
+    typedef allele          allele_t;
+//    typedef VariantDB< locus_t, allele_t > variant_db_t;
+    
+    typedef boost::bimaps::bimap<
+        boost::bimaps::unordered_multiset_of< locus_t >,
+        boost::bimaps::set_of< allele_t >,
+        boost::bimaps::vector_of_relation > variant_db_t;
+    typedef variant_db_t::value_type edge_type;
+    typedef std::pair< variant_db_t::left_map::iterator, variant_db_t::left_map::iterator > locus_alleles_t;
 
-    typedef typename variant_db_t::symbol_t symbol_t;
+    typedef std::size_t                         index_t;
 
-    typedef std::vector< symbol_t > population_alphabet_t;
+    typedef unsigned long                       block_type;
+    typedef boost::dynamic_bitset< block_type > bitset_type;
 
     PopulationAlphabet();
+
+    static index_t addSymbol( const locus_t & l, const allele_t & a );
+    static void    updateFreeSymbols( const bitset_type & bs );
 
     symbol_t operator[]( size_t idx );
 
@@ -28,11 +42,8 @@ public:
 
     virtual ~PopulationAlphabet();
 protected:
-    population_alphabet_t   m_alphabet;
-
-    bit_vector  m_free_list;
-
     static variant_db_t     m_db;
+    static bitset_type      m_free_list;
 };
 
 #include "utility/collection_accessor.hpp"
