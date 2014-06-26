@@ -1,25 +1,26 @@
 #ifndef INDIVIDUAL2_HPP_
 #define INDIVIDUAL2_HPP_
 
-#include "../clotho.h"
-#include "../clotho_object.hpp"
+#include "config.hpp"
+//#include "../../clotho.h"
+//#include "../../clotho_object.hpp"
 
 #include "individual_initializer.hpp"
-#include "individual_life_cycle.hpp"
+//#include "individual_life_cycle.hpp"
 #include "individual_finalizer.hpp"
 
-#include "../clotho_event.h"
+//#include "../clotho_event.h"
 
 //#include "../event/inherit_event.hpp"
-#include "../event/inherit_event.2.h"
+#include "../../event/inherit_event.2.h"
 
-#include "genetics/reproduction.hpp"   // from libcchmc
+#include "genetics/reproduction.hpp"   // from lib*_genetics 
 
 #include "individual_properties.hpp"
 
 #include <type_traits>
 
-#include "../app_object.hpp"
+//#include "../app_object.hpp"
 
 template < class LCM, class IP, class RMODEL, class ENABLED = void >
 class TIndividual;
@@ -27,10 +28,10 @@ class TIndividual;
 template < class LCM, class IP, class RMODEL >
 class TIndividual< LCM, IP, RMODEL, typename std::enable_if< std::is_base_of< life_cycle::life_cycle_model, LCM >::value >::type >
     :   public AppObject
- {
+{
 public:
     typedef IP properties_t;
-    typedef typename properties_t::gamete_t gamete_t;
+    typedef typename properties_t::gamete_type gamete_t;
 //    typedef InheritEvent< gamete_t > inherit_event_t;
     typedef InheritEvent inherit_event_t;
 

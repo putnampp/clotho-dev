@@ -30,7 +30,7 @@
 #ifndef LOCUS_H_
 #define LOCUS_H_
 
-#include "common.h"
+#include "config.hpp"
 #include "Allele.h"
 //#include "Mutate.h"
 //#include "Genotype.h"

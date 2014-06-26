@@ -63,7 +63,7 @@
 #elif defined LOG     // debugging turned on, but debug_level not defined
     #define LOG_LEVEL LOG_DEFAULT
 #endif  // end verifications
-
+/*
 #ifndef MAX_ALLELES
 #define    MAX_ALLELES 256
 #endif  // MAX_ALLELES
@@ -87,5 +87,5 @@ typedef unsigned char pword_t;
 #else
 #error Unexpected processor word bit length
 #endif  // pword_t
-
+*/
 #endif  // CLOTHO_CONFIG_H_

@@ -8,7 +8,8 @@
 #include "clotho_application_initializer.hpp"
 #include "clotho_application_finalizer.hpp"
 //#include "object/environment2.hpp"
-#include "object/environment_pooled.hpp"
+//#include "object/environment_pooled.hpp"
+#include "object/environment.hpp"
 
 #include <type_traits>
 #include <vector>

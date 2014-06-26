@@ -9,7 +9,7 @@ void * locus_bitset::operator new( size_t s ) {
     return m_pool.malloc();
 }
 
-locus_bitset::locus_bitset( alphabet_t * a ) :
+locus_bitset::locus_bitset( alphabet_t::pointer a ) :
     m_bits(),
     m_copies(1),
     m_alphabet( a )
@@ -35,7 +35,7 @@ locus_bitset::pointer locus_bitset::clone() {
 }
 
 void locus_bitset::addVariant( const locus_type & l, const allele_type & a ) {
-    index_type idx = alphabet_t::getSymbol( l, a );
+    index_type idx = m_alphabet->getSymbol( l, a );
 
     assert( idx != alphabet_t::npos );
 
@@ -48,7 +48,7 @@ void locus_bitset::addVariant( const locus_type & l, const allele_type & a ) {
 }
 
 void locus_bitset::removeVariant( const locus_type & l, const allele_type & a ) {
-   index_type idx = alphabet_t::getSymbol( l, a, false );
+   index_type idx = m_alphabet->getSymbol( l, a, false );
 
     if( idx == alphabet_t::npos || idx >= m_bits.size() ) return;
 

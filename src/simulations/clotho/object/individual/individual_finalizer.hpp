@@ -1,7 +1,8 @@
 #ifndef INDIVIDUAL_FINALIZER_HPP_
 #define INDIVIDUAL_FINALIZER_HPP_
 
-#include "../finalizer.hpp"
+//#include "../finalizer.hpp"
+#include "config.hpp"
 
 namespace finalizer {
 

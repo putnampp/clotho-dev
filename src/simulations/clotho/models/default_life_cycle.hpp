@@ -1,15 +1,15 @@
 #ifndef DEFAULT_LIFE_CYCLE_HPP_
 #define DEFAULT_LIFE_CYCLE_HPP_
 
-#include "../clotho.h"
+#include "clotho.h"
 
-#include "../object/environment_life_cycle.hpp"
-#include "../object/individual_life_cycle.hpp"
+#include "object/environment_life_cycle.hpp"
+#include "object/individual_life_cycle.hpp"
 
 #include <iostream>
 
-#include "../clotho_event.h"
-#include "../event/events.h"
+#include "clotho_event.hpp"
+//#include "event/events.h"
 //#include "../event/birth_event.h"
 //#include "../event/death_event.h"
 //#include "../event/inherit_event.hpp"
@@ -245,7 +245,7 @@ protected:
     }
 
     static void handle_mate( IND * ind, MateEvent * me ) {
-        typedef typename IND::properties_t::gamete_t   gamete_t;
+        typedef typename IND::properties_t::gamete_type   gamete_t;
         typedef typename gamete_t::pointer gamete_ptr;
         
         gamete_ptr z = IND::reproduction_model_t::reproduce( ind, (gamete_t *) NULL );

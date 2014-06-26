@@ -29,7 +29,7 @@
 #ifndef ALLELETUPLE_H_
 #define ALLELETUPLE_H_
 
-#include "common.h"
+#include "config.hpp"
 #include "ploidy.h"
 
 #include <vector>

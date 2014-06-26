@@ -1,22 +1,23 @@
 #ifndef CLOTHO_EVENT_H_
 #define CLOTHO_EVENT_H_
 
-//#include "engine/default_event.h"
 #include "engine/event_interface.h"
 #include "engine/object/system_object.h"
-//#include "engine/pager.hpp"
 #include "clotho.h"
 #include "ider.h"
 
-//#include <boost/pool/object_pool.hpp>
 #include "utility/pool/object_manager.h"
 
 #include <ostream>
 
+#define CEID id
+#define CLOTHO_EVENT_ID( x ) static const clotho_event_type CEID = x; \
+inline clotho_event_type getEventType() const { return CEID; }
+
 static const unsigned int EVENT_PAGE_SIZE = (1 << 14);
 
-//typedef std::string event_type_t;
 typedef unsigned int event_type_t;
+typedef event_type_t clotho_event_type;
 
 class ClothoEvent : public event {
 public:
@@ -47,9 +48,6 @@ public:
     }
 
     virtual event_type_t getEventType() const = 0;
-
-//    virtual void release() = 0;
-//
 
     virtual ~ClothoEvent() {}
 protected:

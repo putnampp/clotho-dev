@@ -1,11 +1,13 @@
 #ifndef SELECTION_EVENT_H_
 #define SELECTION_EVENT_H_
 
-#include "../clotho_event.h"
+#include "clotho_event.h"
 
 class SelectionEvent : public ClothoEvent {
 public:
-    static const event_type_t TYPE_ID = 8;
+//    static const event_type_t TYPE_ID = 8;
+
+    CLOTHO_EVENT_ID( 8 )
 
     typedef ObjectManager< SelectionEvent, EVENT_PAGE_SIZE > object_manager_t;
 
@@ -18,7 +20,7 @@ public:
                 const system_object * sender, const system_object * receiver,
                 event_id_t eid, Sex s, const system_id & pending_offspring );
 
-    inline event_type_t getEventType() const { return TYPE_ID; }
+//    inline event_type_t getEventType() const { return TYPE_ID; }
 
     Sex getSex() const;
     system_id getOffspring() const;

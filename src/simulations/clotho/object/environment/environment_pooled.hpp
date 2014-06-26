@@ -1,11 +1,11 @@
 #ifndef ENVIRONMENTPOOLED_HPP_
 #define ENVIRONMENTPOOLED_HPP_
 
-#include "../clotho.h"
-#include "../clotho_object.hpp"
-#include "../clotho_event.h"
-#include "../models/selection_model.h"
-#include "../models/life_cycle_model.h"
+#include "clotho.h"
+#include "clotho_object.hpp"
+#include "clotho_event.hpp"
+#include "models/selection_model.h"
+#include "models/life_cycle_model.h"
 
 #include "environment_initializer.hpp"
 #include "environment_life_cycle.hpp"
@@ -25,9 +25,9 @@
 #include <functional>
 
 #include "utility/pool/active_pool.hpp"
-#include "../app_object.hpp"
+#include "app_object.hpp"
 
-#include "individual2.hpp"
+#include "object/individual.hpp"
 
 using std::deque;
 using std::vector;

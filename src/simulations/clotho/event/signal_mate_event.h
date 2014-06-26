@@ -1,11 +1,13 @@
 #ifndef SIGNAL_MATE_EVENT_H_
 #define SIGNAL_MATE_EVENT_H_
 
-#include "../clotho_event.h"
+#include "clotho_event.h"
 
 class SignalMateEvent : public ClothoEvent {
 public:
-    static const event_type_t TYPE_ID = 9;
+//    static const event_type_t TYPE_ID = 9;
+
+    CLOTHO_EVENT_ID(9)
 
     typedef ObjectManager< SignalMateEvent, EVENT_PAGE_SIZE > object_manager_t;
 
@@ -17,7 +19,7 @@ public:
                 const system_object * sender, const system_object * receiver,
                 event_id_t eid, Sex s, unsigned int idx, const system_id & offspring );
 
-    inline event_type_t getEventType() const { return TYPE_ID; }
+//    inline event_type_t getEventType() const { return TYPE_ID; }
 
     Sex getSex() const;
     unsigned int getIndex() const;

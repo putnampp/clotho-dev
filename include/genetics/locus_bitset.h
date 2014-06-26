@@ -20,7 +20,7 @@ public:
 
 //    typedef EdgeIterator< bitset_type, alphabet_t > iterator;
 
-    locus_bitset( alphabet_t * alpha );
+    locus_bitset( alphabet_t::pointer alpha = alphabet_t::getInstance() );
     locus_bitset( const locus_bitset & la );
 
     pointer copy();
@@ -40,9 +40,9 @@ public:
 
     virtual ~locus_bitset();
 protected:
-    bitset_type     m_bits;
-    size_t          m_copies;
-    alphabet_t *    m_alphabet;
+    bitset_type             m_bits;
+    size_t                  m_copies;
+    alphabet_t::pointer     m_alphabet;
 
     static pool_type m_pool;
 };

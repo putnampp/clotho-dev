@@ -1,7 +1,7 @@
 #ifndef ENVIRONMENT_LIFE_CYCLE_HPP_
 #define ENVIRONMENT_LIFE_CYCLE_HPP_
 
-#include "../life_cycle.hpp"
+#include "object/life_cycle.hpp"
 
 namespace life_cycle {
 

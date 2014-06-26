@@ -1,7 +1,8 @@
 #ifndef INDIVIDUAL_INITIALIZER_HPP_
 #define INDIVIDUAL_INITIALIZER_HPP_
 
-#include "../initializer.hpp"
+//#include "../initializer.hpp"
+#include "config.hpp"
 
 namespace initializer {
 

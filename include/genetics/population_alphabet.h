@@ -1,6 +1,8 @@
 #ifndef POPULATION_ALPHABET_H_
 #define POPULATION_ALPHABET_H_
 
+#define BOOST_DYNAMIC_BITSET_DONT_USE_FRIENDS
+
 #include <vector>
 
 #include "locus.h"
@@ -10,7 +12,10 @@
 #include <boost/bimap/vector_of.hpp>
 #include <boost/bimap/set_of.hpp>
 #include <boost/bimap/unordered_multiset_of.hpp>
+
 #include <boost/dynamic_bitset.hpp>
+
+#include <memory>
 
 class PopulationAlphabet {
 public:
@@ -29,22 +34,31 @@ public:
     typedef unsigned long                       block_type;
     typedef boost::dynamic_bitset< block_type > bitset_type;
 
+    typedef std::shared_ptr< PopulationAlphabet > pointer;
+
     PopulationAlphabet();
 
     static const index_type  npos = (index_type) -1;
 
-    static index_type  getSymbol( const locus_t & l, const allele_t & a, bool createNew = true );
-    static void     updateFreeSymbols( const bitset_type & fs );
-    static size_t   block_count();
+    static pointer getInstance() {
+        static pointer instance(new PopulationAlphabet());
+        return instance;
+    } 
 
-    edge_type operator[]( index_type idx );
-    index_type operator[]( edge_type sym );
+    index_type  getSymbol( const locus_t & l, const allele_t & a, bool createNew = true );
+    void     updateFreeSymbols( const bitset_type & fs );
+    void     resetFreeSymbols( );
+    size_t   block_count();
 
+    edge_type   operator[]( index_type idx );
+    index_type  operator[]( edge_type sym );
 
     virtual ~PopulationAlphabet();
 protected:
-    static variant_db_t     m_db;
-    static bitset_type      m_free_list;
+    variant_db_t     m_db;
+    bitset_type      m_free_list, m_free_intersect, m_free_union;
 };
+
+#undef BOOST_DYNAMIC_BITSET_DONT_USE_FRIENDS
 
 #endif  // POPULATION_ALPHABET_H_

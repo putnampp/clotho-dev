@@ -1,15 +1,15 @@
 #ifndef OPT_DEFAULT_LIFE_CYCLE_HPP_
 #define OPT_DEFAULT_LIFE_CYCLE_HPP_
 
-#include "../clotho.h"
+#include "clotho.h"
 
-#include "../object/environment_life_cycle.hpp"
-#include "../object/individual_life_cycle.hpp"
+#include "object/environment/environment_life_cycle.hpp"
+#include "object/individual/individual_life_cycle.hpp"
 
 #include <iostream>
 
-#include "../clotho_event.h"
-#include "../event/events.h"
+#include "clotho_event.hpp"
+//#include "../event/events.h"
 //#include "../event/birth_event.h"
 //#include "../event/death_event.h"
 //#include "../event/inherit_event.hpp"
@@ -112,13 +112,13 @@ public:
 
     static void handle_event( ENV * env, const ClothoEvent * evt ) {
         event_type_t tmp = evt->getEventType();
-        if( tmp == BirthEvent::TYPE_ID ) {
+        if( tmp == BirthEvent::CEID ) {
             handle_birth( env, (const BirthEvent * ) evt );
 //        } else if( evt->getEventType() == MATURITY_EVENT_K ) {
 //            handle_maturity( env, evt );
-        } else if( tmp == DeathEvent::TYPE_ID ) {
+        } else if( tmp == DeathEvent::CEID ) {
             handle_death(env, (const DeathEvent * )evt );
-        } else if( tmp == MateSelectEvent::TYPE_ID ) {
+        } else if( tmp == MateSelectEvent::CEID ) {
             handle_mate_select( env, (const MateSelectEvent * )evt );
         } else {
             assert(false);
@@ -226,13 +226,13 @@ public:
 
     static void handle_event( IND * ind, ClothoEvent * evt ) {
         event_type_t e_id = evt->getEventType();
-        if( e_id == BirthEvent::TYPE_ID ) {
+        if( e_id == BirthEvent::CEID ) {
             handle_birth( ind, (BirthEvent * )evt );
-        } else if( e_id == DeathEvent::TYPE_ID ) {
+        } else if( e_id == DeathEvent::CEID ) {
            handle_death(ind, (DeathEvent * )evt );
-        } else if( e_id == IND::inherit_event_t::TYPE_ID ) {
+        } else if( e_id == IND::inherit_event_t::CEID ) {
             handle_inherit(ind, (ievent_t * )evt );
-        } else if( e_id == MateEvent::TYPE_ID ) {
+        } else if( e_id == MateEvent::CEID ) {
             handle_mate(ind, (MateEvent * ) evt );
         //} else if( evt->getEventType() == MATURITY_EVENT_K ) {
         //    handle_maturity(ind, evt );
@@ -280,7 +280,7 @@ protected:
     }
 
     static void handle_mate( IND * ind, MateEvent * me ) {
-        typedef typename IND::properties_t::gamete_t   gamete_t;
+        typedef typename IND::properties_t::gamete_type   gamete_t;
         typedef typename gamete_t::pointer gamete_ptr;
         
         gamete_ptr z = IND::reproduction_model_t::reproduce( ind, (gamete_t *) NULL );

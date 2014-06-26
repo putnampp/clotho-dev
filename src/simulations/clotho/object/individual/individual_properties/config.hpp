@@ -1,0 +1,6 @@
+#ifndef INDIVIDUAL_PROPERTIES_CONFIG_HPP_
+#define INDIVIDUAL_PROPERTIES_CONFIG_HPP_
+
+#include "../../../clotho.h"
+
+#endif  // INDIVIDUAL_PROPERTIES_CONFIG_HPP_

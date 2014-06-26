@@ -1,7 +1,7 @@
 #ifndef ENVIRONMENT_INITIALIZER_HPP_
 #define ENVIRONMENT_INITIALIZER_HPP_
 
-#include "../initializer.hpp"
+#include "initializer.hpp"
 
 namespace initializer {
 

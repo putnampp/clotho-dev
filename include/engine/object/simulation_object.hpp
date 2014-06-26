@@ -157,7 +157,9 @@ public:
     }
 
     event_id_t getNextEventID( unsigned int offset = 1) {
-        return m_next_eid++;
+        event_id_t t = m_next_eid;
+        m_next_eid += offset;
+        return t;
 //        event_id_t tmp = __sync_fetch_and_add( &m_next_eid, offset );
 //        return tmp;
     }

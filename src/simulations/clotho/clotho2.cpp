@@ -60,8 +60,8 @@ typedef reproduction::models::recombination::no_recomb< 2 >     recombination_mo
 typedef reproduction::IndividualReproduction< mutation_model_t, recombination_model_t > reproduction_model_t;
 typedef selection::models::random_selection selection_model_t;
 
-typedef TIndividual< LCM_t, individual_props< /*VT_t,*/ gamete_t, 2 >, reproduction_model_t > IND_t;
-typedef TEnvironment< LCM_t, /*VT_t,*/ IND_t, selection_model_t > ENV_t;
+typedef TIndividual< LCM_t, individual_props< gamete_t, 2 >, reproduction_model_t > IND_t;
+typedef TEnvironment< LCM_t, IND_t, selection_model_t > ENV_t;
 
 typedef CentralizedSimulationManager< ClothoEvent, ClothoObject >  CENTRAL_MGR_t;
 typedef ClothoApplication< CENTRAL_MGR_t, ENV_t > SIMPLE_CENTRAL_APP_t;

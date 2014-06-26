@@ -1,7 +1,7 @@
 #ifndef ENVIRONMENT_FINALIZER_HPP_
 #define ENVIRONMENT_FINALIZER_HPP_
 
-#include "../finalizer.hpp"
+#include "finalizer.hpp"
 
 namespace finalizer {
 

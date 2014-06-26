@@ -27,6 +27,7 @@
 # either expressed or implied, of the FreeBSD Project.
 ################################################################################
 INCLUDE_DIRECTORIES( ${${PROJECT_NAME}_INCLUDE_DIR} )
+INCLUDE_DIRECTORIES( ${${PROJECT_NAME}_SRC_DIR}/simulations/clotho )
 
 #LIST( APPEND CLOTHOLIBS event )
 #LIST( APPEND CLOTHOLIBS object )
@@ -43,7 +44,7 @@ INCLUDE_DIRECTORIES( ${${PROJECT_NAME}_INCLUDE_DIR} )
 #ADD_LIBRARY( event SHARED ${EVENT_SRCS} )
 
 #LIST( APPEND OBJECT_SRCS rng/rng_gsl.cpp )
-LIST( APPEND OBJECT_SRCS clotho_event.cpp )
+LIST( APPEND OBJECT_SRCS event/clotho_event.cpp )
 LIST( APPEND OBJECT_SRCS event/birth_event.cpp )
 LIST( APPEND OBJECT_SRCS event/death_event.cpp )
 LIST( APPEND OBJECT_SRCS event/mate_event.cpp )

@@ -150,6 +150,7 @@ IF( EXISTS "${${PROJECT_NAME}_INCLUDE_DIR}/config.h" )
 ENDIF()
 
 CONFIGURE_FILE( ${${PROJECT_NAME}_INCLUDE_DIR}/config.h.in ${${PROJECT_NAME}_INCLUDE_DIR}/config.h)
+CONFIGURE_FILE( ${${PROJECT_NAME}_INCLUDE_DIR}/cchmc/config.hpp.in ${${PROJECT_NAME}_INCLUDE_DIR}/cchmc/config.hpp)
 
 CONFIGURE_FILE( ${${PROJECT_NAME}_UNITTEST_DIR}/test_main.cpp.in ${${PROJECT_NAME}_UNITTEST_DIR}/test_main.cpp )
 

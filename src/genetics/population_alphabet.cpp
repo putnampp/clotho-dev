@@ -2,8 +2,12 @@
 
 #include <cassert>
 
-PopulationAlphabet::variant_db_t PopulationAlphabet::m_db;
-PopulationAlphabet::bitset_type  PopulationAlphabet::m_free_list;
+#include "utility/bitset_ops.hpp"
+
+//PopulationAlphabet::variant_db_t PopulationAlphabet::m_db;
+//PopulationAlphabet::bitset_type  PopulationAlphabet::m_free_list;
+//PopulationAlphabet::bitset_type  PopulationAlphabet::m_free_intersect;
+//PopulationAlphabet::bitset_type  PopulationAlphabet::m_free_union;
 
 PopulationAlphabet::index_type     PopulationAlphabet::getSymbol( const locus_t & l, const allele_t & a, bool createNew ) {
     locus_alleles_t res = m_db.left.equal_range( l );
@@ -42,16 +46,50 @@ PopulationAlphabet::index_type     PopulationAlphabet::getSymbol( const locus_t 
 
             offset = fspace;
         }
-    } else if( m_free_list[offset] ) {
-        m_free_list[offset] = false;
     }
 
     return offset;
 }
 
 void PopulationAlphabet::updateFreeSymbols( const bitset_type & fs ) {
-    assert( fs.size() == m_free_list.size());
-    m_free_list |= fs;
+    // boost::dynamic_bitset returns # of bits as size
+    size_t max = ((m_free_intersect.size() >= m_free_union.size() ) ? m_free_intersect.size() : m_free_union.size());
+    max = ((max >= m_free_list.size()) ? max : m_free_list.size());
+    max = ((max >= fs.size()) ? max : fs.size());
+
+    assert( max <= fs.size());
+    m_free_list.resize( max );
+    m_free_intersect.resize( max );
+    m_free_union.resize( max );
+
+    typedef bitset_type::block_type block_type;
+
+    block_type * res = &m_free_list.m_bits[0], 
+               * inter = &m_free_intersect.m_bits[0], 
+               * uni = &m_free_union.m_bits[0];
+
+    const block_type * next = &fs.m_bits[0];
+
+    size_t i = m_free_list.num_blocks();
+    while( i-- ) {
+        block_type b = (*next++);
+        (*inter) &= b;
+        (*uni)   |= b;
+        (*res++) = ((*inter++) | (~(*uni++)));
+    }
+}
+
+void PopulationAlphabet::resetFreeSymbols() {
+    m_free_list.reset();
+    m_free_union.reset();
+
+    typedef bitset_type::block_type block_type;
+
+    block_type * p = &m_free_intersect.m_bits[0];
+    size_t i = m_free_intersect.num_blocks();
+    while( i-- ) {
+        (*p++) = (block_type)-1;
+    }
 }
 
 size_t PopulationAlphabet::block_count() {

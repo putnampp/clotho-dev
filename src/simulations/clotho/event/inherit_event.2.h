@@ -1,14 +1,16 @@
 #ifndef INHERIT_EVENT_2_HPP_
 #define INHERIT_EVENT_2_HPP_
 
-#include "../clotho_event.h"
+#include "clotho_event.h"
 
 #include "genetics/gamete.h"
 
 class InheritEvent : public ClothoEvent {
 public:
 
-    static const event_type_t TYPE_ID = 4;
+//    static const event_type_t TYPE_ID = 4;
+    CLOTHO_EVENT_ID(4)
+
     typedef Gamete::pointer gamete_ptr_t;
 
     typedef ObjectManager< InheritEvent, EVENT_PAGE_SIZE > object_manager_t;
@@ -32,7 +34,7 @@ public:
         m_gamete = z;
     }
 
-    inline event_type_t getEventType() const { return TYPE_ID; }
+//    inline event_type_t getEventType() const { return TYPE_ID; }
 
     unsigned char getParentIndex() const { return m_gidx; }
     gamete_ptr_t getGamete() const { return m_gamete; }

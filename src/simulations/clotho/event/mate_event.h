@@ -1,11 +1,13 @@
 #ifndef MATE_EVENT_H_
 #define MATE_EVENT_H_
 
-#include "../clotho_event.h"
+#include "clotho_event.h"
 
 class MateEvent : public ClothoEvent {
 public:
-    static const event_type_t TYPE_ID = 6;
+//    static const event_type_t TYPE_ID = 6;
+    CLOTHO_EVENT_ID(6)
+
     typedef ObjectManager< MateEvent, EVENT_PAGE_SIZE > object_manager_t;
 
     void init( const vtime_t & tSent, const vtime_t & tRecv,
@@ -15,7 +17,7 @@ public:
                 const system_object * sender, const system_object * receiver,
                 event_id_t eid, const system_object * offspring );
 
-    inline event_type_t getEventType() const { return TYPE_ID; }
+    //inline event_type_t getEventType() const { return TYPE_ID; }
 
     const system_id & getOffspringID() const;
 

@@ -49,20 +49,7 @@ using std::static_pointer_cast;
 
 #endif // USE_BOOST_SMART_PTR
 
-#include "cchmc/Allele.h"
-
 #include <string>
 using std::string;
-
-typedef unsigned char   byte_t;
-typedef unsigned int    pos_t;
-
-typedef unsigned char   chromid_t;
-
-#if BITS_PER_ALLELE > PWORD_SIZE
-#error Allele bit representation is greater than processor word size
-#endif  // allele_size v pword_size
-
-static const int ALLELES_PER_PWORD = PWORD_SIZE / BITS_PER_ALLELE;
 
 #endif  // COMMON_H_
