@@ -4,6 +4,7 @@
 #include "object/life_cycles/tags.hpp"
 #include "object/life_cycles/detail/clotho_event_core.hpp"
 #include "object/life_cycles/detail/individual_event_core.hpp"
+#include "object/life_cycles/detail/environment_event_core.hpp"
 
 namespace life_cycle {
 

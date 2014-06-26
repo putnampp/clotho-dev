@@ -7,6 +7,7 @@
 #include <iostream>
 
 #include "engine/event_interface.h"
+#include "rng/rng.hpp"
 
 #include "clotho_types.h"
 

@@ -3,7 +3,7 @@
 
 #include "object/environment/environment3.hpp"
 
-namespace object {
+namespace objects {
 namespace environment {
 
 #include <vector>

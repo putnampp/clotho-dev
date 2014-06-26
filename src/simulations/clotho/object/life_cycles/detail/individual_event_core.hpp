@@ -3,8 +3,8 @@
 
 #include "object/life_cycles/detail/life_cycle_handler.hpp"
 
-#include "object/individual.hpp"
-#include "object/individual_properties.hpp"
+#include "object/individual/individual3.hpp"
+#include "object/individual/individual_properties/individual_properties.hpp"
 #include "clotho_event.hpp"
 
 namespace life_cycle {

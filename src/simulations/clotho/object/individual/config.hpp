@@ -9,6 +9,5 @@
 
 #include "initializer.hpp"
 #include "finalizer.hpp"
-#include "object/life_cycle.hpp"
 
 #endif  // INDIVIDUAL_CONFIG_HPP_

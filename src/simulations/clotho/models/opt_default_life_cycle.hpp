@@ -3,7 +3,10 @@
 
 #include "clotho.h"
 
+#include "object/environment/environment_pooled.hpp"
 #include "object/environment/environment_life_cycle.hpp"
+
+#include "object/individual/individual2.hpp"
 #include "object/individual/individual_life_cycle.hpp"
 
 #include <iostream>

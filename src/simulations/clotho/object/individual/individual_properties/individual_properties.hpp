@@ -1,7 +1,6 @@
 #ifndef INDIVIDUAL_PROPERTIES_DETAILS_HPP_
 #define INDIVIDUAL_PROPERTIES_DETAILS_HPP_
 
-//#include "../../clotho.h"
 #include "config.hpp"
 
 #include <iostream>
@@ -12,7 +11,7 @@
 
 static const unsigned char UNKNOWN_GAMETE_INDEX = (unsigned char) -1;
 
-template < class G, unsigned char P = 2, class S = system_id >
+template < class G, unsigned char P, class S >
 class individual_props {
 public:
     typedef G                                       gamete_type;

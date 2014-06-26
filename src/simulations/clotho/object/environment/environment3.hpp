@@ -2,16 +2,16 @@
 #define ENVIRONMENT3_HPP_
 
 #include "config.hpp"
-namespace object {
+namespace objects {
 namespace environment {
 
 template< class POP >
 class TEnvironment : public AppObject {
 public:
-    typedef POP                     population_type;
-    typedef POP::individual_type    individual_type;    
+    typedef POP                             population_type;
+    typedef typename POP::individual_type   individual_type;    
 
-    typedef individual_type *       individual_pointer;
+    typedef individual_type *               individual_pointer;
 
     TEnvironment();
     TEnvironment( ClothoObject * co );
@@ -28,7 +28,7 @@ protected:
     population_type    m_individuals;
 };
 
-template < template< class T1, class... > TT, class T1, class... REST >
+template < template< class T1, class... > class TT, class T1, class... REST >
 class TEnvironment< TT< T1, REST...> > : public AppObject {
 public:
     typedef T1                  individual_type;
