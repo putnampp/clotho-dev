@@ -42,13 +42,16 @@ protected:
 #define CONSTRUCTOR() STRUCTOR( SPECIALIZATION )
 #define DESTRUCTOR()  STRUCTOR( ~SPECIALIZATION )
 
-CONSTRUCTOR()()
+CONSTRUCTOR()() :
+    AppObject()
 {}
 
-CONSTRUCTOR()( ClothoObject * co )
+CONSTRUCTOR()( ClothoObject * co ) :
+    AppObject( co )
 {}
 
-CONSTRUCTOR()( const SPECIALIZATION & env )
+CONSTRUCTOR()( const SPECIALIZATION & env ) :
+    AppObject(env)
 {}
 
 DESTRUCTOR()()

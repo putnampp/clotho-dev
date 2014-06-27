@@ -83,37 +83,40 @@ typedef ClothoApplication< threaded_manager_type, environment_type > threaded_ap
 
 typedef SimulationManager< ClothoEvent, ClothoObject > manager_type;
 
-//namespace initializer {
+namespace initializer {
 
-//template < > 
-//void ClothoAppInitializer::createEnvironment< sequential_application_type, sequential_application_type::environment_t >( sequential_application_type * a, sequential_application_type::environment_t * ) {
-//    cout << "Blocking default protocol" << endl;
-//    //typename sequential_application_type::environment_ptr_t env = new typename sequential_application_type::environment_t( a->m_sim_manager, a->m_rng );
-//    //
-//    typedef typename sequential_application_type::environment_t environment_t;
+template < > 
+void ClothoAppInitializer::createEnvironment< sequential_application_type, sequential_application_type::environment_t >( sequential_application_type * a, sequential_application_type::environment_t * ) {
+    cout << "Blocking default protocol" << endl;
+    //typename sequential_application_type::environment_ptr_t env = new typename sequential_application_type::environment_t( a->m_sim_manager, a->m_rng );
+    //
+    typedef typename sequential_application_type::environment_t environment_t;
+
+    ClothoObject * co = a->m_sim_manager->getSimulationObject();
+
+//    a->m_env = new environment_t( co, a->m_rng );
+//    a->m_env->setFounderSize( a->m_nFounder );
+    a->m_env = new environment_t( co );
+    a->m_env->initialize();
+    //a->m_objects.push_back( env->getSystemID());
+}
 //
-//    ClothoObject * co = a->m_sim_manager->getSimulationObject();
+template <>
+void ClothoAppInitializer::createEnvironment< threaded_application_type, threaded_application_type::environment_t >( threaded_application_type * a, threaded_application_type::environment_t * ) {
+    cout << "Blocking default protocol" << endl;
+    //
+    typedef typename threaded_application_type::environment_t environment_t;
 //
+    ClothoObject * co = a->m_sim_manager->getSimulationObject();
+
 //    a->m_env = new environment_t( co, a->m_rng );
 //    a->m_env->setFounderSize( a->m_nFounder );
 //    a->m_env->initialize();
-//    //a->m_objects.push_back( env->getSystemID());
-//}
-//
-//template <>
-//void ClothoAppInitializer::createEnvironment< threaded_application_type, threaded_application_type::environment_t >( threaded_application_type * a, threaded_application_type::environment_t * ) {
-//    cout << "Blocking default protocol" << endl;
-//    //
-//    typedef typename threaded_application_type::environment_t environment_t;
-//
-//    ClothoObject * co = a->m_sim_manager->getSimulationObject();
-//
-//    a->m_env = new environment_t( co, a->m_rng );
-//    a->m_env->setFounderSize( a->m_nFounder );
-//    a->m_env->initialize();
-//}
-//
-//}   // namespace initializer
+    a->m_env = new environment_t( co );
+    a->m_env->initialize();
+}
+
+}   // namespace initializer
 
 
 int main( int argc, char ** argv ) {

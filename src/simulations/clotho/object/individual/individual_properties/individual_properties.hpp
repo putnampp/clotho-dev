@@ -9,6 +9,8 @@
 
 #include <boost/pool/object_pool.hpp>
 
+#include "finalizer.hpp"
+
 static const unsigned char UNKNOWN_GAMETE_INDEX = (unsigned char) -1;
 
 template < class G, unsigned char P, class S >
@@ -23,6 +25,8 @@ public:
     typedef boost::object_pool< individual_props<G,P,S> >  pool_type;
 
     static const unsigned char GAMETE_COUNT = P;
+
+    friend class finalizer::FinalWorker< individual_props< G, P, S > >;
 
     static void * operator new( size_t );
     static void operator delete( void * );
@@ -117,10 +121,11 @@ typename individual_props<G,P,S>::gamete_ptr individual_props<G,P,S>::getGamete(
 
 template < class G, unsigned char P, class S >
 void individual_props<G,P,S>::reset() {
-    for( unsigned char i = 0; i < GAMETE_COUNT; ++i ) {
-        delete m_gametes[i].second;
-    }
-    m_free_gametes = GAMETE_COUNT;
+//    for( unsigned char i = 0; i < GAMETE_COUNT; ++i ) {
+//        delete m_gametes[i].second;
+//    }
+//    m_free_gametes = GAMETE_COUNT;
+    finalizer::FinalWorker< individual_props<G,P,S> >::finalize( this );
 }
 
 template < class G, unsigned char P, class S >

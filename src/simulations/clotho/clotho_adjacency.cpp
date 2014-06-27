@@ -36,44 +36,45 @@
 #include <memory>
 
 #include "utility/simulation_stats.h"
-#include "object/individual2.hpp"
+#include "object/individual.hpp"
+#include "object/individual_properties.hpp"
 
-//#include "genetics/variant_base.h"
-//#include "genetics/basic_variant_map.h"
-//#include "genetics/gamete.h"
-
-#include "locus_bitset.h"
-
+#include "genetics/locus_bitset.h"
 
 #include "rng/rng.hpp"
-#include "models/default_life_cycle.hpp"
+//#include "models/default_life_cycle.hpp"
 #include "models/selection_models.hpp"
 #include "models/reproduction_models.hpp"
 
+#define _PLOIDY 2
+
 using std::shared_ptr;
 
-//typedef life_cycle::def_life_cycle    LCM_t;
-//typedef variant_base      VT_t;
-//
+namespace finalizer {
 
 template < unsigned char P, class S >
-void individual_props< locus_bitset, P, S >::reset() {
-    for( unsigned char i = 0; i < GAMETE_COUNT; ++i ) {
-        m_gametes[i].second->release();
+class FinalWorker< individual_props< locus_bitset, P, S > > {
+public:
+    static void finalize( individual_props< locus_bitset, P, S > * props ) {
+        for( unsigned char i = 0; i < P; ++i ) {
+            props->m_gametes[i].second->release();
+        }
+        props->m_free_gametes = P;
     }
-    m_free_gametes = GAMETE_COUNT;
+};
+
 }
 
 typedef locus_bitset gamete_t;
 typedef typename gamete_t::pointer gamete_ptr;
 
-typedef reproduction::models::mutation::mutate_site< VT_t, variant_map_t, gamete_t >   mutation_model_t;
-typedef reproduction::models::recombination::no_recomb< 2 >     recombination_model_t;
+//typedef reproduction::models::mutation::mutate_site< VT_t, variant_map_t, gamete_t >   mutation_model_t;
+typedef reproduction::models::recombination::no_recomb< _PLOIDY >     recombination_model_t;
 
-typedef reproduction::IndividualReproduction< mutation_model_t, recombination_model_t > reproduction_model_t;
+typedef reproduction::IndividualReproduction< mutation_model_t, recombination_model_t > rmodel_type;
 
-typedef TIndividual< LCM_t, individual_props< /*VT_t,*/ gamete_t, 2 >, reproduction_model_t > individual_t;
-typedef std::vector< individual_t * > environment_t;
+typedef TIndividual< gamete_t, _PLOIDY, system_id, individual_props< gamete_t, _PLOIDY, system_id >> individual_type;
+typedef std::vector< individual_type * > environment_t;
 
 class DiscreteSelector {
 public:
@@ -88,11 +89,11 @@ public:
         return gsl_ran_discrete( m_rng, m_lookup );
     }
 
-    std::pair< individual_t * , individual_t * > operator()( environment_t * env, double f = 1.0 ) {
+    std::pair< individual_type * , individual_type * > operator()( environment_t * env, double f = 1.0 ) {
         size_t i0 = gsl_ran_discrete( m_rng, m_lookup );
         size_t i1 = ((gsl_rng_uniform(m_rng) <= f ) ? i0 : gsl_ran_discrete( m_rng, m_lookup ));
 
-        std::pair< individual_t *, individual_t * > res = make_pair( env->at(i0), env->at(i1));
+        std::pair< individual_type *, individual_type * > res = make_pair( env->at(i0), env->at(i1));
 
         return res;
     }
@@ -107,8 +108,8 @@ protected:
 
 class SimpleSelector : public RandomProcess {
 public:
-    static std::pair< individual_t * , individual_t * > select( environment_t * env ) {
-        std::pair< individual_t *, individual_t * > res;
+    static std::pair< individual_type * , individual_type * > select( environment_t * env ) {
+        std::pair< individual_type *, individual_type * > res;
 
         size_t nInd = env->size();
 
@@ -154,7 +155,7 @@ public:
         m_hom_case(hom) 
     {}
 
-    double operator()( double f, individual_t * ind ) {
+    double operator()( double f, individual_type * ind ) {
         return (*this)(f, ind->getProperties()->getGamete(0), ind->getProperties()->getGamete(1) );
     }
 
@@ -244,12 +245,12 @@ int main( int argc, char ** argv ) {
     fitness_multiplicative< het_fitness, hom_fitness > fmult;
 
     for( unsigned int i = 0; i < vm[ FOUNDER_SIZE_K ].as< unsigned int >(); ++i) {
-        population.push_back( new individual_t() );
+        population.push_back( new individual_type() );
 
         population.back()->getProperties()->inheritFrom( blank_id,  gamete_t::EMPTY_GAMETE.copy() );
         population.back()->getProperties()->inheritFrom( blank_id,  gamete_t::EMPTY_GAMETE.copy() );
 
-        buffer.push_back( new individual_t() );
+        buffer.push_back( new individual_type() );
     }
 
     stats->stopPhase( "PopInit" );
@@ -291,12 +292,12 @@ int main( int argc, char ** argv ) {
         while( child_idx < child->size()) {
             (*child)[child_idx]->reset();
 
-            //std::pair< individual_t *, individual_t * > mate_pair = selector_t::select( parent );
-            std::pair< individual_t *, individual_t * > mate_pair = ds( parent );
-            gamete_ptr g = reproduction_model_t::reproduce( mate_pair.first, (gamete_t *) NULL);
+            //std::pair< individual_type *, individual_type * > mate_pair = selector_t::select( parent );
+            std::pair< individual_type *, individual_type * > mate_pair = ds( parent );
+            gamete_ptr g = rmodel_type::reproduce( mate_pair.first, (gamete_t *) NULL);
             (*child)[child_idx]->getProperties()->inheritFrom(blank_id, g);
 
-            gamete_ptr g1 = reproduction_model_t::reproduce( mate_pair.second, (gamete_t *) NULL);
+            gamete_ptr g1 = rmodel_type::reproduce( mate_pair.second, (gamete_t *) NULL);
             
             (*child)[child_idx]->getProperties()->inheritFrom(blank_id, g1);
             (*child)[child_idx++]->getProperties()->setDOB( i );
@@ -312,14 +313,14 @@ int main( int argc, char ** argv ) {
     stats->startPhase( "Final" );
 
     while( !population.empty() ) {
-        individual_t * ind = population.back();
+        individual_type * ind = population.back();
         population.pop_back();
 
         delete ind;
     }
 
     while( !buffer.empty() ) {
-        individual_t * ind = buffer.back();
+        individual_type * ind = buffer.back();
         buffer.pop_back();
         delete ind;
     }

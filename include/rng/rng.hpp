@@ -6,5 +6,6 @@
 #include "rng_gsl.hpp"
 
 #include "threaded_rng.hpp"
+#include "random_process.hpp"
 
 #endif  // RNG_HPP_
