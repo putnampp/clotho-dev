@@ -70,15 +70,15 @@ ADD_LIBRARY( object SHARED ${OBJECT_SRCS} )
 
 LIST( APPEND SRCS common_strings.cpp )
 LIST( APPEND SRCS sex.cpp )
-LIST( APPEND SRCS clotho_commandline.cpp )
+LIST( APPEND SRCS examples/clotho_commandline.cpp )
 #LIST( APPEND SRCS clotho_application.cpp )
 #LIST( APPEND SRCS main.cpp )
 #LIST( APPEND SRCS clotho2.cpp )
 
 #ADD_EXECUTABLE(clotho clotho2.cpp ${SRCS} )
 #ADD_EXECUTABLE(clotho_fixed clotho_fixed.cpp ${SRCS} )
-ADD_EXECUTABLE(clotho_no_sim clotho_no_sim.cpp ${SRCS} )
-ADD_EXECUTABLE(clotho_adjacency clotho_adjacency.cpp ${SRCS} )
+ADD_EXECUTABLE(clotho_no_sim examples/clotho_no_sim.cpp ${SRCS} )
+ADD_EXECUTABLE(clotho_adjacency examples/clotho_adjacency.cpp ${SRCS} )
 #ADD_EXECUTABLE(clotho_env_only clotho_env_only.cpp ${SRCS} )
 
 #TARGET_LINK_LIBRARIES( clotho ${COMMON_LIBRARIES} ${PROJECT_NAME}_genetics engine object timer ${PROJECT_NAME}_utility)
