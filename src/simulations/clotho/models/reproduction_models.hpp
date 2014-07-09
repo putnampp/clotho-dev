@@ -26,6 +26,7 @@ public:
     typedef VM  variant_map_t;
     typedef GM  gamete_t;
     typedef typename GM::pointer gamete_ptr;
+    typedef std::shared_ptr< variant_map_t > map_pointer;
 
     static void initialize( double mu = 0.0001, bool bFixed = false ) {
         m_variants.reset( new variant_map_t() );

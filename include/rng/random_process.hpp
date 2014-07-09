@@ -6,6 +6,8 @@
 
 class RandomProcess {
 public:
+    typedef std::shared_ptr< iRNG > rng_pointer;
+
     static void initialize( std::shared_ptr< iRNG > r ) {
         if( m_init ) return;
         reinitialize( r );

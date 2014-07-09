@@ -62,7 +62,7 @@ typedef Gamete gamete_type;
 typedef typename gamete_type::pointer gamete_ptr;
 
 typedef reproduction::models::mutation::mutate_site< variant_type, variant_map_t, gamete_type >   mmodel_type;
-typedef reproduction::models::recombination::no_recomb< 2 >     rcmodel_type;
+typedef reproduction::models::recombination::no_recomb< _PLOIDY >     rcmodel_type;
 typedef reproduction::IndividualReproduction< mmodel_type, rcmodel_type > rmodel_type;
 
 //typedef TIndividual< life_cycle_type, individual_props< /*variant_type,*/ gamete_type, 2 >, rmodel_type > individual_type;
@@ -222,10 +222,11 @@ int main( int argc, char ** argv ) {
     shared_ptr< iRNG > rng( new GSL_RNG( my_rng, m_type, m_seed ));
     cout << "RNG: " <<  rng->getType() << "; seed: " << rng->getSeed() << endl;
 
-    mmodel_type::initialize( 0.0001, false);
-    
     RandomProcess::initialize( rng );
 
+    double mu = vm[ MUTATION_RATE_K ].as<double>();
+    mmodel_type::initialize( mu, false);
+    
     shared_ptr< SimulationStats > stats( new SimulationStats() );
 
     stats->startPhase( RUNTIME_K );

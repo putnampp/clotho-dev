@@ -3,6 +3,20 @@
 
 typedef double Locus;
 
+template < typename L, typename P >
+struct locus_generator {
+    typedef L return_type;
+    typedef P parameter_type;
+
+    locus_generator() {}
+    locus_generator( parameter_type p ) : m_params(p) {}
+    
+    return_type operator()() { }
+
+    parameter_type m_params;
+};
+
+
 //#include <functional>
 
 //class Locus {

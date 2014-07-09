@@ -10,12 +10,15 @@
 
 #include <boost/bimap.hpp>
 #include <boost/bimap/vector_of.hpp>
-#include <boost/bimap/set_of.hpp>
+#include <boost/bimap/multiset_of.hpp>
 #include <boost/bimap/unordered_multiset_of.hpp>
 
 #include <boost/dynamic_bitset.hpp>
 
 #include <memory>
+
+#include "edge_iterator.hpp"
+#include "symbol_generator.hpp"
 
 class PopulationAlphabet {
 public:
@@ -24,17 +27,26 @@ public:
     
     typedef boost::bimaps::bimap<
         boost::bimaps::unordered_multiset_of< locus_t >,
-        boost::bimaps::set_of< allele_t >,
+        boost::bimaps::multiset_of< allele_t >,
         boost::bimaps::vector_of_relation > variant_db_t;
     typedef variant_db_t::iterator      edge_type;
+    typedef variant_db_t::left_map::iterator locus_iterator;
+    typedef variant_db_t::left_map::const_iterator locus_citerator;
+    typedef variant_db_t::right_map::iterator allele_iterator;
+    typedef variant_db_t::right_map::const_iterator allele_citerator;
     typedef std::pair< variant_db_t::left_map::iterator, variant_db_t::left_map::iterator > locus_alleles_t;
 
     typedef std::size_t                         index_type;
 
     typedef unsigned long                       block_type;
     typedef boost::dynamic_bitset< block_type > bitset_type;
+    typedef bitset_type                         edge_set_type;
+
+    typedef EdgeIterator< variant_db_t, edge_set_type > edge_iterator;
 
     typedef std::shared_ptr< PopulationAlphabet > pointer;
+
+    friend class symbol_generator< locus_t, allele_t, index_type, PopulationAlphabet >;
 
     PopulationAlphabet();
 
@@ -50,8 +62,16 @@ public:
     void     resetFreeSymbols( );
     size_t   block_count();
 
+    size_t  size();
+    size_t  active_size();
+
+    bool isLocus( locus_t & l ) const;
+
     edge_type   operator[]( index_type idx );
     index_type  operator[]( edge_type sym );
+
+    edge_iterator begin( edge_set_type * es );
+    edge_iterator end( edge_set_type * es );
 
     virtual ~PopulationAlphabet();
 protected:
