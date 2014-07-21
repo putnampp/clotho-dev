@@ -10,18 +10,8 @@
 
 #include <boost/dynamic_bitset.hpp>
 
-//template < 
-//    template < class, class...> class NS1,
-//        class N1, class... NS1REST,
-//    template < class, class...> class NS2,
-//        class N2, class... NS2REST,
-//    class AP1, class AP2,
-//    class B,   class BA >
-//class EdgeIterator< boost::bimaps::bimap< NS1<N1, NS1REST... >, NS2<N2, NS2REST... >, AP1, AP2 >, 
-//                    boost::dynamic_bitset< B, BA > > {
-//public:
-//    typedef boost::bimaps::bimap< NS1<N1, NS1REST... >, NS2<N2, NS2REST... >, AP1, AP2 > graph_type;
-//    typedef boost::dynamic_bitset<B, BA>   edge_set_type;
+//
+// SPECIALIZATION
 //
 template < class NS1, class NS2, class NR, class B >
 class EdgeIterator< boost::bimaps::bimap< NS1, NS2, NR >, 
@@ -83,8 +73,12 @@ THEADER SPECIALIZATION::EdgeIterator( graph_pointer gp, edge_set_pointer es, siz
     m_edge_index( idx ),
     m_it( m_graph->end() )
 {
-    if( m_edge_index != edge_set_type::npos && m_edge_index < m_edges->size() && !(*m_edges)[ m_edge_index] ) {
-        operator++();
+    if( m_edge_index != edge_set_type::npos ) {
+        if( m_edges->size() == 0 || m_edge_index >= m_edges->size() ) {
+            m_edge_index = edge_set_type::npos;
+        } else if( !(*m_edges)[ m_edge_index] ) {
+            operator++();
+        }
     }
 }
 

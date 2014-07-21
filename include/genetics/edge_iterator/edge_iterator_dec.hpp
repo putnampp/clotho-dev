@@ -11,8 +11,8 @@ public:
 
     typedef typename graph_type::edge_type   edge_type;
 
-    typedef std::add_pointer< graph_type >   graph_pointer;
-    typedef std::add_pointer< edge_set_type >   edge_set_pointer;
+    typedef graph_type *    graph_pointer;
+    typedef edge_set_type * edge_set_pointer;
 
     EdgeIterator( graph_pointer gp, edge_set_pointer es );
     EdgeIterator( const EdgeIterator< graph_type, edge_set_type > & other );

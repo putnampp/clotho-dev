@@ -90,12 +90,13 @@ SYM_SPEC::symbol_type SYM_SPEC::operator()< infinite_site >( alphabet_pointer al
     static locus_generator< PopulationAlphabet::locus_t, RandomProcess::rng_pointer> lgen; 
     static allele_generator< PopulationAlphabet::allele_t, void > agen;
 
-    PopulationAlphabet::locus_t l = lgen();
-    while( alpha->isLocus( l ) ) {
-        l = lgen();
-    }
+//    PopulationAlphabet::locus_t l = lgen();
+//    while( alpha->isLocus( l ) ) {
+//        l = lgen();
+//    }
 
-    return alpha->getSymbol( l, agen(), true );
+//    return alpha->getSymbol( l, agen(), true );
+    return alpha->getSymbol(lgen(), agen(), true );
 }
 
 #undef SYM_SPEC

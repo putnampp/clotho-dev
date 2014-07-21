@@ -1,7 +1,8 @@
 #ifndef LOCUS_BITSET_H_
 #define LOCUS_BITSET_H_
 
-#include "population_alphabet.h"
+//#include "population_alphabet.h"
+#include "allele_alphabet.h"
 #include "edge_iterator.hpp"
 
 #include <type_traits>
@@ -11,7 +12,8 @@
 
 class locus_bitset {
 public:
-    typedef PopulationAlphabet      alphabet_t;
+//    typedef PopulationAlphabet      alphabet_t;
+    typedef AlleleAlphabet          alphabet_t;
     typedef alphabet_t::locus_t     locus_type;
     typedef alphabet_t::allele_t    allele_type;
     typedef alphabet_t::bitset_type bitset_type;
