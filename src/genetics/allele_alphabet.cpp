@@ -126,12 +126,12 @@ bool AlleleAlphabet::isLocus( locus_t & l ) const {
     return res != m_db.end();
 }
 
-AlleleAlphabet::edge_iterator AlleleAlphabet::begin( edge_set_type * es ) {
-    return edge_iterator( &m_db, es, 0 );
+AlleleAlphabet::adjacency_iterator AlleleAlphabet::begin( edge_set_type * es ) {
+    return adjacency_iterator( &m_db, es, 0 );
 }
 
-AlleleAlphabet::edge_iterator AlleleAlphabet::end( edge_set_type * es ) {
-    return edge_iterator( &m_db, es );
+AlleleAlphabet::adjacency_iterator AlleleAlphabet::end( edge_set_type * es ) {
+    return adjacency_iterator( &m_db, es );
 }
 
 AlleleAlphabet::~AlleleAlphabet() {}

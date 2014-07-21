@@ -145,12 +145,12 @@ bool PopulationAlphabet::isLocus( locus_t & l ) const {
     return it != m_db.left.end();
 }
 
-PopulationAlphabet::edge_iterator PopulationAlphabet::begin( edge_set_type * es ) {
-    return edge_iterator( &m_db, es, 0 );
+PopulationAlphabet::adjacency_iterator PopulationAlphabet::begin( edge_set_type * es ) {
+    return adjacency_iterator( &m_db, es, 0 );
 }
 
-PopulationAlphabet::edge_iterator PopulationAlphabet::end( edge_set_type * es ) {
-    return edge_iterator( &m_db, es );
+PopulationAlphabet::adjacency_iterator PopulationAlphabet::end( edge_set_type * es ) {
+    return adjacency_iterator( &m_db, es );
 }
 
 PopulationAlphabet::~PopulationAlphabet() {}

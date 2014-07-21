@@ -14,7 +14,7 @@
 
 #include <memory>
 
-#include "edge_iterator.hpp"
+#include "adjacency_iterator.hpp"
 #include "symbol_generator.hpp"
 
 class AlleleAlphabet {
@@ -31,8 +31,8 @@ public:
     typedef alleles_type::iterator              allele_iterator;
 
     typedef std::pair< locus_t, std::pair< allele_iterator, index_type> >       symbol_type;
-    typedef std::pair< locus_t, std::pair< allele_iterator, index_type> >       edge_type;
     typedef std::multimap< locus_t, std::pair< allele_iterator, index_type> >   variant_db_t;
+    typedef variant_db_t::iterator                                              vertex_type;
     typedef variant_db_t::iterator                                              locus_iterator;
     typedef variant_db_t::const_iterator                                        clocus_iterator;
     typedef std::vector< locus_iterator >                                            active_database_type;
@@ -41,7 +41,7 @@ public:
     typedef boost::dynamic_bitset< block_type > bitset_type;
     typedef bitset_type                         edge_set_type;
 
-    typedef EdgeIterator< variant_db_t, edge_set_type > edge_iterator;
+    typedef AdjacencyIterator< variant_db_t, edge_set_type > adjacency_iterator;
 
     typedef std::shared_ptr< AlleleAlphabet >   pointer;
 
@@ -71,8 +71,8 @@ public:
         return sym->second.second;
     }
 
-    edge_iterator begin( edge_set_type * es );
-    edge_iterator end( edge_set_type * es );
+    adjacency_iterator begin( edge_set_type * es );
+    adjacency_iterator end( edge_set_type * es );
 
     virtual ~AlleleAlphabet();
 protected:

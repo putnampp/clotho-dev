@@ -17,7 +17,7 @@
 
 #include <memory>
 
-#include "edge_iterator.hpp"
+#include "adjacency_iterator.hpp"
 #include "symbol_generator.hpp"
 
 class PopulationAlphabet {
@@ -42,7 +42,7 @@ public:
     typedef boost::dynamic_bitset< block_type > bitset_type;
     typedef bitset_type                         edge_set_type;
 
-    typedef EdgeIterator< variant_db_t, edge_set_type > edge_iterator;
+    typedef AdjacencyIterator< variant_db_t, edge_set_type > adjacency_iterator;
 
     typedef std::shared_ptr< PopulationAlphabet > pointer;
 
@@ -70,8 +70,8 @@ public:
     edge_type   operator[]( index_type idx );
     index_type  operator[]( edge_type sym );
 
-    edge_iterator begin( edge_set_type * es );
-    edge_iterator end( edge_set_type * es );
+    adjacency_iterator begin( edge_set_type * es );
+    adjacency_iterator end( edge_set_type * es );
 
     virtual ~PopulationAlphabet();
 protected:

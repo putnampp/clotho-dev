@@ -78,11 +78,11 @@ size_t locus_bitset::size() {
     return m_bits.count();
 }
 
-locus_bitset::edge_iterator locus_bitset::begin() {
+locus_bitset::adjacency_iterator locus_bitset::begin() {
     return m_alphabet->begin( &m_bits );
 }
 
-locus_bitset::edge_iterator locus_bitset::end() {
+locus_bitset::adjacency_iterator locus_bitset::end() {
     return m_alphabet->end( &m_bits );
 }
 

@@ -3,7 +3,7 @@
 
 //#include "population_alphabet.h"
 #include "allele_alphabet.h"
-#include "edge_iterator.hpp"
+//#include "adjacency_iterator.hpp"
 
 #include <type_traits>
 #include <boost/pool/object_pool.hpp>
@@ -18,13 +18,13 @@ public:
     typedef alphabet_t::allele_t    allele_type;
     typedef alphabet_t::bitset_type bitset_type;
     typedef alphabet_t::index_type  index_type;
-    typedef alphabet_t::edge_type   edge_type;
+    typedef alphabet_t::vertex_type edge_type;
 
     typedef locus_bitset *  pointer;
 
     typedef boost::object_pool< locus_bitset >      pool_type;
 
-    typedef alphabet_t::edge_iterator edge_iterator;
+    typedef alphabet_t::adjacency_iterator adjacency_iterator;
 
     typedef std::set< locus_bitset * > active_bitsets;
     typedef typename active_bitsets::iterator active_iterator;
@@ -47,8 +47,8 @@ public:
 
     size_t size();
 
-    edge_iterator begin();
-    edge_iterator end();
+    adjacency_iterator begin();
+    adjacency_iterator end();
 
     void updateSymbols();
 

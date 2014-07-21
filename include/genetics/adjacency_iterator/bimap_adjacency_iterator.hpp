@@ -1,7 +1,7 @@
-#ifndef BIMAP_EDGE_ITERATOR_HPP_
-#define BIMAP_EDGE_ITERATOR_HPP_
+#ifndef BIMAP_ADJACENCY_ITERATOR_HPP_
+#define BIMAP_ADJACENCY_ITERATOR_HPP_
 
-#include "edge_iterator_dec.hpp"
+#include "adjacency_iterator_dec.hpp"
 
 #include <boost/bimap.hpp>
 #include <boost/bimap/vector_of.hpp>
@@ -14,7 +14,7 @@
 // SPECIALIZATION
 //
 template < class NS1, class NS2, class NR, class B >
-class EdgeIterator< boost::bimaps::bimap< NS1, NS2, NR >, 
+class AdjacencyIterator< boost::bimaps::bimap< NS1, NS2, NR >, 
                     boost::dynamic_bitset< B > > {
 public:
     typedef boost::bimaps::bimap< NS1, NS2, NR > graph_type;
@@ -25,22 +25,22 @@ public:
     typedef graph_type *      graph_pointer;
     typedef edge_set_type *   edge_set_pointer;
 
-    EdgeIterator( graph_pointer gp, edge_set_pointer es, size_t offset = edge_set_type::npos );
-    EdgeIterator( const EdgeIterator< graph_type, edge_set_type > & other );
+    AdjacencyIterator( graph_pointer gp, edge_set_pointer es, size_t offset = edge_set_type::npos );
+    AdjacencyIterator( const AdjacencyIterator< graph_type, edge_set_type > & other );
 
-    EdgeIterator< graph_type, edge_set_type > & operator++();
-    EdgeIterator< graph_type, edge_set_type > operator++( int );
+    AdjacencyIterator< graph_type, edge_set_type > & operator++();
+    AdjacencyIterator< graph_type, edge_set_type > operator++( int );
 
-    bool operator==( const EdgeIterator< graph_type, edge_set_type> & );
-    bool operator!=( const EdgeIterator< graph_type, edge_set_type> & );
+    bool operator==( const AdjacencyIterator< graph_type, edge_set_type> & );
+    bool operator!=( const AdjacencyIterator< graph_type, edge_set_type> & );
 
-    bool operator<( const EdgeIterator< graph_type, edge_set_type > & );
+    bool operator<( const AdjacencyIterator< graph_type, edge_set_type > & );
 
-    bool comparable( const EdgeIterator< graph_type, edge_set_type > & );
+    bool comparable( const AdjacencyIterator< graph_type, edge_set_type > & );
 
     edge_type operator*();
 
-    virtual ~EdgeIterator();
+    virtual ~AdjacencyIterator();
 protected:
     graph_pointer           m_graph;
     edge_set_pointer        m_edges;
@@ -61,13 +61,13 @@ protected:
 //    class B,   class BA >
 //#define BITSET boost::dynamic_bitset< B, BA >
 //
-//#define SPECIALIZATION EdgeIterator< boost::bimaps::bimap< NS1< N1, NS1REST...>, NS2<N2, NS2REST...>, AP1, AP2 >, BITSET >
+//#define SPECIALIZATION AdjacencyIterator< boost::bimaps::bimap< NS1< N1, NS1REST...>, NS2<N2, NS2REST...>, AP1, AP2 >, BITSET >
 
 #define THEADER template < class NS1, class NS2, class NR, class B >
 
-#define SPECIALIZATION EdgeIterator< boost::bimaps::bimap< NS1, NS2, NR >, boost::dynamic_bitset< B > >
+#define SPECIALIZATION AdjacencyIterator< boost::bimaps::bimap< NS1, NS2, NR >, boost::dynamic_bitset< B > >
 
-THEADER SPECIALIZATION::EdgeIterator( graph_pointer gp, edge_set_pointer es, size_t idx ) :
+THEADER SPECIALIZATION::AdjacencyIterator( graph_pointer gp, edge_set_pointer es, size_t idx ) :
     m_graph(gp),
     m_edges(es),
     m_edge_index( idx ),
@@ -82,7 +82,7 @@ THEADER SPECIALIZATION::EdgeIterator( graph_pointer gp, edge_set_pointer es, siz
     }
 }
 
-THEADER SPECIALIZATION::EdgeIterator( const SPECIALIZATION & other ) :
+THEADER SPECIALIZATION::AdjacencyIterator( const SPECIALIZATION & other ) :
     m_graph(other.m_graph),
     m_edges(other.m_edges),
     m_edge_index( other.m_edge_index ),
@@ -135,9 +135,9 @@ bool SPECIALIZATION::comparable( const SPECIALIZATION & rhs ) {
 }
 
 THEADER
-SPECIALIZATION::~EdgeIterator() {}
+SPECIALIZATION::~AdjacencyIterator() {}
 
 #undef THEADER
 #undef SPECIALIZATION
 
-#endif  // BIMAP_EDGE_ITERATOR_HPP_
+#endif  // BIMAP_ADJACENCY_ITERATOR_HPP_
