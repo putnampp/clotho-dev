@@ -3,4 +3,7 @@
 
 #include "processes/config.hpp"
 
+#include "mutation_model.hpp"
+#include "recombination_model.hpp"
+
 #endif  // PROCESSES_HPP_

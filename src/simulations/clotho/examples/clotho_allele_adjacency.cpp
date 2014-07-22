@@ -45,8 +45,9 @@
 #include "rng/rng.hpp"
 //#include "models/default_life_cycle.hpp"
 #include "models/selection_models.hpp"
-#include "models/reproduction_models.hpp"
+//#include "models/reproduction_models.hpp"
 
+#include "processes.hpp"
 #define _PLOIDY 2
 
 using std::shared_ptr;
