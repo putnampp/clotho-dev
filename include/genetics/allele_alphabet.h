@@ -1,7 +1,7 @@
 #ifndef ALLELE_ALPHABET_H_
 #define ALLELE_ALPHABET_H_
 
-//#define BOOST_DYNAMIC_BITSET_DONT_USE_FRIENDS
+#define BOOST_DYNAMIC_BITSET_DONT_USE_FRIENDS
 
 #include <vector>
 #include <map>
@@ -78,6 +78,9 @@ public:
 
     locus_iterator          end_db() { return m_db.end(); }
 
+    size_t  active_count() const { return m_active.size() - m_free_list.count(); }
+    size_t  fixed_lost_count() const { return m_free_list.count(); }
+
     virtual ~AlleleAlphabet();
 protected:
     alleles_type    m_alleles;
@@ -88,6 +91,6 @@ protected:
     bitset_type     m_free_list, m_free_intersect, m_free_union;
 };
 
-//#undef BOOST_DYNAMIC_BITSET_DONT_USE_FRIENDS
+#undef BOOST_DYNAMIC_BITSET_DONT_USE_FRIENDS
 
 #endif  // ALLELE_ALPHABET_H_

@@ -7,7 +7,7 @@
 AlleleAlphabet::AlleleAlphabet() {}
 
 AlleleAlphabet::index_type     AlleleAlphabet::getSymbol( const locus_t & l, const allele_t & a, bool createNew ) {
-    std::cout << "Getting symbol for: " << l << std::endl;
+//    std::cout << "Getting symbol for: " << l << std::endl;
 
     locus_iterator it = m_db.end();
     allele_iterator a_it = m_alleles.find(a);
@@ -43,8 +43,8 @@ AlleleAlphabet::index_type     AlleleAlphabet::getSymbol( const locus_t & l, con
     if( offset == bitset_type::npos ) {
         // inactive variant
         //
-        std::cout << "Free list size: " << m_free_list.size() << std::endl;
-        std::cout << "count size: " << m_free_list.count() << std::endl;
+//        std::cout << "Free list size: " << m_free_list.size() << std::endl;
+//        std::cout << "count size: " << m_free_list.count() << std::endl;
         offset = m_free_list.find_first();
         if( offset == bitset_type::npos ) {
             offset = m_active.size();
@@ -53,17 +53,17 @@ AlleleAlphabet::index_type     AlleleAlphabet::getSymbol( const locus_t & l, con
             m_free_intersect.push_back(false);
             m_free_union.push_back(false);
         } else {
-            std::cout << "Active size: " << m_active.size() << std::endl;
+//            std::cout << "Active size: " << m_active.size() << std::endl;
             assert( offset < m_active.size() );
-            std::cout << "Reusing offset: " << offset << std::endl;
+//            std::cout << "Reusing offset: " << offset << std::endl;
             m_active[ offset ]->second.second = bitset_type::npos;
             m_free_list[ offset ] = false;
         }
         it->second.second = offset;
-        std::cout << "count size: " << m_free_list.count() << std::endl;
-        std::cout << "Free list size: " << m_free_list.size() << std::endl;
+//        std::cout << "count size: " << m_free_list.count() << std::endl;
+//        std::cout << "Free list size: " << m_free_list.size() << std::endl;
     }
-    std::cout << "Offset: " << offset << std::endl;
+//    std::cout << "Offset: " << offset << std::endl;
     return offset;
 }
 
@@ -86,19 +86,19 @@ void AlleleAlphabet::updateFreeSymbols( const bitset_type & fs ) {
     
 //    typedef bitset_type::block_type block_type;
 
-    std::cout << "FS: " << fs.size() << std::endl;
-    std::cout << "FL: " << m_free_list.size() 
-                << "; FI: " << m_free_intersect.size()
-                << "; FU: " << m_free_union.size() << std::endl;
+//    std::cout << "FS: " << fs.size() << std::endl;
+//    std::cout << "FL: " << m_free_list.size() 
+//                << "; FI: " << m_free_intersect.size()
+//                << "; FU: " << m_free_union.size() << std::endl;
     assert((m_free_list.size() == m_free_intersect.size()) && (m_free_list.size() == m_free_union.size()));
     bitset_type b(fs);
     while( b.size() < m_free_list.size() ) {
         b.push_back(false);
     }
-    std::cout << "B: " << b.size() << std::endl;
-    assert( b.size() == m_free_intersect.size() );
+//    std::cout << "B: " << b.size() << std::endl;
+//    assert( b.size() == m_free_intersect.size() );
     m_free_intersect &= b;
-    assert( b.size() == m_free_union.size());
+//    assert( b.size() == m_free_union.size());
     m_free_union |= b;
     m_free_list = m_free_intersect | ~m_free_union;
 //    block_type * res = &m_free_list.m_bits[0], 

@@ -46,6 +46,7 @@ public:
     bool operator[]( index_type idx );
 
     size_t size();
+    size_t block_count() { return m_bits.num_blocks(); }
 
     adjacency_iterator begin();
     adjacency_iterator end();
@@ -55,8 +56,11 @@ public:
     static void * operator new( size_t );
     void    release();
 
+    static bool isGamete( locus_bitset * lb );
     static active_iterator active_begin();
     static active_iterator active_end();
+
+    size_t  copies() { return m_copies; }
 
     virtual ~locus_bitset();
 protected:

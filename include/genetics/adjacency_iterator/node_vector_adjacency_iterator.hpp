@@ -83,18 +83,18 @@ SPECIALIZATION SPECIALIZATION::operator++(int) {
 
 THEADER
 typename SPECIALIZATION::vertex_type SPECIALIZATION::operator*() {
-    std::cout << m_graph->size() << std::endl;
+//    std::cout << m_graph->size() << std::endl;
     assert( m_index < m_graph->size() );
     return (*m_graph)[m_index];
 }
 
 THEADER
 bool SPECIALIZATION::operator==( const SPECIALIZATION & rhs) {
-    if( m_graph == rhs.m_graph && m_edges == rhs.m_edges ) {
-        if( m_index != rhs.m_index ) {
-            std::cout << m_index << " != " << rhs.m_index << std::endl;
-        }
-    }
+//    if( m_graph == rhs.m_graph && m_edges == rhs.m_edges ) {
+//        if( m_index != rhs.m_index ) {
+//            std::cout << m_index << " != " << rhs.m_index << std::endl;
+//        }
+//    }
 
     return m_graph == rhs.m_graph && m_edges == rhs.m_edges && m_index == rhs.m_index;
 }

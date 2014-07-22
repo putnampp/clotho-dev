@@ -131,7 +131,7 @@ void individual_props<G,P,S>::reset() {
 template < class G, unsigned char P, class S >
 void individual_props<G,P,S>::release( ) {
     reset();
-    m_pool.free(this);
+//    m_pool.free(this);
 }
 
 template < class G, unsigned char P, class S >

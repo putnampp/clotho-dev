@@ -182,9 +182,9 @@ typename SPECIALIZATION::gamete_ptr SPECIALIZATION::mutate( gamete_ptr gm, doubl
 
 typename SPECIALIZATION::gamete_ptr SPECIALIZATION::mutate_infinite( gamete_ptr gm, double mu ) {
     unsigned int nMut = m_rng->nextPoisson( mu );
+    gamete_ptr res = NULL;
     if( nMut > 0) {
-        gamete_ptr res = gm->clone();
-
+        res = gm->clone();
         assert( res != NULL );
          
         do {
@@ -197,10 +197,10 @@ typename SPECIALIZATION::gamete_ptr SPECIALIZATION::mutate_infinite( gamete_ptr 
             //std::cout << "Adding variant: " << s << std::endl;
             res->addVariant( s );
         } while( --nMut );
-
-        return res;
-   } 
-   return gm->copy();
+    } else {
+        res = gm->copy();
+    }
+    return res;
 }
 
 typename SPECIALIZATION::gamete_ptr SPECIALIZATION::mutate_fixed( gamete_ptr g, double mu ) {
@@ -308,8 +308,8 @@ struct het_fitness {
     }
 
     inline void operator()( double & f, const allele_type & v ) {
-        std::cout << v.dominance << std::endl;
-        std::cout << v.selection << std::endl;
+//        std::cout << v.dominance << std::endl;
+//        std::cout << v.selection << std::endl;
         f *= (1. + v.dominance * v.selection);
     }
 };
@@ -350,8 +350,8 @@ public:
         unsigned int s = g1->size() + g2->size();
         if( s == 0 ) return res;
 
-        std::cout << "G1 has " << g1->size() << std::endl;
-        std::cout << "G2 has " << g2->size() << std::endl;
+//        std::cout << "G1 has " << g1->size() << std::endl;
+//        std::cout << "G2 has " << g2->size() << std::endl;
 
         adjacency_iterator g1_it = g1->begin(), g1_e = g1->end();
         adjacency_iterator g2_it = g2->begin(), g2_e = g2->end();
@@ -446,6 +446,9 @@ int main( int argc, char ** argv ) {
         buffer.push_back( new individual_type() );
     }
 
+    std::cout << gamete_type::EMPTY.copies() << std::endl;
+    assert( gamete_type::EMPTY.copies() - 1 == 2 * vm[ FOUNDER_SIZE_K ].as<unsigned int>() );
+
     stats->stopPhase( "PopInit" );
 
     environment_type * parent = &population, * child = &buffer;
@@ -467,7 +470,7 @@ int main( int argc, char ** argv ) {
         memset( fitness, 0, sizeof(double) * fitness_size );
         alphabet_type::getInstance()->resetFreeSymbols();
 
-        std::cout << "Generation: " << i << std::endl;
+//        std::cout << "Generation: " << i << std::endl;
 
         for( typename locus_bitset::active_iterator it = locus_bitset::active_begin(); it != locus_bitset::active_end(); it++ ) {
             (*it)->updateSymbols();
@@ -489,11 +492,12 @@ int main( int argc, char ** argv ) {
         DiscreteSelector ds( my_rng, fitness, parent->size() );
         unsigned int child_idx = 0;
         while( child_idx < child->size()) {
-            (*child)[child_idx]->reset();
+        //    (*child)[child_idx]->reset();
 
             //std::pair< individual_type *, individual_type * > mate_pair = selector_t::select( parent );
             std::pair< individual_type *, individual_type * > mate_pair = ds( parent );
             gamete_pointer g = rmodel_type::reproduce( mate_pair.first, (gamete_pointer) NULL);
+            assert( gamete_type::isGamete( g ) );
             (*child)[child_idx]->getProperties()->inheritFrom(blank_id, g);
 
             gamete_pointer g1 = rmodel_type::reproduce( mate_pair.second, (gamete_pointer) NULL);
@@ -502,14 +506,50 @@ int main( int argc, char ** argv ) {
             (*child)[child_idx++]->getProperties()->setDOB( i );
         }
 
+        assert( parent->size() == vm[ FOUNDER_SIZE_K ].as< unsigned int > () );
         for( environment_type::iterator it = parent->begin(); it != parent->end(); it++ ) {
-            (*it)->getProperties()->died();
+            (*it)->reset();
         }
 
         std::swap( parent, child );
     }
+
     stats->stopPhase( "Sim" );
     stats->startPhase( "Final" );
+
+    double nSymbols = 0;
+    double nGametes = 0;
+    size_t nMaxSymbols = 0, nMinSymbols = -1;
+    double nBlocks = 0;
+    unsigned int n = 0;
+    for( typename locus_bitset::active_iterator it = locus_bitset::active_begin(); it != locus_bitset::active_end(); it++ ) {
+        (*it)->updateSymbols();
+        size_t s = (*it)->size();
+        nBlocks += (double)(*it)->block_count();
+        nSymbols += (double)s;
+        nGametes += 1.0;
+
+        if( nMaxSymbols < s ) {
+            nMaxSymbols = s;
+        }
+
+        if( nMinSymbols > s ) {
+            nMinSymbols = s;
+        }
+
+        n += (*it)->copies();
+    }
+
+    std::cout << "Final population has " << nGametes  << " (" << n << ") gametes" << std::endl;
+
+    std::cout << "Average number of blocks per Gamete: " << nBlocks/nGametes << std::endl;
+
+    std::cout << "Max Variants single Gamete: " << nMaxSymbols << std::endl;
+    std::cout << "Min Variants single Gamete: " << nMinSymbols << std::endl;
+    std::cout << "Average Alleles per Gamete: " << nSymbols/nGametes << std::endl;
+
+    std::cout << "Population variant count: " << alphabet_type::getInstance()->active_count() << " (" << mmodel_type::getVariantMap()->size() << ")" << std::endl;
+    std::cout << "Lost or Fixed from previous generation: " << alphabet_type::getInstance()->fixed_lost_count() << std::endl;
 
     while( !population.empty() ) {
         individual_type * ind = population.back();
@@ -528,8 +568,6 @@ int main( int argc, char ** argv ) {
     stats->stopPhase( RUNTIME_K );
 
     cout << *stats;
-
-    cout << "Created " << mmodel_type::getVariantMap()->size() << " variants" << std::endl;
 
     delete [] fitness;
 

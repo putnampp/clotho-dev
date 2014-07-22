@@ -1,8 +1,8 @@
 #ifndef DIPLOID_PROPERTIES_TCC_
 #define DIPLOID_PROPERTIES_TCC_
 
-template < class G >
-class individual_props< G, 2 > {
+template < class G, class S >
+class individual_props< G, 2, S > {
 public:
     typedef G   gamete_t;
     typedef typename gamete_t::pointer gamete_ptr;

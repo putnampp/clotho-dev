@@ -7,6 +7,10 @@ locus_bitset::pool_type locus_bitset::m_pool;
 locus_bitset  locus_bitset::EMPTY;
 typename locus_bitset::active_bitsets locus_bitset::m_active;
 
+bool locus_bitset::isGamete( locus_bitset * lb ) {
+    return lb == &EMPTY || m_active.find( lb ) != m_active.end();
+}
+
 locus_bitset::active_iterator locus_bitset::active_begin() {
     return m_active.begin();
 }
@@ -23,13 +27,19 @@ locus_bitset::locus_bitset( alphabet_t::pointer a ) :
     m_bits(),
     m_copies(1),
     m_alphabet( a )
-{}
+{
+    if( this != &EMPTY ) {
+        m_active.insert( this );
+    }
+}
 
 locus_bitset::locus_bitset( const locus_bitset & la ) :
     m_bits(la.m_bits),
     m_copies( la.m_copies ),
     m_alphabet(la.m_alphabet)
-{}
+{
+    m_active.insert(this);
+}
 
 locus_bitset::pointer locus_bitset::copy() {
     ++m_copies;
@@ -41,8 +51,8 @@ locus_bitset::pointer locus_bitset::clone() const {
 
     c->m_copies = 1;
 
-    std::pair< active_iterator, bool > res =  m_active.insert( c );
-    assert( res.second );
+//    std::pair< active_iterator, bool > res =  m_active.insert( c );
+//    assert( res.second );
 
     return c;
 }
@@ -108,6 +118,7 @@ locus_bitset::allele_iterator locus_bitset::allele_end() {
 */
 void locus_bitset::release() {
     if( --m_copies == 0 ) {
+        m_bits.reset();
         if( this != &EMPTY ) {
             m_active.erase( this );
 //            m_pool.free( this );
