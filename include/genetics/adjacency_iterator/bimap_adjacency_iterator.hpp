@@ -1,7 +1,7 @@
 #ifndef BIMAP_ADJACENCY_ITERATOR_HPP_
 #define BIMAP_ADJACENCY_ITERATOR_HPP_
 
-#include "adjacency_iterator_dec.hpp"
+#include "adjacency_iterator_decl.hpp"
 
 #include <boost/bimap.hpp>
 #include <boost/bimap/vector_of.hpp>
@@ -51,17 +51,6 @@ protected:
 //
 // IMPLEMENTATION
 //
-
-//#define THEADER template < \
-//    template < class, class...> class NS1,\
-//        class N1, class... NS1REST,\
-//    template < class, class...> class NS2,\
-//        class N2, class... NS2REST,\
-//    class AP1, class AP2,\
-//    class B,   class BA >
-//#define BITSET boost::dynamic_bitset< B, BA >
-//
-//#define SPECIALIZATION AdjacencyIterator< boost::bimaps::bimap< NS1< N1, NS1REST...>, NS2<N2, NS2REST...>, AP1, AP2 >, BITSET >
 
 #define THEADER template < class NS1, class NS2, class NR, class B >
 

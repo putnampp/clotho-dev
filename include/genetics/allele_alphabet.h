@@ -1,7 +1,7 @@
 #ifndef ALLELE_ALPHABET_H_
 #define ALLELE_ALPHABET_H_
 
-#define BOOST_DYNAMIC_BITSET_DONT_USE_FRIENDS
+//#define BOOST_DYNAMIC_BITSET_DONT_USE_FRIENDS
 
 #include <vector>
 #include <map>
@@ -35,13 +35,13 @@ public:
     typedef variant_db_t::iterator                                              vertex_type;
     typedef variant_db_t::iterator                                              locus_iterator;
     typedef variant_db_t::const_iterator                                        clocus_iterator;
-    typedef std::vector< locus_iterator >                                            active_database_type;
+    typedef std::vector< locus_iterator >                                       active_database_type;
 
     typedef unsigned long                       block_type;
     typedef boost::dynamic_bitset< block_type > bitset_type;
     typedef bitset_type                         edge_set_type;
 
-    typedef AdjacencyIterator< variant_db_t, edge_set_type > adjacency_iterator;
+    typedef AdjacencyIterator< active_database_type, edge_set_type > adjacency_iterator;
 
     typedef std::shared_ptr< AlleleAlphabet >   pointer;
 
@@ -74,6 +74,10 @@ public:
     adjacency_iterator begin( edge_set_type * es );
     adjacency_iterator end( edge_set_type * es );
 
+    alleles_type::iterator end_allele() { return m_alleles.end(); }
+
+    locus_iterator          end_db() { return m_db.end(); }
+
     virtual ~AlleleAlphabet();
 protected:
     alleles_type    m_alleles;
@@ -84,6 +88,6 @@ protected:
     bitset_type     m_free_list, m_free_intersect, m_free_union;
 };
 
-#undef BOOST_DYNAMIC_BITSET_DONT_USE_FRIENDS
+//#undef BOOST_DYNAMIC_BITSET_DONT_USE_FRIENDS
 
 #endif  // ALLELE_ALPHABET_H_

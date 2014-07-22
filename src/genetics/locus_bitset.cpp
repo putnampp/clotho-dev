@@ -50,10 +50,13 @@ locus_bitset::pointer locus_bitset::clone() const {
 void locus_bitset::addVariant( index_type idx ) {
     assert( idx != alphabet_t::npos );
 
-    while( m_bits.size() <= idx ) {
+    while( m_bits.size() + bitset_type::bits_per_block <= idx ) {
         m_bits.append( (typename bitset_type::block_type) 0);
     }
 
+    while( m_bits.size() <= idx ) {
+        m_bits.push_back( false );
+    }
     assert( !m_bits[idx] );
     m_bits[idx] = true;
 }
