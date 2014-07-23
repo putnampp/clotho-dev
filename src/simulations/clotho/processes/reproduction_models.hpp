@@ -132,5 +132,5 @@ class basic_recomb;
 
 #endif  // REPRODUCTION_MODELS_HPP_
 
-#include "no_recombination.tcc"
-#include "basic_recombination.tcc"
+#include "processes/recombination/no_recombination.tcc"
+#include "processes/recombination/basic_recombination.tcc"

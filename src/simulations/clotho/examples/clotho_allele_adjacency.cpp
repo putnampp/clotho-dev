@@ -31,6 +31,7 @@
 #include "clotho_commandline.h"
 #include <cstdlib>
 #include <functional>
+#include <algorithm>
 
 #include <vector>
 #include <memory>
@@ -47,7 +48,9 @@
 #include "models/selection_models.hpp"
 //#include "models/reproduction_models.hpp"
 
-#include "processes.hpp"
+//#include "processes.hpp"
+#include "processes/reproduction_models.hpp"
+
 #define _PLOIDY 2
 
 using std::shared_ptr;
@@ -109,129 +112,11 @@ SYM_SPEC::symbol_type SYM_SPEC::operator()< infinite_site >( alphabet_pointer al
     static locus_generator< AlleleAlphabet::locus_t, RandomProcess::rng_pointer> lgen; 
     static allele_generator< AlleleAlphabet::allele_t, void > agen;
 
-//    PopulationAlphabet::locus_t l = lgen();
-//    while( alpha->isLocus( l ) ) {
-//        l = lgen();
-//    }
-
-//    return alpha->getSymbol( l, agen(), true );
     return alpha->getSymbol(lgen(), agen(), true );
 }
 #undef SYM_SPEC
 
-namespace reproduction {
-namespace models {
-namespace mutation {
-
-template < >
-class mutate_site< locus_bitset::allele_type, locus_bitset::alphabet_t, locus_bitset > : public RandomProcess {
-public:
-    typedef locus_bitset                    gamete_t;
-    typedef typename gamete_t::allele_type  variant_type;
-    typedef typename gamete_t::alphabet_t   variant_map_t;
-    typedef typename gamete_t::pointer      gamete_ptr;
-
-    typedef typename variant_map_t::pointer map_pointer;
-
-//    mutate_site( map_pointer mp, double mu = 0.0001, bool bFixed = false );
-    static void initialize( double mu = 0.0001, bool bFixed = false );
-  
-    static map_pointer  getVariantMap();
-
-    static gamete_ptr   mutate( gamete_ptr gm );
-    static gamete_ptr   mutate( gamete_ptr gm, double mu, bool bFixed );
-protected:
-
-    static gamete_ptr mutate_infinite( gamete_ptr, double );
-    static gamete_ptr mutate_fixed( gamete_ptr, double );
-
-    static map_pointer m_variants;
-    static double      m_mu;
-    static bool        m_bFixed;
-};
-
-#define THEADER template<>
-#define SPECIALIZATION mutate_site< locus_bitset::allele_type, locus_bitset::alphabet_t, locus_bitset >
-
-typename SPECIALIZATION::map_pointer SPECIALIZATION::m_variants;
-
-double SPECIALIZATION::m_mu = 0.0;
-
-bool SPECIALIZATION::m_bFixed = false;
-
-void SPECIALIZATION::initialize( double mu, bool bFixed ) {
-    m_variants = locus_bitset::alphabet_t::getInstance();
-    m_mu = mu;
-    m_bFixed = bFixed;
-}
-
-typename SPECIALIZATION::map_pointer SPECIALIZATION::getVariantMap() {
-    return m_variants;
-}
-
-typename SPECIALIZATION::gamete_ptr SPECIALIZATION::mutate( gamete_ptr gm ) {
-    return mutate( gm, m_mu, m_bFixed );
-}
-
-typename SPECIALIZATION::gamete_ptr SPECIALIZATION::mutate( gamete_ptr gm, double mu, bool bFixed) {
-    if( !bFixed ) {
-        return mutate_infinite(gm, mu);
-    } else {
-        return mutate_fixed(gm, mu);
-    }
-}
-
-typename SPECIALIZATION::gamete_ptr SPECIALIZATION::mutate_infinite( gamete_ptr gm, double mu ) {
-    unsigned int nMut = m_rng->nextPoisson( mu );
-    gamete_ptr res = NULL;
-    if( nMut > 0) {
-        res = gm->clone();
-        assert( res != NULL );
-         
-        do {
-//            typename variant_map_t::value_ptr_t var = getNewVariant();
-            typedef symbol_generator< variant_map_t::locus_t, variant_map_t::allele_t, variant_map_t::index_type, variant_map_t > sgen_type;
-            typedef typename sgen_type::symbol_type symbol_type;
-
-            static sgen_type sgen;
-            symbol_type s = sgen( m_variants, (infinite_site * ) NULL );
-            //std::cout << "Adding variant: " << s << std::endl;
-            res->addVariant( s );
-        } while( --nMut );
-    } else {
-        res = gm->copy();
-    }
-    return res;
-}
-
-typename SPECIALIZATION::gamete_ptr SPECIALIZATION::mutate_fixed( gamete_ptr g, double mu ) {
-    if( g->size() >= m_variants->size() ) return g; // no sites available for novel mutation
-
-    unsigned int nMut = m_rng->nextPoisson( mu );   // how many mutations should occur
-    if( nMut ) {
-        gamete_ptr res = (( g != NULL ) ? g->clone() : gamete_t::EMPTY.clone());
-        while( nMut-- ) {
-            typename variant_map_t::index_type idx = m_rng->nextInt( m_variants->size() );
-//            typename variant_map_t::value_ptr_t vptr = (*m_variants)[idx];
-
-            while( (*res)[idx] ) {
-                // random site already mutated. check another
-                idx = m_rng->nextInt( m_variants->size() );
-            }
-
-            res->addVariant( idx );   // site is unmutated. mutate it
-        }
-        return res;
-    }
-    return g->copy();
-}
-
-
-#undef THEADER
-#undef SPECIALIZATION
-}   // namespace mutation
-}   // namespace models
-}   // namespace reproduction
+#include "locus_bitset_mutate.tcc"
 
 typedef locus_bitset gamete_type;
 typedef typename gamete_type::alphabet_t    alphabet_type;
@@ -249,6 +134,7 @@ typedef reproduction::IndividualReproduction< mmodel_type, rcmodel_type > rmodel
 typedef TIndividual< gamete_type, _PLOIDY, system_id, individual_props< gamete_type, _PLOIDY, system_id >> individual_type;
 typedef individual_type  *                  individual_pointer;
 typedef std::vector< individual_pointer >   environment_type;
+
 
 class DiscreteSelector {
 public:
@@ -278,6 +164,89 @@ public:
 protected:
     gsl_rng * m_rng;
     gsl_ran_discrete_t * m_lookup;
+};
+
+class ReproduceWithRecombination : public RandomProcess {
+public:
+    ReproduceWithRecombination( double mu, double rho ) : m_mu(mu), m_rho(rho), m_nRecomb(0) {}
+
+    size_t getRecombinationCalls() { return m_nRecomb; }
+
+    gamete_pointer operator()( individual_pointer ind ) {
+        gamete_pointer res = NULL;
+        unsigned int nRec = m_rng->nextPoisson( m_rho );
+        bool copied = true;
+        if( nRec > 0 ) {
+            ++m_nRecomb;
+            copied = false;
+            res = ind->getProperties()->getGamete(0)->clone();
+
+            (*res) ^= *(ind->getProperties()->getGamete(1));
+            gamete_type::bitset_type mask;
+
+            mask.resize( res->set_size(), true );
+
+            static locus_generator< AlleleAlphabet::locus_t, RandomProcess::rng_pointer> lgen; 
+            typedef std::vector< AlleleAlphabet::locus_t > recombination_points;
+            typedef typename recombination_points::iterator recombination_iterator;
+            recombination_points rec_points(nRec, 0.0);
+            do {
+                rec_points[ --nRec ] = lgen();
+            } while( nRec );
+            rec_points.push_back(0.0);
+            rec_points.push_back(1.0);
+            std::sort( rec_points.begin(), rec_points.end() );
+
+            gamete_type::adjacency_iterator it = res->begin();
+            gamete_type::adjacency_iterator it_end = res->end();
+
+            while( it != it_end ) {
+                locus_bitset::index_type offset = it.index();
+
+                recombination_iterator rit = std::lower_bound( rec_points.begin(), rec_points.end(), (*(*it++)).first);
+                size_t gamete_idx = ((rit - rec_points.begin()) % 2);
+                if( (*(ind->getProperties()->getGamete(gamete_idx)))[offset] ) {
+                    res->addVariant(offset);
+                } else {
+                    res->removeVariant(offset);
+                }
+                mask[offset] = false;
+            }
+
+            res->masked_join( *ind->getProperties()->getGamete(0), mask );
+        } else if( m_rng->nextBool() ) {
+            res = ind->getProperties()->getGamete(0);
+        } else {
+            res = ind->getProperties()->getGamete(1);
+        }
+
+        unsigned int nMut = m_rng->nextPoisson( m_mu );
+        if( nMut > 0 ) {
+            if( copied ) {
+                res = res->clone();
+            }
+
+            do {
+                typedef symbol_generator< AlleleAlphabet::locus_t, AlleleAlphabet::allele_t, AlleleAlphabet::index_type, AlleleAlphabet > sgen_type;
+                typedef typename sgen_type::symbol_type symbol_type;
+
+                static sgen_type sgen;
+                symbol_type s = sgen( res->getAlphabet(), (infinite_site * ) NULL );
+                //std::cout << "Adding variant: " << s << std::endl;
+                res->addVariant( s );
+            } while( --nMut );
+
+        } else if( copied ) {
+            res = res->copy();
+        }
+
+        return res;
+    }
+
+    virtual ~ReproduceWithRecombination() {}
+protected:
+    double m_mu, m_rho;
+    size_t m_nRecomb;
 };
 
 class SimpleSelector : public RandomProcess {
@@ -423,6 +392,8 @@ int main( int argc, char ** argv ) {
     RandomProcess::initialize( rng );
     
     double mu = vm[ MUTATION_RATE_K ].as<double>();
+    double rho = vm[ RECOMBINATION_RATE_K ].as< double >();
+
     mmodel_type::initialize( mu, false);
 
     shared_ptr< SimulationStats > stats( new SimulationStats() );
@@ -457,6 +428,8 @@ int main( int argc, char ** argv ) {
     unsigned int fitness_size = 0;
     double * fitness = NULL;
 
+    ReproduceWithRecombination repro( mu, rho );
+
     stats->startPhase( "Sim" );
     for( SystemClock::vtime_t i = 0; i < tUntil; ++i ) {
 
@@ -487,21 +460,23 @@ int main( int argc, char ** argv ) {
             ++tmp;
         }
         //e_fitness /= (double)parent->size();
-        // mate
+
         //
+        // mate
         //
         DiscreteSelector ds( my_rng, fitness, parent->size() );
         unsigned int child_idx = 0;
         while( child_idx < child->size()) {
-        //    (*child)[child_idx]->reset();
+//            std::pair< individual_type *, individual_type * > mate_pair = ds( parent );
+            std::pair< individual_pointer, individual_pointer > mate_pair = ds( parent );
+//            gamete_pointer g = rmodel_type::reproduce( mate_pair.first, (gamete_pointer) NULL);
 
-            //std::pair< individual_type *, individual_type * > mate_pair = selector_t::select( parent );
-            std::pair< individual_type *, individual_type * > mate_pair = ds( parent );
-            gamete_pointer g = rmodel_type::reproduce( mate_pair.first, (gamete_pointer) NULL);
+            gamete_pointer g = repro( mate_pair.first );
             assert( gamete_type::isGamete( g ) );
             (*child)[child_idx]->getProperties()->inheritFrom(blank_id, g);
 
-            gamete_pointer g1 = rmodel_type::reproduce( mate_pair.second, (gamete_pointer) NULL);
+//            gamete_pointer g1 = rmodel_type::reproduce( mate_pair.second, (gamete_pointer) NULL);
+            gamete_pointer g1 = repro( mate_pair.second );
             (*child)[child_idx]->getProperties()->inheritFrom(blank_id, g1);
 
             (*child)[child_idx++]->getProperties()->setDOB( i );
@@ -545,11 +520,12 @@ int main( int argc, char ** argv ) {
 
     std::cout << "Average number of blocks per Gamete: " << nBlocks/nGametes << std::endl;
 
-    std::cout << "Max Variants single Gamete: " << nMaxSymbols << std::endl;
-    std::cout << "Min Variants single Gamete: " << nMinSymbols << std::endl;
-    std::cout << "Average Alleles per Gamete: " << nSymbols/nGametes << std::endl;
+    std::cout << "Max Mutations single Gamete: " << nMaxSymbols << std::endl;
+    std::cout << "Min Mutations single Gamete: " << nMinSymbols << std::endl;
+    std::cout << "Average Mutations per Gamete: " << nSymbols/nGametes << std::endl;
 
-    std::cout << "Population variant count: " << alphabet_type::getInstance()->active_count() << " (" << mmodel_type::getVariantMap()->size() << ")" << std::endl;
+    std::cout << "Population Mutation count: " << alphabet_type::getInstance()->active_count() << " (" << mmodel_type::getVariantMap()->size() << ")" << std::endl;
+    std::cout << "Population Recombinations: " << repro.getRecombinationCalls() << std::endl;
     std::cout << "Lost or Fixed from previous generation: " << alphabet_type::getInstance()->fixed_lost_count() << std::endl;
 
     while( !population.empty() ) {

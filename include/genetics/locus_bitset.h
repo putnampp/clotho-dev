@@ -46,7 +46,10 @@ public:
     bool operator[]( index_type idx );
 
     size_t size();
+    size_t set_size();
     size_t block_count() { return m_bits.num_blocks(); }
+
+    alphabet_t::pointer getAlphabet() { return m_alphabet; }
 
     adjacency_iterator begin();
     adjacency_iterator end();
@@ -61,6 +64,11 @@ public:
     static active_iterator active_end();
 
     size_t  copies() { return m_copies; }
+
+    locus_bitset & operator^=( const locus_bitset & rhs );
+    locus_bitset & operator|=( const locus_bitset & rhs );
+
+    void masked_join( const locus_bitset & rhs, const bitset_type & mask );
 
     virtual ~locus_bitset();
 protected:

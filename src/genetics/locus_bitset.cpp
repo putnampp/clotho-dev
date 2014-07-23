@@ -1,6 +1,5 @@
 #include "genetics/locus_bitset.h"
 
-
 // statics
 //
 locus_bitset::pool_type locus_bitset::m_pool;
@@ -60,14 +59,8 @@ locus_bitset::pointer locus_bitset::clone() const {
 void locus_bitset::addVariant( index_type idx ) {
     assert( idx != alphabet_t::npos );
 
-    while( m_bits.size() + bitset_type::bits_per_block <= idx ) {
-        m_bits.append( (typename bitset_type::block_type) 0);
-    }
+    if( m_bits.size() <= idx) { m_bits.resize( idx + 1, false ); }
 
-    while( m_bits.size() <= idx ) {
-        m_bits.push_back( false );
-    }
-    assert( !m_bits[idx] );
     m_bits[idx] = true;
 }
 
@@ -91,6 +84,10 @@ size_t locus_bitset::size() {
     return m_bits.count();
 }
 
+size_t locus_bitset::set_size() {
+    return m_bits.size();
+}
+
 locus_bitset::adjacency_iterator locus_bitset::begin() {
     return m_alphabet->begin( &m_bits );
 }
@@ -100,7 +97,7 @@ locus_bitset::adjacency_iterator locus_bitset::end() {
 }
 
 bool locus_bitset::operator[]( index_type idx ) {
-    return m_bits[idx];
+    return ((idx < m_bits.size()) ? m_bits[idx] : false);
 }
 
 void locus_bitset::updateSymbols() {
@@ -124,6 +121,56 @@ void locus_bitset::release() {
 //            m_pool.free( this );
 //            delete this;
         }
+    }
+}
+
+locus_bitset & locus_bitset::operator^=( const locus_bitset & rhs ) {
+    assert( m_alphabet == rhs.m_alphabet );
+
+    if( rhs.m_bits.size() < m_bits.size() ) {
+        bitset_type b( rhs.m_bits );
+        b.resize( m_bits.size(), false);
+        m_bits ^= b;
+    } else {
+        if( m_bits.size() < rhs.m_bits.size() ) {
+            m_bits.resize( rhs.m_bits.size(), false );
+        }
+
+        m_bits ^= rhs.m_bits;
+    }
+
+    return *this;
+}
+
+locus_bitset & locus_bitset::operator|=( const locus_bitset & rhs ) {
+    assert( m_alphabet == rhs.m_alphabet );
+
+    if( rhs.m_bits.size() < m_bits.size() ) {
+        bitset_type b( rhs.m_bits );
+        b.resize( m_bits.size(), false);
+        m_bits |= b;
+    } else {
+        if( m_bits.size() < rhs.m_bits.size() ) {
+            m_bits.resize( rhs.m_bits.size(), false );
+        }
+
+        m_bits |= rhs.m_bits;
+    }
+
+    return *this;
+}
+
+void locus_bitset::masked_join( const locus_bitset & rhs, const bitset_type & mask ) {
+    assert( rhs.m_bits.size() <= mask.size() && m_bits.size() <= mask.size() );
+    if( m_bits.size() < mask.size() ) {
+        m_bits.resize( mask.size(), false );
+    }
+    if( rhs.m_bits.size() == mask.size() ) {
+        m_bits |= (rhs.m_bits & mask);
+    } else {
+        bitset_type r = rhs.m_bits;
+        r.resize( mask.size(), false );
+        m_bits |= (r & mask);
     }
 }
 

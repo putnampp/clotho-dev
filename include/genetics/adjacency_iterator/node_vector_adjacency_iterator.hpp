@@ -36,6 +36,8 @@ public:
 
     vertex_type operator*();
 
+    size_t index() { return m_index; }
+
     virtual ~AdjacencyIterator();
 protected:
     graph_pointer       m_graph;
