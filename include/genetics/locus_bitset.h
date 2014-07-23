@@ -56,7 +56,7 @@ public:
 
     void updateSymbols();
 
-    static void * operator new( size_t );
+    //static void * operator new( size_t );
     void    release();
 
     static bool isGamete( locus_bitset * lb );
@@ -76,7 +76,7 @@ protected:
     mutable size_t          m_copies;
     alphabet_t::pointer     m_alphabet;
 
-    static pool_type m_pool;
+//    static pool_type m_pool;
 
     static active_bitsets m_active;
 };

@@ -2,7 +2,7 @@
 
 // statics
 //
-locus_bitset::pool_type locus_bitset::m_pool;
+//locus_bitset::pool_type locus_bitset::m_pool;
 locus_bitset  locus_bitset::EMPTY;
 typename locus_bitset::active_bitsets locus_bitset::m_active;
 
@@ -18,9 +18,9 @@ locus_bitset::active_iterator locus_bitset::active_end() {
     return m_active.end();
 }
 
-void * locus_bitset::operator new( size_t s ) {
-    return m_pool.malloc();
-}
+//void * locus_bitset::operator new( size_t s ) {
+//    return m_pool.malloc();
+//}
 
 locus_bitset::locus_bitset( alphabet_t::pointer a ) :
     m_bits(),
@@ -119,7 +119,7 @@ void locus_bitset::release() {
         if( this != &EMPTY ) {
             m_active.erase( this );
 //            m_pool.free( this );
-//            delete this;
+            delete this;
         }
     }
 }

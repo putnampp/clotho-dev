@@ -56,7 +56,9 @@ AlleleAlphabet::index_type     AlleleAlphabet::getSymbol( const locus_t & l, con
 //            std::cout << "Active size: " << m_active.size() << std::endl;
             assert( offset < m_active.size() );
 //            std::cout << "Reusing offset: " << offset << std::endl;
-            m_active[ offset ]->second.second = bitset_type::npos;
+//            m_active[ offset ]->second.second = bitset_type::npos;
+            m_db.erase( m_active[offset] );
+            m_active[offset] = it;
             m_free_list[ offset ] = false;
         }
         it->second.second = offset;

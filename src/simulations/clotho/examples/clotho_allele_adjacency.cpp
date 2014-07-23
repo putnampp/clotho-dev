@@ -159,7 +159,8 @@ public:
     }
 
     virtual ~DiscreteSelector() {
-        delete m_lookup;
+//        delete m_lookup;
+        gsl_ran_discrete_free( m_lookup );
     }
 protected:
     gsl_rng * m_rng;
