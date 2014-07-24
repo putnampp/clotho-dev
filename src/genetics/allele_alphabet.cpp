@@ -94,9 +94,11 @@ void AlleleAlphabet::updateFreeSymbols( const bitset_type & fs ) {
 //                << "; FU: " << m_free_union.size() << std::endl;
     assert((m_free_list.size() == m_free_intersect.size()) && (m_free_list.size() == m_free_union.size()));
     bitset_type b(fs);
-    while( b.size() < m_free_list.size() ) {
-        b.push_back(false);
-    }
+//    while( b.size() < m_free_list.size() ) {
+//        b.push_back(false);
+//    }
+    if( b.size() < m_free_list.size() ) { b.resize( m_free_list.size(), false ); }
+
 //    std::cout << "B: " << b.size() << std::endl;
 //    assert( b.size() == m_free_intersect.size() );
     m_free_intersect &= b;
