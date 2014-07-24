@@ -456,6 +456,7 @@ int main( int argc, char ** argv ) {
         double * tmp = fitness;
 //        double e_fitness = 0.0;
         for( environment_type::iterator it = parent->begin(); it != parent->end(); it++ ) {
+            (*tmp) = 1.0;
             (*tmp) = fmult( (*tmp), (*it) );
             //e_fitness += (*tmp++);
             ++tmp;
