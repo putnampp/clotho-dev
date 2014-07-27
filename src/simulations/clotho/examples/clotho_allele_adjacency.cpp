@@ -62,8 +62,10 @@ class FinalWorker< individual_props< locus_bitset, P, S > > {
 public:
     static void finalize( individual_props< locus_bitset, P, S > * props ) {
         for( unsigned char i = 0; i < P; ++i ) {
-            if( props->m_gametes[i].second != NULL )
+            if( props->m_gametes[i].second != NULL ) {
                 props->m_gametes[i].second->release();
+                props->m_gametes[i].second = NULL;
+            }
         }
         props->m_free_gametes = P;
     }
