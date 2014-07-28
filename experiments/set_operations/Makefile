@@ -2,6 +2,7 @@ CXX=clang++
 CXXFLAGS=-g -Wall -std=c++11
 
 INCLUDEDIRS=-I../../include/time
+INCLUDEDIRS+=-I./include
 
 BINDIR=bin
 SRCDIR=src
