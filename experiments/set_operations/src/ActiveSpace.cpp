@@ -36,7 +36,7 @@ ActiveSpace::indirect_type ActiveSpace::operator[]( value_type v ) {
     return (( it == m_active.end() ) ? npos : it->second);
 }
 
-virtual ~ActiveSpace::ActiveSpace() {
+ActiveSpace::~ActiveSpace() {
     m_indexed.clear();
     m_active.clear();
 }

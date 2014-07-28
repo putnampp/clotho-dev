@@ -8,6 +8,8 @@ BINDIR=bin
 SRCDIR=src
 
 OBJS=${SRCDIR}/ActiveSpace.cpp
+OBJS+=${SRCDIR}/ActiveSpaceSubset.cpp
+OBJS+=../../src/time/timing.cpp
 
 LINKDIRS=-L/opt/boost/lib
 
@@ -20,8 +22,8 @@ all: set_ops2
 set_ops: ${SRCDIR}/set_ops.cpp ../../src/time/timing.cpp
 	$(CXX) $(CXXFLAGS) ${INCLUDEDIRS} -o ${BINDIR}/set_ops ${SRCDIR}/set_ops.cpp ../../src/time/timing.cpp ${LINKDIRS} ${LIBRARIES}
 
-set_ops2: ${SRCDIR}/set_ops2.cpp ../../src/time/timing.cpp
-	$(CXX) $(CXXFLAGS) ${INCLUDEDIRS} -o ${BINDIR}/set_ops2 ${SRCDIR}/set_ops2.cpp ../../src/time/timing.cpp ${LINKDIRS} ${LIBRARIES}
+set_ops2: ${SRCDIR}/set_ops2.cpp ${OBJS}
+	$(CXX) $(CXXFLAGS) ${INCLUDEDIRS} -o ${BINDIR}/set_ops2 ${SRCDIR}/set_ops2.cpp ${OBJS} ${LINKDIRS} ${LIBRARIES}
 
 pretty:
 	find . \( -name "*.cpp" -o -name "*.h" -o -name "*.hpp" \) -type f -exec astyle -A2 '{}' \;

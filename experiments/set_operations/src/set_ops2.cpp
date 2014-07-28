@@ -19,12 +19,15 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
-#include "active_space_subset.hpp"
+//#include "active_space_subset.hpp"
+#include "ActiveSpaceSubset.h"
 
 #include "random_pair.hpp"
 #include "union_operation.hpp"
 #include "intersection_operation.hpp"
 #include "difference_operation.hpp"
+//
+//#include "set_operations.h"
 
 #include "timing.h"
 
@@ -32,14 +35,34 @@
 using namespace timing;
 using std::string;
 
+//using set_operations::union_operation;
+//using set_operations::intersect_operation;
+//using set_operations::difference_operation;
+//using set_operations::symmetric_difference_operation;
+
+template < >
+void union_operation< ActiveSpaceSubset, ActiveSpaceSubset >::operator()( const ActiveSpaceSubset & s1, const ActiveSpaceSubset & s2, ActiveSpaceSubset & res )  {
+    res = (s1 | s2);
+}
+
+template < >
+void intersection_operation< ActiveSpaceSubset, ActiveSpaceSubset >::operator()( const ActiveSpaceSubset & s1, const ActiveSpaceSubset & s2, ActiveSpaceSubset & res )  {
+    res = (s1 & s2);
+}
+
+template < >
+void difference_operation< ActiveSpaceSubset, ActiveSpaceSubset >::operator()( const ActiveSpaceSubset & s1, const ActiveSpaceSubset & s2, ActiveSpaceSubset & res )  {
+    res = (s1 - s2);
+}
+
 namespace po=boost::program_options;
 
-typedef double  value_type;
+typedef ActiveSpaceSubset::value_type       value_type;
 
-typedef std::vector< value_type > dynamic_subset_type;
-typedef std::vector< dynamic_subset_type > dynamic_subsets;
+typedef std::vector< value_type >           dynamic_subset_type;
+typedef std::vector< dynamic_subset_type >  dynamic_subsets;
 
-typedef active_space_subset< value_type >   indirect_subset_type;
+typedef ActiveSpaceSubset                   indirect_subset_type;
 typedef std::vector< indirect_subset_type > indirect_subsets;
 
 // FUNCTION PROTOTYPES
@@ -96,13 +119,16 @@ void add_to_log( boost::property_tree::ptree & props, SIterator first, SIterator
     }
 }
 
+
 template < class LogType = boost::property_tree::ptree >
 class PerformanceTester {
 public:
     typedef LogType performance_log_type;
 
-    template < class ForwardIterator, class BaseIterator, class OP >
-    void operator()( ForwardIterator first, ForwardIterator last, BaseIterator lbound, OP & _operation, performance_log_type & log, const string & base_key ) {
+    PerformanceTester( performance_log_type & log, string key_prefix) : m_log(&log), m_prefix( key_prefix ) {}
+
+    template< class ForwardIterator, typename OP >
+    void operator()( ForwardIterator first, ForwardIterator last, OP op ) {
         std::ostringstream oss;
 
         INIT_LAPSE_TIME;
@@ -111,95 +137,28 @@ public:
         while( first != last ) {
             typename OP::result_type r;
             RECORD_START;
-            _operation( *first, r );
+            op( (*first->first), (*first->second), r );
             RECORD_STOP;
 
             oss.str( "" );
             oss.clear();
-            oss << base_key << k++;
-
+            oss << m_prefix << k++;
             string ckey = oss.str();
+
             oss.str("");
             oss.clear();
-
             PRINT_LAPSE( oss, "" );
-            log.put( ckey + ".lapse", oss.str() );
-            log.put( ckey + ".s0", (first->first - lbound) );
-            log.put( ckey + ".s1", (first->second - lbound) );
-//
-//            add_to_log( log, r.begin(), r.end(), ckey + ".result" );
 
-            unsigned int i = 0;
-            for( typename OP::result_type::iterator it = r.begin(); it != r.end(); it++ ) {
-                oss.str("");
-                oss.clear();
-                oss << ckey << ".result." << i++;
-                log.put( oss.str(), *it );
-                std::cerr << *it << std::endl;
-            }
+            m_log->put( ckey + ".lapse", oss.str() );
             ++first;
         }
     }
 
     virtual ~PerformanceTester() {}
+protected:
+    performance_log_type *  m_log;
+    string                  m_prefix;
 };
-
-template < class URNG >
-void test_union( URNG & rgen, const dynamic_subsets & samples, unsigned int test_count, unsigned int sampling_rate,  boost::property_tree::ptree & props, const string & prefix ) {
-    std::ostringstream oss;
-
-    string cprefix = prefix + ".union";
-    oss << cprefix << ".test_count";
-    props.put( oss.str(), test_count );
-
-    oss.str( "" );
-    oss.clear();
-    oss << cprefix << ".sampling_rate";
-    props.put( oss.str(), sampling_rate );
-
-    INIT_LAPSE_TIME;
-    boost::random::uniform_int_distribution<> uni(0, samples.size());
-    for( unsigned int i = 0; i < test_count; ++i) {
-        oss.str("" );
-        oss.clear();
-        oss << cprefix << ".results." << i << ".";
-
-        string test_key = oss.str();
-
-        typedef std::vector< std::pair< size_t, size_t > > pairing_set;
-        pairing_set pairing;
-        pairing.reserve( sampling_rate );
-        for( unsigned int j = 0; j < sampling_rate; ++j ) {
-            pairing.push_back( std::make_pair( uni(rgen), uni(rgen) ) );
-        }
-
-        unsigned int k = 0;
-        for( pairing_set::iterator it = pairing.begin(); it != pairing.end(); it++ ) {
-            dynamic_subsets::value_type result;
-
-            dynamic_subsets::value_type::const_iterator f1 = samples[ it->first ].begin(), e1 = samples[it->first].end(), f2 = samples[ it->second ].begin(), e2 = samples[ it->second ].end();
-
-            RECORD_START;
-
-            std::set_union( f1, e1, f2, e2, std::back_inserter(result) );
-
-            RECORD_STOP;
-
-            oss.str( "" );
-            oss.clear();
-            oss << test_key << k++;
-
-            string ckey = oss.str();
-            oss.str("");
-            oss.clear();
-
-            PRINT_LAPSE( oss, "" );
-            props.put( ckey + ".lapse", oss.str() );
-            props.put( ckey + ".s0", it->first);
-            props.put( ckey + ".s1", it->second);
-        }
-    }
-}
 
 void convert( const dynamic_subsets & src, indirect_subsets & dest ) {
     dest.reserve( src.size() );
@@ -211,6 +170,23 @@ void convert( const dynamic_subsets & src, indirect_subsets & dest ) {
         dest.push_back( s );
     }
 }
+
+template < class URNG >
+struct my_uniform_generator {
+    typedef URNG rng_type;
+    rng_type    * rng;
+    boost::random::uniform_int_distribution<> dist;
+
+    my_uniform_generator( rng_type * r ) : rng(r) {}
+    my_uniform_generator( const my_uniform_generator< URNG > & other ) : rng(other.rng) {}
+
+    unsigned int operator()( unsigned int min, unsigned int max ) {
+        unsigned int range = (max - min);
+        unsigned int val = dist( *rng ) % range;
+        return min + val;
+    }
+};
+
 
 // CONSTANT VALUES
 const unsigned int DEFAULT_SUBSETS = 10000;
@@ -272,37 +248,56 @@ int main(int argc, char ** argv) {
 
     add_to_log( sim_props, samples.begin(), samples.end(), "samples.dynamic" );
 
+    my_uniform_generator< boost::random::mt19937> mug( &rgen );
+
+//    union_operation< dynamic_subsets::value_type > dynamic_union_op;
+
     bool bRanAnalysis = false;
     if( vm.count( DYNAMIC_SUBSET_K ) ) {
         std::cerr << "Running dynamic vector set" << std::endl;
 
-        union_operation< dynamic_subsets::iterator, dynamic_subset_type > union_op;
-        intersection_operation< dynamic_subsets::iterator, dynamic_subset_type > inter_op;
-        difference_operation< dynamic_subsets::iterator, dynamic_subset_type > diff_op;
-
-        PerformanceTester<> pt;
-
         for( int i = 0; i < 10; ++i ) {
             std::ostringstream oss;
 
-            randomly_pair< dynamic_subsets::iterator > paired( samples.begin(), samples.end() );
-            paired.generate( rgen, 5 );
+            std::vector< std::pair< dynamic_subsets::iterator, dynamic_subsets::iterator > > pairs;
+            random_pair_n( samples.begin(), samples.end(), (unsigned int) 5, std::back_inserter( pairs ), mug );
 
-            oss << "samples.dynamic.test." << union_op.name() << "." << i << ".";
-            pt( paired.begin(), paired.end(), paired.start(), union_op, sim_props, oss.str() );
+            oss << "samples.dynamic.test." << i << ".union.";
+            {
+                PerformanceTester<> pt( sim_props, oss.str() );
+                pt( pairs.begin(), pairs.end(), union_operation< dynamic_subsets::value_type >() );
+            }
+
 
             oss.str("");
             oss.clear();
-            oss << "samples.dynamic.test." << inter_op.name() << "." << i << ".";
-            pt( paired.begin(), paired.end(), paired.start(), inter_op, sim_props, oss.str() );
+            oss << "samples.dynamic.test." << i << ".intersection.";
+            {
+                PerformanceTester<> pt( sim_props, oss.str() );
+                pt( pairs.begin(), pairs.end(), intersection_operation< dynamic_subsets::value_type >() );
+            }
 
             oss.str("");
             oss.clear();
-            oss << "samples.dynamic.test." << diff_op.name() << "." << i << ".";
-            pt( paired.begin(), paired.end(), paired.start(), diff_op, sim_props, oss.str() );
+            oss << "samples.dynamic.test." << i << ".difference.";
+            {
+                PerformanceTester<> pt( sim_props, oss.str() );
+                pt( pairs.begin(), pairs.end(), difference_operation< dynamic_subsets::value_type >() );
+            }
+
+            oss.str("");
+            oss.clear();
+            oss << "samples.dynamic.test." << i << ".pairs.";
+            string tmpk = oss.str();
+            for( unsigned int j = 0; j < pairs.size(); ++j) {
+                oss.str("");
+                oss.clear();
+                oss << tmpk << j;
+                sim_props.put( oss.str() + ".first", pairs[ j ].first - samples.begin() );
+                sim_props.put( oss.str() + ".second", pairs[ j ].second - samples.begin() );
+            }
         }
 
-//        test_union( rgen, samples, 10, 5, sim_props, "samples.dynamic.test");
         bRanAnalysis = true;
     }
 
@@ -312,30 +307,45 @@ int main(int argc, char ** argv) {
         indirect_subsets samples2;
         convert( samples, samples2);
 
-        union_operation< indirect_subsets::iterator, indirect_subset_type > union_op;
-        intersection_operation< indirect_subsets::iterator, indirect_subset_type > inter_op;
-        difference_operation< indirect_subsets::iterator, indirect_subset_type > diff_op;
-
-        PerformanceTester<> pt;
-
         for( int i = 0; i < 10; ++i ) {
             std::ostringstream oss;
 
-            randomly_pair< indirect_subsets::iterator > paired( samples2.begin(), samples2.end() );
-            paired.generate( rgen, 5 );
+            std::vector< std::pair< indirect_subsets::iterator, indirect_subsets::iterator > > pairs;
+            random_pair_n( samples2.begin(), samples2.end(), (unsigned int) 5, std::back_inserter( pairs ), mug );
 
-            oss << "samples.indirect.test." << union_op.name() << "." << i << ".";
-            pt( paired.begin(), paired.end(), paired.start(), union_op, sim_props, oss.str() );
-
-            oss.str("");
-            oss.clear();
-            oss << "samples.indirect.test." << inter_op.name() << "." << i << ".";
-            pt( paired.begin(), paired.end(), paired.start(), inter_op, sim_props, oss.str() );
+            oss << "samples.indirect.test." << i << ".union.";
+            {
+                PerformanceTester<> pt( sim_props, oss.str() );
+                pt( pairs.begin(), pairs.end(), union_operation< indirect_subsets::value_type >() );
+            }
 
             oss.str("");
             oss.clear();
-            oss << "samples.indirect.test." << diff_op.name() << "." << i << ".";
-            pt( paired.begin(), paired.end(), paired.start(), diff_op, sim_props, oss.str() );
+            oss << "samples.indirect.test." << i << ".intersection.";
+            {
+                PerformanceTester<> pt( sim_props, oss.str() );
+                pt( pairs.begin(), pairs.end(), intersection_operation< indirect_subsets::value_type >() );
+            }
+
+            oss.str("");
+            oss.clear();
+            oss << "samples.indirect.test." << i << ".difference.";
+            {
+                PerformanceTester<> pt( sim_props, oss.str() );
+                pt( pairs.begin(), pairs.end(), difference_operation< indirect_subsets::value_type >() );
+            }
+
+            oss.str("");
+            oss.clear();
+            oss << "samples.indirect.test." << i << ".pairs.";
+            string tmpk = oss.str();
+            for( unsigned int j = 0; j < pairs.size(); ++j) {
+                oss.str("");
+                oss.clear();
+                oss << tmpk << j;
+                sim_props.put( oss.str() + ".first", pairs[ j ].first - samples2.begin() );
+                sim_props.put( oss.str() + ".second", pairs[ j ].second - samples2.begin() );
+            }
         }
         bRanAnalysis = true;
     }
