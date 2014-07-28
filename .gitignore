@@ -14,4 +14,3 @@ src/third_party
 *.log 
 *.pdf
 helgrind
-experiments
