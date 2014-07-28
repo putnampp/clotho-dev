@@ -35,7 +35,8 @@ AlleleAlphabet::index_type     AlleleAlphabet::getSymbol( const locus_t & l, con
         it = m_db.insert( make_pair( l, make_pair( a_it, offset)));
     } else {
         // existing edge
-        offset = it->second.second;
+        //offset = it->second.second;
+        return npos;
     }
 
     if( offset == bitset_type::npos ) {

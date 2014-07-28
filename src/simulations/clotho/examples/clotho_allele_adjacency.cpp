@@ -112,7 +112,11 @@ SYM_SPEC::symbol_type SYM_SPEC::operator()< infinite_site >( alphabet_pointer al
     static locus_generator< AlleleAlphabet::locus_t, RandomProcess::rng_pointer> lgen; 
     static allele_generator< AlleleAlphabet::allele_t, void > agen;
 
-    return alpha->getSymbol(lgen(), agen(), true );
+    SYM_SPEC::symbol_type res = alpha->getSymbol(lgen(), agen(), true );
+    while( res == AlleleAlphabet::npos ) {
+        res = alpha->getSymbol(lgen(), agen(), true );
+    }
+    return res;
 }
 #undef SYM_SPEC
 
