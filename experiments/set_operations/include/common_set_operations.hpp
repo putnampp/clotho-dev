@@ -9,7 +9,7 @@ struct set_op {
     typedef SIterator set_iterator;
 
     template < class ResultType, class OP >
-    ResultType operator()( set_type S, OP 
+    ResultType operator()( set_type S, OP
 };
 
 }

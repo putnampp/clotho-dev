@@ -11,7 +11,7 @@
 // instead of a multimap of values because the multimap approach
 // will enumerate every instance of a value resulting in
 // duplicate instances of the same value.  This consequently increases the space
-// needed to represent a subset.  Furthermore, it complicates the set operations 
+// needed to represent a subset.  Furthermore, it complicates the set operations
 //
 //
 template < class ValueType = double, class IndirectType = size_t, class BlockType = unsigned long >

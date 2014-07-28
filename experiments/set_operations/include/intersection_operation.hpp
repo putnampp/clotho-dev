@@ -13,9 +13,9 @@ struct intersection_operation {
 
     void operator()( std::pair< sample_iterator, sample_iterator > paired, result_type & res ) {
         typename set_type::element_type::iterator b1 = (*paired.first)->begin(),
-                           e1 = (*paired.first)->end(),
-                           b2 = (*paired.second)->begin(),
-                           e2 = (*paired.second)->end();
+                                                  e1 = (*paired.first)->end(),
+                                                  b2 = (*paired.second)->begin(),
+                                                  e2 = (*paired.second)->end();
         std::set_intersection( b1, e1, b2, e2, std::back_inserter( *res ) );
     }
 

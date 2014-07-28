@@ -7,6 +7,8 @@ INCLUDEDIRS+=-I./include
 BINDIR=bin
 SRCDIR=src
 
+OBJS=${SRCDIR}/ActiveSpace.cpp
+
 LINKDIRS=-L/opt/boost/lib
 
 LIBRARIES=-lboost_system
@@ -20,6 +22,10 @@ set_ops: ${SRCDIR}/set_ops.cpp ../../src/time/timing.cpp
 
 set_ops2: ${SRCDIR}/set_ops2.cpp ../../src/time/timing.cpp
 	$(CXX) $(CXXFLAGS) ${INCLUDEDIRS} -o ${BINDIR}/set_ops2 ${SRCDIR}/set_ops2.cpp ../../src/time/timing.cpp ${LINKDIRS} ${LIBRARIES}
+
+pretty:
+	find . \( -name "*.cpp" -o -name "*.h" -o -name "*.hpp" \) -type f -exec astyle -A2 '{}' \;
+	find . -name "*.orig" -type f -exec rm '{}' \;
 
 clean:
 	find ./bin -type f -exec rm '{}' \;

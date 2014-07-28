@@ -39,13 +39,23 @@ public:
         }
     }
 
-    size_t  index_of( sample_iterator it ) { return it - m_first; }
+    size_t  index_of( sample_iterator it ) {
+        return it - m_first;
+    }
 
-    iterator begin()    { return m_pairs.begin(); }
-    iterator end()      { return m_pairs.end(); }
+    iterator begin()    {
+        return m_pairs.begin();
+    }
+    iterator end()      {
+        return m_pairs.end();
+    }
 
-    sample_iterator start() { return m_first; }
-    sample_iterator last() { return m_last; }
+    sample_iterator start() {
+        return m_first;
+    }
+    sample_iterator last() {
+        return m_last;
+    }
 
     virtual ~randomly_pair() {}
 

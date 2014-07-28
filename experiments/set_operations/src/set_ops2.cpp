@@ -63,7 +63,7 @@ struct build< SMPLS< SUBSET, REST...> > {
             subset_type samp;
             for( unsigned int j = 0; j < m; ++j ) {
                 double v = vdist( rgen );
-                samp.push_back( v );            
+                samp.push_back( v );
             }
 
             std::sort( samp.begin(), samp.end() );
@@ -77,7 +77,7 @@ void add_to_log( boost::property_tree::ptree & props, SIterator first, SIterator
     std::ostringstream cur_key;
     props.put( prefix + ".N", (last - first) );
     string ckey = prefix + ".data";
-    unsigned int i = 0;   
+    unsigned int i = 0;
     while( first != last ) {
         cur_key.str("");
         cur_key.clear();
@@ -163,7 +163,7 @@ void test_union( URNG & rgen, const dynamic_subsets & samples, unsigned int test
         oss.str("" );
         oss.clear();
         oss << cprefix << ".results." << i << ".";
-        
+
         string test_key = oss.str();
 
         typedef std::vector< std::pair< size_t, size_t > > pairing_set;
@@ -198,7 +198,7 @@ void test_union( URNG & rgen, const dynamic_subsets & samples, unsigned int test
             props.put( ckey + ".s0", it->first);
             props.put( ckey + ".s1", it->second);
         }
-   }
+    }
 }
 
 void convert( const dynamic_subsets & src, indirect_subsets & dest ) {
@@ -287,7 +287,7 @@ int main(int argc, char ** argv) {
 
             randomly_pair< dynamic_subsets::iterator > paired( samples.begin(), samples.end() );
             paired.generate( rgen, 5 );
-            
+
             oss << "samples.dynamic.test." << union_op.name() << "." << i << ".";
             pt( paired.begin(), paired.end(), paired.start(), union_op, sim_props, oss.str() );
 
@@ -323,7 +323,7 @@ int main(int argc, char ** argv) {
 
             randomly_pair< indirect_subsets::iterator > paired( samples2.begin(), samples2.end() );
             paired.generate( rgen, 5 );
-            
+
             oss << "samples.indirect.test." << union_op.name() << "." << i << ".";
             pt( paired.begin(), paired.end(), paired.start(), union_op, sim_props, oss.str() );
 
@@ -357,22 +357,22 @@ int parse_options( int argc, char ** argv, po::variables_map & vm ) {
 
     po::options_description general( "General options" );
     general.add_options()
-        ( (HELP_K + ",h").c_str(), "Print this stuff" )
+    ( (HELP_K + ",h").c_str(), "Print this stuff" )
     ;
 
     po::options_description params( "Parameters" );
     params.add_options()
-        ( MAX_SUBSETS_K.c_str(), po::value< unsigned int >()->default_value( DEFAULT_SUBSETS ), "Number of subsets to produce")
-        ( MU_K.c_str(), po::value< double >()->default_value( DEFAULT_MU ), "Expected number of elements per subset")
-        ( SAMPLING_SIZE_K.c_str(), po::value< unsigned int >()->default_value( 10 ), "Performance test sample size")
-        ( SEED_K.c_str(), po::value< unsigned long >()->default_value(-1), "Random number generator seed value" )
-        ( (OUTPUT_FILE_K + ",o" ).c_str(), po::value< string >()->default_value(""), "Output file" )
+    ( MAX_SUBSETS_K.c_str(), po::value< unsigned int >()->default_value( DEFAULT_SUBSETS ), "Number of subsets to produce")
+    ( MU_K.c_str(), po::value< double >()->default_value( DEFAULT_MU ), "Expected number of elements per subset")
+    ( SAMPLING_SIZE_K.c_str(), po::value< unsigned int >()->default_value( 10 ), "Performance test sample size")
+    ( SEED_K.c_str(), po::value< unsigned long >()->default_value(-1), "Random number generator seed value" )
+    ( (OUTPUT_FILE_K + ",o" ).c_str(), po::value< string >()->default_value(""), "Output file" )
     ;
 
     po::options_description control("Control");
     control.add_options()
-        ( BINARY_SUBSET_K.c_str(), "Enumerate space elements, and represent subsets as binary sequence")
-        ( DYNAMIC_SUBSET_K.c_str(), "Represent subsets as dynamic sorted vectors [Default]" )
+    ( BINARY_SUBSET_K.c_str(), "Enumerate space elements, and represent subsets as binary sequence")
+    ( DYNAMIC_SUBSET_K.c_str(), "Represent subsets as dynamic sorted vectors [Default]" )
     ;
 
     po::options_description cmdline;
