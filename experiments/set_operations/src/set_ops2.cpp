@@ -8,8 +8,6 @@
 #include <algorithm>
 #include <iterator>
 
-#include <memory>
-
 #include <boost/dynamic_bitset.hpp>
 
 #include <boost/random/mersenne_twister.hpp>
@@ -39,10 +37,10 @@ namespace po=boost::program_options;
 typedef double  value_type;
 
 typedef std::vector< value_type > dynamic_subset_type;
-typedef std::vector< std::shared_ptr< dynamic_subset_type > > dynamic_subsets;
+typedef std::vector< dynamic_subset_type > dynamic_subsets;
 
 typedef active_space_subset< value_type >   indirect_subset_type;
-typedef std::vector< std::shared_ptr< indirect_subset_type > > indirect_subsets;
+typedef std::vector< indirect_subset_type > indirect_subsets;
 
 // FUNCTION PROTOTYPES
 int parse_options( int argc, char ** argv, po::variables_map & vm );
@@ -62,14 +60,13 @@ struct build< SMPLS< SUBSET, REST...> > {
         for( unsigned int i = 0; i < N; ++i ) {
             unsigned int m = ss( rgen );
 
-//            subset_type samp;
-            subset_type samp( new typename subset_type::element_type() );
+            subset_type samp;
             for( unsigned int j = 0; j < m; ++j ) {
                 double v = vdist( rgen );
-                samp->push_back( v );            
+                samp.push_back( v );            
             }
 
-            std::sort( samp->begin(), samp->end() );
+            std::sort( samp.begin(), samp.end() );
             samples.push_back(samp);
         }
     }
@@ -86,13 +83,13 @@ void add_to_log( boost::property_tree::ptree & props, SIterator first, SIterator
         cur_key.clear();
 
         cur_key << ckey << "." << i << ".N";
-        props.put( cur_key.str(), (*first)->size());
-        for( unsigned int j = 0; j < (*first)->size(); ++j) {
+        props.put( cur_key.str(), first->size());
+        for( unsigned int j = 0; j < first->size(); ++j) {
             cur_key.str("");
             cur_key.clear();
 
             cur_key << ckey << "." << i << ".data." << j;
-            props.put( cur_key.str(), (*(*first))[j]);
+            props.put( cur_key.str(), (*first)[j]);
         }
         ++i;
         ++first;
@@ -133,7 +130,7 @@ public:
 //            add_to_log( log, r.begin(), r.end(), ckey + ".result" );
 
             unsigned int i = 0;
-            for( typename OP::result_type::element_type::iterator it = r->begin(); it != r->end(); it++ ) {
+            for( typename OP::result_type::iterator it = r.begin(); it != r.end(); it++ ) {
                 oss.str("");
                 oss.clear();
                 oss << ckey << ".result." << i++;
@@ -147,7 +144,7 @@ public:
     virtual ~PerformanceTester() {}
 };
 
-/*template < class URNG >
+template < class URNG >
 void test_union( URNG & rgen, const dynamic_subsets & samples, unsigned int test_count, unsigned int sampling_rate,  boost::property_tree::ptree & props, const string & prefix ) {
     std::ostringstream oss;
 
@@ -202,14 +199,14 @@ void test_union( URNG & rgen, const dynamic_subsets & samples, unsigned int test
             props.put( ckey + ".s1", it->second);
         }
    }
-}*/
+}
 
 void convert( const dynamic_subsets & src, indirect_subsets & dest ) {
     dest.reserve( src.size() );
     for( dynamic_subsets::const_iterator it = src.begin(); it != src.end(); it++ ) {
-        typename indirect_subsets::value_type s( new typename indirect_subsets::value_type::element_type());
-        for( dynamic_subset_type::const_iterator it2 = (*it)->begin(); it2 != (*it)->end(); it2++) {
-            s->add( *it2 );
+        indirect_subset_type s;
+        for( dynamic_subset_type::const_iterator it2 = it->begin(); it2 != it->end(); it2++) {
+            s.add( *it2 );
         }
         dest.push_back( s );
     }
@@ -279,9 +276,9 @@ int main(int argc, char ** argv) {
     if( vm.count( DYNAMIC_SUBSET_K ) ) {
         std::cerr << "Running dynamic vector set" << std::endl;
 
-        union_operation< dynamic_subsets::iterator, dynamic_subsets::value_type > union_op;
-        intersection_operation< dynamic_subsets::iterator, dynamic_subsets::value_type > inter_op;
-        difference_operation< dynamic_subsets::iterator, dynamic_subsets::value_type > diff_op;
+        union_operation< dynamic_subsets::iterator, dynamic_subset_type > union_op;
+        intersection_operation< dynamic_subsets::iterator, dynamic_subset_type > inter_op;
+        difference_operation< dynamic_subsets::iterator, dynamic_subset_type > diff_op;
 
         PerformanceTester<> pt;
 
@@ -315,9 +312,9 @@ int main(int argc, char ** argv) {
         indirect_subsets samples2;
         convert( samples, samples2);
 
-        union_operation< indirect_subsets::iterator, indirect_subsets::value_type > union_op;
-        intersection_operation< indirect_subsets::iterator, indirect_subsets::value_type > inter_op;
-        difference_operation< indirect_subsets::iterator, indirect_subsets::value_type > diff_op;
+        union_operation< indirect_subsets::iterator, indirect_subset_type > union_op;
+        intersection_operation< indirect_subsets::iterator, indirect_subset_type > inter_op;
+        difference_operation< indirect_subsets::iterator, indirect_subset_type > diff_op;
 
         PerformanceTester<> pt;
 

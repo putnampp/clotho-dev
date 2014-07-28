@@ -63,7 +63,7 @@ public:
     active_space_subset() {}
     active_space_subset( const active_space_subset< ValueType > & other ) :
         m_subset( other.m_subset ) {
-        updateReference();
+//        updateReference();
     }
 
     void add( value_type v ) {
@@ -78,7 +78,7 @@ public:
         size_t p = m_space[ v ];
         if( p != space_type::npos ) {
             if( m_subset[ p ] ) {
-                m_space.releaseValue( p );
+//                m_space.releaseValue( p );
                 m_subset[ p ] = false;
             }
         }
@@ -88,12 +88,12 @@ public:
     iterator end()  { return iterator(this, -1); }
 
     active_space_subset< ValueType > & operator=( const active_space_subset< ValueType > & rhs ) {
-        std::cerr << "Dereferencing " << m_subset.count() << " [" << m_subset.size() << "]" << std::endl;
-        for( iterator it = begin(); it != end(); it++ ) {
-            m_space.releaseValue( it.position() );
-        }
+//        std::cerr << "Dereferencing " << m_subset.count() << " [" << m_subset.size() << "]" << std::endl;
+//        for( iterator it = begin(); it != end(); it++ ) {
+//            m_space.releaseValue( it.position() );
+//        }
         m_subset = rhs.m_subset;
-        updateReference();
+//        updateReference();
         return *this;
     }
 
@@ -109,7 +109,7 @@ public:
             m_subset &= rhs.m_subset;
         }
 
-        updateReference();
+//        updateReference();
         return *this;
     }
     
@@ -122,10 +122,11 @@ public:
             if( m_subset.size() < rhs.m_subset.size() ) {
                 m_subset.resize( rhs.m_subset.size());
             }
+            assert( m_subset.size() != 0 && m_subset.size() == rhs.m_subset.size() );
             m_subset |= rhs.m_subset;
         } 
 
-        updateReference();
+//        updateReference();
         return *this;
     }
 
@@ -140,23 +141,23 @@ public:
             }
             m_subset -= rhs.m_subset;
         } 
-        updateReference();
+//        updateReference();
         return *this;
     }
     virtual ~active_space_subset() {
-        size_t p = m_subset.find_first();
-        while( p != bitset_type::npos ) {
-            m_space.releaseValue( p );
-            p = m_subset.find_next(p);
-        }
+//        size_t p = m_subset.find_first();
+//        while( p != bitset_type::npos ) {
+//            m_space.releaseValue( p );
+//            p = m_subset.find_next(p);
+//        }
     }
 protected:
 
-    inline void updateReference( ) {
-        for( iterator it = begin(); it != end(); it++ ) {
-            m_space.addReference( it.position() );
-        }
-    }
+//    inline void updateReference( ) {
+//        for( iterator it = begin(); it != end(); it++ ) {
+//            m_space.addReference( it.position() );
+//        }
+//    }
     bitset_type         m_subset;
     static space_type   m_space;
 };

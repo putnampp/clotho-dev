@@ -19,8 +19,9 @@ class active_space {
 public:
     typedef ValueType value_type;
     typedef IndirectType indirect_type;
-    typedef std::pair< indirect_type, size_t >          id_count_type;
-    typedef std::map< value_type, id_count_type >       active_space_type;
+//    typedef std::pair< indirect_type, size_t >          id_count_type;
+//    typedef std::map< value_type, id_count_type >       active_space_type;
+    typedef std::map< value_type, indirect_type >       active_space_type;
     typedef std::vector< typename active_space_type::iterator >  indexed_active_space;
     typedef boost::dynamic_bitset<BlockType> bitset_type;
 
@@ -37,32 +38,34 @@ public:
             idx = m_free_space.find_first();
             if( idx == bitset_type::npos ) {
                 idx = m_indexed.size();
-                std::pair< typename active_space_type::iterator, bool > res = m_active.insert( std::make_pair( v, std::make_pair( idx, 1)));
+//                std::pair< typename active_space_type::iterator, bool > res = m_active.insert( std::make_pair( v, std::make_pair( idx, 1)));
+                std::pair< typename active_space_type::iterator, bool > res = m_active.insert( std::make_pair( v, idx));
                 m_indexed.push_back( res.first );
                 m_free_space.push_back(false);
             } else {
                 m_active.erase( m_indexed[ idx ] );
-                std::pair< typename active_space_type::iterator, bool > res = m_active.insert( std::make_pair( v, std::make_pair( idx, 1)));
+//                std::pair< typename active_space_type::iterator, bool > res = m_active.insert( std::make_pair( v, std::make_pair( idx, 1)));
+                std::pair< typename active_space_type::iterator, bool > res = m_active.insert( std::make_pair( v, idx));
                 m_indexed[ idx ] = res.first;
                 m_free_space[ idx ] = false;
             }
         } else {
-            idx = it->second.first;
-            it->second.second++;
+            idx = it->second;
+//            it->second.second++;
         }
         return idx;
     }
 
-    void addReference( indirect_type ind ) {
-        assert( ind < m_indexed.size() );
-        ++m_indexed[ind]->second.second;
-    }
+//    void addReference( indirect_type ind ) {
+//        assert( ind < m_indexed.size() );
+//        ++m_indexed[ind]->second.second;
+//    }
 
-    void releaseValue( indirect_type ind ) {
-        if( --m_indexed[ ind ]->second.second == 0) {
-            m_free_space[ ind ] = true;
-        }
-    }
+//    void releaseValue( indirect_type ind ) {
+//        if( --m_indexed[ ind ]->second.second == 0) {
+//            m_free_space[ ind ] = true;
+//        }
+//    }
 
     value_type      operator[]( indirect_type ind ) {
         assert( !m_free_space[ind] );
@@ -71,7 +74,7 @@ public:
 
     indirect_type operator[]( value_type v ) {
         typename active_space_type::iterator it = m_active.find( v );
-        return (( it == m_active.end() ) ? npos : it->second.first);
+        return (( it == m_active.end() ) ? npos : it->second);
     }
 
     virtual ~active_space() {
