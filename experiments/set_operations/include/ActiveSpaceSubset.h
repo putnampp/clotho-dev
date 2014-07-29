@@ -12,6 +12,8 @@ public:
 
     typedef  bit_iterator< bitset_type >    iterator;
 
+    static size_t enumerated_space_size();
+
     ActiveSpaceSubset();
     ActiveSpaceSubset( const ActiveSpaceSubset & other );
 
@@ -32,6 +34,9 @@ public:
     ActiveSpaceSubset operator&( const ActiveSpaceSubset & rhs ) const;
     ActiveSpaceSubset operator-( const ActiveSpaceSubset & rhs ) const;
     ActiveSpaceSubset operator^( const ActiveSpaceSubset & rhs ) const;
+
+    size_t count() const;
+    size_t num_blocks() const;
 
     virtual ~ActiveSpaceSubset();
 

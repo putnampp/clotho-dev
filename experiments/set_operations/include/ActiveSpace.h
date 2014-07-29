@@ -30,6 +30,8 @@ public:
     value_type      operator[]( indirect_type ind );
     indirect_type operator[]( value_type v );
 
+    size_t size() const;
+
     virtual ~ActiveSpace();
 protected:
     map_type            m_active;

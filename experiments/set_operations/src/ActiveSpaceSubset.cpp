@@ -3,6 +3,10 @@
 // static
 typename ActiveSpaceSubset::space_type ActiveSpaceSubset::m_space;
 
+size_t ActiveSpaceSubset::enumerated_space_size() {
+    return m_space.size();
+}
+
 ActiveSpaceSubset::ActiveSpaceSubset() : m_subset() {}
 
 ActiveSpaceSubset::ActiveSpaceSubset( const ActiveSpaceSubset & other ) :
@@ -116,6 +120,14 @@ ActiveSpaceSubset ActiveSpaceSubset::operator-( const ActiveSpaceSubset & rhs ) 
 ActiveSpaceSubset ActiveSpaceSubset::operator^( const ActiveSpaceSubset & rhs ) const {
     ActiveSpaceSubset tmp( *this );
     return tmp -= rhs;
+}
+
+size_t ActiveSpaceSubset::count() const {
+    return m_subset.count();
+}
+
+size_t ActiveSpaceSubset::num_blocks() const {
+    return m_subset.num_blocks();
 }
 
 ActiveSpaceSubset::~ActiveSpaceSubset() { }

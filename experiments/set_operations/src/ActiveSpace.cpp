@@ -36,6 +36,10 @@ ActiveSpace::indirect_type ActiveSpace::operator[]( value_type v ) {
     return (( it == m_active.end() ) ? npos : it->second);
 }
 
+size_t ActiveSpace::size() const {
+    return m_indexed.size();
+}
+
 ActiveSpace::~ActiveSpace() {
     m_indexed.clear();
     m_active.clear();
