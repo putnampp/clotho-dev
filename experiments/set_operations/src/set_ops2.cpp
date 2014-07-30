@@ -131,7 +131,10 @@ public:
         string all_path = m_prefix;
         string op_path = m_prefix;
 
-        if( m_prefix.back() != '.') { all_path += "."; op_path += "."; }
+        if( m_prefix.back() != '.') {
+            all_path += ".";
+            op_path += ".";
+        }
 
         all_path += "all";
         op_path += op_type;
@@ -162,7 +165,7 @@ public:
         }
 
         if( m_log->get_child_optional( op_path +  ".z" ) == boost::none ||
-            m_log->get_child_optional( op_path + ".z.DataType") == boost::none ) {
+                m_log->get_child_optional( op_path + ".z.DataType") == boost::none ) {
             boost::property_tree::ptree dt;
             m_log->add_child( op_path + ".z.DataType", dt );
         }
@@ -187,7 +190,7 @@ public:
             m_log->add_child( op_path + ".y.smps", smps);
             m_log->add_child( op_path + ".y.data", data);
             m_log->add_child( op_path + ".y.vars", vars);
-        } else { 
+        } else {
             k = m_log->get_child( op_path + ".y.data" ).count( "" );
         }
 
@@ -232,7 +235,7 @@ public:
 
             m_log->get_child(op_path + ".z.DataType").push_back( std::make_pair("", dt));
             m_log->get_child(all_path + ".z.DataType").push_back( std::make_pair("", dt));
-            
+
             boost::property_tree::ptree oper;
             oper.put( "", op.operation_name() );
             m_log->get_child(all_path + ".z.OperationType").push_back( std::make_pair("", oper ));
@@ -473,16 +476,16 @@ int main(int argc, char ** argv) {
 
     sim_props.put( "runtime.units", "seconds");
 
-    
+
     boost::random::poisson_distribution< unsigned int, double> poisson(mu);
     dynamic_subsets samples;
     if( vm[ MAX_UNIQUE_VALUES_K ].as< unsigned int >() == INFINITE_SPACE ) {
         sim_props.put( "value_space.max_size", "infinite");
         typedef boost::random::uniform_01< double > value_space_type;
-        typedef sample_generator< dynamic_subsets::value_type, 
-                    boost::random::mt19937, 
-                    boost::random::poisson_distribution< unsigned int, double>, 
-                    value_space_type > sample_gen_type;
+        typedef sample_generator< dynamic_subsets::value_type,
+                boost::random::mt19937,
+                boost::random::poisson_distribution< unsigned int, double>,
+                value_space_type > sample_gen_type;
         value_space_type uni;
 
         std::generate_n( std::back_inserter( samples ), N, sample_gen_type( rgen, poisson, uni ) );
