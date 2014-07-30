@@ -50,6 +50,11 @@ void difference_operation< ActiveSpaceSubset, ActiveSpaceSubset >::operator()( c
     res = (s1 - s2);
 }
 
+template < >
+void symmetric_difference_operation< ActiveSpaceSubset, ActiveSpaceSubset >::operator()( const ActiveSpaceSubset & s1, const ActiveSpaceSubset & s2, ActiveSpaceSubset & res )  {
+    res = (s1 ^ s2);
+}
+
 namespace po=boost::program_options;
 
 typedef ActiveSpaceSubset::value_type       value_type;
@@ -97,6 +102,16 @@ size_t result_size( const ActiveSpaceSubset & s ) {
     return s.count();
 }
 
+string data_type( const std::vector< double > & s ) {
+    static string res("dynamic");
+    return res;
+}
+
+string data_type( const ActiveSpaceSubset & s ) {
+    static string res("binary");
+    return res;
+}
+
 template < class LogType = boost::property_tree::ptree >
 class PerformanceTester {
 public:
@@ -111,7 +126,71 @@ public:
 
         INIT_LAPSE_TIME;
 
+        string op_type = op.operation_name();
+
+        string all_path = m_prefix;
+        string op_path = m_prefix;
+
+        if( m_prefix.back() != '.') { all_path += "."; op_path += "."; }
+
+        all_path += "all";
+        op_path += op_type;
+
+        if( m_log->get_child_optional( all_path ) == boost::none ) {
+            boost::property_tree::ptree dt;
+            m_log->add_child( all_path + ".z.DataType", dt );
+            m_log->add_child( all_path + ".z.OperationType", dt );
+
+            boost::property_tree::ptree data;
+            boost::property_tree::ptree smps;
+            boost::property_tree::ptree vars;
+
+            boost::property_tree::ptree _1, _2, _3, _4;
+            _1.put( "", "Set1 Size");
+            _2.put( "", "Set2 Size");
+            _3.put( "", "Result Size");
+            _4.put( "", "Runtime");
+
+            smps.push_back( std::make_pair( "", _1));
+            smps.push_back( std::make_pair( "", _2));
+            smps.push_back( std::make_pair( "", _3));
+            smps.push_back( std::make_pair( "", _4));
+
+            m_log->add_child( all_path + ".y.smps", smps);
+            m_log->add_child( all_path + ".y.data", data);
+            m_log->add_child( all_path + ".y.vars", vars);
+        }
+
+        if( m_log->get_child_optional( op_path +  ".z" ) == boost::none ||
+            m_log->get_child_optional( op_path + ".z.DataType") == boost::none ) {
+            boost::property_tree::ptree dt;
+            m_log->add_child( op_path + ".z.DataType", dt );
+        }
+
         unsigned int k = 0;
+        if( m_log->get_child_optional( op_path + ".y" ) == boost::none) {
+            boost::property_tree::ptree data;
+            boost::property_tree::ptree smps;
+            boost::property_tree::ptree vars;
+
+            boost::property_tree::ptree _1, _2, _3, _4;
+            _1.put( "", "Set1 Size");
+            _2.put( "", "Set2 Size");
+            _3.put( "", "Result Size");
+            _4.put( "", "Runtime");
+
+            smps.push_back( std::make_pair( "", _1));
+            smps.push_back( std::make_pair( "", _2));
+            smps.push_back( std::make_pair( "", _3));
+            smps.push_back( std::make_pair( "", _4));
+
+            m_log->add_child( op_path + ".y.smps", smps);
+            m_log->add_child( op_path + ".y.data", data);
+            m_log->add_child( op_path + ".y.vars", vars);
+        } else { 
+            k = m_log->get_child( op_path + ".y.data" ).count( "" );
+        }
+
         while( first != last ) {
             typename OP::result_type r;
             RECORD_START;
@@ -123,20 +202,40 @@ public:
             PRINT_LAPSE( oss, "" );
             string val = oss.str().substr(0, oss.str().size() - 1);
 
-            oss.str( "" );
-            oss.clear();
-            oss << m_prefix << "lapse." << k;
-            m_log->put( oss.str(), val );
+            boost::property_tree::ptree smp;
+
+            boost::property_tree::ptree s1, s2, s3, s4, s5;
+            s1.put( "", result_size((*first->first)));
+            s2.put( "", result_size((*first->second)));
+            s3.put( "", result_size(r));
+            s4.put( "", val );
+
+            smp.push_back( std::make_pair( "", s1) );
+            smp.push_back( std::make_pair( "", s2) );
+            smp.push_back( std::make_pair( "", s3) );
+            smp.push_back( std::make_pair( "", s4) );
 
             oss.str("");
             oss.clear();
-            oss  << m_prefix << "result.count." << k;
-            m_log->put( oss.str(), result_size( r ) );
+            oss << "s" << k;
+            boost::property_tree::ptree v;
+            v.put("", oss.str() );
 
-            oss.str("");
-            oss.clear();
-            oss  << m_prefix << "result.bytes." << k;
-            m_log->put( oss.str(), computeMemoryUsage( r ) );
+            m_log->get_child(op_path + ".y.vars").push_back( std::make_pair("", v));
+            m_log->get_child(op_path + ".y.data").push_back( std::make_pair("", smp));
+
+            m_log->get_child(all_path + ".y.vars").push_back( std::make_pair("", v) );
+            m_log->get_child(all_path + ".y.data").push_back( std::make_pair("", smp) );
+
+            boost::property_tree::ptree dt;
+            dt.put( "", data_type(r) );
+
+            m_log->get_child(op_path + ".z.DataType").push_back( std::make_pair("", dt));
+            m_log->get_child(all_path + ".z.DataType").push_back( std::make_pair("", dt));
+            
+            boost::property_tree::ptree oper;
+            oper.put( "", op.operation_name() );
+            m_log->get_child(all_path + ".z.OperationType").push_back( std::make_pair("", oper ));
 
             ++first;
             ++k;
@@ -200,27 +299,40 @@ struct simulator {
             string round_prefix = oss.str();
 
             {
-                PerformanceTester<> pt( sim_props, round_prefix + ".union." );
+                PerformanceTester<> pt( sim_props, round_prefix );
                 pt( pairs.begin(), pairs.end(), union_operation< typename SAMPLES::value_type >() );
             }
 
             {
-                PerformanceTester<> pt( sim_props, round_prefix + ".intersection." );
+                PerformanceTester<> pt( sim_props, round_prefix );
                 pt( pairs.begin(), pairs.end(), intersection_operation< typename SAMPLES::value_type >() );
             }
 
             {
-                PerformanceTester<> pt( sim_props, round_prefix + ".difference." );
+                PerformanceTester<> pt( sim_props, round_prefix );
                 pt( pairs.begin(), pairs.end(), difference_operation< typename SAMPLES::value_type >() );
             }
 
-            string tmpk = round_prefix + ".pairs.";
+            {
+                PerformanceTester<> pt( sim_props, round_prefix );
+                pt( pairs.begin(), pairs.end(), symmetric_difference_operation< typename SAMPLES::value_type >() );
+            }
+
+            string tmpk = round_prefix + ".pairs." + data_type(samples[0]);
+            if( sim_props->get_child_optional( tmpk ) == boost::none ) {
+                boost::property_tree::ptree pt;
+                sim_props->add_child( tmpk, pt);
+            }
+
             for( unsigned int j = 0; j < pairs.size(); ++j) {
-                oss.str("");
-                oss.clear();
-                oss << tmpk << j;
-                sim_props->put( oss.str() + ".first", pairs[ j ].first - samples.begin() );
-                sim_props->put( oss.str() + ".second", pairs[ j ].second - samples.begin() );
+                boost::property_tree::ptree c1, c2, p;
+                c1.put( "", (pairs[j].first - samples.begin()));
+                c2.put( "", (pairs[j].second - samples.begin()));
+
+                p.push_back( std::make_pair( "", c1));
+                p.push_back( std::make_pair( "", c2));
+
+                sim_props->get_child( tmpk ).push_back( std::make_pair( "", p ));
             }
         }
     }
@@ -356,15 +468,24 @@ int main(int argc, char ** argv) {
     std::cerr << "Each object is expected to have " << mu << " elements (Poisson Distributed)" << std::endl;
     std::cerr << "Elements are random values in [0, 1) following a Uniform Distribution" << std::endl;
 
-    dynamic_subsets samples;
+    unsigned int nReps = vm[ REPETITION_K ].as< unsigned int >();
+    unsigned int nCases = N * vm[ TEST_CASE_RATE_K ].as< double >();
 
+    sim_props.put( "runtime.units", "seconds");
+
+    
     boost::random::poisson_distribution< unsigned int, double> poisson(mu);
+    dynamic_subsets samples;
     if( vm[ MAX_UNIQUE_VALUES_K ].as< unsigned int >() == INFINITE_SPACE ) {
         sim_props.put( "value_space.max_size", "infinite");
         typedef boost::random::uniform_01< double > value_space_type;
+        typedef sample_generator< dynamic_subsets::value_type, 
+                    boost::random::mt19937, 
+                    boost::random::poisson_distribution< unsigned int, double>, 
+                    value_space_type > sample_gen_type;
         value_space_type uni;
 
-        std::generate_n( std::back_inserter( samples ), N, sample_generator< dynamic_subsets::value_type, boost::random::mt19937, boost::random::poisson_distribution< unsigned int, double>, boost::random::uniform_01< double > >( rgen, poisson, uni ) );
+        std::generate_n( std::back_inserter( samples ), N, sample_gen_type( rgen, poisson, uni ) );
     } else {
         sim_props.put( "value_space.max_size", vm[ MAX_UNIQUE_VALUES_K ].as< unsigned int >() );
         typedef fixed_value_space< boost::random::uniform_01< double >, constant_weight > value_space_type;
@@ -383,15 +504,12 @@ int main(int argc, char ** argv) {
     bool bRanAnalysis = false;
     simulator sim( sim_props, rgen );
 
-    unsigned int nReps = vm[ REPETITION_K ].as< unsigned int >();
-    unsigned int nCases = N * vm[ TEST_CASE_RATE_K ].as< double >();
-
-    sim_props.put( "lapse.units", "seconds");
+    sim_props.put( "runtime.units", "seconds");
 
     if( vm.count( DYNAMIC_SUBSET_K ) ) {
         std::cerr << "Running dynamic vector set" << std::endl;
 
-        sim( samples, nReps, nCases, "dynamic" );
+        sim( samples, nReps, nCases, "cases" );
 
         bRanAnalysis = true;
     }
@@ -402,7 +520,7 @@ int main(int argc, char ** argv) {
         indirect_subsets samples2;
         convert( samples, samples2);
 
-        sim( samples2, nReps, nCases, "indirect" );
+        sim( samples2, nReps, nCases, "cases" );
 
         sim_props.put( "value_space.enumerated", ActiveSpaceSubset::enumerated_space_size());
         bRanAnalysis = true;

@@ -13,6 +13,11 @@ struct intersection_operation {
     void operator()( const set_type & s1, const set_type & s2, result_type & res ) {
         std::set_intersection( s1.begin(), s1.end(), s2.begin(), s2.end(), std::back_inserter( res ) );
     }
+
+    std::string operation_name() {
+        static const std::string n( "intersection" );
+        return n;
+    }
 };
 
 #endif  // INTERSECTION_OPERATION_HPP_
