@@ -25,7 +25,7 @@ struct iRNG {
 
     /*
     * Common Distribution interfaces
-    */ 
+    */
     virtual unsigned int    nextPoisson( double mu ) = 0;
 
     virtual ~iRNG() {}

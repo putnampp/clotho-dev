@@ -12,7 +12,7 @@ class variant_base : public genetic_region {
 public:
     typedef ObjectManager< variant_base > object_manager_t;
     typedef variant_base * pointer;
-    
+
     variant_base() : genetic_region(0) {}
     variant_base( const key_t & k, double cSelection, double cDominance, variant_flags f);
     variant_base( const chromosome_t & c, pos_t s, double cSelection, double cDominance, variant_flags f);
@@ -36,7 +36,9 @@ public:
     virtual ~variant_base();
 
 protected:
-    inline bool check_flag( variant_flags f ) const { return (m_flags & f); }
+    inline bool check_flag( variant_flags f ) const {
+        return (m_flags & f);
+    }
 
     unsigned int  m_penetrance;
 

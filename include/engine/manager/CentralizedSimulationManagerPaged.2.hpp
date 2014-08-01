@@ -96,8 +96,8 @@ CentralizedSimulationManager<E, O>::CentralizedSimulationManager( shared_ptr< ap
     m_nProcessedEvents(0),
     m_nRegisteredObjs(0),
     m_nUnregisterCalls(0),
-    m_stats( new SimulationStats() )
-{}
+    m_stats( new SimulationStats() ) {
+}
 
 template < class E, class O >
 CentralizedSimulationManager<E,O>::CentralizedSimulationManager( shared_ptr< application > app, shared_ptr< SimulationStats > stats, system_id::manager_id_t id ) :
@@ -110,8 +110,8 @@ CentralizedSimulationManager<E,O>::CentralizedSimulationManager( shared_ptr< app
     m_nProcessedEvents(0),
     m_nRegisteredObjs(0),
     m_nUnregisterCalls(0),
-    m_stats( stats )
-{}
+    m_stats( stats ) {
+}
 
 template < class E, class O >
 CentralizedSimulationManager<E, O>::~CentralizedSimulationManager() {
@@ -265,19 +265,19 @@ void CentralizedSimulationManager<E, O>::simulate( const vtime_t & until ) {
     while( timestamp != SystemClock::POSITIVE_INFINITY && !setSimulationTime( timestamp ) ) {
         paged_event_pool_t * tmp_evts = it->second;
         typename paged_event_pool_t::event_page_t * pg = tmp_evts->getReadPage();
-    
+
         while( pg != NULL ) {
             object_t * obj = NULL;
             typename paged_event_pool_t::iterator pg_it = pg->begin();
 
             while( pg_it != pg->end() ) {
-                
+
                 event_t * evt = pg_it.getEvent();
                 if( obj == NULL || pg_it.HasObjectChanged() ) {
                     system_id::object_id_t oid = evt->getReceiver().getObjectID();
                     obj = m_objects[ oid ].first;
                     obj->updateLocalTime(timestamp);
-                    assert( obj->getEventPerformer() != NULL );              
+                    assert( obj->getEventPerformer() != NULL );
                 }
 
                 obj->getEventPerformer()->perform_event( evt );

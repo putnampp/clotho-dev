@@ -23,7 +23,7 @@ public:
     typedef allele          allele_t;
 
 //    typedef std::pair< locus_t, allele_t > symbol_type;
-    
+
     // using set and multimap (log(size) lookup) b/c unordered version
     // will invalid iterators upon rehash (resize)
     typedef std::size_t                         index_type;
@@ -54,7 +54,7 @@ public:
     static pointer getInstance() {
         static pointer instance(new AlleleAlphabet());
         return instance;
-    } 
+    }
 
     index_type  getSymbol( const locus_t & l, const allele_t & a, bool createNew = true );
     void     updateFreeSymbols( const bitset_type & fs );
@@ -74,20 +74,28 @@ public:
     adjacency_iterator begin( edge_set_type * es );
     adjacency_iterator end( edge_set_type * es );
 
-    alleles_type::iterator end_allele() { return m_alleles.end(); }
+    alleles_type::iterator end_allele() {
+        return m_alleles.end();
+    }
 
-    locus_iterator          end_db() { return m_db.end(); }
+    locus_iterator          end_db() {
+        return m_db.end();
+    }
 
-    size_t  active_count() const { return m_active.size() - m_free_list.count(); }
-    size_t  fixed_lost_count() const { return m_free_list.count(); }
+    size_t  active_count() const {
+        return m_active.size() - m_free_list.count();
+    }
+    size_t  fixed_lost_count() const {
+        return m_free_list.count();
+    }
 
     virtual ~AlleleAlphabet();
 protected:
     alleles_type    m_alleles;
     variant_db_t    m_db;
- 
+
     active_database_type    m_active;
-  
+
     bitset_type     m_free_list, m_free_intersect, m_free_union;
 };
 

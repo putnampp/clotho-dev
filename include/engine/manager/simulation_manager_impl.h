@@ -5,10 +5,9 @@
 #include "simulation_manager_event_manager.h"
 
 template < class ES >
-class SimulationManager : 
+class SimulationManager :
     virtual public simulation_manager,
-    virtual public SimulationManagerEventManager< ES >
-{
+    virtual public SimulationManagerEventManager< ES > {
 public:
     const system_id & getSystemID() const {
         return m_id;
@@ -30,13 +29,13 @@ public:
 protected:
     SimulationManager( system_id::manager_id_t man_id  ) :
         m_id( man_id, -1 )
-        , m_next_object_id(0)
-    { }
+        , m_next_object_id(0) {
+    }
 
     void setID( const system_id & id ) {
         m_id = id;
     }
-    
+
     system_id   m_id;
     system_id::object_id_t   m_next_object_id;
 };

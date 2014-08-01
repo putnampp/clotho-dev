@@ -3,13 +3,13 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
+ * modification, are permitted provided that the following conditions are met:
  *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
+ *    and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -80,7 +80,7 @@ public:
         }
         return it->second;
     }
-    
+
     Locus::Ptr getLocus( const locus_id & id ) {
         locus_iterator it = m_loci->find( lp );
         if( it == m_loci->end() ) {
@@ -195,7 +195,7 @@ public:
 
         phenotyper * p = m_phenotypers[tidx];
 
-        if( p != NULL ) 
+        if( p != NULL )
             return p->addIndexedGenotyper( lidx );
 
         return false;
@@ -203,13 +203,17 @@ public:
 
 
     virtual double computeGenotype( locus_index_t locus, const copy_group_ptr la ) const;
-    
+
     double computePhenotype( const string & trait, const copy_group_ptr ag, const environmental * env ) const;
     double computePhenotype( TraitPtr t, const copy_group_ptr ag, const environmental * env ) const;
     virtual double computePhenotype( trait_index_t trait, const copy_group_ptr ag, const environmental * env ) const;
 
-    inline size_t getLociCount() const { return m_loci->size(); }
-    inline size_t getTraitCount() const { return m_trait->size(); }
+    inline size_t getLociCount() const {
+        return m_loci->size();
+    }
+    inline size_t getTraitCount() const {
+        return m_trait->size();
+    }
 
     copy_group_ptr createLociAlleles() const {
         return allele_group::createAlleleCopyGroup( m_loci );

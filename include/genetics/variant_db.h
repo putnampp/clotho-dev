@@ -11,9 +11,9 @@
 #include <boost/bimap/list_of.hpp>
 
 template < typename L, typename A,
-            typename LH = std::hash< L >,
-            typename LE = std::equal_to< L >
-         >
+           typename LH = std::hash< L >,
+           typename LE = std::equal_to< L >
+           >
 class VariantDB {
 public:
     typedef L   locus_t;
@@ -28,9 +28,9 @@ public:
 //
 //
     typedef boost::bimaps::bimap <
-        boost::bimaps::unordered_multiset_of< locus_t, LH, LE >,
-        boost::bimaps::multiset_of< allele_t >,
-        boost::bimaps::list_of_relation > locus_allele_map;
+    boost::bimaps::unordered_multiset_of< locus_t, LH, LE >,
+          boost::bimaps::multiset_of< allele_t >,
+          boost::bimaps::list_of_relation > locus_allele_map;
 
     typedef locus_allele_map::value_type     locus_allele_t;
     typedef locus_allele_map::const_iterator symbol_t;

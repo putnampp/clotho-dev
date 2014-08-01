@@ -14,7 +14,7 @@ public:
 
     typedef ManagedPage< _node, O > object_page_t;
 protected:
-    
+
 };
 
 #endif  // NODE_LIST_HPP_

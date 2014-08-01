@@ -3,13 +3,13 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
+ * modification, are permitted provided that the following conditions are met:
  *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
+ *    and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -64,7 +64,7 @@ struct index_space : public enumerable {
  *
  * It assumes that dimensions are expressed in row-major order. In other words,
  * the last dimension is considered to be continuous.
- * 
+ *
  ******************************************************************************/
 template < unsigned char R >
 class IndexSpace : public index_space {
@@ -73,17 +73,17 @@ public:
 
     }
 
-/*****
- *  Default constructor for creating a square IndexSpace
- *
- *  Each dimension has the same limit value
- ****/
+    /*****
+     *  Default constructor for creating a square IndexSpace
+     *
+     *  Each dimension has the same limit value
+     ****/
     IndexSpace( uint32_t limit ) : m_offset(0), m_maxIndex(0), m_bUpToDate(false) {
         for( int i = 0; i < RANK; ++i ) {
             this->m_dims[i] = limit;
         }
     }
-    
+
     IndexSpace( uint32_t * limits, value_t * coords, size_t rank = RANK ) : m_offset(0), m_maxIndex(0), m_bUpToDate(false) {
         memcpy( this->m_dims, dims, RANK * sizeof( uint32_t ) );
         memcpy( this->m_coords, coords, RANK * sizeof(uint32_t) );

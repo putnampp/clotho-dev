@@ -19,7 +19,7 @@ public:
     typedef value_t::key_t key_t;    // assuming, for the moment, that key_t is double
     typedef value_t *   value_ptr_t;
 
- //   typedef std::unordered_map< key_t, value_ptr_t, std::hash< key_t >, equal_eps< key_t > > lookup_map_t;
+//   typedef std::unordered_map< key_t, value_ptr_t, std::hash< key_t >, equal_eps< key_t > > lookup_map_t;
     typedef std::unordered_map< key_t, value_ptr_t > lookup_map_t;
 
     typedef typename lookup_map_t::iterator iterator;
@@ -34,12 +34,12 @@ public:
 
     basic_variant_map( ) {}
 
-/*
- *  By default variant_map assumes an infite site model for every
- *  variant type (VT).  Thus we randomly generate a key value from
- *  the uniform distribution that does not exist within the current
- *  pool of variants.
- */
+    /*
+     *  By default variant_map assumes an infite site model for every
+     *  variant type (VT).  Thus we randomly generate a key value from
+     *  the uniform distribution that does not exist within the current
+     *  pool of variants.
+     */
     value_ptr_t createNewVariant() {
         key_t   k = RandomProcess::getRNG()->nextUniform();
         while( is_known(k) ) {

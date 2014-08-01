@@ -38,7 +38,7 @@ struct pword_allele_mask {
     inline const PWORD operator[]( size_t mask_idx ) const {
         return pword_masks[ mask_idx ];
     }
-    
+
     pword_allele_mask() { }
     virtual ~pword_allele_mask() {}
 };

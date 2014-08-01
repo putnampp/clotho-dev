@@ -64,7 +64,7 @@ public:
 
     virtual void perform_event( const event * e ) {}
 
-    virtual void finalize() { 
+    virtual void finalize() {
         if( m_sim_manager )
             m_sim_manager->unregisterObject( this );
     }
@@ -102,16 +102,15 @@ protected:
         m_id(),
         m_sim_manager( NULL ),
         m_local_time( SystemClock::ZERO ),
-        m_next_eid( 0 )
-    {}
+        m_next_eid( 0 ) {
+    }
 
 
     Object( simulation_manager * manager ) :
         m_id(),
         m_sim_manager( NULL ),
         m_local_time( SystemClock::ZERO ),
-        m_next_eid(0)
-    {
+        m_next_eid(0) {
         setSimulationManager( manager );
     }
 

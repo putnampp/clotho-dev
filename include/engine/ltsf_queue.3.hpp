@@ -28,24 +28,24 @@ public:
             } _ltsf;
 
             d( ) : _object() {}
-                
+
         } _data;
         size_t  next, prev;
         _node() :
             _data(),
             next( UNKNOWN_INDEX ),
-            prev( UNKNOWN_INDEX )
-        {}
+            prev( UNKNOWN_INDEX ) {
+        }
     };
 
     ltsf_queue( ) :
         m_head(NULL),
 //        m_available_node( UNKNOWN_INDEX ),
-        //m_unset_object(UNKNOWN_INDEX), 
-        m_root( UNKNOWN_INDEX ), 
+        //m_unset_object(UNKNOWN_INDEX),
+        m_root( UNKNOWN_INDEX ),
         //m_available( UNKNOWN_INDEX ),
-        m_nEnqueued(0)
-    { }
+        m_nEnqueued(0) {
+    }
 
     object_ptr getPoolObject( size_t pool_idx ) {
         assert( pool_idx < m_nodes.size() );
@@ -120,26 +120,26 @@ public:
         return res;
     }
 
-/*    object_ptr getNextObject( vtime_t t ) {
-        if( m_root != UNKNOWN_INDEX ) {
-            ltsf_node & rnode = m_nodes[m_root];
+    /*    object_ptr getNextObject( vtime_t t ) {
+            if( m_root != UNKNOWN_INDEX ) {
+                ltsf_node & rnode = m_nodes[m_root];
 
-            if( rnode.timestamp == t ) {
-                _object & n = m_objects[rnode.head];
-    
-                rnode.head = n.next;
-                if( rnode.head == UNKNOWN_INDEX ) {
-                    remove_ltsf_node( m_root );
+                if( rnode.timestamp == t ) {
+                    _object & n = m_objects[rnode.head];
+
+                    rnode.head = n.next;
+                    if( rnode.head == UNKNOWN_INDEX ) {
+                        remove_ltsf_node( m_root );
+                    }
+
+                    n.queue = UNKNOWN_INDEX;
+                    n.next = UNKNOWN_INDEX;
+                    n.prev = UNKNOWN_INDEX;
+                    return n.object;
                 }
-
-                n.queue = UNKNOWN_INDEX;
-                n.next = UNKNOWN_INDEX;
-                n.prev = UNKNOWN_INDEX;
-                return n.object;
             }
-        }
-        return NULL;
-    }*/
+            return NULL;
+        }*/
 
     void dump( std::ostream & o ) {
         size_t tmp_idx = m_root;
@@ -196,35 +196,35 @@ public:
             assert( obj._data._object.queue == UNKNOWN_INDEX );
         }
 
-/*        size_t p = UNKNOWN_INDEX;
-        q = m_root;
+        /*        size_t p = UNKNOWN_INDEX;
+                q = m_root;
 
-        while( q != UNKNOWN_INDEX ) {
-            _node & qnode = m_nodes[q];
-            vtime_t ts = qnode._data._ltsf.timestamp;
+                while( q != UNKNOWN_INDEX ) {
+                    _node & qnode = m_nodes[q];
+                    vtime_t ts = qnode._data._ltsf.timestamp;
 
-            if( ts < t ) {
-                p = q;
-                q = qnode.next;
-            } else if( ts == t ) {
-                break;
-            } else {
-                // ltsf pool does not have node for
-                // current timestamp t, but
-                // it should be inserted after the
-                // current p
-                //
-                q = UNKNOWN_INDEX;
-                break;
-            }
-        }
-        
-        if( q == UNKNOWN_INDEX ) {
-            // there are currently no queues
-            q = getLTSFNode( t );
+                    if( ts < t ) {
+                        p = q;
+                        q = qnode.next;
+                    } else if( ts == t ) {
+                        break;
+                    } else {
+                        // ltsf pool does not have node for
+                        // current timestamp t, but
+                        // it should be inserted after the
+                        // current p
+                        //
+                        q = UNKNOWN_INDEX;
+                        break;
+                    }
+                }
 
-            insert_ltsf_node_after(q, p);
-        }*/
+                if( q == UNKNOWN_INDEX ) {
+                    // there are currently no queues
+                    q = getLTSFNode( t );
+
+                    insert_ltsf_node_after(q, p);
+                }*/
 
         insert_object_to_ltsf_node( o_idx, q );
 
@@ -256,7 +256,7 @@ protected:
                 break;
             }
         }
-        
+
         if( q == UNKNOWN_INDEX ) {
             // there are currently no queues
             q = getLTSFNode( t );
@@ -371,7 +371,7 @@ protected:
     }
 
     object_ptr m_head;
-    size_t m_root; 
+    size_t m_root;
     size_t m_nEnqueued;
 
     static std::vector< _node > m_nodes;

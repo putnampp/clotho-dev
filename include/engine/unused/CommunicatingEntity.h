@@ -5,7 +5,7 @@ struct CommunicatingEntity {
     typedef string identifier_t;
 
     virtual identifier_t    getIdentifier() const = 0;
-    virtual void            receiveKernelMessage   
+    virtual void            receiveKernelMessage
     virtual ~CommunicatingEntity() {}
 };
 

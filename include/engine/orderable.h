@@ -5,7 +5,9 @@ template < class CLOCK >
 class orderable {
 public:
     typedef CLOCK   logical_clock_t;
-    CLOCK getTime() const { return m_time; }
+    CLOCK getTime() const {
+        return m_time;
+    }
     virtual bool operator<( const orderable< CLOCK > & rhs ) const {
         return m_time < rhs.m_time;
     }

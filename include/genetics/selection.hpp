@@ -30,10 +30,10 @@ public:
         assert(false);
     }
 
-/**
- *  by default this selection just returns the input param
- *  ie. selfing (cloning) reproduction scheme
- */
+    /**
+     *  by default this selection just returns the input param
+     *  ie. selfing (cloning) reproduction scheme
+     */
     template < class ENV, typename PARAM, typename RES = PARAM >
     static RES select( ENV * env, PARAM p, parameter_t * c ) {
         return p;

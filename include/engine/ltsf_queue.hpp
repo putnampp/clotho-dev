@@ -67,7 +67,7 @@ public:
                 break;
             }
         }
-        
+
         bool res = false;
         if( q == NULL ) {
             // there is no queue for this timestamp

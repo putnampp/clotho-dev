@@ -10,7 +10,7 @@ public:
     typedef unsigned char gamete_type_t;
 
     typedef _gamete_id< gamete_key_t, gamete_source_t, gamete_type_t > gamete_id_t;
-    
+
     gamete_base( ) : m_id(0) {}
     gamete_base( gamete_source_t s, gamete_type_t t ) : m_id(s, t ) {}
     gamete_base( const gamete_id_t & cid ) : m_id( cid ) {}

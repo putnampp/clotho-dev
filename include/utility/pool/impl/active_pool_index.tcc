@@ -18,29 +18,29 @@ public:
         queue_node   * queue;
         size_t next, prev;
 
-        object_node( size_t idx ) : 
-            node_idx(idx), 
-            object( UNKNOWN_INDEX ), 
-            queue(NULL), 
-            next(UNKNOWN_INDEX ), 
-            prev(UNKNOWN_INDEX) 
-        {}
+        object_node( size_t idx ) :
+            node_idx(idx),
+            object( UNKNOWN_INDEX ),
+            queue(NULL),
+            next(UNKNOWN_INDEX ),
+            prev(UNKNOWN_INDEX) {
+        }
 
-        object_node( size_t idx, object_t o, queue_node * q, size_t n = UNKNOWN_INDEX, size_t p = UNKNOWN_INDEX) : 
-            node_idx(idx), 
-            object(o), 
-            queue(q), 
-            next(n), 
-            prev(p) 
-        {}
+        object_node( size_t idx, object_t o, queue_node * q, size_t n = UNKNOWN_INDEX, size_t p = UNKNOWN_INDEX) :
+            node_idx(idx),
+            object(o),
+            queue(q),
+            next(n),
+            prev(p) {
+        }
 
         object_node( const object_node & n ) :
             node_idx(n.node_idx),
             object(n.object),
             queue(n.queue),
             next(n.next),
-            prev(n.prev)
-        {}
+            prev(n.prev) {
+        }
     };
 
     struct queue_node {
@@ -232,7 +232,7 @@ protected:
 
     size_t getObjectNode( ) {
         size_t idx = UNKNOWN_INDEX;
- 
+
         if( m_unset_object.head != UNKNOWN_INDEX ) {
             idx = m_unset_object.head;
             remove_object_from_queue( idx );

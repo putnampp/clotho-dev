@@ -28,7 +28,7 @@ public:
             SET_INUSE = (1 << ( sizeof( offset_t ) * 8 - 1 )),
             UNSET_INUSE = ~SET_INUSE,
             IDX_OFFSET = offsetof( struct _node, obj)
-    };
+         };
 
 
     header_t    * header;
@@ -36,9 +36,8 @@ public:
 
     static const ManagedPage< H, O, S> TEMPLATE;
 
-    ManagedPage( const ManagedPage< H, O, S > & src ) : 
-        header(NULL) 
-    {
+    ManagedPage( const ManagedPage< H, O, S > & src ) :
+        header(NULL) {
         memcpy( objects, src.objects, sizeof( _node ) * COUNT );
     }
 
@@ -54,7 +53,7 @@ public:
     template < class FNC >
     object_t * getObject( header_t * h ) {
         static FNC pred;
-        
+
         object_t * obj = pred(h, objects);
 
         return obj;
@@ -80,9 +79,8 @@ public:
     virtual ~ManagedPage() { }
 
 protected:
-    ManagedPage( ) : 
-        header(NULL) 
-    {
+    ManagedPage( ) :
+        header(NULL) {
         offset_t id = 0;
         _node * tmp = objects;
 

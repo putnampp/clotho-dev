@@ -93,8 +93,8 @@ CentralizedSimulationManager<E, O>::CentralizedSimulationManager( shared_ptr< ap
     m_nProcessedEvents(0),
     m_nRegisteredObjs(0),
     m_nUnregisterCalls(0),
-    m_stats( new SimulationStats() )
-{}
+    m_stats( new SimulationStats() ) {
+}
 
 template < class E, class O >
 CentralizedSimulationManager<E,O>::CentralizedSimulationManager( shared_ptr< application > app, shared_ptr< SimulationStats > stats, system_id::manager_id_t id ) :
@@ -107,8 +107,8 @@ CentralizedSimulationManager<E,O>::CentralizedSimulationManager( shared_ptr< app
     m_nProcessedEvents(0),
     m_nRegisteredObjs(0),
     m_nUnregisterCalls(0),
-    m_stats( stats )
-{}
+    m_stats( stats ) {
+}
 
 template < class E, class O >
 CentralizedSimulationManager<E, O>::~CentralizedSimulationManager() {
@@ -185,7 +185,7 @@ void CentralizedSimulationManager<E, O>::moveObject( object_t * obj, vtime_t new
                 // object is not at the end of vector
                 // swap with object at the end of the vector
                 // and update that objects offset value to
-                // be that of the current obj 
+                // be that of the current obj
                 system_id::object_id_t other = g->back()->getObjectID();
 
 //                (*g)[ pto.second ] = g->back();

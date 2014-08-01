@@ -30,8 +30,8 @@ protected:
     Object( ) :
         m_id(0),
         m_local_time( SystemClock::ZERO ),
-        m_next_eid( 0 )
-    {}
+        m_next_eid( 0 ) {
+    }
 
     void setID( const system_id & id ) {
         m_id = id;

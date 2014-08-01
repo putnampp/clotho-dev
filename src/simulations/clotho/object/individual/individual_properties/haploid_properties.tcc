@@ -12,8 +12,8 @@ public:
 
     individual_props() :
         p0_id( ),
-        p0( NULL )
-    {}
+        p0( NULL ) {
+    }
 
     void died() {
         setDOB( SystemClock::POSITIVE_INFINITY);
@@ -29,10 +29,14 @@ public:
             m_dob = d;
         }
     }
-    
-    bool isAlive() const { return m_dob != SystemClock::POSITIVE_INFINITY; }
 
-    bool hasSourceGametes() const { return (p0 != NULL); }
+    bool isAlive() const {
+        return m_dob != SystemClock::POSITIVE_INFINITY;
+    }
+
+    bool hasSourceGametes() const {
+        return (p0 != NULL);
+    }
 
     void inheritFrom( const system_id & p_id, gamete_t * g, unsigned char p = 0 ) {
         assert( !p0 );
@@ -50,7 +54,7 @@ public:
     void reset() {
         died();
         if(p0) {
-        //    delete p0;
+            //    delete p0;
             p0->~gamete_t();
             p0 = NULL;
         }

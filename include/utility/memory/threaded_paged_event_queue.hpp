@@ -23,15 +23,14 @@ public:
     typedef EVT event_t;
     typedef OBJ object_t;
 
-    //ThreadedPagedEventQueue( event_page_manager_t * epm, unsigned int threads = 1 ) : 
+    //ThreadedPagedEventQueue( event_page_manager_t * epm, unsigned int threads = 1 ) :
     //    m_page_manager( epm ),
     ThreadedPagedEventQueue( unsigned int threads = 1 ) :
         m_read( NULL ),
         m_tail( NULL ),
         m_nThreads(threads),
         m_thread_write( NULL ),
-        m_bMoreEvents(false)
-    {
+        m_bMoreEvents(false) {
         m_tail = new event_page_t();
         m_read = new event_page_t( m_tail );
 
@@ -70,7 +69,7 @@ public:
             m_tail->setNextPage(tmp);
             m_tail = tmp;
         }
-        
+
         m_bMoreEvents = true;
         pthread_mutex_unlock( &m_mutLock );
 
@@ -99,7 +98,7 @@ public:
                 m_read->setNextPage(m_tail);
             }
             m_bMoreEvents = m_read != NULL && !m_read->isEmpty();
-        } 
+        }
         pthread_mutex_unlock( &m_mutLock );
         return t;
     }

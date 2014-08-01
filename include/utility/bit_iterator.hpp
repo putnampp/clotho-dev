@@ -17,8 +17,7 @@ public:
         m_block( m ),
         m_mask( ((m == NULL) ? 0 : 1) ),
         m_weight( w ),
-        m_seq_index(0)
-    {
+        m_seq_index(0) {
         operator++();
     }
 
@@ -26,8 +25,8 @@ public:
         m_block( m.m_block ),
         m_mask( m.m_mask ),
         m_weight( m.m_weight ),
-        m_seq_index(m.m_seq_index)
-    {}
+        m_seq_index(m.m_seq_index) {
+    }
 
     BitIterator<B,O> & operator++() {
         if( m_block != NULL && m_weight >= 1 ) {

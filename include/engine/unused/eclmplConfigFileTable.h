@@ -10,7 +10,9 @@ public:
     eclmplConfigFileTable() {}
     ~eclmplConfigFileTable() {}
 
-    inline void addEntry(const std::vector<string>& entry) { configTable.push_back(entry); }
+    inline void addEntry(const std::vector<string>& entry) {
+        configTable.push_back(entry);
+    }
 
     inline std::vector<string> getEntry(const unsigned int& entryNr) const {
         ASSERT(entryNr <= (configTable.size()-1));
@@ -21,7 +23,9 @@ public:
         configTable[entryNr].push_back(add);
     }
 
-    inline const unsigned int getNumberOfEntries() const { return configTable.size(); }
+    inline const unsigned int getNumberOfEntries() const {
+        return configTable.size();
+    }
 
     void serialize(char* buf, unsigned int& bufSize) const;
     void deserialize(const char* const buf);

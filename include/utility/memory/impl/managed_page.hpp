@@ -33,7 +33,7 @@ public:
             SET_INUSE = (1 << ( sizeof( offset_t ) * 8 - 1 )),
             UNSET_INUSE = ~SET_INUSE,
             IDX_OFFSET = offsetof( struct _node, obj)
-    };
+         };
 
 
     free_list_t header;
@@ -41,9 +41,8 @@ public:
 
     static const ManagedPage< N, O, S> TEMPLATE;
 
-    ManagedPage( const ManagedPage< N, O, S > & src ) : 
-        header(NULL, COUNT, 0) 
-    {
+    ManagedPage( const ManagedPage< N, O, S > & src ) :
+        header(NULL, COUNT, 0) {
         memcpy( objects, src.objects, sizeof( _node ) * COUNT );
     }
 
@@ -95,9 +94,8 @@ public:
     virtual ~ManagedPage() { }
 
 protected:
-    ManagedPage( ) : 
-        header(NULL, COUNT, 0 ) 
-    {
+    ManagedPage( ) :
+        header(NULL, COUNT, 0 ) {
         offset_t id = 0;
         _node * tmp = objects;
 

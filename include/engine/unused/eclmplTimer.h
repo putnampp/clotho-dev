@@ -9,7 +9,9 @@ public:
     eclmplTimer(const double timeOutVal);
     bool timedOut() const;
     void setTimeOut(const double timeOutVal);
-    inline void start() { gettimeofday(&startTime, NULL); }
+    inline void start() {
+        gettimeofday(&startTime, NULL);
+    }
 protected:
     eclmplTimer() {} // Disallow instantiation without a timeOut value.
     timeval startTime;

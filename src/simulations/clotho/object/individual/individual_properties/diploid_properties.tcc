@@ -13,17 +13,17 @@ public:
         m_dob( SystemClock::POSITIVE_INFINITY ),
         p0_id(),
         p1_id(),
-        p0( ), 
-        p1( )
-    {}
+        p0( ),
+        p1( ) {
+    }
 
     individual_props( const individual_props< G, 2> & ip ) :
         m_dob( ip.m_dob ),
         p0_id(ip.p0_id),
         p1_id(ip.p1_id),
         p0(ip.p0),
-        p1(ip.p1)
-    {}
+        p1(ip.p1) {
+    }
 
     void died() {
         setDOB( SystemClock::POSITIVE_INFINITY );
@@ -46,9 +46,13 @@ public:
         return (m_dob != SystemClock::POSITIVE_INFINITY);
     }
 
-    bool hasSameGamates() const { return p0 == p1; }
+    bool hasSameGamates() const {
+        return p0 == p1;
+    }
 
-    bool hasSourceGametes() const { return (p0 != NULL && p1 != NULL); }
+    bool hasSourceGametes() const {
+        return (p0 != NULL && p1 != NULL);
+    }
 
     void inheritFrom( const system_id & p_id, gamete_ptr g, unsigned char gidx = UNKNOWN_GAMETE_INDEX) {
         if( gidx == UNKNOWN_GAMETE_INDEX) {
@@ -79,7 +83,7 @@ public:
     gamete_ptr getGamete( unsigned char gamete_idx ) const {
         if( gamete_idx == 0 && p0 != NULL ) {
             return p0;
-        } else /*if( p1 != NULL )*/ {
+        } else { /*if( p1 != NULL )*/
             return p1;
         }
 //        return new gamete_t();
@@ -90,14 +94,14 @@ public:
         //std::cout << "Resetting individual properties" << std::endl;
         if( p0 ) {
 //            delete p0;
-       //     std::cout << "Deconstructing P0: " << p0 << std::endl;
+            //     std::cout << "Deconstructing P0: " << p0 << std::endl;
             p0->~gamete_t();
             p0 = NULL;
         }
 
         if( p1 ) {
 //            delete p1;
-       //     std::cout << "Deconstructing P1: " << p1 << std::endl;
+            //     std::cout << "Deconstructing P1: " << p1 << std::endl;
             p1->~gamete_t();
             p1 = NULL;
         }

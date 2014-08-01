@@ -13,7 +13,7 @@ typedef unsigned short offset_t;
 //        free_end( e_off )
 //    {}
 //
-//    memory_page_header( offset_t size ) : 
+//    memory_page_header( offset_t size ) :
 //        memory_page_header(0, size )
 //    {}
 //};
@@ -33,9 +33,9 @@ struct memory_page {
 
 //    memory_page( memory_page * n = NULL) : next(n), header( 0, BLOCK_SIZE ) {}
     memory_page( memory_page * n = NULL ) : next(n), header(block, block + BLOCK_SIZE) {}
-    void clear() { 
-        header.free_start = block; 
-        header.free_end = block + BLOCK_SIZE;  
+    void clear() {
+        header.free_start = block;
+        header.free_end = block + BLOCK_SIZE;
     }
 };
 

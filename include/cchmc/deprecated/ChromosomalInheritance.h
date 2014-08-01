@@ -9,8 +9,8 @@ class ChromosomalInheritance : public inheritance_model {
 public:
     ChromosomalInheritance( GeneticMap::Ptr gm, RNG * rng ) :
         m_genetic_map( gm ),
-        m_rng( rng )
-    {}
+        m_rng( rng ) {
+    }
 
     bool hasGeneticMap() const {
         return (bool) m_genetic_map;

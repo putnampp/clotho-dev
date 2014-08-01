@@ -36,7 +36,9 @@ public:
 
     vertex_type operator*();
 
-    size_t index() { return m_index; }
+    size_t index() {
+        return m_index;
+    }
 
     virtual ~AdjacencyIterator();
 protected:
@@ -51,8 +53,7 @@ protected:
 THEADER SPECIALIZATION::AdjacencyIterator( graph_pointer gp, edge_set_pointer es, size_t idx ) :
     m_graph(gp),
     m_edges(es),
-    m_index( idx )
-{
+    m_index( idx ) {
     if( m_index != edge_set_type::npos ) {
         if( m_edges->size() == 0 || m_index >= m_edges->size() ) {
             m_index = edge_set_type::npos;
@@ -65,8 +66,8 @@ THEADER SPECIALIZATION::AdjacencyIterator( graph_pointer gp, edge_set_pointer es
 THEADER SPECIALIZATION::AdjacencyIterator( const SPECIALIZATION & other ) :
     m_graph(other.m_graph),
     m_edges(other.m_edges),
-    m_index( other.m_index )
-{}
+    m_index( other.m_index ) {
+}
 
 THEADER
 SPECIALIZATION & SPECIALIZATION::operator++() {

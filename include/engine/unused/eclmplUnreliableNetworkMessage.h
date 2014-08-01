@@ -41,31 +41,67 @@ public:
     //void deserialize(char *msg);
     void deserialize(char* msg, const int& msgLen);
 
-    inline void setType(const eclmplUnreliableNetworkMessageType& msgType) { hdr.type = msgType; }
-    inline eclmplUnreliableNetworkMessageType getType() const { return hdr.type; }
-    inline void setSourceId(const unsigned int& source) { hdr.sourceId = source; }
-    inline unsigned int getSourceId() const { return hdr.sourceId; }
-    inline void setAckFlag(const bool& isAck) { hdr.ackFlag = isAck; }
-    inline bool getAckFlag() const { return hdr.ackFlag; }
-    inline void setUserDataFlag(const bool& isUserData) { hdr.userDataFlag = isUserData; }
-    inline bool getUserDataFlag() const { return hdr.userDataFlag; }
-    inline void setAckSequenceNr(const SequenceNumber& nr) { hdr.ackSequenceNr = nr; }
-    inline SequenceNumber getAckSequenceNr() const { return hdr.ackSequenceNr; }
-    inline void setEndOfHoleNr(const SequenceNumber& nr) { hdr.endOfHoleNr = nr; }
-    inline SequenceNumber getEndOfHoleNr() const { return hdr.endOfHoleNr; }
-    inline void setSequenceNr(const SequenceNumber& nr) { hdr.sequenceNr = nr; }
-    inline SequenceNumber getSequenceNr() const { return hdr.sequenceNr; }
+    inline void setType(const eclmplUnreliableNetworkMessageType& msgType) {
+        hdr.type = msgType;
+    }
+    inline eclmplUnreliableNetworkMessageType getType() const {
+        return hdr.type;
+    }
+    inline void setSourceId(const unsigned int& source) {
+        hdr.sourceId = source;
+    }
+    inline unsigned int getSourceId() const {
+        return hdr.sourceId;
+    }
+    inline void setAckFlag(const bool& isAck) {
+        hdr.ackFlag = isAck;
+    }
+    inline bool getAckFlag() const {
+        return hdr.ackFlag;
+    }
+    inline void setUserDataFlag(const bool& isUserData) {
+        hdr.userDataFlag = isUserData;
+    }
+    inline bool getUserDataFlag() const {
+        return hdr.userDataFlag;
+    }
+    inline void setAckSequenceNr(const SequenceNumber& nr) {
+        hdr.ackSequenceNr = nr;
+    }
+    inline SequenceNumber getAckSequenceNr() const {
+        return hdr.ackSequenceNr;
+    }
+    inline void setEndOfHoleNr(const SequenceNumber& nr) {
+        hdr.endOfHoleNr = nr;
+    }
+    inline SequenceNumber getEndOfHoleNr() const {
+        return hdr.endOfHoleNr;
+    }
+    inline void setSequenceNr(const SequenceNumber& nr) {
+        hdr.sequenceNr = nr;
+    }
+    inline SequenceNumber getSequenceNr() const {
+        return hdr.sequenceNr;
+    }
     //void setAdvertisedWindow(const short &windowSize) { advertisedWindow = windowSize; }
     //short getAdvertisedWindow() const { return advertisedWindow; }
-    inline int setSendTime() { return gettimeofday(&sendTime, NULL); }
+    inline int setSendTime() {
+        return gettimeofday(&sendTime, NULL);
+    }
     inline bool timedOut(const struct timeval& currTime, const double& timeOut) {
         return (((currTime.tv_sec*1.0+currTime.tv_usec/1.0e+6) -
                  (sendTime.tv_sec*1.0+sendTime.tv_usec/1.0e+6)) > timeOut);
     }
-    inline struct timeval getSendTime() const { return sendTime; }
+    inline struct timeval getSendTime() const {
+        return sendTime;
+    }
 
-    inline bool operator<(const eclmplUnreliableNetworkMessage& a) { return hdr.sequenceNr < a.getSequenceNr(); }
-    inline bool operator>(const eclmplUnreliableNetworkMessage& a) { return hdr.sequenceNr > a.getSequenceNr(); }
+    inline bool operator<(const eclmplUnreliableNetworkMessage& a) {
+        return hdr.sequenceNr < a.getSequenceNr();
+    }
+    inline bool operator>(const eclmplUnreliableNetworkMessage& a) {
+        return hdr.sequenceNr > a.getSequenceNr();
+    }
 
     friend std::ostream& operator<< (std::ostream& os, const eclmplUnreliableNetworkMessage& msg);
 protected:

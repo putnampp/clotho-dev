@@ -30,7 +30,7 @@ class KernelMessage;
  network.
 
  */
-class CommunicationManager /*: virtual public Configurable*/ {
+class CommunicationManager { /*: virtual public Configurable*/
 public:
 
     /**@name Public Class Methods of CommunicationManager. */

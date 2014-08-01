@@ -47,9 +47,13 @@ public:
 
     size_t size();
     size_t set_size();
-    size_t block_count() { return m_bits.num_blocks(); }
+    size_t block_count() {
+        return m_bits.num_blocks();
+    }
 
-    alphabet_t::pointer getAlphabet() { return m_alphabet; }
+    alphabet_t::pointer getAlphabet() {
+        return m_alphabet;
+    }
 
     adjacency_iterator begin();
     adjacency_iterator end();
@@ -63,7 +67,9 @@ public:
     static active_iterator active_begin();
     static active_iterator active_end();
 
-    size_t  copies() { return m_copies; }
+    size_t  copies() {
+        return m_copies;
+    }
 
     locus_bitset & operator^=( const locus_bitset & rhs );
     locus_bitset & operator|=( const locus_bitset & rhs );

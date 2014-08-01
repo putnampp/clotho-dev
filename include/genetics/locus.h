@@ -10,7 +10,7 @@ struct locus_generator {
 
     locus_generator() {}
     locus_generator( parameter_type p ) : m_params(p) {}
-    
+
     return_type operator()() { }
 
     parameter_type m_params;

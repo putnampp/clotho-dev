@@ -13,13 +13,12 @@
 struct simulation_manager;
 
 struct object :
-    virtual public system_object,
-    virtual public event_manager,
-    virtual public event_processor,
-    virtual public event_transceiver
-{
+        virtual public system_object,
+        virtual public event_manager,
+        virtual public event_processor,
+        virtual public event_transceiver {
     typedef event::vtime_t  vtime_t;
-    
+
 //    virtual const system_id &       getSystemID() const = 0;
 //    virtual system_id::object_id_t  getObjectID() const = 0;
 
@@ -29,17 +28,17 @@ struct object :
 
     virtual void setSimulationManager( simulation_manager * sim ) = 0;
 
-/*
-    virtual void process() = 0;
-    virtual void perform_event( const event * ) = 0;
+    /*
+        virtual void process() = 0;
+        virtual void perform_event( const event * ) = 0;
 
-    virtual size_t pendingEventCount() = 0;
-    virtual const event * getEvent() = 0;
-    virtual const event * peekEvent() = 0;
+        virtual size_t pendingEventCount() = 0;
+        virtual const event * getEvent() = 0;
+        virtual const event * peekEvent() = 0;
 
-    virtual void sendEvent( const event * evt ) = 0;
-    virtual void receiveEvent( const event * evt ) = 0;
-*/
+        virtual void sendEvent( const event * evt ) = 0;
+        virtual void receiveEvent( const event * evt ) = 0;
+    */
 
     virtual void updateLocalTime( const vtime_t & t ) = 0;
     virtual const vtime_t & getCurrentTime() const = 0;

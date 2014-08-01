@@ -16,14 +16,13 @@ public:
     typedef EVT event_t;
     typedef OBJ object_t;
 
-    PagedEventQueue( event_page_manager_t * epm ) : 
+    PagedEventQueue( event_page_manager_t * epm ) :
         m_page_manager( epm ),
         m_read( NULL ),
         m_tail( NULL ),
         m_next_evt( NULL ),
         m_read_it(NULL),
-        m_nSize(0)
-    {
+        m_nSize(0) {
         m_read = m_page_manager->getOrCreate();
         m_tail = m_page_manager->getOrCreate();
         m_read->setNextPage( m_tail );
@@ -48,7 +47,7 @@ public:
         if( !updateReadPage() ) {
             return NULL;
         }
-        
+
         return m_next_evt;
     }
 
@@ -57,7 +56,7 @@ public:
             std::cout << "No more events" << std::endl;
             return NULL;
         }
-        
+
         event_t * tmp = m_next_evt;
 
         ++m_read_it;
@@ -130,7 +129,7 @@ protected:
                 assert( false ); // this shouldn't happen
             }
         }
-        
+
         if( m_read_it == m_read->end() ) {
             return false;
         }
@@ -138,7 +137,7 @@ protected:
         m_next_evt = m_read_it.getEvent();
         return true;
     }
-    
+
     event_page_manager_t    * m_page_manager;
     event_page_t            * m_read, * m_tail;
     event_t                 * m_next_evt;

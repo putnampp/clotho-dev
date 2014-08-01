@@ -10,8 +10,7 @@
 #include "event_processor.h"
 #include "event_transceiver.h"*/
 
-class object : public system_object
-{
+class object : public system_object {
 public:
     typedef SystemClock::vtime_t  vtime_t;
 

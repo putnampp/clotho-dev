@@ -3,13 +3,13 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
+ * modification, are permitted provided that the following conditions are met:
  *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
+ *    and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -37,13 +37,15 @@
 #include <functional>
 #include <unordered_map>
 
-class Trait : 
+class Trait :
     virtual public MultilocusGenotyper,
     virtual public phenotyper {
 public:
     typedef shared_ptr< Trait > Ptr;
 
-    const string & getName() const { return m_name; }
+    const string & getName() const {
+        return m_name;
+    }
 
     virtual bool addIndexedGenotyper( size_t idx, LocusGenotyper * lg ) = 0;
     virtual size_t getLociCount() const = 0;
@@ -51,7 +53,9 @@ public:
     virtual double genotype( const AlleleGroupPtr ag ) const = 0;
     virtual double phenotype( const AlleleGroupPtr ag, const environmental * env ) const = 0;
 
-    virtual bool operator==( const Trait & rhs ) const {    return m_name == rhs.m_name; }
+    virtual bool operator==( const Trait & rhs ) const {
+        return m_name == rhs.m_name;
+    }
 
     virtual ~Trait() {}
 protected:

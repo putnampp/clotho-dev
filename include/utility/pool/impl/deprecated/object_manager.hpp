@@ -9,7 +9,7 @@
 #include <ostream>
 
 typedef std::pair< unsigned short, void * > free_page_t;
-struct free_page_comp { 
+struct free_page_comp {
     bool operator()( const free_page_t & lhs, const free_page_t & rhs ) {
         return lhs.first > rhs.first;
     }

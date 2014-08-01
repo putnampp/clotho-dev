@@ -8,10 +8,10 @@
 template < class RNG, unsigned char ALL >
 class RandomAlleleInheritance : public inheritance_model {
 public:
-    RandomAlleleInheritance( GeneticMap::Ptr gm, RNG * rng ) : 
+    RandomAlleleInheritance( GeneticMap::Ptr gm, RNG * rng ) :
         m_nLoci( gm->getLociCount() ),
-        m_rng( rng )
-    {}
+        m_rng( rng ) {
+    }
 
     void inherit( AlleleGroupPtr p0, AlleleGroupPtr p1, AlleleGroupPtr offspring ) {
         assert( false );

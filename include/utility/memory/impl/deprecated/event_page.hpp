@@ -42,12 +42,12 @@ public:
         size_t      m_nObjects;
         size_t      m_nEvents;
 
-        event_page_header( EventPage<EVT,OBJ> * n = NULL,  char * s = NULL, char * e = NULL ) : 
+        event_page_header( EventPage<EVT,OBJ> * n = NULL,  char * s = NULL, char * e = NULL ) :
             memory_page_header(s, e),
             next(n),
             m_nObjects(0),
-            m_nEvents(0)
-        {}
+            m_nEvents(0) {
+        }
     };
 
     enum { BLOCK_SIZE = PAGE_SIZE - sizeof( event_page_header ) - sizeof( void * ) };   // additional pointer for template overhead
@@ -73,7 +73,7 @@ public:
     }
 
     bool addEvent( event_t * e, const object_t & object_id ) {
-        if( isFull() ) { 
+        if( isFull() ) {
             return false;  // page full
         }
 
@@ -90,7 +90,7 @@ public:
         bool res = (n_free_start < n_free_end); // is there sufficient space to schedule event?
         if( res ) {
             // sufficient space to add event to page
-            
+
             event_node * nevt = reinterpret_cast< event_node * >(m_header.free_start);
             nevt->p_event = e;
             nevt->next = NULL;
@@ -109,7 +109,7 @@ public:
                 obj->tail->next = nevt;
             }
             obj->tail = nevt;
-            
+
             m_header.free_start = n_free_start;
             m_header.free_end = n_free_end;
             ++m_header.m_nEvents;
@@ -132,7 +132,9 @@ public:
     iterator getEventsByObjectIndex( size_t idx ) {
         if( idx < getObjectCount() ) {
             object_node * s = head_object();
-            while( idx-- ) { s++; }
+            while( idx-- ) {
+                s++;
+            }
 
             object_node * e = s;
             ++e;
@@ -184,7 +186,7 @@ public:
         iterator s = begin();
         iterator e = end();
         if( s != e ) {
-            do { 
+            do {
                 if( s.HasObjectChanged() ) {
                     out << "\n";
                     out << s.getObjectID();

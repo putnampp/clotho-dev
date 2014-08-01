@@ -15,11 +15,11 @@ public:
     typedef EVT event_t;
     typedef OBJ object_t;
 
-    PagedEventQueue( ) : 
+    PagedEventQueue( ) :
         m_read( NULL ),
         m_tail( NULL ),
-        m_nSize( 0 )
-    { }
+        m_nSize( 0 ) {
+    }
 
     void append( event_t * evt, const object_t & obj ) {
         if( m_tail == NULL ) {

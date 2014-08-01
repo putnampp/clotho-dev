@@ -35,7 +35,7 @@ public:
         (*this)((idx / BPB), (idx % BPB), state);
     }
 
-    inline void operator()( size_t b_idx, size_t offset, bool state ){
+    inline void operator()( size_t b_idx, size_t offset, bool state ) {
 //        if( b_idx >= m_blocks ) {
 //            resize( b_idx + 1 );
 //        }
@@ -69,7 +69,9 @@ public:
     void resize( size_t nBlocks );
 
 //    inline size_t block_count() const { return m_blocks; }
-    inline size_t block_count() const { return m_bits.size(); }
+    inline size_t block_count() const {
+        return m_bits.size();
+    }
 
     size_t hamming_weight();
 
@@ -82,7 +84,9 @@ public:
     virtual ~bit_vector();
 protected:
     template < class OP >
-    void tail_operator( bit_block_t * p, bit_block_t * e, OP & oper ) const { return; }
+    void tail_operator( bit_block_t * p, bit_block_t * e, OP & oper ) const {
+        return;
+    }
 
     template < typename OP >
     bit_vector combiner( const bit_vector & rhs, OP oper ) const {
@@ -105,7 +109,7 @@ protected:
             p0 = &m_bits[0];
 //            p0_e = p0 + m_blocks;
             p0_e = p0 + m_bits.size();
-        } 
+        }
 
         while( p0 < p0_e ) {
             (*pres) = oper((*pres), (*p0++));

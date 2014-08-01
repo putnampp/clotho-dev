@@ -18,8 +18,8 @@ public:
 
     Pooler( ) :
         m_unused( UNKNOWN_INDEX ),
-        m_free_node( UNKNOWN_INDEX )    
-    { }
+        m_free_node( UNKNOWN_INDEX ) {
+    }
 
     event_t * getOrCreate() {
         event_t * res = NULL;

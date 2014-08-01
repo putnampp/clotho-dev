@@ -118,7 +118,7 @@ protected:
         @param argsPerEntry Number of arguments per line in the file.
     */
     virtual eclmplConfigFileTable* scanConfigFile(const std::string& fileName,
-                                                  int argsPerEntry = 2);
+            int argsPerEntry = 2);
 
     /** Parse command line arguments.
 
@@ -132,7 +132,7 @@ protected:
         @param argv Arguments to parse.
      */
     virtual slaveStartupInfo parseCommandLineArguments(const int* const argc,
-                                                       const char* const* const* const argv);
+            const char* const* const* const argv);
 
     /** Create command line arguments for the slave to parse.
 
@@ -149,11 +149,11 @@ protected:
         @param id Connection id of slave to be started.
     */
     virtual void createSlaveCommandLineArguments(const int* const argc,
-                                                 const char* const* const* const argv,
-                                                 int& newArgc, char**& newArgv,
-                                                 const std::vector<std::string>& configTableEntry,
-                                                 const eclmplContactInfo& masterContactInfo,
-                                                 const unsigned int& id);
+            const char* const* const* const argv,
+            int& newArgc, char**& newArgv,
+            const std::vector<std::string>& configTableEntry,
+            const eclmplContactInfo& masterContactInfo,
+            const unsigned int& id);
 
     /** Fork off slave.
 

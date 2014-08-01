@@ -63,12 +63,11 @@ ObjectWorkerThread<G>::ObjectWorkerThread( synchronizer * sync_point, unsigned i
     m_id( id ),
     m_pool_size( pool_size ),
     m_thread( new pthread_t() ),
-    m_done(false), 
-    m_waiting(false), 
+    m_done(false),
+    m_waiting(false),
     m_sync(true),
     m_cur_time( SystemClock::POSITIVE_INFINITY ),
-    m_cur_objs(NULL)
-{
+    m_cur_objs(NULL) {
     pthread_mutex_init( &m_mutWait, NULL );
     pthread_cond_init( &m_cond_wait, NULL );
 
@@ -77,7 +76,7 @@ ObjectWorkerThread<G>::ObjectWorkerThread( synchronizer * sync_point, unsigned i
     assert( rVal == 0);
 }
 
-template< class G > 
+template< class G >
 ObjectWorkerThread<G>::~ObjectWorkerThread() {
     force_stop();
 
@@ -126,7 +125,7 @@ void ObjectWorkerThread<G>::force_stop() {
 
     m_cur_time = SystemClock::POSITIVE_INFINITY;
     m_cur_objs = NULL;
-    
+
     pthread_cond_signal( &m_cond_wait );
     pthread_mutex_unlock( &m_mutWait );
 }

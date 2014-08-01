@@ -36,8 +36,8 @@ class AlleleTupleGroup {
     typedef AlleleTuple< P > tuple_t;
 
     AlleleTupleGroup( size_t size ) :
-         m_tuples( new tuple_t[ size ] ),
-         m_size( size ) { }
+        m_tuples( new tuple_t[ size ] ),
+        m_size( size ) { }
 
     inline tuple_t & operator[]( size_t idx ) {
         return m_tuples[ idx ];

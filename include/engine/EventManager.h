@@ -50,12 +50,12 @@ public:
         m_head( m_events.begin() ),
         m_nPending(0),
         m_nProcessed(0),
-        m_nCanceled(0)
-    {}
+        m_nCanceled(0) {
+    }
 
     bool insertEvent( const event * evt ) {
         iterator pos = upper_bound( m_head, m_events.end(), evt, ltsf_event_order());
-        
+
         bool res = false;
         if( pos == m_head ) {
             m_head = m_events.insert( pos, evt );
@@ -136,12 +136,12 @@ public:
         m_events(),
         m_head(0),
         m_nProcessed(0),
-        m_nCanceled(0)
-    {}
+        m_nCanceled(0) {
+    }
 
     bool insertEvent( const event * e ) {
         if( e == NULL ) return false;
-        
+
         iterator s = m_events.begin() + m_head;
         iterator pos = upper_bound( s, m_events.end(), e, ltsf_event_order());
 
@@ -162,7 +162,7 @@ public:
         while( m_head != 0 ) {
             const event * t = m_events[ --m_head ];
             m_events.erase( m_events.begin() + m_head );
-            
+
             if( t ) delete t;
             ++m_nProcessed;
         }
@@ -212,8 +212,8 @@ public:
         m_events(),
         m_processed(),
         m_nProcessed(0),
-        m_nCanceled(0)
-    {}
+        m_nCanceled(0) {
+    }
 
     bool insertEvent( const event * e ) {
         event_set_t::iterator it = m_events.insert( e );

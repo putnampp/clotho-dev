@@ -8,9 +8,15 @@
 template < class T >
 class RNG : virtual public iRNG {
 public:
-    RNG( ) : m_rng(), m_type(""), m_seed(0) { initialize(); }
-    RNG( seed_t s ) : m_rng(s), m_type(""), m_seed(s) { initialize(); }
-    RNG( const type_t & type, seed_t s ) : m_rng(s), m_type(type), m_seed(s) { initialize(); }
+    RNG( ) : m_rng(), m_type(""), m_seed(0) {
+        initialize();
+    }
+    RNG( seed_t s ) : m_rng(s), m_type(""), m_seed(s) {
+        initialize();
+    }
+    RNG( const type_t & type, seed_t s ) : m_rng(s), m_type(type), m_seed(s) {
+        initialize();
+    }
 
     const type_t & getType() const {
         return m_type;

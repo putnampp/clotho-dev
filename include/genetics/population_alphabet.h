@@ -24,11 +24,11 @@ class PopulationAlphabet {
 public:
     typedef Locus           locus_t;
     typedef allele          allele_t;
-    
+
     typedef boost::bimaps::bimap<
-        boost::bimaps::unordered_multiset_of< locus_t >,
-        boost::bimaps::multiset_of< allele_t >,
-        boost::bimaps::vector_of_relation > variant_db_t;
+    boost::bimaps::unordered_multiset_of< locus_t >,
+          boost::bimaps::multiset_of< allele_t >,
+          boost::bimaps::vector_of_relation > variant_db_t;
     typedef variant_db_t::iterator      edge_type;
     typedef variant_db_t::left_map::iterator locus_iterator;
     typedef variant_db_t::left_map::const_iterator locus_citerator;
@@ -55,7 +55,7 @@ public:
     static pointer getInstance() {
         static pointer instance(new PopulationAlphabet());
         return instance;
-    } 
+    }
 
     index_type  getSymbol( const locus_t & l, const allele_t & a, bool createNew = true );
     void     updateFreeSymbols( const bitset_type & fs );

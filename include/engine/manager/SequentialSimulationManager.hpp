@@ -108,8 +108,8 @@ SequentialSimulationManager<ES>::SequentialSimulationManager( shared_ptr< applic
     m_nProcessedEvents(0),
     m_nRegisteredObjs(0),
     m_nUnregisterCalls(0),
-    m_stats( new SimulationStats() )
-{}
+    m_stats( new SimulationStats() ) {
+}
 
 template< class ES >
 SequentialSimulationManager<ES>::SequentialSimulationManager( shared_ptr< application > app, shared_ptr< SimulationStats > stats, system_id::manager_id_t id ) :
@@ -122,8 +122,8 @@ SequentialSimulationManager<ES>::SequentialSimulationManager( shared_ptr< applic
     m_nProcessedEvents(0),
     m_nRegisteredObjs(0),
     m_nUnregisterCalls(0),
-    m_stats( stats )
-{ }
+    m_stats( stats ) {
+}
 
 template< class ES >
 SequentialSimulationManager<ES>::~SequentialSimulationManager() {

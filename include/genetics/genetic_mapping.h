@@ -48,6 +48,6 @@ protected:
     static chromosome_list_t    m_chroms;
 };
 
-template <> double genetic_mapping::convertToKey<double>( const chromosome_t & c, pos_t p ); 
+template <> double genetic_mapping::convertToKey<double>( const chromosome_t & c, pos_t p );
 
 #endif  // GENETIC_MAPPING_H_

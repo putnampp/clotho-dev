@@ -39,31 +39,31 @@ public:
     typedef typename page_t::_node   object_node_t;
 
     struct update_header_on_get {
-        object_t * operator()( header_t * h, typename page_t::_node * objs ) {
-            page_header * ph = &h->key;
-            typename page_t::_node * onode = &objs[ph->available];
-            if( onode->idx.id < page_t::SET_INUSE ) {
-                onode->idx.id |= page_t::SET_INUSE;
-                if( --ph->free_count > 0 ) {
-                    assert( onode->idx.fl_offset != COUNT );
-                    ph->available = onode->idx.fl_offset;
-                } else {
-                    ph->available = COUNT;
-                }
+    object_t * operator()( header_t * h, typename page_t::_node * objs ) {
+        page_header * ph = &h->key;
+        typename page_t::_node * onode = &objs[ph->available];
+        if( onode->idx.id < page_t::SET_INUSE ) {
+            onode->idx.id |= page_t::SET_INUSE;
+            if( --ph->free_count > 0 ) {
+                assert( onode->idx.fl_offset != COUNT );
+                ph->available = onode->idx.fl_offset;
             } else {
-                assert(false);
+                ph->available = COUNT;
             }
-            return &onode->obj;
+        } else {
+            assert(false);
         }
-    };
+        return &onode->obj;
+    }
+      };
 
     struct update_header_on_release {
-        void operator()( header_t * h, typename page_t::index_t * idx ) {
-            page_header * ph = &h->key;
-            idx->fl_offset = ph->available;
-            ph->available = idx->id;
-            ++ph->free_count;
-        }
+    void operator()( header_t * h, typename page_t::index_t * idx ) {
+        page_header * ph = &h->key;
+        idx->fl_offset = ph->available;
+        ph->available = idx->id;
+        ++ph->free_count;
+    }
     };
 
     enum {  PAGE_SIZE = S,

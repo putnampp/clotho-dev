@@ -6,11 +6,10 @@
 #include "../event_manager.h"
 #include "../event_router.h"
 
-struct simulation_manager : 
-    virtual public system_object,
-    virtual public event_manager,
-    virtual public event_router
-{
+struct simulation_manager :
+        virtual public system_object,
+        virtual public event_manager,
+        virtual public event_router {
 
     virtual const event::vtime_t & getSimulationTime() const = 0;
     virtual bool isSimulationComplete() const = 0;

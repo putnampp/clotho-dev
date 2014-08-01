@@ -14,8 +14,8 @@ inline bool operator==( const allele & lhs, const allele & rhs ) {
 }
 
 inline bool operator<( const allele & lhs, const allele & rhs ) {
-    return lhs.dominance < rhs.dominance || 
-            (lhs.dominance == rhs.dominance && lhs.selection < rhs.selection);
+    return lhs.dominance < rhs.dominance ||
+           (lhs.dominance == rhs.dominance && lhs.selection < rhs.selection);
     // return (lhs.dominance <= rhs.dominance) && (lhs.selection < rhs.selection || lhs.dominance == rhs.dominance );
 }
 

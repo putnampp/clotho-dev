@@ -183,7 +183,7 @@ public:
         if( r == NULL ) return;
 
         if( r->left != NULL ) printNode(out, r->left, pad + "\t");
- 
+
         out << pad << r << ":" << r->key << "\n";
 
         if( r->right != NULL ) printNode(out, r->right, pad + "\t");

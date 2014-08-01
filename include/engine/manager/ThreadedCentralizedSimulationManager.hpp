@@ -40,7 +40,7 @@ protected:
 
     pthread_barrier_t   m_syncpoint;
     pthread_mutex_t     m_mutObjID;
-    
+
     vector< const event * > ** m_buffers;
 };
 
@@ -50,12 +50,11 @@ protected:
 
 template < class ES >
 ThreadedCentralizedSimulationManager< ES >::ThreadedCentralizedSimulationManager( shared_ptr< application > app, unsigned int nThreads, system_id::manager_id_t id ) :
-    CentralizedSimulationManager< ES >( app, id ), 
+    CentralizedSimulationManager< ES >( app, id ),
     m_nThreads(nThreads),
     m_tid( nThreads ),
     m_workers( new worker_thread_t[ nThreads ] ),
-    m_buffers( new vector< const event * >[ nThreads ] )
-{
+    m_buffers( new vector< const event * >[ nThreads ] ) {
     pthread_barrier_init( &m_syncpoint, NULL, m_nThreads + 1 );
     pthread_mutex_init( &m_mutObjID, NULL );
 
@@ -65,12 +64,11 @@ ThreadedCentralizedSimulationManager< ES >::ThreadedCentralizedSimulationManager
 
 template < class ES >
 ThreadedCentralizedSimulationManager< ES >::ThreadedCentralizedSimulationManager( shared_ptr< application > app, shared_ptr< SimulationStats > stats, unsigned int nThreads, system_id::manager_id_t id ) :
-    CentralizedSimulationManager< ES >( app, stats, id ), 
+    CentralizedSimulationManager< ES >( app, stats, id ),
     m_nThreads(nThreads),
     m_tid( nThreads ),
     m_workers( new worker_thread_t *[ nThreads ] ),
-    m_buffers( new vector< const event *> *[ nThreads ] )
-{
+    m_buffers( new vector< const event *> *[ nThreads ] ) {
     pthread_barrier_init( &m_syncpoint, NULL, m_nThreads + 1 );
     pthread_mutex_init( &m_mutObjID, NULL );
 
@@ -97,7 +95,7 @@ const system_id ThreadedCentralizedSimulationManager<ES>::getNextObjectID() {
 
     system_id nid( this->getManagerID(), CentralizedSimulationManager<ES>::m_objects.size() );
     CentralizedSimulationManager<ES>::m_objects.push_back( make_pair( (object *)NULL, make_pair( SystemClock::POSITIVE_INFINITY, 0 ) ) );
-    
+
     pthread_mutex_unlock( &m_mutObjID );
     return nid;
 }
@@ -105,7 +103,7 @@ const system_id ThreadedCentralizedSimulationManager<ES>::getNextObjectID() {
 template < class ES >
 void ThreadedCentralizedSimulationManager<ES>::initialize( ) {
     CentralizedSimulationManager<ES>::m_stats->startPhase( INIT_PHASE_K );
-    
+
     for( unsigned int i = 0; i < m_nThreads; ++i ) {
         m_workers[i] = new worker_thread_t( this, i, m_nThreads );
         m_buffers[i] = new vector< const event * >();
@@ -120,7 +118,7 @@ void ThreadedCentralizedSimulationManager<ES>::initialize( ) {
 template < class ES >
 void ThreadedCentralizedSimulationManager<ES>::simulate( const event::vtime_t & until ) {
     CentralizedSimulationManager<ES>::setSimulateUntil( until );
-    
+
     CentralizedSimulationManager<ES>::m_stats->startPhase( SIMULATE_PHASE_K );
     while(! CentralizedSimulationManager<ES>::m_ordered_objs.empty() ) {
         typename CentralizedSimulationManager<ES>::concurrent_group_t ot = CentralizedSimulationManager<ES>::getNextObjectGroup();

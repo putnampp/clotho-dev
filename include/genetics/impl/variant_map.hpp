@@ -50,24 +50,24 @@ public:
         value_ptr_t nVar( new value_t( k, 0.0, 0.0, NEUTRAL ) );
         return addVariant( nVar, bReplace );
     }
-/*
- *  By default variant_map assumes an infite site model for every
- *  variant type (VT).  Thus we randomly generate a key value from
- *  the uniform distribution that does not exist within the current
- *  pool of variants.
- *
- */
-/*    value_ptr_t getNewVariant() {
-        key_t   k = 0.0;
-        do {
-            k = m_rng->nextUniform();
-        } while( is_known(k) );
+    /*
+     *  By default variant_map assumes an infite site model for every
+     *  variant type (VT).  Thus we randomly generate a key value from
+     *  the uniform distribution that does not exist within the current
+     *  pool of variants.
+     *
+     */
+    /*    value_ptr_t getNewVariant() {
+            key_t   k = 0.0;
+            do {
+                k = m_rng->nextUniform();
+            } while( is_known(k) );
 
-        value_ptr_t v = createNewVariant( k );
-        m_variants_lookup.insert(std::make_pair( k, v));
+            value_ptr_t v = createNewVariant( k );
+            m_variants_lookup.insert(std::make_pair( k, v));
 
-        return v;
-    }*/
+            return v;
+        }*/
 
     value_ptr_t addVariant( value_ptr_t v, bool bReplace ) {
         typename lookup_map_t::iterator it = m_variants_lookup.find( v->getKey() );

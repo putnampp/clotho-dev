@@ -6,7 +6,7 @@
 
 template < typename B, typename A, typename OP >
 inline void combine( boost::dynamic_bitset< B, A > & res,
-    const boost::dynamic_bitset< B, A > & rhs, OP oper ) {
+                     const boost::dynamic_bitset< B, A > & rhs, OP oper ) {
 
     size_t i = 0;
     while( i < res.m_bits.size() && i < rhs.m_bits.size() ) {

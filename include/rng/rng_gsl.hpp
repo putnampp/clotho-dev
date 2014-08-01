@@ -14,35 +14,32 @@ using std::ostringstream;
 template < >
 class RNG< gsl_rng * > : virtual public iRNG {
 public:
-    RNG( ) : 
-        m_rng(NULL), 
-        m_type(""), 
-        m_seed(0) 
-    {
+    RNG( ) :
+        m_rng(NULL),
+        m_type(""),
+        m_seed(0) {
         initialize();
     }
 
-    RNG( seed_t s ) : 
-        m_rng(NULL), 
-        m_type(""), 
-        m_seed(s) 
-    {
+    RNG( seed_t s ) :
+        m_rng(NULL),
+        m_type(""),
+        m_seed(s) {
         initialize();
     }
 
-    RNG( const type_t & type, seed_t s ) : 
-        m_rng(NULL), 
-        m_type(type), 
-        m_seed(s) 
-    {
+    RNG( const type_t & type, seed_t s ) :
+        m_rng(NULL),
+        m_type(type),
+        m_seed(s) {
         initialize();
     }
 
-    RNG( gsl_rng * r, const type_t & t, seed_t s ) : 
+    RNG( gsl_rng * r, const type_t & t, seed_t s ) :
         m_rng( r ),
         m_type(t),
-        m_seed(s)
-    {}
+        m_seed(s) {
+    }
 
     shared_ptr< iRNG > split() {
         seed_t r = this->nextInt();

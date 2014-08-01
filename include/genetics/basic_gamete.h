@@ -21,7 +21,7 @@ public:
     static Gamete EMPTY_GAMETE;
 
     Gamete();
- 
+
     pointer clone() const;
     pointer copy();
 

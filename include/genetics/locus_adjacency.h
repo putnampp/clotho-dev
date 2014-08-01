@@ -10,12 +10,12 @@ class locus_adjacency : public bit_vector {
 public:
     typedef PopulationAlphabet  alphabet_t;
 
-    typedef MaskIterator< bit_vector::iterator, alphabet_t, 
-                            size_t, alphabet_t::allele_t * > allele_iterator;
-    typedef MaskIterator< bit_vector::iterator, alphabet_t, 
-                            size_t, alphabet_t::locus_t * > locus_iterator;
-    typedef MaskIterator< bit_vector::iterator, alphabet_t, 
-                            size_t, alphabet_t::alphabet_key_t > locus_allele_iterator;
+    typedef MaskIterator< bit_vector::iterator, alphabet_t,
+            size_t, alphabet_t::allele_t * > allele_iterator;
+    typedef MaskIterator< bit_vector::iterator, alphabet_t,
+            size_t, alphabet_t::locus_t * > locus_iterator;
+    typedef MaskIterator< bit_vector::iterator, alphabet_t,
+            size_t, alphabet_t::alphabet_key_t > locus_allele_iterator;
 
     typedef locus_adjacency * pointer;
 

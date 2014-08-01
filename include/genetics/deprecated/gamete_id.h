@@ -5,7 +5,7 @@
 
 template < class K, class S, class T, class E= void >
 union _gamete_id;
- 
+
 template < class K, class S, class T >
 union _gamete_id<K, S, T, typename std::enable_if< sizeof(K) >= sizeof(S) + sizeof(T) >::type > {
     typedef K gamete_key_t;

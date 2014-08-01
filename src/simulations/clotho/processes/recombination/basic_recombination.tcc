@@ -13,12 +13,12 @@ public:
     typedef typename gamete_t::pointer gamete_ptr;
 
     basic_recomb( double g = 0.0001 ) : m_gamma(((g < 0.0) ? 0.0 : g )) { }
- 
+
     gamete_ptr operator()( individual_properties_t * ip ) {
         gamete_ptr p0 = ip->getGamete(0);
         gamete_ptr p1 = ip->getGamete(1);
 
-        if( p0 == p1 ) return p0; // gametes the same, recombination has no effect 
+        if( p0 == p1 ) return p0; // gametes the same, recombination has no effect
 
         size_t nVar = p0->size() + p1->size();
         if( nVar == 0 || nVar == 1 ) return p0;
@@ -59,7 +59,7 @@ public:
                     }
 
                     while( p0_it != p0_end && p0_it->getKey() < b ) {
-                            p0_it++;
+                        p0_it++;
                     }
                 }
                 sw = !sw;
@@ -80,7 +80,7 @@ public:
 
         return ((m_rng->nextBool() ) ? p0 : p1);
     }
-     
+
     virtual ~basic_recomb() {}
 protected:
     double m_gamma;

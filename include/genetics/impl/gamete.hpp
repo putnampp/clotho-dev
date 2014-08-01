@@ -83,8 +83,12 @@ public:
         return (--m_active_count == 0 );
     }
 
-    var_iterator begin() { return m_vars.begin(); }
-    var_iterator end() { return m_vars.end(); }
+    var_iterator begin() {
+        return m_vars.begin();
+    }
+    var_iterator end() {
+        return m_vars.end();
+    }
 
     void print( std::ostream & out ) {
         out << "{";

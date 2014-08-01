@@ -43,9 +43,8 @@ public:
 
     static const Pager< T, S > TEMPLATE;
 
-    Pager( Pager< T, S > * n ) : 
-        header( n, COUNT, 0 ) 
-    {
+    Pager( Pager< T, S > * n ) :
+        header( n, COUNT, 0 ) {
         memcpy( objects, n->objects, sizeof(_node) * COUNT );
     }
 
@@ -88,7 +87,7 @@ public:
     void freeObject( object_t * obj ) {
         if( isOnPage( obj ) ) {
             index_t * idx = reinterpret_cast< index_t * >( reinterpret_cast< char * >(obj) - IDX_OFFSET );
-            
+
             assert( idx->key.id >= SET_INUSE );
 
             idx->key.id &= (UNSET_INUSE);

@@ -6,7 +6,7 @@ namespace utility {
 template < class I >
 struct iterator_helper {
     typedef I::iterator         type;
-    typedef I::const_iterator   ctype;  
+    typedef I::const_iterator   ctype;
 };
 
 }   // namespace utility

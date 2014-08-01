@@ -6,7 +6,7 @@
 #include "active_poolable.h"
 
 template < class OBJ >
-class active_pool< OBJ, 
+class active_pool< OBJ,
     typename std::enable_if< std::is_base_of< active_poolable, OBJ >::value >::type > {
 public:
     typedef OBJ object_t;
@@ -99,7 +99,7 @@ public:
         updateObject( pool_idx, &m_active );
     }
 
-    inline void pendingObject( object_ptr o ) { 
+    inline void pendingObject( object_ptr o ) {
         assert( o != NULL );
         pendingObject( o->getActiveIndex() );
     }
@@ -140,7 +140,10 @@ public:
     object_ptr getActiveObjectAt( size_t index ) const {
         object_node * o = m_active.head;
 
-        while( o != NULL && index > 0) { o = o->next; --index; }
+        while( o != NULL && index > 0) {
+            o = o->next;
+            --index;
+        }
 
         assert( index == 0 );
 

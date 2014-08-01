@@ -140,7 +140,9 @@ public:
 
         @return Id of peer.
     */
-    inline unsigned int getConnectionId() const { return connectionId; }
+    inline unsigned int getConnectionId() const {
+        return connectionId;
+    }
 
     /** Get the total number of participating peers.
 
@@ -149,7 +151,9 @@ public:
 
         @return Total number of participating peers.
     */
-    inline unsigned int getNumberOfConnections() const { return numberOfConnections; }
+    inline unsigned int getNumberOfConnections() const {
+        return numberOfConnections;
+    }
 
     /** Get the maximum message size that can be sent or received.
 
@@ -158,7 +162,9 @@ public:
 
         @return MTU of this connection interface.
     */
-    inline unsigned int getMTU() const { return mtu; }
+    inline unsigned int getMTU() const {
+        return mtu;
+    }
 
     /** Get connection status.
 
@@ -170,7 +176,9 @@ public:
 
         @return Was connections established?
     */
-    inline bool isConnected() const { return connected; }
+    inline bool isConnected() const {
+        return connected;
+    }
 
     //@} // End of Public Class Methods of eclmplConnectionInterface.
 

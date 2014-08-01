@@ -40,26 +40,26 @@ public:
     typedef typename page_t::_node   object_node_t;
 
     struct update_header_on_get {
-        object_t * operator()( header_t * h ) {
-            page_header * ph = &h->key;
-            typename page_t::_node * onode = reinterpret_cast< typename page_t::_node * >(ph->available);
-            assert( onode != NULL );
-            if( --ph->free_count > 0 ) {
-                //assert( onode->idx.fl_offset != COUNT );
-                //ph->available = onode->idx.fl_offset;
-                //
-                if( onode->flp == NULL ) {
-                    ph->available = onode + 1;
-                } else {
-                    ph->available = onode->flp;
-                }
-                onode->flp = ph;
+    object_t * operator()( header_t * h ) {
+        page_header * ph = &h->key;
+        typename page_t::_node * onode = reinterpret_cast< typename page_t::_node * >(ph->available);
+        assert( onode != NULL );
+        if( --ph->free_count > 0 ) {
+            //assert( onode->idx.fl_offset != COUNT );
+            //ph->available = onode->idx.fl_offset;
+            //
+            if( onode->flp == NULL ) {
+                ph->available = onode + 1;
             } else {
-                ph->available = NULL;
+                ph->available = onode->flp;
             }
-            return &onode->obj;
+            onode->flp = ph;
+        } else {
+            ph->available = NULL;
         }
-    };
+        return &onode->obj;
+    }
+                                                     };
 
     struct update_header_on_release {
         void operator()( header_t * h, typename page_t::_node * n ) {

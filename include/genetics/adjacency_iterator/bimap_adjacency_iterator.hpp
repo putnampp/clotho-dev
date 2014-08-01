@@ -14,8 +14,8 @@
 // SPECIALIZATION
 //
 template < class NS1, class NS2, class NR, class B >
-class AdjacencyIterator< boost::bimaps::bimap< NS1, NS2, NR >, 
-                    boost::dynamic_bitset< B > > {
+class AdjacencyIterator< boost::bimaps::bimap< NS1, NS2, NR >,
+    boost::dynamic_bitset< B > > {
 public:
     typedef boost::bimaps::bimap< NS1, NS2, NR > graph_type;
     typedef boost::dynamic_bitset< B > edge_set_type;
@@ -60,8 +60,7 @@ THEADER SPECIALIZATION::AdjacencyIterator( graph_pointer gp, edge_set_pointer es
     m_graph(gp),
     m_edges(es),
     m_edge_index( idx ),
-    m_it( m_graph->end() )
-{
+    m_it( m_graph->end() ) {
     if( m_edge_index != edge_set_type::npos ) {
         if( m_edges->size() == 0 || m_edge_index >= m_edges->size() ) {
             m_edge_index = edge_set_type::npos;
@@ -75,8 +74,8 @@ THEADER SPECIALIZATION::AdjacencyIterator( const SPECIALIZATION & other ) :
     m_graph(other.m_graph),
     m_edges(other.m_edges),
     m_edge_index( other.m_edge_index ),
-    m_it( other.m_it )
-{}
+    m_it( other.m_it ) {
+}
 
 THEADER
 SPECIALIZATION & SPECIALIZATION::operator++() {

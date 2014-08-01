@@ -20,7 +20,7 @@ public:
 
 //    mutate_site( map_pointer mp, double mu = 0.0001, bool bFixed = false );
     static void initialize( double mu = 0.0001, bool bFixed = false );
-  
+
     static map_pointer  getVariantMap();
 
     static gamete_ptr   mutate( gamete_ptr gm );
@@ -72,7 +72,7 @@ typename SPECIALIZATION::gamete_ptr SPECIALIZATION::mutate_infinite( gamete_ptr 
     if( nMut > 0) {
         res = gm->clone();
         assert( res != NULL );
-         
+
         do {
 //            typename variant_map_t::value_ptr_t var = getNewVariant();
             typedef symbol_generator< variant_map_t::locus_t, variant_map_t::allele_t, variant_map_t::index_type, variant_map_t > sgen_type;

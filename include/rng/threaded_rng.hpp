@@ -19,8 +19,7 @@ public:
         m_type( r->getType() ),
         m_seed( r->getSeed() ),
         m_min( m_rng->getMin() ),
-        m_max( m_rng->getMax() )
-    {
+        m_max( m_rng->getMax() ) {
         m_lock = PTHREAD_MUTEX_INITIALIZER;
         getRNG();
     }
@@ -35,8 +34,12 @@ public:
         return nrng;
     }
 
-    const type_t & getType() const { return m_type; }
-    seed_t    getSeed() const { return m_seed; }
+    const type_t & getType() const {
+        return m_type;
+    }
+    seed_t    getSeed() const {
+        return m_seed;
+    }
 
     void    reseed( seed_t s ) {
         rng_t r = getRNG();
@@ -48,7 +51,7 @@ public:
         return m_min;
     }
 
-    unsigned int    getMax() const { 
+    unsigned int    getMax() const {
         return m_max;
     }
 
@@ -74,12 +77,12 @@ public:
 
     /*
     * Common Distribution interfaces
-    */ 
+    */
     unsigned int    nextPoisson( double mu ) {
         rng_t r = getRNG();
         return r->nextPoisson( mu );
     }
-    
+
     virtual ~ThreadedRNG() {
         m_thread_rng.clear();
     }
@@ -87,7 +90,7 @@ protected:
 
     rng_t       getRNG() {
         pthread_t s = pthread_self();
-        
+
         pthread_mutex_lock( &m_lock );
 
         rng_group_t::iterator it = m_thread_rng.find(s);

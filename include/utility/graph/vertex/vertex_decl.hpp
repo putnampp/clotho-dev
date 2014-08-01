@@ -5,11 +5,11 @@ namespace utility {
 namespace graph {
 namespace vertices {
 
-template < class Properties, 
-            class InNeighbor, 
-            class OutNeighbor, 
-            class InNeighborhood,
-            class OutNeighborhood >
+template < class Properties,
+           class InNeighbor,
+           class OutNeighbor,
+           class InNeighborhood,
+           class OutNeighborhood >
 class vertex {
 public:
     typedef Properties          properties_type;

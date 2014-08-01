@@ -13,7 +13,7 @@ namespace sentences {
 
 template < typename W, typename C, typename B, typename BA, typename S = boost::mpl::na >
 class sentence < grammar::lexicons::lexicon< W, C, boost::dynamic_bitset<B, BA>::size_type >,
-                W, boost::dynamic_bitset< B >, S > {
+    W, boost::dynamic_bitset< B >, S > {
 public:
     typedef boost::dynamic_bitset< B, BA >          word_group_type;
     typedef typename word_group_type::size_type     word_reference;
@@ -92,7 +92,9 @@ void    SPECIALIZATION::addWord( const word_type & w ) {
 
 THEADER
 void    SPECIALIZATION::addWord( const word_reference & w ) {
-    if( w >= m_words.size() ) { m_words.resize( w + 1 ); }
+    if( w >= m_words.size() ) {
+        m_words.resize( w + 1 );
+    }
 
     m_words[ w ] = true;
 }

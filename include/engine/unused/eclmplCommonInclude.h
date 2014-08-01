@@ -103,14 +103,15 @@ inline char* cppStrDup(const char* toDup, int len = -1) {
 void __eclmpl__printCharStr(const char* const str, const unsigned int& strLen) {
     cerr << "\"";
     for (unsigned int i = 0; i < strLen; i++) {
-        if (str[i] == '\0')
-        { cerr << "'\\0'"; }
-        else if (str[i] == '\n')
-        { cerr << "'\\n'"; }
-        else if (str[i] >= 32 && str[i] <= 126)
-        { cerr << str[i]; }
-        else
-        { cerr << "'ascii_" << (int)str[i] << "'"; }
+        if (str[i] == '\0') {
+            cerr << "'\\0'";
+        } else if (str[i] == '\n') {
+            cerr << "'\\n'";
+        } else if (str[i] >= 32 && str[i] <= 126) {
+            cerr << str[i];
+        } else {
+            cerr << "'ascii_" << (int)str[i] << "'";
+        }
     }
     cerr << "\"";
 }

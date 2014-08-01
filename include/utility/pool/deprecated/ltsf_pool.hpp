@@ -10,7 +10,7 @@ template < class T, class OBJ, class E = void >
 class ltsf_pool;
 
 template < class T, class OBJ >
-class ltsf_pool< T, OBJ, 
+class ltsf_pool< T, OBJ,
     typename std::enable_if< std::is_base_of< poolable, OBJ >::value >::type > {
 public:
     typedef T   vtime_t;
@@ -195,7 +195,7 @@ protected:
                 break;
             }
         }
-        
+
         if( q == NULL ) {
             // there are currently no queues
 //            std::cout << "Adding new LTSF Node to queue " << t << std::endl;
@@ -333,13 +333,13 @@ public:
         size_t queue;
         size_t next, prev;
 
-        object_node( size_t idx, object_t o = UNKNOWN_INDEX, size_t q = UNKNOWN_INDEX, size_t n = UNKNOWN_INDEX, size_t p = UNKNOWN_INDEX) : 
-            node_idx(idx), 
-            object(o), 
-            queue(q), 
-            next(n), 
-            prev(p) 
-        {}
+        object_node( size_t idx, object_t o = UNKNOWN_INDEX, size_t q = UNKNOWN_INDEX, size_t n = UNKNOWN_INDEX, size_t p = UNKNOWN_INDEX) :
+            node_idx(idx),
+            object(o),
+            queue(q),
+            next(n),
+            prev(p) {
+        }
     };
 
     struct ltsf_node {
@@ -348,19 +348,19 @@ public:
         size_t head;
         size_t next, prev;
 
-        ltsf_node( vtime_t t, size_t h = UNKNOWN_INDEX, size_t n = UNKNOWN_INDEX, size_t p = UNKNOWN_INDEX ) : 
-            timestamp(t), 
-            head(h), 
-            next(n), 
-            prev(p) 
-        {}
+        ltsf_node( vtime_t t, size_t h = UNKNOWN_INDEX, size_t n = UNKNOWN_INDEX, size_t p = UNKNOWN_INDEX ) :
+            timestamp(t),
+            head(h),
+            next(n),
+            prev(p) {
+        }
     };
 
-    ltsf_pool() : 
-        m_unset_object(UNKNOWN_INDEX), 
-        m_root( UNKNOWN_INDEX ), 
-        m_available( UNKNOWN_INDEX ) 
-    {}
+    ltsf_pool() :
+        m_unset_object(UNKNOWN_INDEX),
+        m_root( UNKNOWN_INDEX ),
+        m_available( UNKNOWN_INDEX ) {
+    }
 
     object_t getPoolObject( size_t pool_idx ) {
         assert( pool_idx < m_objects.size() );
@@ -404,7 +404,7 @@ public:
 
             if( rnode.timestamp == t ) {
                 object_node & n = m_objects[rnode.head];
-    
+
                 rnode.head = n.next;
                 if( rnode.head == UNKNOWN_INDEX ) {
                     remove_ltsf_node( m_root );
@@ -499,7 +499,7 @@ protected:
                 break;
             }
         }
-        
+
         if( q == UNKNOWN_INDEX ) {
             // there are currently no queues
             q = getLTSFNode( t );

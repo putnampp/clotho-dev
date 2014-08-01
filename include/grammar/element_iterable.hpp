@@ -11,7 +11,7 @@ struct iterable_container {
     citerator begin() const {
         return m_container.begin();
     }
-    
+
     citerator end() const {
         return m_container.end();
     }

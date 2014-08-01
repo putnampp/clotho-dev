@@ -22,21 +22,21 @@ public:
 
     typedef object_t object_reference;
 
-    EventPageWalker( event_page_t * page = NULL, object_node_t * s = NULL, object_node_t * e = NULL) : 
+    EventPageWalker( event_page_t * page = NULL, object_node_t * s = NULL, object_node_t * e = NULL) :
         m_page(page),
         m_obj( ((s == NULL )? ((page != NULL) ? page->head_object() : NULL ) : s) ),
         m_stop_obj( ((e == NULL ) ? ((page != NULL) ? page->end_object() : NULL ) : e) ),
         m_en( ((m_obj != NULL )? m_obj->onode.events : NULL )),
-        m_bObjectChange(m_obj != m_stop_obj)
-    { }
+        m_bObjectChange(m_obj != m_stop_obj) {
+    }
 
-    EventPageWalker( const EventPageWalker< EP > & epw ) : 
+    EventPageWalker( const EventPageWalker< EP > & epw ) :
         m_page( epw.m_page ),
         m_obj( epw.m_obj ),
         m_stop_obj( epw.m_stop_obj ),
         m_en( epw.m_en ),
-        m_bObjectChange( epw.m_bObjectChange )
-    {}
+        m_bObjectChange( epw.m_bObjectChange ) {
+    }
 
     EventPageWalker< EP > & operator++() {
         if( m_page != NULL ) {
@@ -66,11 +66,13 @@ public:
 
     bool operator==( const EventPageWalker< EP > & rhs ) const {
         return m_page == rhs.m_page
-                && m_obj == rhs.m_obj
-                && m_en == rhs.m_en;
+               && m_obj == rhs.m_obj
+               && m_en == rhs.m_en;
     }
 
-    bool HasObjectChanged() const { return m_bObjectChange; }
+    bool HasObjectChanged() const {
+        return m_bObjectChange;
+    }
 
     EventPageWalker< EP > & operator=( const EventPageWalker< EP > & rhs ) {
         if( this != &rhs ) {
@@ -82,9 +84,13 @@ public:
         return *(this);
     }
 
-    event_pointer getEvent() { return m_en->p_event; }
+    event_pointer getEvent() {
+        return m_en->p_event;
+    }
 
-    object_reference getObjectID() { return m_obj->onode.object_id; }
+    object_reference getObjectID() {
+        return m_obj->onode.object_id;
+    }
 
     virtual ~EventPageWalker() {    }
 protected:

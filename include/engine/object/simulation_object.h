@@ -6,15 +6,14 @@
 #include "event_transceiver.h"
 
 template< class ES >
-class SimulationObject : 
+class SimulationObject :
     virtual public Object,
-    virtual public EventManager< ES >
-{
+    virtual public EventManager< ES > {
 public:
     SimulationObject( ) : Object( ) {}
-    SimulationObject( simulation_manager * manager ) : 
-        Object( manager )
-    {}
+    SimulationObject( simulation_manager * manager ) :
+        Object( manager ) {
+    }
 
     virtual ~SimulationObject() { }
 protected:

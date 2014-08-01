@@ -17,7 +17,7 @@ public:
     typedef SM simulation_manager_t;
 
     typedef EventPage< E, O > event_page_t;
-   
+
 
 //    PageWorkerThread( simulation_manager_t * sm, unsigned int id, unsigned int pool_size );
     PageWorkerThread( simulation_manager_t * sm, unsigned int id, unsigned int pool_size );
@@ -27,7 +27,9 @@ public:
     void stop();
     void force_stop();
 
-    size_t getProcessedCount() const { return m_nProcessed; }
+    size_t getProcessedCount() const {
+        return m_nProcessed;
+    }
 
     virtual ~PageWorkerThread();
 
@@ -74,13 +76,12 @@ PageWorkerThread<E,O,SM>::PageWorkerThread( simulation_manager_t * sm, unsigned 
     m_id( id ),
     m_pool_size( pool_size ),
     m_thread( new pthread_t() ),
-    m_done(false), 
-    m_waiting(false), 
+    m_done(false),
+    m_waiting(false),
     m_sync(true),
     m_cur_time( SystemClock::POSITIVE_INFINITY ),
     m_cur_objs(NULL),
-    m_nProcessed(0)
-{
+    m_nProcessed(0) {
     pthread_mutex_init( &m_mutWait, NULL );
     pthread_cond_init( &m_cond_wait, NULL );
 
@@ -89,7 +90,7 @@ PageWorkerThread<E,O,SM>::PageWorkerThread( simulation_manager_t * sm, unsigned 
     assert( rVal == 0);
 }
 
-template < class E, class O, class SM > 
+template < class E, class O, class SM >
 PageWorkerThread<E,O,SM>::~PageWorkerThread() {
     force_stop();
 
@@ -138,7 +139,7 @@ void PageWorkerThread<E,O,SM>::force_stop() {
 
     m_cur_time = SystemClock::POSITIVE_INFINITY;
     m_cur_objs = NULL;
-    
+
     pthread_cond_signal( &m_cond_wait );
     pthread_mutex_unlock( &m_mutWait );
 }

@@ -25,9 +25,8 @@ public:
     void        * header;
     _node       objects[ COUNT ];
 
-    ObjectSpace( const ObjectSpace & src ) : 
-        header(NULL) 
-    {
+    ObjectSpace( const ObjectSpace & src ) :
+        header(NULL) {
         memcpy( objects, src.objects, sizeof( _node ) * COUNT );
     }
 
@@ -43,7 +42,7 @@ public:
     template < class FNC >
     object_t * getObject( header_t * h ) {
         static FNC pred;
-        
+
         object_t * obj = pred(h, objects);
 
         return obj;
@@ -66,9 +65,8 @@ public:
     virtual ~ObjectSpace() { }
 
 protected:
-    ObjectSpace( ) : 
-        header(NULL) 
-    {
+    ObjectSpace( ) :
+        header(NULL) {
         offset_t id = 0;
         _node * tmp = objects;
 

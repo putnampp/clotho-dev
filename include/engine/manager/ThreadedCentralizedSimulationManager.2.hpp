@@ -117,8 +117,7 @@ ThreadedCentralizedSimulationManager< E, O >::ThreadedCentralizedSimulationManag
     m_stats(),
     m_nThreads(nThreads),
     m_tid( nThreads ),
-    m_workers( NULL )
-{
+    m_workers( NULL ) {
     m_workers = new worker_thread_t[ nThreads ];
 
     pthread_barrier_init( &m_syncpoint, NULL, m_nThreads + 1 );
@@ -133,7 +132,7 @@ ThreadedCentralizedSimulationManager< E, O >::ThreadedCentralizedSimulationManag
 
 template < class E, class O >
 ThreadedCentralizedSimulationManager< E, O >::ThreadedCentralizedSimulationManager( shared_ptr< application > app, shared_ptr< SimulationStats > stats, unsigned int nThreads, system_id::manager_id_t id ) :
-    SimulationManager< E, O >( id ), 
+    SimulationManager< E, O >( id ),
     m_app(app),
     m_sim_time( SystemClock::ZERO ),
     m_sim_until( SystemClock::POSITIVE_INFINITY ),
@@ -145,8 +144,7 @@ ThreadedCentralizedSimulationManager< E, O >::ThreadedCentralizedSimulationManag
     m_stats(stats),
     m_nThreads(nThreads),
     m_tid( nThreads ),
-    m_workers( NULL )
-{
+    m_workers( NULL ) {
     m_workers = new worker_thread_t *[ m_nThreads ];
 
     pthread_barrier_init( &m_syncpoint, NULL, m_nThreads + 1 ); // + 1 for simulation manager thread
@@ -238,7 +236,7 @@ typename ThreadedCentralizedSimulationManager<E, O>::object_t * ThreadedCentrali
 template < class E, class O >
 void ThreadedCentralizedSimulationManager<E,O>::initialize( ) {
     m_stats->startPhase( INIT_PHASE_K );
-    
+
     for( unsigned int i = 0; i < m_nThreads; ++i ) {
         m_workers[i] = new worker_thread_t( this, i, m_nThreads );
     }
@@ -252,7 +250,7 @@ void ThreadedCentralizedSimulationManager<E,O>::initialize( ) {
 template < class E, class O >
 void ThreadedCentralizedSimulationManager<E,O>::simulate( const vtime_t & until ) {
     setSimulateUntil( until );
-    
+
     m_stats->startPhase( SIMULATE_PHASE_K );
 
     typename ltsf_pool_t::iterator it = m_pooled_events.begin();
@@ -269,7 +267,7 @@ void ThreadedCentralizedSimulationManager<E,O>::simulate( const vtime_t & until 
 
             sync();
 
-        //    m_page_manager->release( ep );
+            //    m_page_manager->release( ep );
             delete ep;
         }
 
@@ -301,12 +299,12 @@ void ThreadedCentralizedSimulationManager< E, O >::routeEvent( const system_id &
 template < class E, class O >
 void ThreadedCentralizedSimulationManager< E, O >::routeEvent( event_t * evt, const system_id & id, const vtime_t & rt ) {
     unsigned int tid = *((unsigned int * ) pthread_getspecific(common_thread_key) );
-    
+
     pthread_mutex_lock( &m_mutEventPool );
     typename ltsf_pool_t::iterator it = m_pooled_events.find( rt );
     if( it == m_pooled_events.end() ) {
         // sufficient to only lock this block
-    //    pthread_mutex_lock( &m_mutEventPool );
+        //    pthread_mutex_lock( &m_mutEventPool );
 
         std::pair< typename ltsf_pool_t::iterator, bool > res = m_pooled_events.insert( make_pair( rt, (paged_event_pool_t * )NULL ));
         it = res.first;
@@ -315,10 +313,10 @@ void ThreadedCentralizedSimulationManager< E, O >::routeEvent( event_t * evt, co
             it->second = new paged_event_pool_t( m_nThreads + 1 );
         }
 
-     //   pthread_mutex_unlock( &m_mutEventPool );
+        //   pthread_mutex_unlock( &m_mutEventPool );
     }
     pthread_mutex_unlock( &m_mutEventPool );
-    
+
     it->second->append( evt, id, tid );
 }
 

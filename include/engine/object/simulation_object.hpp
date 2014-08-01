@@ -10,13 +10,12 @@
 //#include "poolable.h"
 
 template< class E, class ES, class EM = EventManager< E, ES > >
-class SimulationObject : 
+class SimulationObject :
     public object,
 //    public poolable,
     public event_manager< E >,
     public event_processor,
-    public event_transceiver< E >
-{
+    public event_transceiver< E > {
 public:
     typedef E event_t;
     typedef ES event_set_t;
@@ -26,15 +25,14 @@ public:
 
     typedef typename event_t::event_id_t event_id_t;
 
-    SimulationObject( ) : 
+    SimulationObject( ) :
         object( ),
         m_evt_manager( NULL ),
         m_router( NULL ),
         m_performer( NULL ),
         m_local_time( SystemClock::ZERO ),
 //        m_pool_idx( -1 ),
-        m_next_eid(0)
-    {
+        m_next_eid(0) {
         m_evt_manager = new event_manager_t();
     }
 
@@ -44,8 +42,7 @@ public:
         m_router( router ),
         m_performer( NULL ),
         m_local_time( SystemClock::ZERO ),
-        m_next_eid(0)
-    {
+        m_next_eid(0) {
         m_evt_manager = new event_manager_t();
     }
 
@@ -55,8 +52,8 @@ public:
         m_router( so.m_router ),
         m_performer( so.m_performer ),
         m_local_time( so.m_local_time ),
-        m_next_eid( so.m_next_eid )
-    {}
+        m_next_eid( so.m_next_eid ) {
+    }
 
     virtual void process() {
         if( m_performer == NULL ) return;
@@ -70,7 +67,7 @@ public:
             m_performer->perform_event( tmp );
 
             //tmp->release();
-        //    delete tmp;
+            //    delete tmp;
             tmp = peekEvent( m_id );
         }
 

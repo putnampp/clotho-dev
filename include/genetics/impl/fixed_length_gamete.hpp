@@ -16,27 +16,24 @@ public:
     typedef A                           allele_t;
     typedef VM  variant_map_t;
 
-    fixed_gamete() : 
-        gamete_base(), 
+    fixed_gamete() :
+        gamete_base(),
         m_alleles( new allele_t[ m_variants->size() ] ),
-        m_nMutated( m_variants->size() )
-    {
+        m_nMutated( m_variants->size() ) {
         memset( m_alleles, 0, sizeof( allele_t ) * m_variants->size() );
     }
 
-    fixed_gamete(gamete_source_t s, gamete_type_t t) : 
-        gamete_base(s,t), 
+    fixed_gamete(gamete_source_t s, gamete_type_t t) :
+        gamete_base(s,t),
         m_alleles( new allele_t[ m_variants->size() ] ),
-        m_nMutated( m_variants->size() )
-    {
+        m_nMutated( m_variants->size() ) {
         memset( m_alleles, 0, sizeof( allele_t ) * m_variants->size() );
     }
 
-    fixed_gamete( const fixed_gamete< allele_t, variant_map_t > & c ) : 
-        gamete_base( c.m_id ), 
-        m_alleles( new allele_t[ m_variants->size() ] ), 
-        m_nMutated( c.m_nMutated )
-    {
+    fixed_gamete( const fixed_gamete< allele_t, variant_map_t > & c ) :
+        gamete_base( c.m_id ),
+        m_alleles( new allele_t[ m_variants->size() ] ),
+        m_nMutated( c.m_nMutated ) {
         memcpy( m_alleles, c.m_alleles, sizeof( allele_t ) * m_variants->size());
     }
 
