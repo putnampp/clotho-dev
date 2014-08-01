@@ -9,13 +9,13 @@ public:
 
 //    static const event_type_t TYPE_ID = 7;
     CLOTHO_EVENT_ID( 7 )
- 
+
     void init( const vtime_t & tSent, const vtime_t & tRecv,
-                const system_id & sender, const system_id & receiver,
-                event_id_t eid );
+               const system_id & sender, const system_id & receiver,
+               event_id_t eid );
     void init( const vtime_t & tSent, const vtime_t & tRecv,
-                const system_object * sender, const system_object * receiver,
-                event_id_t eid );
+               const system_object * sender, const system_object * receiver,
+               event_id_t eid );
 
     //inline event_type_t getEventType() const { return TYPE_ID; }
 
@@ -34,11 +34,11 @@ public:
     MateSelectEvent() {}
 
     MateSelectEvent( const vtime_t & tSent, const vtime_t & tRecv,
-                const system_id & sender, const system_id & receiver,
-                event_id_t eid );
+                     const system_id & sender, const system_id & receiver,
+                     event_id_t eid );
     MateSelectEvent( const vtime_t & tSent, const vtime_t & tRecv,
-                const system_object * sender, const system_object * receiver,
-                event_id_t eid );
+                     const system_object * sender, const system_object * receiver,
+                     event_id_t eid );
 
     static object_manager_t m_pool;
 };

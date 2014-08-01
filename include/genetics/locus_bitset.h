@@ -70,6 +70,8 @@ public:
 
     void masked_join( const locus_bitset & rhs, const bitset_type & mask );
 
+    bool minMutationCount( size_t threshold ) const;
+
     virtual ~locus_bitset();
 protected:
     bitset_type             m_bits;

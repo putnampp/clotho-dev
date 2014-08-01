@@ -34,7 +34,7 @@ CommunicationManagerFactory::allocate(SimulationConfiguration& configuration,
 
     // first configure what physical communication layer we are going to use ...
     std::string physicalLayer = configuration.get_string({"TimeWarp", "CommunicationManager", "PhysicalLayer"},
-                                                         "Default");
+                                "Default");
     if (physicalLayer == "MPI" || physicalLayer == "UDPSelect" || physicalLayer == "TCPSelect") {
         myPhysicalCommunicationLayer = allocatePhysicalCommunicationLayer(physicalLayer);
         debug::debugout << "(" << mySimulationManager->getSimulationManagerID() << ") ";
@@ -50,7 +50,7 @@ CommunicationManagerFactory::allocate(SimulationConfiguration& configuration,
     }
 
     std::string managerType = configuration.get_string({"TimeWarp", "CommunicationManager", "Type"},
-                                                       "Default");
+                              "Default");
     std::string simulationType = configuration.get_string({"Simulation"}, "Sequential");
 
     if (simulationType == "ThreadedTimeWarp") {
@@ -76,11 +76,11 @@ CommunicationManagerFactory::allocate(SimulationConfiguration& configuration,
     myPhysicalCommunicationLayer->physicalInit();
     if (managerType == "Default") {
         retval = new DefaultCommunicationManager(myPhysicalCommunicationLayer,
-                                                 mySimulationManager);
+                mySimulationManager);
         debug::debugout << "configured the default communication manager" << endl;
     } else if (managerType == "MessageAggregating") {
         retval = new MsgAggregatingCommunicationManager(myPhysicalCommunicationLayer,
-                                                        mySimulationManager);
+                mySimulationManager);
         debug::debugout << "configured a message aggregating communication manager" << endl;
     } else {
         mySimulationManager->shutdown("Unknown CommunicationManager type \"" + managerType + "\"");

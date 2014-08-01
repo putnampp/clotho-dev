@@ -27,8 +27,7 @@ class TIndividual;
 
 template < class LCM, class IP, class RMODEL >
 class TIndividual< LCM, IP, RMODEL, typename std::enable_if< std::is_base_of< life_cycle::life_cycle_model, LCM >::value >::type >
-    :   public AppObject
-{
+    :   public AppObject {
 public:
     typedef IP properties_t;
     typedef typename properties_t::gamete_type gamete_t;
@@ -51,15 +50,14 @@ public:
     TIndividual( ) :
         AppObject(),
         m_env(NULL),
-        m_prop()
-    { }
+        m_prop() {
+    }
 
     TIndividual( ClothoObject * co, ClothoObject * env ) :
         AppObject( co ),
         m_env(env),
         m_env_id( env->getSystemID() ),
-        m_prop()
-    {
+        m_prop() {
         if( m_clotho_object != NULL ) m_clotho_object->updatePerformer(this);
     }
 
@@ -67,8 +65,7 @@ public:
         AppObject( ind ),
         m_env( ind.m_env ),
         m_env_id( ind.m_env_id ),
-        m_prop( ind.m_prop )
-    {
+        m_prop( ind.m_prop ) {
         if( m_clotho_object != NULL ) m_clotho_object->updatePerformer(this);
     }
 

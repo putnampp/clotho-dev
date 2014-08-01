@@ -34,9 +34,9 @@ PopulationAlphabet::index_type     PopulationAlphabet::getSymbol( const locus_t 
         assert( res.second );
 
         it = res.first;
-  //      std::cout << it->left << " ?== " << l << std::endl;
+        //      std::cout << it->left << " ?== " << l << std::endl;
         assert( it->left == l );
-    //    std::cout << "Added new variant to database: " << l << std::endl;
+        //    std::cout << "Added new variant to database: " << l << std::endl;
     } else {
         offset = (it - m_db.begin());
     }
@@ -89,9 +89,9 @@ void PopulationAlphabet::updateFreeSymbols( const bitset_type & fs ) {
     assert( fs.num_blocks() <= m_free_list.num_blocks() );
     typedef bitset_type::block_type block_type;
 
-    block_type * res = &m_free_list.m_bits[0], 
-               * inter = &m_free_intersect.m_bits[0], 
-               * uni = &m_free_union.m_bits[0];
+    block_type * res = &m_free_list.m_bits[0],
+                 * inter = &m_free_intersect.m_bits[0],
+                   * uni = &m_free_union.m_bits[0];
 
     const block_type * next = &fs.m_bits[0];
 

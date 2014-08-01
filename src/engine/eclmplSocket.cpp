@@ -54,7 +54,9 @@ eclmplSocket::wBind(const int& portNr) {
     serverAddr.sin_port = htons(portNumber);
 
     retVal = bind(socketFd, (struct sockaddr*) &serverAddr, sizeof(serverAddr));
-    ECLMPL_DEBUG_SOCKET(if (retVal == -1) { printError(errno, "bind"); })
+    ECLMPL_DEBUG_SOCKET(if (retVal == -1) {
+    printError(errno, "bind");
+    })
     return retVal;
 } // End of wBind(...).
 
@@ -63,7 +65,9 @@ int
 eclmplSocket::wListen(const int& maxConnQLen) const {
     int retVal;
     retVal = listen(socketFd, maxConnQLen);
-    ECLMPL_DEBUG_SOCKET(if (retVal == -1) { printError(errno, "listen"); })
+    ECLMPL_DEBUG_SOCKET(if (retVal == -1) {
+    printError(errno, "listen");
+    })
     return retVal;
 } // End of wListen(...).
 
@@ -100,7 +104,9 @@ eclmplSocket::wConnect(const char* const fullyQualifiedServerAddress) {
     *colonPosition = ':';
 
     retVal = connect(socketFd, (struct sockaddr*) &remoteAddr, sizeof(remoteAddr));
-    ECLMPL_DEBUG_SOCKET(if (retVal == -1) { printError(errno, "connect"); })
+    ECLMPL_DEBUG_SOCKET(if (retVal == -1) {
+    printError(errno, "connect");
+    })
 
     return retVal;
 } // End of wConnect(...).
@@ -128,7 +134,9 @@ eclmplSocket::wConnect(const char* const serverName, const int& portNr) {
     remoteAddrLen = sizeof(remoteAddr);
 
     retVal = connect(socketFd, (struct sockaddr*) &remoteAddr, remoteAddrLen);
-    ECLMPL_DEBUG_SOCKET(if (retVal == -1) { printError(errno, "connect"); })
+    ECLMPL_DEBUG_SOCKET(if (retVal == -1) {
+    printError(errno, "connect");
+    })
 
     return retVal;
 }
@@ -138,7 +146,9 @@ struct hostent*
 eclmplSocket::wGethostbyname(const char* const name) const {
     struct hostent* retVal;
     retVal = gethostbyname(name);
-    ECLMPL_DEBUG_SOCKET(if (retVal == NULL) { printError(h_errno, "gethostbyname"); })
+    ECLMPL_DEBUG_SOCKET(if (retVal == NULL) {
+    printError(h_errno, "gethostbyname");
+    })
     return retVal;
 } // End of w(...).
 
@@ -152,7 +162,9 @@ eclmplSocket::wAccept() {
 #endif
     socketFd = accept(socketFd, (struct sockaddr*)&remoteAddr, &len);
     remoteAddrLen = (int)len;
-    ECLMPL_DEBUG_SOCKET(if (socketFd == -1) { printError(errno, "accept"); })
+    ECLMPL_DEBUG_SOCKET(if (socketFd == -1) {
+    printError(errno, "accept");
+    })
     return socketFd;
 } // End of wAccept(...).
 
@@ -166,7 +178,9 @@ eclmplSocket::wAccept(int& sockFd, struct sockaddr* addr, int* addrLen) const {
 #endif
     sockFd = accept(socketFd, addr, len);
     *addrLen = (int)*len;
-    ECLMPL_DEBUG_SOCKET(if (sockFd == -1) { printError(errno, "accept"); })
+    ECLMPL_DEBUG_SOCKET(if (sockFd == -1) {
+    printError(errno, "accept");
+    })
     return sockFd;
 } // End of wAccept(...).
 
@@ -177,7 +191,9 @@ int
 eclmplSocket::wAccept(const int& s, struct sockaddr* addr, socklen_t* addrLen) const {
     int retVal;
     retVal = accept(s, addr, addrLen);
-    ECLMPL_DEBUG_SOCKET(if (retVal == -1) { printError(errno, "accept"); })
+    ECLMPL_DEBUG_SOCKET(if (retVal == -1) {
+    printError(errno, "accept");
+    })
     return retVal;
 } // End of wAccept(...).
 #endif
@@ -225,14 +241,15 @@ eclmplSocket::readn(char* buf, const unsigned int& n) const {
         if (dataRead < n) {
             std::cerr << "____wRecv____ READ SO FAR (dataRead="<<dataRead<<",n="<<n<<")=\"";
             for (unsigned int i = 0; i < dataRead; i++) {
-                if (buf[i] == '\0')
-                { fprintf(stderr, "'\\0'"); }
-                else if (buf[i] == '\n')
-                { fprintf(stderr, "'\\n'"); }
-                else if (buf[i] >= 32 && buf[i] <= 126)
-                { fprintf(stderr, "%c", buf[i]); }
-                else
-                { fprintf(stderr, "'%d'", (int)buf[i]); }
+                if (buf[i] == '\0') {
+                    fprintf(stderr, "'\\0'");
+                } else if (buf[i] == '\n') {
+                    fprintf(stderr, "'\\n'");
+                } else if (buf[i] >= 32 && buf[i] <= 126) {
+                    fprintf(stderr, "%c", buf[i]);
+                } else {
+                    fprintf(stderr, "'%d'", (int)buf[i]);
+                }
             }
             std::cerr << "\" (length=" << strlen(buf)+1 << ")" << std::endl;
         }
@@ -241,14 +258,15 @@ eclmplSocket::readn(char* buf, const unsigned int& n) const {
 #if 0
     std::cerr << "SOCKET_READN:\"";
     for (int i = 0; i < dataRead; i++) {
-        if (buf[i] == '\0')
-        { fprintf(stderr, "'\\0'"); }
-        else if (buf[i] == '\n')
-        { fprintf(stderr, "'\\n'"); }
-        else if (buf[i] >= 32 && buf[i] <= 126)
-        { fprintf(stderr, "%c", buf[i]); }
-        else
-        { fprintf(stderr, "'%d'", (int)buf[i]); }
+        if (buf[i] == '\0') {
+            fprintf(stderr, "'\\0'");
+        } else if (buf[i] == '\n') {
+            fprintf(stderr, "'\\n'");
+        } else if (buf[i] >= 32 && buf[i] <= 126) {
+            fprintf(stderr, "%c", buf[i]);
+        } else {
+            fprintf(stderr, "'%d'", (int)buf[i]);
+        }
     }
     std::cerr << "\"" << std::endl;
 #endif
@@ -259,7 +277,9 @@ int
 eclmplSocket::wSend(const char* const buf, const int& length, const unsigned int& flags) const {
     int retVal;
     retVal = sendto(socketFd, buf, length, flags, NULL, 0);
-    ECLMPL_DEBUG_SOCKET(if (retVal == -1) { printError(errno, "send"); })
+    ECLMPL_DEBUG_SOCKET(if (retVal == -1) {
+    printError(errno, "send");
+    })
     return retVal;
 } // End of wSend(...).
 
@@ -303,7 +323,9 @@ eclmplSocket::wSetsockopt(const int& level, const int& optname,
     retVal = setsockopt(socketFd, level, optname, optval, len);
 #endif
 
-    ECLMPL_DEBUG_SOCKET(if (retVal == -1) { printError(errno, "setsockopt"); })
+    ECLMPL_DEBUG_SOCKET(if (retVal == -1) {
+    printError(errno, "setsockopt");
+    })
     return retVal;
 } // End of wSetsockopt(...).
 

@@ -23,13 +23,13 @@ public:
 
     typedef typename base_object_t::event_id_t event_id_t;
 
-    ClothoObject( ) : 
+    ClothoObject( ) :
         base_object_t(),
         m_sim_manager( NULL )/*,
         m_active_idx( -1 )*/
     {}
 
-    ClothoObject( simulation_manager_t * manager, system_id::manager_id_t man, system_id::object_id_t oid ) : 
+    ClothoObject( simulation_manager_t * manager, system_id::manager_id_t man, system_id::object_id_t oid ) :
         base_object_t( (typename base_object_t::event_router_t *) manager, man, oid ),
         m_sim_manager( manager )/*,
         m_active_idx( -1 )*/
@@ -45,21 +45,21 @@ public:
         m_local_time = m_sim_manager->getSimulationTime();
     }
 
-/*    virtual void setSimulationManager( simulation_manager_t * sim ) {
-        if( m_sim_manager == sim ) return;
+    /*    virtual void setSimulationManager( simulation_manager_t * sim ) {
+            if( m_sim_manager == sim ) return;
 
-        if( m_sim_manager != NULL ) {
-            m_sim_manager->unregisterObject(this);
-        }
+            if( m_sim_manager != NULL ) {
+                m_sim_manager->unregisterObject(this);
+            }
 
-        if( sim == NULL ) return;
+            if( sim == NULL ) return;
 
-        m_sim_manager = sim;
+            m_sim_manager = sim;
 
-        setID( m_sim_manager->getNextObjectID() );
+            setID( m_sim_manager->getNextObjectID() );
 
-        m_sim_manager->registerObject( this );
-    }*/
+            m_sim_manager->registerObject( this );
+        }*/
 
     virtual void finalize() {
         if( m_sim_manager ) {

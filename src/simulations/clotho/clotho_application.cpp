@@ -23,8 +23,8 @@ ClothoApplication::ClothoApplication( const string & config, shared_ptr< iRNG > 
     m_rng( rng ),
     m_selection_model( new SimpleRandomSelection( m_rng ) ),
     m_reproduction_model( new SimpleReproduction( m_rng ) ),
-    m_nFounder(10000)
-{}
+    m_nFounder(10000) {
+}
 
 ClothoApplication::~ClothoApplication() {
     if( m_selection_model ) delete m_selection_model;
@@ -56,7 +56,7 @@ void ClothoApplication::finalize() {
     while( !m_system_objs.empty() ) {
         system_id tmp = m_system_objs.back();
         m_system_objs.pop_back();
-        
+
         object * tmp_obj = m_sim_manager->getObject( tmp );
         if( tmp_obj ) {
             tmp_obj->finalize();

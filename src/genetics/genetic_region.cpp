@@ -4,11 +4,11 @@
 #include <cmath>
 
 genetic_region::genetic_region( key_t  k ) :
-    m_key( k )
-{}
+    m_key( k ) {
+}
 
-genetic_region::genetic_region( const chromosome_t & c, pos_t s ) : genetic_region(genetic_mapping::convertToKey< key_t >( c, s))
-{}
+genetic_region::genetic_region( const chromosome_t & c, pos_t s ) : genetic_region(genetic_mapping::convertToKey< key_t >( c, s)) {
+}
 
 genetic_region::key_t genetic_region::getKey() const {
     return m_key;

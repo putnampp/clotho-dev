@@ -9,7 +9,7 @@ template< class POP >
 class TEnvironment : public AppObject {
 public:
     typedef POP                             population_type;
-    typedef typename POP::individual_type   individual_type;    
+    typedef typename POP::individual_type   individual_type;
 
     typedef individual_type *               individual_pointer;
 

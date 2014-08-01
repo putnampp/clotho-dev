@@ -57,7 +57,7 @@ eclmplReliablePhysicalCommunicationLayer::physicalGetId() const {
 
 void
 eclmplReliablePhysicalCommunicationLayer::physicalSend(const SerializedInstance* toSend,
-                                                       unsigned int dest) {
+        unsigned int dest) {
     const void* buffer = &toSend->getData()[0];
     const unsigned int size = toSend->getSize();
 
@@ -148,7 +148,7 @@ eclmplReliablePhysicalCommunicationLayer::physicalGetSize() const {
 
 void
 eclmplReliablePhysicalCommunicationLayer::send(eclmplUnreliableNetworkMessage* const nwMsg,
-                                               const unsigned int& dest) {
+        const unsigned int& dest) {
     int msgLen;
     char msg[maxBuf];
     msgLen = nwMsg->serialize(msg, maxBuf);
@@ -159,7 +159,7 @@ eclmplReliablePhysicalCommunicationLayer::send(eclmplUnreliableNetworkMessage* c
 
 bool
 eclmplReliablePhysicalCommunicationLayer::insertInOrderMessage(eclmplUnreliableNetworkMessage*
-                                                               nwMsg) {
+        nwMsg) {
     bool retVal;
     unsigned int source = nwMsg->getSourceId();
     // Don't insert if duplicate.
@@ -220,7 +220,7 @@ eclmplReliablePhysicalCommunicationLayer::processNwMsgInfo(eclmplUnreliableNetwo
 
 void
 eclmplReliablePhysicalCommunicationLayer::updateOutOfOrderMessageQs(const unsigned int& source,
-                                                                    const bool& sendRetransmissionReq) {
+        const bool& sendRetransmissionReq) {
     // If we have out of order messages we need to check, for every
     // other message that we insert (whether that message is in order
     // order not), whether we can move some messages from an out-of

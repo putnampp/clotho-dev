@@ -85,7 +85,7 @@ public:
 protected:
     // the pools are set as vectors because we want to access
     // the individuals by index.  Would rather iterate to find
-    // corresponding vector position upon removal (death event), 
+    // corresponding vector position upon removal (death event),
     // than iterator to index in 'list/map' upon selection.
 
     vector< IndividualShell * > m_females, m_males, m_unk;

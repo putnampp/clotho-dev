@@ -18,7 +18,7 @@ eclmplConnectionInterfaceImplementationBase::eclmplConnectionInterfaceImplementa
 
 bool
 eclmplConnectionInterfaceImplementationBase::establishConnections(const int* const argc,
-                                                                  const char* const* const* const argv) {
+        const char* const* const* const argv) {
     ASSERT(*argc > 0);
 
     // We have to check the last argument on the command line to be able
@@ -47,8 +47,8 @@ eclmplConnectionInterfaceImplementationBase::tearDownConnections() {
 
 void
 eclmplConnectionInterfaceImplementationBase::send(const unsigned int&,
-                                                  const char* const,
-                                                  const unsigned int&) {
+        const char* const,
+        const unsigned int&) {
     std::cerr << "Error - eclmplConnectionInterfaceImplementationBase::send called.\n"
               << "Whoever implements this class must also implement this virtual method" << std::endl;
     abort();
@@ -56,8 +56,8 @@ eclmplConnectionInterfaceImplementationBase::send(const unsigned int&,
 
 bool
 eclmplConnectionInterfaceImplementationBase::recv(unsigned int&,
-                                                  char* const,
-                                                  unsigned int&) {
+        char* const,
+        unsigned int&) {
     std::cerr << "Error - eclmplConnectionInterfaceImplementationBase::recv called.\n"
               << "Whoever implements this class must also implement this virtual method" << std::endl;
     abort();
@@ -66,7 +66,7 @@ eclmplConnectionInterfaceImplementationBase::recv(unsigned int&,
 
 slaveStartupInfo
 eclmplConnectionInterfaceImplementationBase::parseCommandLineArguments(const int* const argc,
-                                                                       const char* const* const* const argv) {
+        const char* const* const* const argv) {
     ASSERT(*argc >= 8);
     slaveStartupInfo info;
     int currArg;
@@ -112,7 +112,7 @@ eclmplConnectionInterfaceImplementationBase::parseCommandLineArguments(const int
 // 2. full pathname of executable to execute
 eclmplConfigFileTable*
 eclmplConnectionInterfaceImplementationBase::scanConfigFile(const std::string& fileName,
-                                                            int argsPerEntry) {
+        int argsPerEntry) {
     std::ifstream infile;
     std::string arg;
     eclmplConfigFileTable* connTable = new eclmplConfigFileTable;
@@ -159,11 +159,11 @@ eclmplConnectionInterfaceImplementationBase::scanConfigFile(const std::string& f
 // masterContactInfo numberOfConnections connectionId amslave NULL
 void
 eclmplConnectionInterfaceImplementationBase::createSlaveCommandLineArguments(const int* const argc,
-                                                                             const char* const* const* const argv,
-                                                                             int& newArgc, char**& newArgv,
-                                                                             const std::vector<std::string>& configTableEntry,
-                                                                             const eclmplContactInfo& masterContactInfo,
-                                                                             const unsigned int& id) {
+        const char* const* const* const argv,
+        int& newArgc, char**& newArgv,
+        const std::vector<std::string>& configTableEntry,
+        const eclmplContactInfo& masterContactInfo,
+        const unsigned int& id) {
     ASSERT(configTableEntry.size() >= 2);
     ASSERT(masterContactInfo.nrOfContactArguments() >= 1);
     char tmp[maxBuf];
@@ -268,10 +268,10 @@ eclmplConnectionInterfaceImplementationBase::createSlaveCommandLineArguments(con
 
 void
 eclmplConnectionInterfaceImplementationBase::forkOffSlave(const int* const argc,
-                                                          const char* const* const* const argv,
-                                                          const eclmplConfigFileTable& connTable,
-                                                          const eclmplContactInfo& masterContactInfo,
-                                                          const unsigned int& id) {
+        const char* const* const* const argv,
+        const eclmplConfigFileTable& connTable,
+        const eclmplContactInfo& masterContactInfo,
+        const unsigned int& id) {
     ASSERT(id >= 1 && id < numberOfConnections);
 
     std::vector<std::string> slaveEntry = connTable.getEntry(id);
@@ -311,9 +311,9 @@ eclmplConnectionInterfaceImplementationBase::forkOffSlave(const int* const argc,
 
 void
 eclmplConnectionInterfaceImplementationBase::forkOffSlaves(const int* const argc,
-                                                           const char* const* const* const argv,
-                                                           const eclmplConfigFileTable& connTable,
-                                                           const eclmplContactInfo& masterContactInfo) {
+        const char* const* const* const argv,
+        const eclmplConfigFileTable& connTable,
+        const eclmplContactInfo& masterContactInfo) {
     for (unsigned int i = 1; i < (unsigned int)connTable.getNumberOfEntries(); i++) {
         forkOffSlave(argc, argv, connTable, masterContactInfo, i);
     } // End of for (unsigned int i = 1; i < (unsigned int)connTable.getNumberOfEntries(); i++).

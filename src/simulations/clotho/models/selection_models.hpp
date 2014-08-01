@@ -32,62 +32,62 @@ public:
 
         return res;
     }
-/*
-    template < class ENV, class ID = system_id >
-    static std::pair< ID, ID > select( ENV * env, ID * ) {
-        std::pair< ID, ID > res;
+    /*
+        template < class ENV, class ID = system_id >
+        static std::pair< ID, ID > select( ENV * env, ID * ) {
+            std::pair< ID, ID > res;
 
-        if( env->m_gender_group_map.size() == 1 ) {
-            size_t nInd = env->m_gender_group_map.begin()->second->size();
+            if( env->m_gender_group_map.size() == 1 ) {
+                size_t nInd = env->m_gender_group_map.begin()->second->size();
 
-            size_t i0 = m_rng->nextInt( nInd );
-            size_t i1 = i0;
+                size_t i0 = m_rng->nextInt( nInd );
+                size_t i1 = i0;
 
-            while( i1 == i0 ) {
-                i1 = m_rng->nextInt( nInd );
-            }
+                while( i1 == i0 ) {
+                    i1 = m_rng->nextInt( nInd );
+                }
 
-            res.first = env->m_gender_group_map.begin()->second->at( i0 );
-            res.second = env->m_gender_group_map.begin()->second->at( i1 );
-        } else {
-            typename ENV::gender_group_map_t::iterator it_g0 = env->m_gender_group_map.begin();
-            typename ENV::gender_group_map_t::iterator it_g1 = env->m_gender_group_map.begin();
-            if( env->m_gender_group_map.size() == 2 ) {
-                it_g1++;
+                res.first = env->m_gender_group_map.begin()->second->at( i0 );
+                res.second = env->m_gender_group_map.begin()->second->at( i1 );
             } else {
-                size_t nGroups = env->m_gender_group_map.size();
-                size_t g0 = m_rng->nextInt( nGroups );
-                size_t g1 = g0;
-
-                while( g1 == g0 ) {
-                    g1 = m_rng->nextInt( nGroups );
-                }
-                while( g0 > 0 && g1 > 0) {
-                    it_g0++;
+                typename ENV::gender_group_map_t::iterator it_g0 = env->m_gender_group_map.begin();
+                typename ENV::gender_group_map_t::iterator it_g1 = env->m_gender_group_map.begin();
+                if( env->m_gender_group_map.size() == 2 ) {
                     it_g1++;
-                    --g0;
-                    --g1;
-                }
+                } else {
+                    size_t nGroups = env->m_gender_group_map.size();
+                    size_t g0 = m_rng->nextInt( nGroups );
+                    size_t g1 = g0;
 
-                while( g0 > 0 ) {
-                    it_g0++;
-                    --g0;
-                }
+                    while( g1 == g0 ) {
+                        g1 = m_rng->nextInt( nGroups );
+                    }
+                    while( g0 > 0 && g1 > 0) {
+                        it_g0++;
+                        it_g1++;
+                        --g0;
+                        --g1;
+                    }
 
-                while( g1 > 0 ) {
-                    it_g1++;
-                    --g1;
+                    while( g0 > 0 ) {
+                        it_g0++;
+                        --g0;
+                    }
+
+                    while( g1 > 0 ) {
+                        it_g1++;
+                        --g1;
+                    }
                 }
+                assert(it_g0 != it_g1 && it_g0 != env->m_gender_group_map.end() && it_g1 != env->m_gender_group_map.end() );
+
+                res.first = it_g0->second->at( m_rng->nextInt( it_g0->second->size() ));
+                res.second =it_g1->second->at( m_rng->nextInt( it_g1->second->size() ));
             }
-            assert(it_g0 != it_g1 && it_g0 != env->m_gender_group_map.end() && it_g1 != env->m_gender_group_map.end() );
 
-            res.first = it_g0->second->at( m_rng->nextInt( it_g0->second->size() ));
-            res.second =it_g1->second->at( m_rng->nextInt( it_g1->second->size() ));
+            return res;
         }
-
-        return res;
-    }
-*/
+    */
 protected:
 
     template < class ID >

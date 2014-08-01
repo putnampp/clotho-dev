@@ -76,17 +76,17 @@ public:
         } else {
             abort();
         }
-/*
-        unsigned int max_variants = DEFAULT_MAX_VARIANTS;
-        if( n[ MAX_VARIANTS_K ] ) {
-            max_variants = n[ MAX_VARIANTS_K ].as< unsigned int >();
-        }
+        /*
+                unsigned int max_variants = DEFAULT_MAX_VARIANTS;
+                if( n[ MAX_VARIANTS_K ] ) {
+                    max_variants = n[ MAX_VARIANTS_K ].as< unsigned int >();
+                }
 
-        unsigned int variants = DEFAULT_ANC_VARIANTS;
-        if( n[ VARIANTS_K ] ) {
-            variants = n[ VARIANTS_K ].as< unsigned int > ();
-        }
-*/
+                unsigned int variants = DEFAULT_ANC_VARIANTS;
+                if( n[ VARIANTS_K ] ) {
+                    variants = n[ VARIANTS_K ].as< unsigned int > ();
+                }
+        */
         unsigned int pop_size = DEFAULT_POP_SIZE;
         if( n[ POP_SIZE_K ] ) {
             pop_size = n[ POP_SIZE_K ].as< unsigned int >();

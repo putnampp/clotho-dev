@@ -12,7 +12,7 @@ struct life_cycle_handler {
 //
 // Implementation
 //
-template < typename OBJ, typename EVT, typename LC > 
+template < typename OBJ, typename EVT, typename LC >
 void life_cycle_handler< OBJ, EVT, LC >::perform( OBJ * o, EVT * e ) { }
 
 }   // namespace detail

@@ -6,7 +6,7 @@
 using std::istringstream;
 
 CommunicationManager::CommunicationManager(PhysicalCommunicationLayer* physicalLayer,
-                                           TimeWarpSimulationManager*) :
+        TimeWarpSimulationManager*) :
     myPhysicalCommunicationLayer(physicalLayer),
     numCatastrophicRollbacks(0),
     recoveringFromCkpt(false) {
@@ -28,7 +28,7 @@ CommunicationManager::getSize() {
 
 void
 CommunicationManager::registerMessageType(const string& messageType,
-                                          CommunicatingEntity* entity) {
+        CommunicatingEntity* entity) {
     // store info in the list of receivers hash map
     listOfReceivers.insert(std::make_pair(messageType, entity));
 }

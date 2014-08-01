@@ -10,11 +10,11 @@ public:
     CLOTHO_EVENT_ID(3)
 
     InheritEvent( const vtime_t & tSent, const vtime_t & tRecv,
-                const system_id & sender, const system_id & receiver,
-                event_id_t eid, Sex parent, gamete * z );
+                  const system_id & sender, const system_id & receiver,
+                  event_id_t eid, Sex parent, gamete * z );
     InheritEvent( const vtime_t & tSent, const vtime_t & tRecv,
-                const system_object * sender, const system_object * receiver,
-                event_id_t eid, Sex parent, gamete * z );
+                  const system_object * sender, const system_object * receiver,
+                  event_id_t eid, Sex parent, gamete * z );
 
 //    inline event_type_t getEventType() const { return TYPE_ID; }
 

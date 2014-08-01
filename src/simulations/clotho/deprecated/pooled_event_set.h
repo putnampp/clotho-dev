@@ -23,15 +23,14 @@ template<>
 class EventManager< pooled_event_set > : virtual public event_manager {};
 
 template<>
-class SimulationObject< pooled_event_set > : 
+class SimulationObject< pooled_event_set > :
     virtual public Object,
-    virtual public EventManager< pooled_event_set >
-{
+    virtual public EventManager< pooled_event_set > {
 public:
     SimulationObject( ) : Object( ) {}
-    SimulationObject( simulation_manager * manager ) : 
-        Object( manager )
-    {}
+    SimulationObject( simulation_manager * manager ) :
+        Object( manager ) {
+    }
 
     virtual const event * getEvent( const system_id & ) {
         return m_sim_manager->getEvent( m_id );
@@ -56,7 +55,9 @@ public:
 
     virtual ~SimulationObject() {}
 protected:
-    bool insertEvent( const event * ) { return false; }
+    bool insertEvent( const event * ) {
+        return false;
+    }
     void receiveEvent( const event * ) {}
 
 };
@@ -72,7 +73,7 @@ public:
     typedef typename object_event_set_t::const_iterator _citerator;
 
     bool insertEvent( const event * e ) {
-    //    cout << "simulation manager insert event: " << endl;
+        //    cout << "simulation manager insert event: " << endl;
         _iterator it = m_event_set.find( e->getReceiver() );
         if( it == m_event_set.end() ) {
             pair< _iterator, bool > res = m_event_set.insert( make_pair( e->getReceiver(), make_pair(new event_set_t(), new processed_events_t()) ) );
@@ -89,7 +90,7 @@ public:
         assert( it != m_event_set.end() );
 
         if( it->second.first->empty() ) return NULL;
-    
+
         const event * t = *(it->second.first->begin());
         it->second.first->erase(it->second.first->begin());
         it->second.second->push_back( t );
@@ -102,7 +103,7 @@ public:
         assert( it != m_event_set.end() );
 
         if( it->second.first->empty() ) return NULL;
-        
+
         return *(it->second.first->begin());
     }
 
@@ -110,7 +111,7 @@ public:
         _citerator it = m_event_set.find( id );
         //assert( it != m_event_set.end() );
         if ( it == m_event_set.end() ) {
-        //    cout << id << " never encountered any events" << endl;
+            //    cout << id << " never encountered any events" << endl;
             return 0;
         }
         return it->second.first->size();

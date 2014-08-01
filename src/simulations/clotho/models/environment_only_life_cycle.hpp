@@ -40,7 +40,7 @@ struct environment_only_life_cycle : public life_cycle_model {
     }
 };
 
-template < class ENV > 
+template < class ENV >
 class EnvironmentLifeCycle< environment_only_life_cycle, ENV, ClothoEvent > {
 public:
     static void initialize() {}
@@ -79,7 +79,7 @@ protected:
 
         size_t idx = env->activateNextIndividual(); // activate next pending individual
         while( idx != ENV::active_pool_t::UNKNOWN_INDEX ) {
-            env->m_individuals[idx].getProperties()->setDOB( ctime );            
+            env->m_individuals[idx].getProperties()->setDOB( ctime );
             idx = env->activateNextIndividual();
         }
 
@@ -123,13 +123,13 @@ protected:
     }
 
     static void handle_death( ENV * env, const ClothoEvent * ce ) {
-/*        while( !env->m_active_individuals.empty() ) {
-            system_id id = env->m_active_individuals.begin()->first;
-            typename ENV::individual_t * ind = dynamic_cast< typename ENV::individual_t * >( env->m_sim_manager->getObject(id));
-            ind->getProperties()->died();
-            env->deactivateIndividual( id );
-        }
-*/
+        /*        while( !env->m_active_individuals.empty() ) {
+                    system_id id = env->m_active_individuals.begin()->first;
+                    typename ENV::individual_t * ind = dynamic_cast< typename ENV::individual_t * >( env->m_sim_manager->getObject(id));
+                    ind->getProperties()->died();
+                    env->deactivateIndividual( id );
+                }
+        */
         size_t idx = env->inactivateNextIndividual();
         while( idx != ENV::active_pool_t::UNKNOWN_INDEX ) {
             env->m_individuals[idx].getProperties()->died();
@@ -191,7 +191,7 @@ protected:
         const MateEvent * me  = static_cast< const MateEvent * >( evt );
 
         typedef typename IND::properties_t::gamete_t   gamete_t;
-        
+
         gamete_t * z = IND::reproduction_model_t::reproduce( ind, (gamete_t *) NULL );
 
         typedef typename IND::inherit_event_t ievent_t;

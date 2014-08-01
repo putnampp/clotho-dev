@@ -39,7 +39,7 @@
 
 class ConstantLifeExpectancyModel :
     virtual public ClothoModel< Individual, BirthEvent >,
-        virtual public ClothoModel< IndividualShell, ShellBirthEvent > {
+    virtual public ClothoModel< IndividualShell, ShellBirthEvent > {
 public:
     ConstantLifeExpectancyModel( int age );
 

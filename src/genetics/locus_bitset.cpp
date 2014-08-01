@@ -25,8 +25,7 @@ locus_bitset::active_iterator locus_bitset::active_end() {
 locus_bitset::locus_bitset( alphabet_t::pointer a ) :
     m_bits(),
     m_copies(1),
-    m_alphabet( a )
-{
+    m_alphabet( a ) {
     if( this != &EMPTY ) {
         m_active.insert( this );
     }
@@ -35,8 +34,7 @@ locus_bitset::locus_bitset( alphabet_t::pointer a ) :
 locus_bitset::locus_bitset( const locus_bitset & la ) :
     m_bits(la.m_bits),
     m_copies( la.m_copies ),
-    m_alphabet(la.m_alphabet)
-{
+    m_alphabet(la.m_alphabet) {
     m_active.insert(this);
 }
 
@@ -59,7 +57,9 @@ locus_bitset::pointer locus_bitset::clone() const {
 void locus_bitset::addVariant( index_type idx ) {
     assert( idx != alphabet_t::npos );
 
-    if( m_bits.size() <= idx) { m_bits.resize( idx + 1, false ); }
+    if( m_bits.size() <= idx) {
+        m_bits.resize( idx + 1, false );
+    }
 
     m_bits[idx] = true;
 }
@@ -172,6 +172,17 @@ void locus_bitset::masked_join( const locus_bitset & rhs, const bitset_type & ma
         r.resize( mask.size(), false );
         m_bits |= (r & mask);
     }
+}
+
+bool locus_bitset::minMutationCount( const size_t threshold ) const {
+    size_t t = 0;
+    size_t pos = m_bits.find_first();
+    while (pos != bitset_type::npos && t < threshold ) {
+        pos = m_bits.find_next(pos);
+        ++t;
+    }
+
+    return (t >= threshold);
 }
 
 locus_bitset::~locus_bitset() {}

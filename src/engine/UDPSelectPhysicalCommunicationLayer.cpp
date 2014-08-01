@@ -182,7 +182,7 @@ UDPSelectPhysicalCommunicationLayer::initializeCommunicationLayerAttributes() {
 #if 0
 bool
 UDPSelectPhysicalCommunicationLayer::UDP_SynchronizeMaster(const eclmplUnreliableNetworkMessageType&
-                                                           msgType) {
+        msgType) {
     bool confirmedId[physicalSize];
     unsigned int numberConfirmed = 0;
     bool confirmationMessage;
@@ -281,7 +281,7 @@ UDPSelectPhysicalCommunicationLayer::UDP_SynchronizeMaster(const eclmplUnreliabl
 
 bool
 UDPSelectPhysicalCommunicationLayer::UDP_SynchronizeSlave(const eclmplUnreliableNetworkMessageType&
-                                                          msgType) {
+        msgType) {
     timeval ttConfirmedTimerStart, ttConfirmedTimerCurr;
     double confirmedTimer;
     double confirmedTimerTimeout = synchTimeBase*(double)physicalSize;

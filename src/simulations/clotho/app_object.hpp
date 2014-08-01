@@ -5,13 +5,13 @@
 
 class AppObject : public event_performer< ClothoEvent > {
 public:
-    AppObject( ClothoObject * co = NULL) : 
-        m_clotho_object( co ) 
-    { }
+    AppObject( ClothoObject * co = NULL) :
+        m_clotho_object( co ) {
+    }
 
     AppObject( const AppObject & ao ) :
-        m_clotho_object( ao.m_clotho_object )
-    { }
+        m_clotho_object( ao.m_clotho_object ) {
+    }
 
     ClothoObject * getClothoObject() const {
         return m_clotho_object;

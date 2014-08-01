@@ -26,17 +26,17 @@ CommunicationManagerImplementationBase::initializeCommunicationManager() {}
 
 void
 CommunicationManagerImplementationBase::sendMessage(KernelMessage* message,
-                                                    unsigned int dest) {
+        unsigned int dest) {
     message->setIncarnationNumber(numCatastrophicRollbacks);
 
     if (!recoveringFromCkpt) {
         myPhysicalCommunicationLayer->physicalSend(message->serialize(),
-                                                   dest);
+                dest);
     } else {
         // When recovering from rollback, only send the restore messages.
         if (message->getDataType() == "RestoreCkptMessage") {
             myPhysicalCommunicationLayer->physicalSend(message->serialize(),
-                                                       dest);
+                    dest);
         }
     }
     delete message;
@@ -49,12 +49,12 @@ CommunicationManagerImplementationBase::routeMessage(KernelMessage* msg) {
     string messageType = msg->getDataType();
 
     if (recoveringFromCkpt) {
-		//if(messageType != "RestoreCkptMessage"){
-        	if (msg->getIncarnationNumber() < numCatastrophicRollbacks) {
-            	delete msg;
-            	return;
-        	}
-		//}
+        //if(messageType != "RestoreCkptMessage"){
+        if (msg->getIncarnationNumber() < numCatastrophicRollbacks) {
+            delete msg;
+            return;
+        }
+        //}
     }
 
     // It's not a CHECK-IDLE MESSAGE.
@@ -162,10 +162,10 @@ CommunicationManagerImplementationBase::waitForInitialization(unsigned int numEx
     }
     delete objectNames;
 
-/*    bool circulate = false;
-    if (numExpected==0) {
-        circulate=true;
-    }*/
+    /*    bool circulate = false;
+        if (numExpected==0) {
+            circulate=true;
+        }*/
     bool circulate = (numExpected == 0);
     // now wait to hear from others
     while (numReceived != numExpected ||
@@ -174,16 +174,16 @@ CommunicationManagerImplementationBase::waitForInitialization(unsigned int numEx
         if (networkMessage != NULL) {
             KernelMessage* msg = dynamic_cast<KernelMessage*>(networkMessage->deserialize());
             if (msg != NULL) {
-/*                if (msg->getDataType() == getInitializationMessageType()) {
-                    numReceived++;
-                    routeMessage(msg);
-                } else if (msg->getDataType() == getCirculateInitializationMessageType()) {
-                    circulate = true;
-                } else {
-                    // we didn't find an initialization message, but we need to
-                    // check for other types of messages
-                    routeMessage(msg);
-                }*/
+                /*                if (msg->getDataType() == getInitializationMessageType()) {
+                                    numReceived++;
+                                    routeMessage(msg);
+                                } else if (msg->getDataType() == getCirculateInitializationMessageType()) {
+                                    circulate = true;
+                                } else {
+                                    // we didn't find an initialization message, but we need to
+                                    // check for other types of messages
+                                    routeMessage(msg);
+                                }*/
                 if (msg->getDataType() == getCirculateInitializationMessageType()) {
                     circulate = true;
                 } else {
@@ -191,7 +191,7 @@ CommunicationManagerImplementationBase::waitForInitialization(unsigned int numEx
 
                     routeMessage(msg);
                 }
-                
+
             }
             delete networkMessage;
         }
@@ -202,7 +202,7 @@ CommunicationManagerImplementationBase::waitForInitialization(unsigned int numEx
     // comm mgrs are still stuck in the while loop above.
 
     KernelMessage* messageToSend = new CirculateInitializationMessage(mySimulationManagerID,
-                                                                      (mySimulationManagerID+1) % numberOfSimulationManagers);
+            (mySimulationManagerID+1) % numberOfSimulationManagers);
     sendMessage(messageToSend, (mySimulationManagerID+1) % numberOfSimulationManagers);
 
 
@@ -211,14 +211,14 @@ CommunicationManagerImplementationBase::waitForInitialization(unsigned int numEx
         SerializedInstance* networkMessage = retrieveMessageFromPhysicalLayer();
         if (networkMessage != NULL) {
             KernelMessage* msg = dynamic_cast<KernelMessage*>(networkMessage->deserialize());
-/*
-            if (msg != NULL && msg->getDataType() == getCirculateInitializationMessageType()) {
-                circulate = true;
-            } else if (msg != NULL) {
-                // we didn't find an initialization message, but we need to
-                // check for other types of messages
-                routeMessage(msg);
-            }*/
+            /*
+                        if (msg != NULL && msg->getDataType() == getCirculateInitializationMessageType()) {
+                            circulate = true;
+                        } else if (msg != NULL) {
+                            // we didn't find an initialization message, but we need to
+                            // check for other types of messages
+                            routeMessage(msg);
+                        }*/
             if( msg != NULL ) {
                 if( msg->getDataType() == getCirculateInitializationMessageType() ) {
                     circulate = true;

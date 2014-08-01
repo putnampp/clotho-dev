@@ -52,8 +52,8 @@ const string COUNT_K = "count";
 
 YamlConfig::YamlConfig( const string & file ) :
     m_config( file ),
-    m_objs( new vector< SimulationObject * >() )
-{}
+    m_objs( new vector< SimulationObject * >() ) {
+}
 
 shared_ptr< vector< SimulationObject * > > YamlConfig::getSimulationObjects() {
     //shared_ptr< vector< SimulationObject * > > objs( new vector< SimulationObject * >() );

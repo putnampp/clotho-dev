@@ -9,8 +9,8 @@ IndividualProperties::IndividualProperties( ) :
     eol( SystemClock::POSITIVE_INFINITY ),
     sex( UNASSIGNED ),
 //    m_genome( new HumanGenome( NULL, NULL) )
-    m_genome(NULL)
-{}
+    m_genome(NULL) {
+}
 
 const system_id & IndividualProperties::getFather() const {
     return father;
@@ -52,7 +52,7 @@ void IndividualProperties::setEOL( const SystemClock::vtime_t & t ) {
     eol = t;
 }
 
-void IndividualProperties::inheritFrom( const system_id & id, Sex s, gamete * g ){
+void IndividualProperties::inheritFrom( const system_id & id, Sex s, gamete * g ) {
     if( s == MALE ) {
         setFather( id );
         m_genome->setGamete( g );
@@ -74,11 +74,11 @@ void IndividualProperties::reset() {
 }
 
 void IndividualProperties::determineSex() {
-    //sex = m_genome->getSex();   
+    //sex = m_genome->getSex();
     sex = UNKNOWN;
 }
 
 IndividualProperties::~IndividualProperties() {
-    if( m_genome != NULL ) 
+    if( m_genome != NULL )
         delete m_genome;
 }

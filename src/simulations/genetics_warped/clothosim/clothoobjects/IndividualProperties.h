@@ -49,14 +49,14 @@ public:
     sex_t   m_sex;
     AlleleGroupPtr m_genos;
 
-    IndividualProperties( AlleleGroupPtr g) : 
+    IndividualProperties( AlleleGroupPtr g) :
         m_id(-1),
         m_mother(-1),
         m_father(-1),
-        m_dob(NULL), 
-        m_eol( NULL ), 
-        m_isMature(false), 
-        m_offspring(0), 
+        m_dob(NULL),
+        m_eol( NULL ),
+        m_isMature(false),
+        m_offspring(0),
         m_sex( UNASSIGNED ),
         m_genos(cloneAlleleGroup( g ) ) {}
 
@@ -64,23 +64,23 @@ public:
         m_id( next_id++),
         m_mother(-1),
         m_father(-1),
-        m_dob(NULL), 
-        m_eol(NULL), 
-        m_isMature(false), 
-        m_offspring(0), 
-        m_sex(s), 
+        m_dob(NULL),
+        m_eol(NULL),
+        m_isMature(false),
+        m_offspring(0),
+        m_sex(s),
         m_genos(cloneAlleleGroup( genos) ) {}
 
     IndividualProperties( IndividualProperties * mother, IndividualProperties * father,
-                         sex_t s, AlleleGroupPtr genos ) :
+                          sex_t s, AlleleGroupPtr genos ) :
         m_id( next_id++),
         m_mother( mother->m_id ),
         m_father( father->m_id ),
-        m_dob(NULL), 
-        m_eol(NULL), 
-        m_isMature(false), 
-        m_offspring(0), 
-        m_sex(s), 
+        m_dob(NULL),
+        m_eol(NULL),
+        m_isMature(false),
+        m_offspring(0),
+        m_sex(s),
         m_genos( cloneAlleleGroup( genos )) {}
 
     void setMother( const IndividualProperties * m );

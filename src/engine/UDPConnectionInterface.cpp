@@ -15,7 +15,7 @@ UDPConnectionInterface::UDPConnectionInterface(const unsigned int& mtuSize) {
 
 bool
 UDPConnectionInterface::establishConnections(const int* const argc,
-                                             const char* const* const* const argv) {
+        const char* const* const* const argv) {
     ASSERT(*argc > 0);
 
     // We have to check the last argument on the command line to be able
@@ -42,7 +42,7 @@ UDPConnectionInterface::establishConnections(const int* const argc,
 
 void
 UDPConnectionInterface::createAndDistributeRecvSocketVector(eclmplConfigFileTable&
-                                                            udpConnectionTable) {
+        udpConnectionTable) {
     // First create the socket vector.
     createSocketPtrVector(recvSocket);
 
@@ -111,7 +111,7 @@ UDPConnectionInterface::createAndDistributeRecvSocketVector(eclmplConfigFileTabl
 
 void
 UDPConnectionInterface::createAndReceiveSendSocketVector(eclmplConfigFileTable&
-                                                         udpConnectionTable) {
+        udpConnectionTable) {
     // First create the socket vector.
     createSocketPtrVector(sendSocket);
 

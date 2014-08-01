@@ -20,7 +20,7 @@ struct individual_properties {
 
     virtual void setDOB( const SystemClock::vtime_t & t ) = 0;
     virtual void setEOL( const SystemClock::vtime_t & t ) = 0;
-    
+
     virtual void setFather( const system_id & id) = 0;
     virtual void setMother( const system_id & id) = 0;
 
@@ -44,7 +44,7 @@ public:
 
     void setDOB( const SystemClock::vtime_t & t );
     void setEOL( const SystemClock::vtime_t & t );
-    
+
     void setFather( const system_id & id);
     void setMother( const system_id & id);
 

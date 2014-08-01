@@ -41,7 +41,7 @@
 
 class LifeExpectancyModel :
     virtual public ClothoModel< Individual, BirthEvent >,
-        virtual public ClothoModel< IndividualShell, ShellBirthEvent > {
+    virtual public ClothoModel< IndividualShell, ShellBirthEvent > {
 public:
 //    LifeExpectancyModel( distribution_params & female, distribution_params & male, distribution_params & unk );
     LifeExpectancyModel( shared_ptr< iDistribution > female, shared_ptr< iDistribution > male, shared_ptr< iDistribution > unk );

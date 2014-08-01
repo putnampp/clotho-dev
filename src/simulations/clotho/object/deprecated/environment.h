@@ -36,7 +36,7 @@ public:
     typedef unordered_map< system_id, pair_individual_group_offset > individual_group_lookup_t;
     typedef typename individual_group_lookup_t::iterator        lookup_iterator;
     typedef typename individual_group_lookup_t::const_iterator  lookup_citerator;
-    
+
 
     Environment( simulation_manager * manager );
 
@@ -45,7 +45,7 @@ public:
     void setFounderSize( unsigned int s );
 
     virtual void initialize();
- 
+
     virtual void perform_event( const event * );
 
     virtual void finalize();
@@ -62,11 +62,11 @@ protected:
 
 //    void addIndividual( const system_id & id );
 //    void removeIndividual( const system_id & id );
-    
+
     individual_group_t m_males, m_females;
     individual_group_lookup_t m_active_individuals;
     deque< system_id > m_available_individuals;
-    set< system_id > m_pending; 
+    set< system_id > m_pending;
 
     GeneticMap::Ptr     m_genetic_map;
     selection_model *   m_selection_model;

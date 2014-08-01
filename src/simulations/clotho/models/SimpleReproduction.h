@@ -7,7 +7,7 @@
 #include "rng/rng.hpp"
 
 /*
- * Round-robin style of gamete cloning 
+ * Round-robin style of gamete cloning
  * of the supplied genome
  *
  */

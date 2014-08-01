@@ -55,7 +55,7 @@ MPIPhysicalCommunicationLayer::checkPendingSends() {
 
 void
 MPIPhysicalCommunicationLayer::physicalSend(const SerializedInstance* messageToSend,
-                                            unsigned int dest) {
+        unsigned int dest) {
     ASSERT(messageToSend != NULL);
     checkPendingSends();
 
@@ -107,8 +107,8 @@ MPIPhysicalCommunicationLayer::physicalProbeRecv() {
 
 bool
 MPIPhysicalCommunicationLayer::physicalProbeRecvBuffer(char* buffer,
-                                                       int size,
-                                                       bool& sizeStatus) {
+        int size,
+        bool& sizeStatus) {
     MPI_Status status;
     int flag = 0, msgSize = 0;
 

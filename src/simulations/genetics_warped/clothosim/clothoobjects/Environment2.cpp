@@ -48,14 +48,14 @@ const string POOL_SIZE_K = "pool_size";
 Environment2::Environment2( const char * n, int max_size, const string & log ) :
     m_genetic_map( new GeneticMap() ),
     m_name( n ),
-    m_max_pool_size( max_size ), 
-    m_pool_size(0), 
+    m_max_pool_size( max_size ),
+    m_pool_size(0),
     m_logdir(log) {
 }
 
 Environment2::~Environment2() {
     /*
-     * SequentialSimulationManager does not perform cleanup of 
+     * SequentialSimulationManager does not perform cleanup of
      * SimulationObjects.
      * Task is assumed to be taken care of by mechanism which
      * created the object. In this case YamlConfig object.
@@ -83,7 +83,9 @@ Environment2::~Environment2() {
     m_males.clear();
     m_unk.clear();
 
-    while( !m_individual_pool.empty() ) { m_individual_pool.pop(); }
+    while( !m_individual_pool.empty() ) {
+        m_individual_pool.pop();
+    }
 
     if( m_logger.is_open() ) m_logger.close();
 }
@@ -195,7 +197,7 @@ void Environment2::removeIndividual( IndividualShell * s ) {
         m_mapped_females.erase( i );
         m_females.pop_back();
     }
-        break;
+    break;
     case MALE: {
 //        l = &m_males;
 //        m = &m_mapped_males;
@@ -207,7 +209,7 @@ void Environment2::removeIndividual( IndividualShell * s ) {
         m_mapped_males.erase( i );
         m_males.pop_back();
     }
-        break;
+    break;
     case UNK_SEX: {
 //        l = &m_unk;
         MappedIndividuals::iterator i = m_mapped_unk.find( s ), b = m_mapped_unk.find( m_unk.back() );
@@ -218,36 +220,36 @@ void Environment2::removeIndividual( IndividualShell * s ) {
         m_mapped_unk.erase( i );
         m_unk.pop_back();
     }
-        break;
+    break;
     default:
         cout << "ERRRORORORROR\n";
         return;
     }
-/*
-    bool bFound = false;
-    while( it != it_end ) {
-        if( *it == s ) {
-            bFound = true;
-            swap( *it, l->back() );
+    /*
+        bool bFound = false;
+        while( it != it_end ) {
+            if( *it == s ) {
+                bFound = true;
+                swap( *it, l->back() );
 
-            l->pop_back();
-            break;             
+                l->pop_back();
+                break;
+            }
+            it++;
         }
-        it++;
-    }
-    if(! bFound ) {
-        cout << "Individual not found" << endl;
-    }
-*/
-/*
-    MappedIndividuals::iterator i = m->find( s ), b = m->find( l->back() );
+        if(! bFound ) {
+            cout << "Individual not found" << endl;
+        }
+    */
+    /*
+        MappedIndividuals::iterator i = m->find( s ), b = m->find( l->back() );
 
-    swap( (*l)[ i->second ], l->back() );
-    b->second = i->second;
+        swap( (*l)[ i->second ], l->back() );
+        b->second = i->second;
 
-    m->erase( i );
-    l->pop_back();
-*/
+        m->erase( i );
+        l->pop_back();
+    */
 
     m_individual_pool.push( s );
 
@@ -265,12 +267,12 @@ IndividualShell * Environment2::nextAvailableIndividual() {
         t = m_individual_pool.front();
         m_individual_pool.pop();
         --m_pool_size;
-/*    } else if( m_max_pool_size == -1 || m_pool_size < m_max_pool_size) {
-        // there are no available Individuals but there is no limit
-        // on pool size;
-        // therefore create a new one
-        cout << "Generating a new individual" << endl;
-        t = new IndividualShell( this, new IndividualProperties() );*/
+        /*    } else if( m_max_pool_size == -1 || m_pool_size < m_max_pool_size) {
+                // there are no available Individuals but there is no limit
+                // on pool size;
+                // therefore create a new one
+                cout << "Generating a new individual" << endl;
+                t = new IndividualShell( this, new IndividualProperties() );*/
     } // else individual pool has been maxed out; consider terminating
 
     return t;

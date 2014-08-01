@@ -47,7 +47,7 @@
 
 class ConstantPopulationRandomMatingModel :
     virtual public ClothoModel< IndividualShell, ShellMaturityEvent >,
-        virtual public ClothoModel< Environment2 , ShellMatingEvent > {
+    virtual public ClothoModel< Environment2 , ShellMatingEvent > {
 public:
 //    ConstantPopulationRandomMatingModel (unsigned int max_offspring, unsigned int birth_delay);
     ConstantPopulationRandomMatingModel( shared_ptr< iDistribution > offspring, shared_ptr< iDistribution > birth_delay );

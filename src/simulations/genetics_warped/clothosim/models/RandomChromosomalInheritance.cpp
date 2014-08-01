@@ -3,7 +3,7 @@
 template <>
 void ChromosomalInheritance< RAND, 2 >::inherit( AlleleGroupPtr p0, AlleleGroupPtr p1, AlleleGroupPtr offspring ) {
     assert( m_genetic_map );
-    size_t prev_offset = 0; 
+    size_t prev_offset = 0;
     for(GeneticMap::chrom_offset_map_t::const_iterator it = m_genetic_map->begin_offsets(); it != m_genetic_map->end_offsets(); it++ ) {
         // copy from p0
         double rnd = m_rng->Uniform();

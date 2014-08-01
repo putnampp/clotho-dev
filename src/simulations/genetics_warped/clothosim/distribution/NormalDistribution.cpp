@@ -31,7 +31,7 @@
 
 #include <gsl/gsl_randist.h>
 
-NormalDistribution::NormalDistribution( double sigma, double mean ) : 
+NormalDistribution::NormalDistribution( double sigma, double mean ) :
     m_rng( NULL ),
     m_mu ( mean ),
     m_sigma( sigma ) {

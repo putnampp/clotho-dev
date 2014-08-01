@@ -26,8 +26,7 @@ Environment::Environment( simulation_manager * manager ) :
     m_selection_model( NULL ),
     m_reproduction_model( NULL ),
     m_nIndAlloc(0),
-    m_nFounder(0)
-{
+    m_nFounder(0) {
     setSimulationManager( manager );
 }
 
@@ -38,8 +37,7 @@ Environment::Environment( simulation_manager * manager, GeneticMap::Ptr gmap, se
     m_selection_model( s ),
     m_reproduction_model( r ),
     m_nIndAlloc(0),
-    m_nFounder(0)
-{
+    m_nFounder(0) {
     setSimulationManager( manager );
 }
 
@@ -143,7 +141,7 @@ void Environment::handle_birth( const ClothoEvent * ce ) {
     } else if( be->getSex() == MALE ) {
         m_active_individuals.insert( make_pair( be->getSender(), make_pair( &m_males, m_males.size())));
         m_males.push_back( be->getSender() );
-        
+
     } else {
         assert(false);
     }

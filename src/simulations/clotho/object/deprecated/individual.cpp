@@ -20,15 +20,14 @@ static const SystemClock::vtime_t LIFE_CYCLE_PADDING = 100;
 
 //EventPerformer< Individual, ClothoEvent > Individual::m_evt_performer;
 
-Individual::Individual( simulation_manager * manager, 
+Individual::Individual( simulation_manager * manager,
                         const system_id & env_id,
                         reproduction * repro ) :
 //    SimulationObject< ClothoEventSet >( manager ),
     ClothoObject( manager ),
     m_env_id( env_id ),
     m_prop( new IndividualProperties() ),
-    m_repro( repro )
-{
+    m_repro( repro ) {
     setSimulationManager( manager );
 }
 

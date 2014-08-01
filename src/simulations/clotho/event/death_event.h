@@ -11,12 +11,12 @@ public:
     CLOTHO_EVENT_ID(2)
 
     void init( const vtime_t & tSent, const vtime_t & tRecv,
-                const system_id & sender, const system_id & receiver,
-                event_id_t eid );
+               const system_id & sender, const system_id & receiver,
+               event_id_t eid );
 
     void init( const vtime_t & tSent, const vtime_t & tRecv,
-                const system_object * sender, const system_object * receiver,
-                event_id_t eid );
+               const system_object * sender, const system_object * receiver,
+               event_id_t eid );
 
 //    inline event_type_t getEventType() const { return TYPE_ID; }
 

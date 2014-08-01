@@ -25,7 +25,7 @@ class TIndividual;
 
 template < class LCM, class IP, class RMODEL >
 class TIndividual< LCM, IP, RMODEL, typename std::enable_if< std::is_base_of< life_cycle::life_cycle_model, LCM >::value >::type >
-: public ClothoObject {
+    : public ClothoObject {
 public:
     typedef IP properties_t;
     typedef InheritEvent< typename properties_t::gamete_t > inherit_event_t;
@@ -42,11 +42,11 @@ public:
     TIndividual( ) :
         ClothoObject( NULL ),
         m_env_id(0),
-        m_prop( new properties_t())
-    {}
+        m_prop( new properties_t()) {
+    }
 
-    TIndividual( simulation_manager * manager, 
-                        const system_id & env_id/*,
+    TIndividual( simulation_manager * manager,
+                 const system_id & env_id/*,
                         reproduction_parameter_t * repro = NULL*/ ) :
         ClothoObject( manager ),
         m_env_id( env_id ),
@@ -59,11 +59,11 @@ public:
     virtual void initialize( ) {
         initializer::IndividualInitializer::init( this );
     }
-/*
-    reproduction_parameter_t * reproduction_parameter() {
-        return this->m_repro;
-    }
-*/
+    /*
+        reproduction_parameter_t * reproduction_parameter() {
+            return this->m_repro;
+        }
+    */
     virtual void perform_event( const event * e) {
         life_cycle::IndividualLifeCycle<LCM>::handle_event( this, e );
     }

@@ -20,16 +20,16 @@ eclmplUnreliableNetworkMessage::eclmplUnreliableNetworkMessage() {
 } // End of constructor.
 
 eclmplUnreliableNetworkMessage::eclmplUnreliableNetworkMessage(const
-                                                               eclmplUnreliableNetworkMessageType& msgType,
-                                                               const unsigned int& source,
-                                                               const bool& isAck,
-                                                               const bool& isUserData,
-                                                               const SequenceNumber& ackSqNr,
-                                                               const SequenceNumber& endHoleNr,
-                                                               const SequenceNumber& sqNr,
-                                                               //const short &windowSize,
-                                                               const int& dataSize,
-                                                               char* data) {
+        eclmplUnreliableNetworkMessageType& msgType,
+        const unsigned int& source,
+        const bool& isAck,
+        const bool& isUserData,
+        const SequenceNumber& ackSqNr,
+        const SequenceNumber& endHoleNr,
+        const SequenceNumber& sqNr,
+        //const short &windowSize,
+        const int& dataSize,
+        char* data) {
     hdr.type = msgType;
     hdr.sourceId = source;
     hdr.ackFlag = isAck;
@@ -134,14 +134,15 @@ operator<< (std::ostream& os, const eclmplUnreliableNetworkMessage& msg) {
        << "usrDtaSz" << msg.userDataSize << ", \"";
 
     for (unsigned int i = 0; i < msg.userDataSize; i++) {
-        if (msg.userData[i] == '\0')
-        { os << "'\\0'"; }
-        else if (msg.userData[i] == '\n')
-        { os << "'\\n'"; }
-        else if (msg.userData[i] >= 32 && msg.userData[i] <= 126)
-        { os << msg.userData[i]; }
-        else
-        { os << "'" << (int)msg.userData[i] << "'"; }
+        if (msg.userData[i] == '\0') {
+            os << "'\\0'";
+        } else if (msg.userData[i] == '\n') {
+            os << "'\\n'";
+        } else if (msg.userData[i] >= 32 && msg.userData[i] <= 126) {
+            os << msg.userData[i];
+        } else {
+            os << "'" << (int)msg.userData[i] << "'";
+        }
     }
     os << "\"";
     return os;

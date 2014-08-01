@@ -37,7 +37,7 @@
 
 class PopulationModel :
     virtual public ClothoModel< Individual, BirthEvent >,
-        virtual public ClothoModel< Individual, DeathEvent > {
+    virtual public ClothoModel< Individual, DeathEvent > {
 public:
     PopulationModel( int pop_size );
 

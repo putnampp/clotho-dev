@@ -38,7 +38,7 @@
 
 class ConstantMaturityModel :
     virtual public ClothoModel< Individual, BirthEvent >,
-        virtual public ClothoModel< IndividualShell, ShellBirthEvent > {
+    virtual public ClothoModel< IndividualShell, ShellBirthEvent > {
 public:
     ConstantMaturityModel( int age );
 

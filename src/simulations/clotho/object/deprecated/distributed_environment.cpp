@@ -12,8 +12,7 @@ DistributedEnvironment::DistributedEnvironment( simulation_manager * manager, co
     Environment( manager ),
     m_global_env( global_env ),
     m_snapshot(),
-    m_view_threshold( 0.5 )
-{
+    m_view_threshold( 0.5 ) {
     setSimulationManager( manager );
     if( m_global_env == DefaultSystemID ) {
         m_global_env = getSystemID();
@@ -26,8 +25,7 @@ DistributedEnvironment::DistributedEnvironment( simulation_manager * manager, co
     m_global_env( global_env ),
     m_snapshot(),
     m_rng( rng->clone() ),
-    m_view_threshold( threshold )
-{
+    m_view_threshold( threshold ) {
     setSimulationManager( manager );
     if( m_global_env == DefaultSystemID ) {
         m_global_env = getSystemID();
@@ -180,7 +178,7 @@ void DistributedEnvironment::handle_selection( const ClothoEvent * ce ) {
         // this env is not considered a root node
         // thus its snapshot only reflects it and its
         // neighbors individuals
-    
+
         if( m_rng->nextUniform() <= m_view_threshold ) {
             // determined that the selection of the mate
             // should be passed along to a higher view

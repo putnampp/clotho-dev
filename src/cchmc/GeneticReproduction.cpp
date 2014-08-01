@@ -6,8 +6,8 @@ GeneticReproduction::GeneticReproduction( GeneticMap::Ptr gm, recombination_mode
     m_inherit( inherit ),
     m_mutate( mutate ),
     m_p0_tmp( gm->createLociAlleles() ),
-    m_offspring_tmp( gm->createLociAlleles() )
-{}
+    m_offspring_tmp( gm->createLociAlleles() ) {
+}
 
 void GeneticReproduction::reproduce( AlleleGroupPtr p0, AlleleGroupPtr offspring ) {
     assert( m_inherit );

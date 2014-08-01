@@ -45,9 +45,9 @@ using std::endl;
 
 //LifeExpectancyModel::LifeExpectancyModel( distribution_params & female, distribution_params & male, distribution_params & unk ) :
 LifeExpectancyModel::LifeExpectancyModel( shared_ptr< iDistribution > female, shared_ptr< iDistribution > male, shared_ptr< iDistribution > unk ) :
-//    m_rng( gsl_rng_alloc( gsl_rng_taus ) ), 
-    m_female( female ), 
-    m_male( male ), 
+//    m_rng( gsl_rng_alloc( gsl_rng_taus ) ),
+    m_female( female ),
+    m_male( male ),
     m_unk(unk) {
 //    long seed = time(NULL);
 //    gsl_rng_set( m_rng, seed );
@@ -81,22 +81,22 @@ void LifeExpectancyModel::operator()( const ShellBirthEvent * evt, IndividualShe
 
 double LifeExpectancyModel::computeExpectedAge( sex_t s ) {
     double expected_age = 0.0;
-/*
-    switch( s ) {
-    case FEMALE:
-        expected_age = gsl_ran_gaussian( m_rng, m_female.sigma );
-        expected_age += m_female.mean;
-        break;
-    case MALE:
-        expected_age = gsl_ran_gaussian( m_rng, m_male.sigma );
-        expected_age += m_male.mean;
-        break;
-    default:
-        expected_age = gsl_ran_gaussian( m_rng, m_unk.sigma );
-        expected_age += m_unk.mean;
-        break;
-    };
-*/
+    /*
+        switch( s ) {
+        case FEMALE:
+            expected_age = gsl_ran_gaussian( m_rng, m_female.sigma );
+            expected_age += m_female.mean;
+            break;
+        case MALE:
+            expected_age = gsl_ran_gaussian( m_rng, m_male.sigma );
+            expected_age += m_male.mean;
+            break;
+        default:
+            expected_age = gsl_ran_gaussian( m_rng, m_unk.sigma );
+            expected_age += m_unk.mean;
+            break;
+        };
+    */
     switch( s ) {
     case FEMALE:
         expected_age = m_female->nextVariate();

@@ -43,19 +43,19 @@ protected:
 #define DESTRUCTOR()  STRUCTOR( ~SPECIALIZATION )
 
 CONSTRUCTOR()() :
-    AppObject()
-{}
+    AppObject() {
+}
 
 CONSTRUCTOR()( ClothoObject * co ) :
-    AppObject( co )
-{}
+    AppObject( co ) {
+}
 
 CONSTRUCTOR()( const SPECIALIZATION & env ) :
-    AppObject(env)
-{}
+    AppObject(env) {
+}
 
-DESTRUCTOR()()
-{}
+DESTRUCTOR()() {
+}
 
 #undef BASE_TEMPLATE
 #undef SPECIALIZATION

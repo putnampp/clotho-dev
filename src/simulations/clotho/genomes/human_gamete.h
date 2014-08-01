@@ -18,7 +18,7 @@ public:
 
     HumanGamete( gamete::gamete_source_t s, gamete_type_t t, size_t );
     HumanGamete( const HumanGamete & z);
-    
+
     gamete * clone() const;
 
 //    chromosome * getChromosome( chromosome::chrom_id_t );

@@ -33,8 +33,8 @@ GeneticMap::GeneticMap() :
     m_loci( new Loci() ),
     m_genotypers( new vector< LocusGenotyper * >() ),
     m_trait_map( new TraitMap() ),
-    m_traits( new Traits() )
-{}
+    m_traits( new Traits() ) {
+}
 
 GeneticMap::~GeneticMap() {
     // delete all trait_loci mappings

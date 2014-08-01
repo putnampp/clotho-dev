@@ -85,7 +85,7 @@ typedef SimulationManager< ClothoEvent, ClothoObject > manager_type;
 
 namespace initializer {
 
-template < > 
+template < >
 void ClothoAppInitializer::createEnvironment< sequential_application_type, sequential_application_type::environment_t >( sequential_application_type * a, sequential_application_type::environment_t * ) {
     cout << "Blocking default protocol" << endl;
     //typename sequential_application_type::environment_ptr_t env = new typename sequential_application_type::environment_t( a->m_sim_manager, a->m_rng );
@@ -220,7 +220,7 @@ int main( int argc, char ** argv ) {
     //}
 
     sim->finalize();
-    
+
     stats->stopPhase( RUNTIME_K );
 
     cout << *stats;

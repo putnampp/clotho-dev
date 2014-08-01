@@ -7,14 +7,15 @@
 void __eclmpl__printCharStr(const char* const str, const unsigned int& strLen) {
     std::cerr << "\"";
     for (unsigned int i = 0; i < strLen; i++) {
-        if (str[i] == '\0')
-        { std::cerr << "'\\0'"; }
-        else if (str[i] == '\n')
-        { std::cerr << "'\\n'"; }
-        else if (str[i] >= 32 && str[i] <= 126)
-        { std::cerr << str[i]; }
-        else
-        { std::cerr << "'" << (int)str[i] << "'"; }
+        if (str[i] == '\0') {
+            std::cerr << "'\\0'";
+        } else if (str[i] == '\n') {
+            std::cerr << "'\\n'";
+        } else if (str[i] >= 32 && str[i] <= 126) {
+            std::cerr << str[i];
+        } else {
+            std::cerr << "'" << (int)str[i] << "'";
+        }
     }
     std::cerr << "\"";
 }
@@ -152,15 +153,15 @@ SocketBasedConnectionInterface::~SocketBasedConnectionInterface() {
 // This is just here to keep the compiler happy... (g++ 2.95.2 that is).
 bool
 SocketBasedConnectionInterface::establishConnections(const int* const argc,
-                                                     const char* const* const* const argv) {
+        const char* const* const* const argv) {
     return eclmplConnectionInterfaceImplementationBase::establishConnections(argc, argv);
 } // End of establishConnections(...).
 
 // Master establishes connection with slaves after forking them off.
 void
 SocketBasedConnectionInterface::establishConnections(const int* const argc,
-                                                     const char* const* const* const argv,
-                                                     const eclmplConfigFileTable& connTable) {
+        const char* const* const* const argv,
+        const eclmplConfigFileTable& connTable) {
 
     ASSERT(connectionId == 0); // Only master executes this method.
     ASSERT(connTable.getNumberOfEntries() == numberOfConnections);
@@ -285,7 +286,7 @@ SocketBasedConnectionInterface::establishConnections(const slaveStartupInfo& inf
     std::cerr << connectionId << ": Done connecting to master. Now sending our portnumber (" << myPort
               << ") to master." << std::endl;
     std::cerr << connectionId << ": _____________ mtu="<<mtu<<", myPortLen="<<(strlen(
-                                                                                   myPort.c_str())+1)<<"_____________" << std::endl;
+                  myPort.c_str())+1)<<"_____________" << std::endl;
 #endif
     // Send a message to master containing our portnumber.
     unsigned int msgSize = mtu;
@@ -557,7 +558,7 @@ SocketBasedConnectionInterface::recv(unsigned int& msgSize, char* const msg,
 
 void
 SocketBasedConnectionInterface::establishConnectionsWithPeerSlaves(const eclmplConfigFileTable&
-                                                                   connTable) {
+        connTable) {
     for (unsigned int i = 1; i < numberOfConnections; i++) {
         if (i < connectionId) {
             int newSocketFd;

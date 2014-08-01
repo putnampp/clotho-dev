@@ -34,8 +34,7 @@
 KAlleleMutationModel::KAlleleMutationModel( double rate ) :
     m_rate( rate ),
     m_rng( gsl_rng_alloc(gsl_rng_mt19937) ),
-    m_poisson( rate )
-{
+    m_poisson( rate ) {
     long seed = time(NULL);
     gsl_rng_set( m_rng, seed );
 

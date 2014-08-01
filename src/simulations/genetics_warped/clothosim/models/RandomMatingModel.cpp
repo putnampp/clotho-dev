@@ -89,7 +89,7 @@ void RandomMatingModel::operator()( const ShellMatingEvent * e, Environment2 * e
             if( offspring ) {
                 IndividualProperties * ip = offspring->getProperties();
                 ip->reset();
-                
+
                 generateOffspringGenotype( female, male, ip->m_genos );
 
 
@@ -127,7 +127,7 @@ void RandomMatingModel::generateOffspringGenotype( IndividualShell * female, Ind
     //assert( female_alleles->size() == nLoci && male_alleles->size() == nLoci );
 
     if( ALLELE_COPIES == 2 ) {
-        unsigned int i = 0; 
+        unsigned int i = 0;
         while( i < nLoci ) {
             // routine only works if ploidy == 2
             genos[0][i] = female_alleles[(m_uniform.nextBoolean() ? 1 : 0)][ i ];

@@ -28,7 +28,7 @@ namespace life_cycle {
 /*
  * The opt_default_life_cycle model is a very simple abstraction of a natural
  * life cycle.  In this model, all individuals encounter the same
- * life cycle events at the same time.  There are 4 phases to this 
+ * life cycle events at the same time.  There are 4 phases to this
  * life cycle: Birth, Maturity, Mating, and Death.  For simplicity,
  * all individuals are born at t_0, mature at t_1 = t_0 + MATURITY_OFFSET,
  * mate at t_2 = t_1 + MATE_OFFSET, and die at t_3 = t_0 + DEATH_OFFSET.
@@ -45,7 +45,7 @@ namespace life_cycle {
  * The next time step starts with an individual becoming mature.
  * A mature individual simply notifies the environment of its maturity.
  * The environment handles this notification by scheduling a mate_select event.
- * 
+ *
  * The mate select process starts the Mate phase. The mate select process
  * selects two parents from the current environment using the selection
  * procedure associated with the environment. An individual is created
@@ -93,7 +93,7 @@ struct opt_default_life_cycle : public life_cycle_model {
     }
 };
 
-template < class ENV > 
+template < class ENV >
 class EnvironmentLifeCycle< opt_default_life_cycle, ENV, ClothoEvent > {
 public:
     typedef void (*handler_t)( ENV *, const ClothoEvent * );
@@ -232,18 +232,18 @@ public:
         if( e_id == BirthEvent::CEID ) {
             handle_birth( ind, (BirthEvent * )evt );
         } else if( e_id == DeathEvent::CEID ) {
-           handle_death(ind, (DeathEvent * )evt );
+            handle_death(ind, (DeathEvent * )evt );
         } else if( e_id == IND::inherit_event_t::CEID ) {
             handle_inherit(ind, (ievent_t * )evt );
         } else if( e_id == MateEvent::CEID ) {
             handle_mate(ind, (MateEvent * ) evt );
-        //} else if( evt->getEventType() == MATURITY_EVENT_K ) {
-        //    handle_maturity(ind, evt );
+            //} else if( evt->getEventType() == MATURITY_EVENT_K ) {
+            //    handle_maturity(ind, evt );
         }
     }
 
 protected:
-    static void handle_birth( IND * ind, BirthEvent * evt ){
+    static void handle_birth( IND * ind, BirthEvent * evt ) {
         ClothoEvent::vtime_t ctime = evt->getReceived();
 
         ind->getProperties()->setDOB( ctime );
@@ -285,7 +285,7 @@ protected:
     static void handle_mate( IND * ind, MateEvent * me ) {
         typedef typename IND::properties_t::gamete_type   gamete_t;
         typedef typename gamete_t::pointer gamete_ptr;
-        
+
         gamete_ptr z = IND::reproduction_model_t::reproduce( ind, (gamete_t *) NULL );
 
         typedef typename IND::inherit_event_t ievent_t;
@@ -348,11 +348,11 @@ protected:
         system_id env_id = ind->getEnvironmentID();
 
         ClothoObject::event_id_t n_eid = co->getNextEventID();
-        
+
 //        DeathEvent * de = new DeathEvent( ctime, ctime, obj_id, env_id, n_eid);
 
         //re-purpose the event
-        evt->init( ctime, ctime, obj_id, env_id, n_eid );      
+        evt->init( ctime, ctime, obj_id, env_id, n_eid );
         co->sendEvent( evt, env_id, ctime );
     }
 };

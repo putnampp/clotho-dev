@@ -13,8 +13,8 @@ namespace individual {
 
 BOILER_PLATE_STRUCTOR( TIndividual )() :
 //    AppObject(),
-    m_props()
-{ }
+    m_props() {
+}
 
 //BOILER_PLATE_STRUCTOR( TIndividual )( ClothoObject * co, ClothoObject * env ) :
 //    AppObject( co ),
@@ -23,8 +23,8 @@ BOILER_PLATE_STRUCTOR( TIndividual )() :
 
 BOILER_PLATE_STRUCTOR( TIndividual )( const BOILER_PLATE_SPECIALIZED_CLASS & ind ) :
 //    AppObject( ind ),
-    m_props( ind.m_prop )
-{}
+    m_props( ind.m_prop ) {
+}
 
 //BOILER_PLATE_METHOD( void, initialize )() {
 //    typedef InheritEvent ievent_t;

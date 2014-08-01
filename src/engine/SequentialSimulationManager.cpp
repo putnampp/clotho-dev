@@ -22,8 +22,8 @@ SequentialSimulationManager::SequentialSimulationManager( shared_ptr< applicatio
     m_nPendingEvents(0),
     m_nProcessedEvents(0),
     m_nRegisteredObjs(0),
-    m_stats( new SimulationStats() )
-{}
+    m_stats( new SimulationStats() ) {
+}
 
 SequentialSimulationManager::SequentialSimulationManager( shared_ptr< application > app, shared_ptr< SimulationStats > stats, system_id::manager_id_t id ) :
     SimulationManager( id ),
@@ -34,8 +34,7 @@ SequentialSimulationManager::SequentialSimulationManager( shared_ptr< applicatio
     m_nPendingEvents(0),
     m_nProcessedEvents(0),
     m_nRegisteredObjs(0),
-    m_stats( stats )
-{
+    m_stats( stats ) {
 
 }
 
@@ -207,12 +206,12 @@ void SequentialSimulationManager::finalize() {
     m_stats->setProcessedEvents( m_nProcessedEvents );
     m_stats->setPendingEvents( m_nPendingEvents );
 
-/*    cout << "\nSequentialSimulationManager: Events Processed = "
-         << m_nProcessedEvents
-         << "; Events Pending = "
-         << m_nPendingEvents
-         << endl;
-*/
+    /*    cout << "\nSequentialSimulationManager: Events Processed = "
+             << m_nProcessedEvents
+             << "; Events Pending = "
+             << m_nPendingEvents
+             << endl;
+    */
 }
 
 bool SequentialSimulationManager::isSimulationComplete() const {

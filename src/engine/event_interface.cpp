@@ -6,9 +6,9 @@ std::ostream & operator<<( std::ostream & o, const event * e ) {
 }
 
 std::ostream & operator<<( std::ostream & o, const event & e ) {
-    o   << e.getSender() << " @ " << e.getSent() 
-        << " -> " 
-        << e.getReceiver() << " @ " << e.getReceived() 
+    o   << e.getSender() << " @ " << e.getSent()
+        << " -> "
+        << e.getReceiver() << " @ " << e.getReceived()
         << " [" << e.getEventID() << "]";
     return o;
 }

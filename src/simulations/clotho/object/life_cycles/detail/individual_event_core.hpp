@@ -13,12 +13,12 @@ namespace detail {
 #define BEGIN_BOILER_EVENT( event_type ) \
 template < class G, unsigned char P, class S, class LC > \
 struct life_cycle_handler < TIndividual< G, P, S, individual_props< G, P, S> > , event_type, LC > { \
-    static void perform( TIndividual< G, P, S, individual_props< G, P, S> > * ind, event_type * evt ) 
+    static void perform( TIndividual< G, P, S, individual_props< G, P, S> > * ind, event_type * evt )
 
 #define BEGIN_BOILER_EVENT_AND_LC( event_type, life_cycle_type ) \
 template < class G, unsigned char P, class S > \
 struct life_cycle_handler < TIndividual< G, P, S, individual_props< G, P, S> > , event_type, life_cycle_type > { \
-    static void perform( TIndividual< G, P, S, individual_props< G, P, S> > * ind, event_type * evt ) 
+    static void perform( TIndividual< G, P, S, individual_props< G, P, S> > * ind, event_type * evt )
 
 #define END_BOILER_EVENT };
 
@@ -27,7 +27,7 @@ BEGIN_BOILER_EVENT( BirthEvent ) {
     ind->getProperties()->setDOB( ctime );
 
     ClothoObject * co = ind->getClothoObject();
-        
+
     system_id obj_id = co->getSystemID();
     system_id env_id = ind->getEnvironmentID();
 
@@ -45,7 +45,7 @@ BEGIN_BOILER_EVENT( DeathEvent ) {
     system_id obj_id = co->getSystemID();
     system_id env_id = ind->getEnvironmentID();
 
-    // re-purpose the event 
+    // re-purpose the event
     evt->init( ctime, ctime, obj_id, env_id, co->getNextEventID() );
     co->sendEvent( evt, env_id, ctime );
 }
@@ -84,7 +84,7 @@ BEGIN_BOILER_EVENT( MateEvent ) {
     typedef typename TIndividual< G, P, S, individual_props<G,P,S> >::gamete_type gamete_t;
     typedef typename gamete_t::pointer gamete_ptr;
     typedef InheritEvent ievent_t;
-        
+
     gamete_ptr z = TIndividual< G, P, S, individual_props<G,P,S> >::reproduce( ind );
 
     ClothoEvent::vtime_t ctime = evt->getReceived();

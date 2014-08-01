@@ -1,7 +1,7 @@
 #include "simple_random_selection.h"
 
-SimpleRandomSelection::SimpleRandomSelection( shared_ptr< iRNG > rng ) : m_rng(rng) 
-{}
+SimpleRandomSelection::SimpleRandomSelection( shared_ptr< iRNG > rng ) : m_rng(rng) {
+}
 
 selection_model * SimpleRandomSelection::clone() {
     selection_model * c = new SimpleRandomSelection( m_rng->clone() );

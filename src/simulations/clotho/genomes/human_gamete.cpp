@@ -9,19 +9,17 @@ const gamete::gamete_source_t HumanGamete::FROM_FATHER = 1;
 const gamete::gamete_type_t HumanGamete::X_TYPE = 0;
 const gamete::gamete_type_t HumanGamete::Y_TYPE = 1;
 
-HumanGamete::HumanGamete( gamete::gamete_source_t s, gamete::gamete_type_t t, size_t n) : 
-    gamete(s , t), 
+HumanGamete::HumanGamete( gamete::gamete_source_t s, gamete::gamete_type_t t, size_t n) :
+    gamete(s , t),
     m_nAlleles( n ),
-    m_alleles( new unsigned char[ m_nAlleles ] )
-{
+    m_alleles( new unsigned char[ m_nAlleles ] ) {
     memset( m_alleles, 0, sizeof( unsigned char ) * m_nAlleles );
 }
 
-HumanGamete::HumanGamete( const HumanGamete & z ) : 
+HumanGamete::HumanGamete( const HumanGamete & z ) :
     gamete( z ),
     m_nAlleles( z.m_nAlleles ),
-    m_alleles( new unsigned char[ m_nAlleles ] )
-{
+    m_alleles( new unsigned char[ m_nAlleles ] ) {
     memcpy( z.m_alleles, m_alleles, sizeof( unsigned char ) * m_nAlleles );
 }
 
@@ -59,6 +57,6 @@ void HumanGamete::print( std::ostream & o ) {
 }
 
 HumanGamete::~HumanGamete() {
-    if( m_alleles != NULL ) 
+    if( m_alleles != NULL )
         delete [] m_alleles;
 }

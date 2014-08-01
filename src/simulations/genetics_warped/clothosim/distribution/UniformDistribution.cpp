@@ -33,8 +33,7 @@
 
 UniformDistribution::UniformDistribution( ) :
     m_rng( NULL ),
-    m_bools()
-{
+    m_bools() {
     setRandomNumberGenerator( NULL );
 }
 
@@ -43,15 +42,15 @@ UniformDistribution::~UniformDistribution() {
 
 void UniformDistribution::setRandomNumberGenerator( gsl_rng * rng ) {
     m_rng = rng;
-/*
-    if( m_rng ) {
-       m_variate = &UniformDistribution::variateRNG; 
-       m_variate2 = &UniformDistribution::variate2RNG; 
-    } else {
-        m_variate = &UniformDistribution::variateNoRNG; 
-        m_variate2 = &UniformDistribution::variate2NoRNG;
-    }
-*/
+    /*
+        if( m_rng ) {
+           m_variate = &UniformDistribution::variateRNG;
+           m_variate2 = &UniformDistribution::variate2RNG;
+        } else {
+            m_variate = &UniformDistribution::variateNoRNG;
+            m_variate2 = &UniformDistribution::variate2NoRNG;
+        }
+    */
 }
 
 bool UniformDistribution::nextBoolean() {
@@ -116,6 +115,6 @@ void UniformDistribution::updateBooleanPool2() {
             if( rnd & (1 << offset) ) {
                 m_bools.push( rnd2 & (1 << offset) );
             }
-        }while( --offset );
+        } while( --offset );
     }
 }

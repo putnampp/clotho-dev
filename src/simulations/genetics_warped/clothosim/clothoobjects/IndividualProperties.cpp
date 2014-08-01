@@ -70,7 +70,7 @@ void IndividualProperties::reset() {
 }
 
 ostream & operator<<( ostream & out, const IndividualProperties & ip ) {
-    out << ip.m_id 
+    out << ip.m_id
         << ", " << ip.m_sex
         << ", " << ip.m_mother
         << ", " << ip.m_father;
@@ -91,14 +91,14 @@ ostream & operator<<( ostream & out, const IndividualProperties & ip ) {
     size_t size = (ip.m_genos[1] - ip.m_genos[0]);
     if( size ) {
         out << ", [";
-       /* 
-        size_t s = 0;
-        for( ploidy_t p = 0; p < ALLELE_COPIES; ++p ) {
-            out << "{" << ip.m_genos[p][s]  << "}";
-        }
-        while( s < size ) {
-            out << ",{" << (*it++) << "}";
-        }*/
+        /*
+         size_t s = 0;
+         for( ploidy_t p = 0; p < ALLELE_COPIES; ++p ) {
+             out << "{" << ip.m_genos[p][s]  << "}";
+         }
+         while( s < size ) {
+             out << ",{" << (*it++) << "}";
+         }*/
         out << "]";
     }
     return out;

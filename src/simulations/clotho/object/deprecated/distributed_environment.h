@@ -41,7 +41,7 @@ public:
     virtual void perform_event( const event * );
 
     virtual void addNeighborEnvironment( const system_id & env );
- 
+
     virtual ~DistributedEnvironment() {}
 
 protected:

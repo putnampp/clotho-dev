@@ -69,8 +69,7 @@ public:
         m_sel_param( NULL ),
         m_nIndAlloc(0),
         m_nFounder(0),
-        m_nMateOps(0)
-    {
+        m_nMateOps(0) {
         ClothoObject::setSimulationManager( manager );
     }
 
@@ -81,8 +80,7 @@ public:
         m_sel_param( s ),
         m_nIndAlloc(0),
         m_nFounder(0),
-        m_nMateOps(0)
-    {
+        m_nMateOps(0) {
         ClothoObject::setSimulationManager( manager );
     }
 
@@ -97,7 +95,7 @@ public:
     virtual void initialize() {
         initializer::EnvironmentInitializer::init(this);
     }
- 
+
     virtual void perform_event( const event * e) {
         life_cycle::EnvironmentLifeCycle<LCM>::handle_event( this, e );
     }
@@ -187,7 +185,7 @@ protected:
     gender_group_map_t m_gender_group_map;
     individual_group_lookup_t m_active_individuals;
     deque< system_id > m_available_individuals;
-    set< system_id > m_pending; 
+    set< system_id > m_pending;
 
     //std::shared_ptr< variant_map_t >       m_variants;
     selection_parameter_t  *   m_sel_param;

@@ -35,15 +35,15 @@ DEFINE_REGISTERED_CLOTHO_EVENT( LogEvent )
 LogEvent::LogEvent( const VTime & tSend, const VTime &tRecv,
                     SimulationObject * sender,
                     SimulationObject * receiver ) :
-    ClothoEvent( tSend, tRecv, sender, receiver )
-{}
+    ClothoEvent( tSend, tRecv, sender, receiver ) {
+}
 
 LogEvent::LogEvent( const VTime & tSend, const VTime & tRecv,
                     const ObjectID &sender,
                     const ObjectID & receiver,
                     const unsigned int evtID ) :
-    ClothoEvent( tSend, tRecv, sender, receiver, evtID )
-{}
+    ClothoEvent( tSend, tRecv, sender, receiver, evtID ) {
+}
 
 bool LogEvent::eventCompare( const Event * evt ) {
     const LogEvent * e = dynamic_cast< const LogEvent * >(evt);

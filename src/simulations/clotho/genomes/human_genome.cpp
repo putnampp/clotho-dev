@@ -3,8 +3,8 @@
 HumanGenome::HumanGenome() :
     m_mother( new HumanGamete(HumanGamete::FROM_MOTHER, HumanGamete::X_TYPE, 1) ),
     m_father( new HumanGamete(HumanGamete::FROM_FATHER, HumanGamete::X_TYPE, 1) ),
-    m_sex( FEMALE )
-{}
+    m_sex( FEMALE ) {
+}
 
 HumanGenome::HumanGenome( HumanGamete * hz0, HumanGamete * hz1 ) {
     if( hz0 == NULL ) {
@@ -51,8 +51,8 @@ HumanGenome::HumanGenome( HumanGamete * hz0, HumanGamete * hz1 ) {
 HumanGenome::HumanGenome( const HumanGenome & g ) :
     m_mother( dynamic_cast< HumanGamete * >(g.m_mother->clone()) ),
     m_father( dynamic_cast< HumanGamete * >(g.m_father->clone()) ),
-    m_sex( g.m_sex )
-{ }
+    m_sex( g.m_sex ) {
+}
 
 genome * HumanGenome::clone() const {
     return new HumanGenome( *this );
@@ -63,11 +63,11 @@ Sex HumanGenome::getSex() const {
 }
 
 gamete * HumanGenome::getGamete( gamete::gamete_source_t id ) const {
-/*    if( id == 0 ) {
-        cout << "Maternal gamete";
-    } else {
-        cout << "Paternal gamete";
-    }*/
+    /*    if( id == 0 ) {
+            cout << "Maternal gamete";
+        } else {
+            cout << "Paternal gamete";
+        }*/
     return ( (id) ? m_father : m_mother );
 }
 

@@ -152,7 +152,7 @@ int main( int argc, char ** argv ) {
     sim->simulate( tUntil );
 
     sim->finalize();
-    
+
     stats->stopPhase( RUNTIME_K );
 
     cout << *stats;

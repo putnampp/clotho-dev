@@ -35,7 +35,7 @@ eclmplPhysicalCommunicationLayer::physicalGetId() const {
 
 void
 eclmplPhysicalCommunicationLayer::physicalSend(const SerializedInstance* toSend,
-                                               unsigned int dest) {
+        unsigned int dest) {
 
     const void* buffer = &toSend->getData()[0];
     unsigned int size = toSend->getSize();

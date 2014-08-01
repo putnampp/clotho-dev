@@ -57,13 +57,13 @@ void Environment2::handleEvent< ShellBirthEvent >( const ShellBirthEvent * e ) {
 ShellBirthEvent::ShellBirthEvent( const VTime & tSend, const VTime &tRecv,
                                   SimulationObject * sender,
                                   SimulationObject * receiver,
-                                    IndividualShell * ind ) :
+                                  IndividualShell * ind ) :
     ClothoEvent( tSend, tRecv, sender, receiver ),
     m_birth( dynamic_cast< IntVTime * >( tRecv.clone() )),
-    m_ind( ind )
-{}
+    m_ind( ind ) {
+}
 
-ShellBirthEvent::ShellBirthEvent( const VTime & tSend, 
+ShellBirthEvent::ShellBirthEvent( const VTime & tSend,
                                   const VTime &tRecv,
                                   ObjectID & sender,
                                   ObjectID & receiver,
@@ -71,8 +71,8 @@ ShellBirthEvent::ShellBirthEvent( const VTime & tSend,
                                   IndividualShell * ind ) :
     ClothoEvent( tSend, tRecv, sender, receiver, evtID ),
     m_birth( dynamic_cast< IntVTime * >( tRecv.clone() )),
-    m_ind( ind )
-{}
+    m_ind( ind ) {
+}
 
 bool ShellBirthEvent::eventCompare( const Event * evt ) {
     const ShellBirthEvent * e = dynamic_cast< const ShellBirthEvent * >(evt);

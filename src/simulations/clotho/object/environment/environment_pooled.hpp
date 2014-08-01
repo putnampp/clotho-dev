@@ -108,8 +108,7 @@ public:
         AppObject( co ),
         m_rng(r),
         m_sel_param(s),
-        m_nFounder(0)
-    {
+        m_nFounder(0) {
         if( m_clotho_object != NULL ) m_clotho_object->updatePerformer( this );
     }
 
@@ -117,8 +116,7 @@ public:
         AppObject( cenv ),
         m_rng( cenv.m_rng ),
         m_sel_param( cenv.m_sel_param ),
-        m_nFounder( cenv.m_nFounder )
-    {
+        m_nFounder( cenv.m_nFounder ) {
         assert(false);
         //if( m_clotho_object != NULL ) m_clotho_object->updatePerformer( this );
     }
@@ -135,7 +133,7 @@ public:
         life_cycle::EnvironmentLifeCycle<LCM, environment_t, ClothoEvent>::initialize();
         initializer::EnvironmentInitializer::init(this);
     }
- 
+
     virtual void perform_event( /*const*/ event_t * e) {
         life_cycle::EnvironmentLifeCycle<LCM, environment_t, ClothoEvent>::handle_event( this, e );
     }
@@ -158,7 +156,7 @@ public:
         return m_individuals.at( idx );
     }
 
-    
+
     size_t activateNextIndividual() {
         return m_individual_pool.activateNextPendingObject();
     }
@@ -183,7 +181,7 @@ protected:
 //        return m_individual_pool.getPoolObject( m_id_pool_index_map.at(id) );
 //    }
 
-    
+
 //    const system_id & getIndividual( ) {
 //        return getIndividualObject().getSystemID();
 //    }
@@ -221,7 +219,7 @@ protected:
     }
 
     void activateIndividual( const system_id & id, unsigned char gtype = -1 ) {
-        
+
         m_individual_pool.activateObject( m_id_pool_index_map[id] );
     }
 

@@ -34,17 +34,17 @@ public:
 
 //    typedef std::vector< system_id > sim_object_id_list_t;
 
-    ClothoApplication( shared_ptr< iRNG > r ) : 
+    ClothoApplication( shared_ptr< iRNG > r ) :
         m_sim_manager( NULL ),
         m_rng( r ),
-        m_nFounder(0)
-    {}
+        m_nFounder(0) {
+    }
 
     ClothoApplication( manager_ptr_t m, shared_ptr< iRNG > r ) :
         m_sim_manager( m ),
         m_rng( r ),
-        m_nFounder(0)
-    {}
+        m_nFounder(0) {
+    }
 
     void setSimulationManager( manager_ptr_t manager ) {
         m_sim_manager = manager;
@@ -53,7 +53,7 @@ public:
     void setFounderSize( unsigned int s ) {
         m_nFounder = s;
     }
-    
+
     void initialize() {
         assert( m_sim_manager );
         initializer::ClothoAppInitializer::init(this);
@@ -73,7 +73,7 @@ protected:
     shared_ptr< iRNG >      m_rng;
     environment_ptr_t       m_env;
 //    sim_object_id_list_t    m_objects;
-    
+
     unsigned int            m_nFounder;
 };
 

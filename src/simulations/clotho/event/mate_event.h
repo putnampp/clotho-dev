@@ -11,11 +11,11 @@ public:
     typedef ObjectManager< MateEvent, EVENT_PAGE_SIZE > object_manager_t;
 
     void init( const vtime_t & tSent, const vtime_t & tRecv,
-                const system_id & sender, const system_id & receiver,
-                event_id_t eid, const system_id & offspring );
+               const system_id & sender, const system_id & receiver,
+               event_id_t eid, const system_id & offspring );
     void init( const vtime_t & tSent, const vtime_t & tRecv,
-                const system_object * sender, const system_object * receiver,
-                event_id_t eid, const system_object * offspring );
+               const system_object * sender, const system_object * receiver,
+               event_id_t eid, const system_object * offspring );
 
     //inline event_type_t getEventType() const { return TYPE_ID; }
 
@@ -35,11 +35,11 @@ public:
     MateEvent() {}
 
     MateEvent( const vtime_t & tSent, const vtime_t & tRecv,
-                const system_id & sender, const system_id & receiver,
-                event_id_t eid, const system_id & offspring );
+               const system_id & sender, const system_id & receiver,
+               event_id_t eid, const system_id & offspring );
     MateEvent( const vtime_t & tSent, const vtime_t & tRecv,
-                const system_object * sender, const system_object * receiver,
-                event_id_t eid, const system_object * offspring );
+               const system_object * sender, const system_object * receiver,
+               event_id_t eid, const system_object * offspring );
 protected:
     system_id   m_offspring;
 

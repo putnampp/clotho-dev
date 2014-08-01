@@ -65,7 +65,7 @@ typedef ClothoApplication< CENTRAL_MGR_t, ENV_t > SIMPLE_CENTRAL_APP_t;
 
 namespace initializer {
 
-template < > 
+template < >
 void ClothoAppInitializer::createEnvironment< SIMPLE_CENTRAL_APP_t, SIMPLE_CENTRAL_APP_t::environment_t >( SIMPLE_CENTRAL_APP_t * a, SIMPLE_CENTRAL_APP_t::environment_t * ) {
     cout << "Blocking default protocol" << endl;
     typedef typename SIMPLE_CENTRAL_APP_t::environment_t environment_t;
@@ -86,7 +86,7 @@ void EnvironmentInitializer::createPopulation( ENV_t * env, IND_t * ind ) {
 
     for( unsigned int i = 0; i < env->m_nFounder; ++i ) {
         size_t idx = env->getIndividualIndex();    // adds individual to pending list
-        
+
         //IND_t * ind = static_cast< IND_t * >( env->m_sim_manager->getObject(id) );
         IND_t & ind = env->getIndividualAt( idx );
 
@@ -130,7 +130,7 @@ int main( int argc, char ** argv ) {
     cout << "RNG: " <<  rng->getType() << "; seed: " << rng->getSeed() << endl;
 
     mutation_model_t::initialize( 0.0001, false);
-    
+
 //    const double dMaxVariants = 10000.0;
 //    for( double i = 0.0; i < dMaxVariants; i += 1.0 ) {
 //        mutation_model_t::getVariantMap()->createVariant( i / dMaxVariants);
@@ -186,7 +186,7 @@ int main( int argc, char ** argv ) {
     sim->simulate( tUntil );
 
     sim->finalize();
-    
+
     stats->stopPhase( RUNTIME_K );
 
     cout << *stats;

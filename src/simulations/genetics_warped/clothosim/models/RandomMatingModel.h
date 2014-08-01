@@ -41,7 +41,7 @@
 
 class RandomMatingModel :
     virtual public ClothoModel< IndividualShell, ShellMaturityEvent >,
-        virtual public ClothoModel< Environment2 , ShellMatingEvent > {
+    virtual public ClothoModel< Environment2 , ShellMatingEvent > {
 public:
     RandomMatingModel ();
 

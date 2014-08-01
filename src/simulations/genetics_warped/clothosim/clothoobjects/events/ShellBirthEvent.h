@@ -38,20 +38,20 @@
 class ShellBirthEvent :
     virtual public ClothoEvent,
     virtual public ModelHandler< Environment2 >,
-        virtual public ModelHandler< IndividualShell > {
+    virtual public ModelHandler< IndividualShell > {
 public:
     ShellBirthEvent( const VTime & tSend, const VTime &tRecv,
                      SimulationObject * sender,
                      SimulationObject * receiver,
                      IndividualShell * ind
-                     );
+                   );
 
     ShellBirthEvent( const VTime & tSend, const VTime &tRecv,
                      ObjectID & sender,
                      ObjectID & receiver,
                      unsigned int evtID,
                      IndividualShell * ind
-                     );
+                   );
 
     virtual const string & getDataType() const;
     virtual unsigned int getEventSize() const;

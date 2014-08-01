@@ -12,7 +12,7 @@
 
 namespace initializer {
 
-BOILER_PLATE_TEMPLATE 
+BOILER_PLATE_TEMPLATE
 class InitWorker< objects::individual::BOILER_PLATE_SPECIALIZED_CLASS > {
 public:
     static void init( objects::individual::BOILER_PLATE_SPECIALIZED_CLASS * ind ) {

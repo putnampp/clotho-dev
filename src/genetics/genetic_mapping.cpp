@@ -7,7 +7,7 @@ genetic_mapping::chromosome_map_t   genetic_mapping::m_chrom_lookup;
 genetic_mapping::chromosome_list_t       genetic_mapping::m_chroms;
 
 
-template <> 
+template <>
 double genetic_mapping::convertToKey<double>( const chromosome_t & c, pos_t p ) {
     chromosome_map_t::iterator it = m_chrom_lookup.find(c);
 
@@ -23,7 +23,7 @@ void genetic_mapping::addChromosome( const chromosome_t & c ) {
     if( genetic_mapping::m_chrom_lookup.find(c) == genetic_mapping::m_chrom_lookup.end() ) {
         genetic_mapping::m_chrom_lookup.insert( std::make_pair(c, genetic_mapping::m_chroms.size()));
         genetic_mapping::m_chroms.push_back( c );
-    } 
+    }
 }
 
 void genetic_mapping::addChromosomeAlias( const chromosome_t & c, const chromosome_t & a ) {

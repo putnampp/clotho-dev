@@ -70,7 +70,7 @@ bool locus_id::operator==( const locus_id & rhs ) const {
 Locus::Locus( chromid_t c, pos_t s, pos_t e, allele_t n ) :
     m_id( c, s, e ),
     m_nAlleles(n)
-   /* alt_alleles( new unordered_map<allele_t, double>() ) */ {}
+/* alt_alleles( new unordered_map<allele_t, double>() ) */ {}
 
 const locus_id & Locus::getID() const {
     return m_id;
@@ -111,11 +111,11 @@ bool Locus::addAlternateAllele( allele_t all, double all_eff ) {
 */
 
 bool Locus::isKnownAllele( allele_t all ) const {
-/*
-    unordered_map< allele_t, double >::iterator it = alt_alleles->find(all);
+    /*
+        unordered_map< allele_t, double >::iterator it = alt_alleles->find(all);
 
-    return it != alt_alleles->end();
-*/
+        return it != alt_alleles->end();
+    */
     return (all < m_nAlleles );
 }
 
@@ -168,8 +168,8 @@ bool    Locus::operator==( const Locus & rhs ) const {
 }
 
 Locus::~Locus() {
-/*
-    alt_alleles->clear();
-    alt_alleles.reset();
-*/
+    /*
+        alt_alleles->clear();
+        alt_alleles.reset();
+    */
 }

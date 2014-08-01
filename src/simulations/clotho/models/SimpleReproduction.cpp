@@ -13,7 +13,7 @@ SimpleReproduction::SimpleReproduction( shared_ptr< iRNG > rng ) : m_rng(rng) {
 // Using human reproduction as an example.
 // Each parent inherits half its genome from
 // a male and a female.  In other words, each
-// genome has source material (gametes) from 
+// genome has source material (gametes) from
 // two parent genomes.  The gametes which the
 // current genome inherits are assumed to be
 // unique.

@@ -45,25 +45,25 @@ public:
         return gsl_rng_uniform_pos( m_rng );
 //        return (*m_variate)();
     }
-/*
- *  De-inlining this function results a 60% slowdown in runtime of the
- *  ConstantPopulationRandomMatingModel. A single call is performed
- *  to determine which one of the 4 parent allele combinations should
- *  be inherited per locus. 
- */
+    /*
+     *  De-inlining this function results a 60% slowdown in runtime of the
+     *  ConstantPopulationRandomMatingModel. A single call is performed
+     *  to determine which one of the 4 parent allele combinations should
+     *  be inherited per locus.
+     */
     inline unsigned long int nextVariate( unsigned long int max ) {
         if( !m_rng ) return 0;
         return gsl_rng_get( m_rng ) % max;
 //        return (*m_variate2)(max);
     }
 
-/*
- * Inlining actually decreases performance of the 
- * ConstantPopulationRandomMatingModel. Assuming that two calls
- * to this function are performed per locus, per offspring. Each
- * call is used to determine which allele should be inherited
- * from the parent.
- */
+    /*
+     * Inlining actually decreases performance of the
+     * ConstantPopulationRandomMatingModel. Assuming that two calls
+     * to this function are performed per locus, per offspring. Each
+     * call is used to determine which allele should be inherited
+     * from the parent.
+     */
     bool nextBoolean();
 
     virtual ~UniformDistribution();

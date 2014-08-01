@@ -9,25 +9,25 @@ struct EnvironmentSnapshot {
     size_t available_count;
 
     EnvironmentSnapshot() :
-        male_count(0), 
-        female_count(0), 
-        pending_count(0), 
-        available_count(0)
-    {}
+        male_count(0),
+        female_count(0),
+        pending_count(0),
+        available_count(0) {
+    }
 
     EnvironmentSnapshot( size_t nMales, size_t nFemales, size_t nPending, size_t nAvail ) :
-        male_count(nMales), 
-        female_count(nFemales), 
-        pending_count(nPending), 
-        available_count(nAvail)
-    {}
+        male_count(nMales),
+        female_count(nFemales),
+        pending_count(nPending),
+        available_count(nAvail) {
+    }
 
     EnvironmentSnapshot( const EnvironmentSnapshot & es ) :
-        male_count(es.male_count), 
-        female_count(es.female_count), 
-        pending_count(es.pending_count), 
-        available_count(es.available_count)
-    {}
+        male_count(es.male_count),
+        female_count(es.female_count),
+        pending_count(es.pending_count),
+        available_count(es.available_count) {
+    }
 
     EnvironmentSnapshot & operator=( const EnvironmentSnapshot & es ) {
         male_count = es.male_count;

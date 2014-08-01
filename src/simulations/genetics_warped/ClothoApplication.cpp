@@ -38,10 +38,10 @@ using std::endl;
 
 #include <boost/lexical_cast.hpp>
 
-ClothoApplication::ClothoApplication( const string & config ) : m_config( config ), 
-        m_time(NULL), 
-        m_part( new ClothoPartitioner() ),
-        m_yaml( new YamlConfig( m_config ) ){}
+ClothoApplication::ClothoApplication( const string & config ) : m_config( config ),
+    m_time(NULL),
+    m_part( new ClothoPartitioner() ),
+    m_yaml( new YamlConfig( m_config ) ) {}
 
 int ClothoApplication::finalize( ) {
     return 0;

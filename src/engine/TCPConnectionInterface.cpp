@@ -7,7 +7,7 @@ TCPConnectionInterface::TCPConnectionInterface(const unsigned int& mtuSize) {
 
 bool
 TCPConnectionInterface::establishConnections(const int* const argc,
-                                             const char* const* const* const argv) {
+        const char* const* const* const argv) {
     return SocketBasedConnectionInterface::establishConnections(argc, argv);
 } // End of establishConnections(...).
 

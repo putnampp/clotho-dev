@@ -39,7 +39,7 @@
 using std::ofstream;
 
 class LogModel :
-        virtual public ClothoModel< ClothoObject, LogEvent > {
+    virtual public ClothoModel< ClothoObject, LogEvent > {
 public:
     LogModel( const string & dirpath, int step);
 

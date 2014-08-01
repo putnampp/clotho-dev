@@ -22,14 +22,26 @@ typedef event_type_t clotho_event_type;
 class ClothoEvent : public event {
 public:
 
-    inline const event_id_t &  getEventID() const { return m_eid; }
-    inline const system_id &   getSender() const { return m_sender; }
-    inline const system_id &   getReceiver() const { return m_receiver; }
+    inline const event_id_t &  getEventID() const {
+        return m_eid;
+    }
+    inline const system_id &   getSender() const {
+        return m_sender;
+    }
+    inline const system_id &   getReceiver() const {
+        return m_receiver;
+    }
 
-    inline const vtime_t &     getSent() const { return m_sent; }
-    inline const vtime_t &     getReceived() const { return m_recv; }
+    inline const vtime_t &     getSent() const {
+        return m_sent;
+    }
+    inline const vtime_t &     getReceived() const {
+        return m_recv;
+    }
 
-    inline bool isReceivedAt( const vtime_t & t ) const { return (m_recv == t); }
+    inline bool isReceivedAt( const vtime_t & t ) const {
+        return (m_recv == t);
+    }
 
     inline bool operator<( const event * rhs ) const {
         return m_recv < rhs->getReceived();
@@ -54,19 +66,19 @@ protected:
     ClothoEvent() {}
 
     ClothoEvent(  const vtime_t & tSent, const vtime_t & tRecv,
-                    const system_id & sender, const system_id & receiver,
-                    event_id_t eid ) :
+                  const system_id & sender, const system_id & receiver,
+                  event_id_t eid ) :
         m_sent( tSent),
         m_recv( tRecv),
         m_sender( sender ),
         m_receiver( receiver ),
-        m_eid( eid )
-    {}
+        m_eid( eid ) {
+    }
 
     ClothoEvent( const vtime_t & tSent, const vtime_t & tRecv,
                  const system_object * sender, const system_object * receiver, event_id_t eid ) :
-        ClothoEvent( tSent, tRecv, sender->getSystemID(), receiver->getSystemID(), eid )
-    {}
+        ClothoEvent( tSent, tRecv, sender->getSystemID(), receiver->getSystemID(), eid ) {
+    }
 
     void init(  const vtime_t & tSent, const vtime_t & tRecv,
                 const system_id & sender, const system_id & receiver,

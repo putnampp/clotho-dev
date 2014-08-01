@@ -23,8 +23,8 @@ Gamete::pointer Gamete::copy() {
 
 Gamete::pointer Gamete::clone() const {
 //    pointer g = m_pool.malloc();
-//    
-//    if( g->m_variants != NULL ) 
+//
+//    if( g->m_variants != NULL )
 //        g->m_variants->clear();
 //    else {
 //        g->m_variants = new variant_set_t();
@@ -60,7 +60,7 @@ size_t Gamete::size() const {
 }
 
 bool Gamete::operator[]( variant_base * vptr ) {
-    if( m_bDirty ) { 
+    if( m_bDirty ) {
         std::sort( m_variants->begin(), m_variants->end() );
         m_bDirty = false;
     }
@@ -102,7 +102,7 @@ Gamete::~Gamete() {
         for( variant_set_t::iterator it = m_variants->begin(); it != m_variants->end(); )
             (*it++)->decrementPenetrance();
     }
-    
+
     if( --m_nActive == 0 ) {
 //        std::cout << "<DUMPING OBJECT MANAGER before_free>" << std::endl;
 //        m_pool.dump(std::cout);
@@ -115,7 +115,7 @@ Gamete::~Gamete() {
         delete m_variants;
         m_variants = NULL;
 
-    //    delete this;
+        //    delete this;
         m_pool.free( this );
 
 //        std::cout << "<DUMPING OBJECT MANAGER after_free>" << std::endl;

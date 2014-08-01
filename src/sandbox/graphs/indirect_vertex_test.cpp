@@ -9,11 +9,11 @@ namespace graph {
 namespace vertex {
 
 template < template < class , class , class... > TT,
-            class T1, class T2, class... TARGS,
+           class T1, class T2, class... TARGS,
            template < class, class...> TT2,
-            class T3, class... TT2ARGS >
-class indirect_vertex< TT< T1, T2, TARGS... >, Key, 
-}   // namespace vertex
+           class T3, class... TT2ARGS >
+class indirect_vertex< TT< T1, T2, TARGS... >, Key,
+    }   // namespace vertex
 }   // namespace graph
 }   // namespace utility
 

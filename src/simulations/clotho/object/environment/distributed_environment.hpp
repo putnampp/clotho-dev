@@ -45,8 +45,7 @@ public:
         TEnvironment<LCM, VT>( manager ),
         m_global_env( global_env ),
         m_snapshot(),
-        m_view_threshold( 0.5 )
-    {
+        m_view_threshold( 0.5 ) {
         ClothoObject::setSimulationManager( manager );
         if( m_global_env == DefaultSystemID ) {
             m_global_env = ClothoObject::getSystemID();
@@ -59,8 +58,7 @@ public:
         m_global_env( global_env ),
         m_snapshot(),
         m_rng( rng->clone() ),
-        m_view_threshold( threshold )
-    {
+        m_view_threshold( threshold ) {
         ClothoObject::setSimulationManager( manager );
         if( m_global_env == DefaultSystemID ) {
             m_global_env = ClothoObject::getSystemID();
@@ -68,9 +66,13 @@ public:
         }
     }
 
-    virtual void process() { assert(false); }
+    virtual void process() {
+        assert(false);
+    }
 
-    virtual void perform_event( const event * ) { assert(false); }
+    virtual void perform_event( const event * ) {
+        assert(false);
+    }
 
     virtual void addNeighborEnvironment( const system_id & env_id ) {
         bool bDuplicate = false;
@@ -87,7 +89,7 @@ public:
             cout << ClothoObject::getSystemID() << " -> " << env_id << endl;
         }
     }
- 
+
     virtual ~TDistributedEnvironment() {}
 
 protected:

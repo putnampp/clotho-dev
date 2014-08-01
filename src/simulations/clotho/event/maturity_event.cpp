@@ -3,32 +3,32 @@
 MaturityEvent::object_manager_t MaturityEvent::m_pool;
 
 MaturityEvent::MaturityEvent( const vtime_t & tSent, const vtime_t & tRecv,
-                const system_id & sender, const system_id & receiver,
-                event_id_t eid, const system_id & obj, Sex s ) :
+                              const system_id & sender, const system_id & receiver,
+                              event_id_t eid, const system_id & obj, Sex s ) :
     ClothoEvent( tSent, tRecv, sender, receiver, eid ),
     m_mature_obj( obj ),
-    m_sex(s)
-{}
+    m_sex(s) {
+}
 
 MaturityEvent::MaturityEvent( const vtime_t & tSent, const vtime_t & tRecv,
-                const system_object * sender, const system_object * receiver,
-                event_id_t eid, const system_id & obj, Sex s ) :
+                              const system_object * sender, const system_object * receiver,
+                              event_id_t eid, const system_id & obj, Sex s ) :
     ClothoEvent( tSent, tRecv, sender, receiver, eid ),
     m_mature_obj(obj),
-    m_sex(s)
-{}
+    m_sex(s) {
+}
 
 void MaturityEvent::init( const vtime_t & tSent, const vtime_t & tRecv,
-                const system_id & sender, const system_id & receiver,
-                event_id_t eid, const system_id & obj, Sex s ) {
+                          const system_id & sender, const system_id & receiver,
+                          event_id_t eid, const system_id & obj, Sex s ) {
     ClothoEvent::init( tSent, tRecv, sender, receiver, eid );
     m_mature_obj = obj;
     m_sex = s;
 }
 
 void MaturityEvent::init( const vtime_t & tSent, const vtime_t & tRecv,
-                const system_object * sender, const system_object * receiver,
-                event_id_t eid, const system_id & obj, Sex s ) {
+                          const system_object * sender, const system_object * receiver,
+                          event_id_t eid, const system_id & obj, Sex s ) {
     ClothoEvent::init( tSent, tRecv, sender, receiver, eid );
     m_mature_obj = obj;
     m_sex = s;

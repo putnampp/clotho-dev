@@ -29,10 +29,9 @@
 
 #include "PoissonDistribution.h"
 
-PoissonDistribution::PoissonDistribution( double mean ) : 
+PoissonDistribution::PoissonDistribution( double mean ) :
     m_rng( NULL ),
-    m_mu ( mean )
-{
+    m_mu ( mean ) {
 }
 
 PoissonDistribution::~PoissonDistribution() { }

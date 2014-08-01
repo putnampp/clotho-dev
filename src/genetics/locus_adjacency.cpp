@@ -3,14 +3,14 @@
 locus_adjacency::locus_adjacency( alphabet_t * a ) :
     bit_vector(),
     m_copies(1),
-    m_alphabet( a )
-{}
+    m_alphabet( a ) {
+}
 
 locus_adjacency::locus_adjacency( const locus_adjacency & la ) :
     bit_vector( la ),
     m_copies( la.m_copies ),
-    m_alphabet(la.m_alphabet)
-{}
+    m_alphabet(la.m_alphabet) {
+}
 
 locus_adjacency::pointer locus_adjacency::copy() {
     ++m_copies;
@@ -34,7 +34,9 @@ locus_adjacency::allele_iterator locus_adjacency::allele_end() {
 }
 
 void locus_adjacency::release() {
-    if( --m_copies == 0 ) { delete this; }
+    if( --m_copies == 0 ) {
+        delete this;
+    }
 }
 
 locus_adjacency::~locus_adjacency() {}

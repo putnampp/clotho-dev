@@ -12,12 +12,12 @@ namespace detail {
 #define BEGIN_BOILER_EVENT( event_type ) \
 template < template < class, class... > class TT, class T1, class... REST, class LC > \
 struct life_cycle_handler < TEnvironment< TT< T1, REST...> > , event_type, LC > { \
-    static void perform( TEnvironment< TT< T1, REST...> > * env, event_type * evt ) 
+    static void perform( TEnvironment< TT< T1, REST...> > * env, event_type * evt )
 
 #define BEGIN_BOILER_EVENT_AND_LC( event_type, life_cycle_type ) \
 template< template < class, class... > class TT, class T1, class... REST > \
 struct life_cycle_handler < TEnvironment< TT< T1, REST...> >, event_type, life_cycle_type > { \
-    static void perform( TEnvironment< TT< T1, REST...> > * env, event_type * evt ) 
+    static void perform( TEnvironment< TT< T1, REST...> > * env, event_type * evt )
 
 #define END_BOILER_EVENT };
 

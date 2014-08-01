@@ -51,7 +51,7 @@ DEFINE_REGISTERED_CLOTHO_EVENT( ShellDeathEvent )
  * such events are notified though. Although those models could just as easily
  * be modified to listen for the IndividualShell + ShellBirthEvent, rather than
  * Environment2 + ShellBirthEvent. However, this creates a race condition as
- * an Individual may be dead, but the environment has not be notified of the 
+ * an Individual may be dead, but the environment has not be notified of the
  * death. Therefore, a mating event may occur which requests the individual from
  * the environment. But because the individual is dead, the mating fails
  *
@@ -76,30 +76,30 @@ ShellDeathEvent::ShellDeathEvent( const VTime & tSend, const VTime &tRecv,
                                   SimulationObject * sender,
                                   SimulationObject * receiver,
                                   IndividualShell * ind
-                                 ) :
+                                ) :
     ClothoEvent( tSend, tRecv, sender, receiver ),
-    m_ind( ind )
-{}
+    m_ind( ind ) {
+}
 
 ShellDeathEvent::ShellDeathEvent( const VTime & tSend, const VTime & tRecv,
                                   const ObjectID &sender,
                                   const ObjectID & receiver,
                                   const unsigned int evtID,
-                                    IndividualShell * ind
-                                 ) :
+                                  IndividualShell * ind
+                                ) :
     ClothoEvent( tSend, tRecv, sender, receiver, evtID ),
-    m_ind( ind )
-{}
+    m_ind( ind ) {
+}
 
 ShellDeathEvent::ShellDeathEvent( const VTime & tSend, const VTime & tRecv,
                                   const ObjectID &sender,
                                   const ObjectID & receiver,
                                   const EventId & evtID,
                                   IndividualShell * ind
-                                 ) :
+                                ) :
     ClothoEvent( tSend, tRecv, sender, receiver, evtID ),
-    m_ind(ind)
-{}
+    m_ind(ind) {
+}
 
 ShellDeathEvent::ShellDeathEvent( const ShellDeathEvent & ce ) :
     ClothoEvent( ce.getSendTime(), ce.getReceiveTime(),

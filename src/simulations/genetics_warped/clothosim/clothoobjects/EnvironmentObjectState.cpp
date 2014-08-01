@@ -29,8 +29,8 @@
 
 #include "EnvironmentObjectState.h"
 
-EnvironmentObjectState::EnvironmentObjectState( )
-{}
+EnvironmentObjectState::EnvironmentObjectState( ) {
+}
 
 void EnvironmentObjectState::copyState( const State * copy ) {}
 

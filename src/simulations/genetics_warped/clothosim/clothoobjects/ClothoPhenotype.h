@@ -3,13 +3,13 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
+ * modification, are permitted provided that the following conditions are met:
  *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
+ *    and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -47,7 +47,7 @@ struct genotypeable {
     /*
     * Calculates genotype for an indexed set of loci
     * and allelic_dominance measure
-    */  
+    */
     virtual double operator()( trait_locus_group_t ) = 0;
 };
 
@@ -67,11 +67,11 @@ struct environmental_effect {
  *   P = f( G, E ), where f : ( \real, \real ) -> \real
  *   G = g( L \intersect l ), where
  *     I = { i : 0 <= i < nLoci }
- *     L_{i \in I} = <a_0, ..., a_{P-1}>; a_{0 <= i < p} \in { ALLELES }, and P = nChromosomes (ploidy) 
+ *     L_{i \in I} = <a_0, ..., a_{P-1}>; a_{0 <= i < p} \in { ALLELES }, and P = nChromosomes (ploidy)
  *     L = \union_{i \in I} L_{i}
  *     l = { x: x \in I }
  *     L \intersect l = { L_{x}: x \in l}
- *     g: ( L ) -> \real 
+ *     g: ( L ) -> \real
  *   E = e( ), where
  *     e: ( {} ) - > \real
  *

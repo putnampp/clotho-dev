@@ -97,7 +97,7 @@ void resizeAlleleGroup( AlleleGroupPtr & agp, size_t size ) {
 
             delete [] agp[0];
         }
-        
+
         agp[0] = tmp;
         for( size_t i = 1; i < ALLELE_COPIES; ++i ) {
             agp[i] = agp[0] + i * padded;

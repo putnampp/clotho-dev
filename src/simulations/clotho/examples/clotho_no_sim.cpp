@@ -76,8 +76,7 @@ class DiscreteSelector {
 public:
     DiscreteSelector( gsl_rng * r, double * fitnesses, size_t s ) :
         m_rng( r ),
-        m_lookup( NULL ) 
-    {
+        m_lookup( NULL ) {
         m_lookup = gsl_ran_discrete_preproc( s, fitnesses );
     }
 
@@ -146,10 +145,10 @@ public:
 //
     fitness_multiplicative() {}
 
-    fitness_multiplicative( het_policy & het, hom_policy & hom ) : 
-        m_het_case(het), 
-        m_hom_case(hom) 
-    {}
+    fitness_multiplicative( het_policy & het, hom_policy & hom ) :
+        m_het_case(het),
+        m_hom_case(hom) {
+    }
 
     double operator()( double f, individual_type * ind ) {
         return (*this)(f, ind->getProperties()->getGamete(0), ind->getProperties()->getGamete(1) );
@@ -227,7 +226,7 @@ int main( int argc, char ** argv ) {
 
     double mu = vm[ MUTATION_RATE_K ].as<double>();
     mmodel_type::initialize( mu, false);
-    
+
     shared_ptr< SimulationStats > stats( new SimulationStats() );
 
     stats->startPhase( RUNTIME_K );
@@ -295,7 +294,7 @@ int main( int argc, char ** argv ) {
             (*child)[child_idx]->getProperties()->inheritFrom(blank_id, g);
 
             gamete_ptr g1 = rmodel_type::reproduce( mate_pair.second, (gamete_type *) NULL);
-            
+
             (*child)[child_idx]->getProperties()->inheritFrom(blank_id, g1);
             (*child)[child_idx++]->getProperties()->setDOB( i );
         }
@@ -322,7 +321,7 @@ int main( int argc, char ** argv ) {
         delete ind;
     }
     stats->stopPhase( "Final" );
-    
+
     stats->stopPhase( RUNTIME_K );
 
     cout << *stats;

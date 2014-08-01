@@ -39,7 +39,7 @@
 class BirthEvent :
     public ClothoEvent,
     virtual public ModelHandler< Environment >,
-        virtual public ModelHandler< Individual > {
+    virtual public ModelHandler< Individual > {
 public:
     BirthEvent( const VTime & tSend, const VTime &tRecv,
                 SimulationObject * sender,

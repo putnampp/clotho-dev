@@ -2,9 +2,9 @@
 #include <cassert>
 
 SimulationStats::SimulationStats() :
-    m_nProcessedEvents(0), 
-    m_nPendingEvents(0)
-{}
+    m_nProcessedEvents(0),
+    m_nPendingEvents(0) {
+}
 
 SimulationStats::~SimulationStats() {
     m_phase_lookup.clear();
@@ -72,9 +72,9 @@ void SimulationStats::printPhase( ostream & out, const phase_id_t & id ) const {
     } else {
         TIME res;
         diff_TIME(res, it->second->second.second, it->second->second.first );
-        
-        out << id 
-            << "\t" << it->second->second.first 
+
+        out << id
+            << "\t" << it->second->second.first
             << "\t" << it->second->second.second
             << "\t" << res;
     }
@@ -98,7 +98,7 @@ ostream & operator<<( ostream & out, const SimulationStats & ss ) {
             << "," << it->second.first
             << "," << it->second.second
             << "," << res
-            << "\n";            
+            << "\n";
     }
 
     out << ss.m_nProcessedEvents << " processed events\n";

@@ -8,7 +8,9 @@ template < typename LC, class IND, class EVT >
 class IndividualLifeCycle {
 public:
 //    template < typename IND, typename EVT >
-    static void handle_event( IND * ind, const EVT * evt ) { assert(false); }
+    static void handle_event( IND * ind, const EVT * evt ) {
+        assert(false);
+    }
 
 protected:
 };

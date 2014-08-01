@@ -64,7 +64,9 @@ void AlleleAlphabet::updateFreeSymbols( const bitset_type & fs ) {
     // boost::dynamic_bitset returns # of bits as size
     assert((m_free_list.size() == m_free_intersect.size()) && (m_free_list.size() == m_free_union.size()));
     bitset_type b(fs);
-    if( b.size() < m_free_list.size() ) { b.resize( m_free_list.size(), false ); }
+    if( b.size() < m_free_list.size() ) {
+        b.resize( m_free_list.size(), false );
+    }
 
     m_free_intersect &= b;
     m_free_union |= b;
@@ -91,7 +93,8 @@ size_t AlleleAlphabet::size() {
 }
 
 size_t AlleleAlphabet::active_size() {
-    return m_free_list.size() - m_free_list.count();
+    return m_free_union.count();
+    //return m_free_list.size() - m_free_list.count();
 }
 
 bool AlleleAlphabet::isLocus( locus_t & l ) const {

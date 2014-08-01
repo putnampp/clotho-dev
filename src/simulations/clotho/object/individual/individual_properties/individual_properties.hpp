@@ -34,10 +34,10 @@ public:
     individual_props();
 
     void died();
-    void setDOB( SystemClock::vtime_t d );   
+    void setDOB( SystemClock::vtime_t d );
     bool isAlive() const;
 
-    bool hasSourceGametes() const; 
+    bool hasSourceGametes() const;
     void inheritFrom( const system_id & p_id, gamete_ptr g, unsigned char p = UNKNOWN_GAMETE_INDEX );
 
     gamete_ptr getGamete( unsigned char ) const;
@@ -45,7 +45,7 @@ public:
     void reset();
 
     void release();
- 
+
     virtual ~individual_props();
 protected:
     SystemClock::vtime_t        m_dob;
@@ -65,8 +65,8 @@ typename individual_props<G,P,S>::pool_type individual_props<G,P,S>::m_pool;
 template < class G, unsigned char P, class S >
 individual_props<G,P,S>::individual_props() :
     m_dob( SystemClock::POSITIVE_INFINITY ),
-    m_free_gametes(GAMETE_COUNT)
-{}
+    m_free_gametes(GAMETE_COUNT) {
+}
 
 
 template < class G, unsigned char P, class S >

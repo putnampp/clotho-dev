@@ -42,7 +42,7 @@ public:
     virtual ~TIndividual();
 
 #if defined USE_FRIENDS
-    template < typename O, typename E, typename L > 
+    template < typename O, typename E, typename L >
     friend struct life_cycle::detail::life_cycle_handler;
 protected:
 #endif

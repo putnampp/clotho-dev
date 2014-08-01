@@ -87,7 +87,7 @@ struct infinite_site {};
 
 template <> template <>
 SYM_SPEC::symbol_type SYM_SPEC::operator()< infinite_site >( alphabet_pointer alpha, infinite_site * inf) {
-    static locus_generator< PopulationAlphabet::locus_t, RandomProcess::rng_pointer> lgen; 
+    static locus_generator< PopulationAlphabet::locus_t, RandomProcess::rng_pointer> lgen;
     static allele_generator< PopulationAlphabet::allele_t, void > agen;
 
 //    PopulationAlphabet::locus_t l = lgen();
@@ -117,7 +117,7 @@ public:
 
 //    mutate_site( map_pointer mp, double mu = 0.0001, bool bFixed = false );
     static void initialize( double mu = 0.0001, bool bFixed = false );
-  
+
     static map_pointer  getVariantMap();
 
     static gamete_ptr   mutate( gamete_ptr gm );
@@ -169,7 +169,7 @@ typename SPECIALIZATION::gamete_ptr SPECIALIZATION::mutate_infinite( gamete_ptr 
         gamete_ptr res = gm->clone();
 
         assert( res != NULL );
-         
+
         do {
 //            typename variant_map_t::value_ptr_t var = getNewVariant();
             typedef symbol_generator< variant_map_t::locus_t, variant_map_t::allele_t, variant_map_t::index_type, variant_map_t > sgen_type;
@@ -182,8 +182,8 @@ typename SPECIALIZATION::gamete_ptr SPECIALIZATION::mutate_infinite( gamete_ptr 
         } while( --nMut );
 
         return res;
-   } 
-   return gm->copy();
+    }
+    return gm->copy();
 }
 
 typename SPECIALIZATION::gamete_ptr SPECIALIZATION::mutate_fixed( gamete_ptr g, double mu ) {
@@ -236,8 +236,7 @@ class DiscreteSelector {
 public:
     DiscreteSelector( gsl_rng * r, double * fitnesses, size_t s ) :
         m_rng( r ),
-        m_lookup( NULL ) 
-    {
+        m_lookup( NULL ) {
         m_lookup = gsl_ran_discrete_preproc( s, fitnesses );
     }
 
@@ -315,10 +314,10 @@ public:
 //
     fitness_multiplicative() {}
 
-    fitness_multiplicative( het_policy & het, hom_policy & hom ) : 
-        m_het_case(het), 
-        m_hom_case(hom) 
-    {}
+    fitness_multiplicative( het_policy & het, hom_policy & hom ) :
+        m_het_case(het),
+        m_hom_case(hom) {
+    }
 
     double operator()( double f, individual_pointer ind ) {
         return (*this)(f, ind->getProperties()->getGamete(0), ind->getProperties()->getGamete(1) );
@@ -395,7 +394,7 @@ int main( int argc, char ** argv ) {
     cout << "RNG: " <<  rng->getType() << "; seed: " << rng->getSeed() << endl;
 
     RandomProcess::initialize( rng );
-    
+
     double mu = vm[ MUTATION_RATE_K ].as<double>();
     mmodel_type::initialize( mu, false);
 
@@ -499,7 +498,7 @@ int main( int argc, char ** argv ) {
         delete ind;
     }
     stats->stopPhase( "Final" );
-    
+
     stats->stopPhase( RUNTIME_K );
 
     cout << *stats;

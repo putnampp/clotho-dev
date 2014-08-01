@@ -44,13 +44,13 @@ void ClothoModelCreator< LifeExpectancyModel, YAML::Node >::createModelFrom( con
     shared_ptr< iDistribution > male;
     if( n[ MALE_K ] ) {
         YAML::Node tmp = n[MALE_K];
-/*        if( tmp[ MEAN_K ] ) {
-            male.mean = tmp[MEAN_K].as< double >();
-        }
-        if( tmp[ STDEV_K ] ) {
-            male.sigma = tmp[STDEV_K].as< double >();
-        }
-*/
+        /*        if( tmp[ MEAN_K ] ) {
+                    male.mean = tmp[MEAN_K].as< double >();
+                }
+                if( tmp[ STDEV_K ] ) {
+                    male.sigma = tmp[STDEV_K].as< double >();
+                }
+        */
         if( tmp[ DISTRIBUTION_K ] ) {
             string name = tmp[DISTRIBUTION_K].as<string>();
             male = DistributionManager< YAML::Node >::getInstance()->createDistribution( name, tmp );
@@ -60,14 +60,14 @@ void ClothoModelCreator< LifeExpectancyModel, YAML::Node >::createModelFrom( con
     shared_ptr< iDistribution> female;
     if( n[ FEMALE_K ] ) {
         YAML::Node tmp = n[FEMALE_K];
-/*
-        if( tmp[ MEAN_K ] ) {
-            female.mean = tmp[MEAN_K].as< double >();
-        }
-        if( tmp[ STDEV_K ] ) {
-            female.sigma = tmp[STDEV_K].as< double >();
-        }
-*/
+        /*
+                if( tmp[ MEAN_K ] ) {
+                    female.mean = tmp[MEAN_K].as< double >();
+                }
+                if( tmp[ STDEV_K ] ) {
+                    female.sigma = tmp[STDEV_K].as< double >();
+                }
+        */
         if( tmp[ DISTRIBUTION_K ] ) {
             string name = tmp[DISTRIBUTION_K].as<string>();
             female = DistributionManager< YAML::Node >::getInstance()->createDistribution( name, tmp );
@@ -77,13 +77,13 @@ void ClothoModelCreator< LifeExpectancyModel, YAML::Node >::createModelFrom( con
     shared_ptr< iDistribution > unk;
     if( n[ UNKSEX_K ] ) {
         YAML::Node tmp = n[UNKSEX_K];
-/*        if( tmp[ MEAN_K ] ) {
-            unk.mean = tmp[MEAN_K].as< double >();
-        }
-        if( tmp[ STDEV_K ] ) {
-            unk.sigma = tmp[STDEV_K].as< double >();
-        }
-*/
+        /*        if( tmp[ MEAN_K ] ) {
+                    unk.mean = tmp[MEAN_K].as< double >();
+                }
+                if( tmp[ STDEV_K ] ) {
+                    unk.sigma = tmp[STDEV_K].as< double >();
+                }
+        */
         if( tmp[DISTRIBUTION_K] ) {
             string name = tmp[DISTRIBUTION_K].as<string>();
             unk = DistributionManager< YAML::Node >::getInstance()->createDistribution( name, tmp );

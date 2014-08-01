@@ -44,7 +44,7 @@ using std::endl;
 using std::random_shuffle;
 
 /*
-ConstantPopulationRandomMatingModel::ConstantPopulationRandomMatingModel( unsigned int max_offspring, unsigned int birth_delay ) : 
+ConstantPopulationRandomMatingModel::ConstantPopulationRandomMatingModel( unsigned int max_offspring, unsigned int birth_delay ) :
     m_rng( gsl_rng_alloc( gsl_rng_taus ) ),
     m_birth_delay( birth_delay ),
     m_offspring_dist( new ConstantDistribution(max_offspring) ),
@@ -60,8 +60,7 @@ ConstantPopulationRandomMatingModel::ConstantPopulationRandomMatingModel( shared
     m_offspring_dist( offspring ),
     m_birth_delay( birth_delay ),
     m_rng(),
-    m_inheritance(NULL, &m_rng )
-{
+    m_inheritance(NULL, &m_rng ) {
 //    long seed = time(NULL);
 //    gsl_rng_set( m_rng, seed );
 
@@ -79,14 +78,16 @@ void ConstantPopulationRandomMatingModel::operator()( const ShellMaturityEvent *
 
         // how many children should the female have?
         double nOff = floor( m_offspring_dist->nextVariate() );
-        
+
         for( ; nOff >= 0.0; nOff -= 1.0) {
             // generate an Mating event for each child
             // if there are available individuals in the pool
             if( env->hasAvailableIndividuals() ) {
                 Event * evt = new ShellMatingEvent( e->getReceiveTime(), e->getReceiveTime(), ind, env, ind );
                 env->receiveEvent( evt );
-            } else { break; }
+            } else {
+                break;
+            }
         }
     }
 }
@@ -167,10 +168,10 @@ void ConstantPopulationRandomMatingModel::dump( ostream & out ) {
 /*
  * Code works. However, serves as a significant bottleneck in performance
  */
-            // routine only works if ploidy == 2
+// routine only works if ploidy == 2
 //            (*genos)[i][0] = (*female_alleles)[ i ][m_rng.Bool()];
 //            (*genos)[i][1] = (*male_alleles)[ i ][m_rng.Bool()];
-            
+
 /*
  * Alternative method. Fewer random number generations
  */
@@ -179,7 +180,7 @@ void ConstantPopulationRandomMatingModel::dump( ostream & out ) {
 //            (*genos)[i][1] = (*male_alleles)[i][ ((0.25 <= rnd) && (rnd < 0.75)) ];
 //            (*g)[0] = (*f++)[ (rnd < 0.5) ];
 //            (*g++)[1] = (*m++)[ ((0.25 <= rnd) && (rnd < 0.75)) ];
-//        } // end loop 
+//        } // end loop
 //
 //        pword_t * f = reinterpret_cast< pword_t * >(female->getProperties()->m_genos[0]),
 //            * f1 = reinterpret_cast< pword_t * >(female->getProperties()->m_genos[1]),

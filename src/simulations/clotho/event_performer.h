@@ -18,8 +18,7 @@ class EventPerformer {
 public:
     typedef void (O::*performer_t)( const E * );
     EventPerformer() :
-        m_performer_map()
-    {
+        m_performer_map() {
         initialize();
     }
 
@@ -36,7 +35,7 @@ public:
 
     virtual ~EventPerformer() {}
 protected:
-    void initialize(); 
+    void initialize();
 
     unordered_map< typename ID::id_type_t, performer_t > m_performer_map;
     ID  m_ider;

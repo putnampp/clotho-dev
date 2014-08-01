@@ -40,7 +40,7 @@
 
 class MaturityModel :
     virtual public ClothoModel< Individual, BirthEvent >,
-        virtual public ClothoModel< IndividualShell, ShellBirthEvent > {
+    virtual public ClothoModel< IndividualShell, ShellBirthEvent > {
 public:
     MaturityModel( shared_ptr< iDistribution > female, shared_ptr< iDistribution > male, shared_ptr< iDistribution > unk);
 

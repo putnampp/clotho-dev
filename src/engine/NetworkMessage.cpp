@@ -10,8 +10,9 @@ NetworkMessage::NetworkMessage(const unsigned int& size, char* data) {
 
 NetworkMessage::~NetworkMessage() {
     // We delete even though we did not allocate
-    if (userData!=0)
-    { delete[] userData; }
+    if (userData!=0) {
+        delete[] userData;
+    }
 } // End of destructor.
 
 char*
@@ -77,14 +78,15 @@ std::ostream&
 operator<< (std::ostream& os, const NetworkMessage& msg) {
     os << msg.userDataSize << ", \"";
     for (unsigned int i = 0; i < msg.userDataSize; i++) {
-        if (msg.userData[i] == '\0')
-        { os << "'\\0'"; }
-        else if (msg.userData[i] == '\n')
-        { os << "'\\n'"; }
-        else if (msg.userData[i] >= 32 && msg.userData[i] <= 126)
-        { os << msg.userData[i]; }
-        else
-        { os << "'" << (int)msg.userData[i] << "'"; }
+        if (msg.userData[i] == '\0') {
+            os << "'\\0'";
+        } else if (msg.userData[i] == '\n') {
+            os << "'\\n'";
+        } else if (msg.userData[i] >= 32 && msg.userData[i] <= 126) {
+            os << msg.userData[i];
+        } else {
+            os << "'" << (int)msg.userData[i] << "'";
+        }
     }
     os << "\"";
     return os;

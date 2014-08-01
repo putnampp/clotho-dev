@@ -45,19 +45,19 @@ public:
                      SimulationObject * sender,
                      SimulationObject * receiver,
                      IndividualShell * ind
-                     );
+                   );
     ShellDeathEvent( const VTime & tSend, const VTime & tRecv,
                      const ObjectID &sender,
                      const ObjectID & receiver,
                      const unsigned int evtID,
-                    IndividualShell * ind
-                     );
+                     IndividualShell * ind
+                   );
     ShellDeathEvent( const VTime & tSend, const VTime & tRecv,
                      const ObjectID &sender,
                      const ObjectID & receiver,
                      const EventId & evtID,
                      IndividualShell * ind
-                     );
+                   );
     ShellDeathEvent( const ShellDeathEvent & ce );
 
     virtual const string & getDataType() const;
