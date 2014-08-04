@@ -32,6 +32,7 @@ public:
     static locus_bitset EMPTY;
 
     locus_bitset( alphabet_t::pointer alpha = alphabet_t::getInstance() );
+    locus_bitset( const bitset_type & bs, alphabet_t::pointer alpha);
     locus_bitset( const locus_bitset & la );
 
     pointer copy();
@@ -51,21 +52,27 @@ public:
         return m_bits.num_blocks();
     }
 
-    alphabet_t::pointer getAlphabet() {
+    alphabet_t::pointer getAlphabet() const {
         return m_alphabet;
     }
+
+    bitset_type * getBits() { return &m_bits; }
 
     adjacency_iterator begin();
     adjacency_iterator end();
 
+protected:
     void updateSymbols();
+    void clearFree();
 
+public:
     //static void * operator new( size_t );
     void    release();
 
     static bool isGamete( locus_bitset * lb );
     static active_iterator active_begin();
     static active_iterator active_end();
+    static void updateActiveAlphabet();
 
     size_t  copies() {
         return m_copies;
@@ -75,8 +82,6 @@ public:
     locus_bitset & operator|=( const locus_bitset & rhs );
 
     void masked_join( const locus_bitset & rhs, const bitset_type & mask );
-
-    bool minMutationCount( size_t threshold ) const;
 
     virtual ~locus_bitset();
 protected:

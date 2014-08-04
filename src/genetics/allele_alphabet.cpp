@@ -4,7 +4,7 @@
 
 #include "utility/bitset_ops.hpp"
 
-AlleleAlphabet::AlleleAlphabet() {}
+AlleleAlphabet::AlleleAlphabet() : m_next_free( bitset_type::npos ) {}
 
 AlleleAlphabet::index_type     AlleleAlphabet::getSymbol( const locus_t & l, const allele_t & a, bool createNew ) {
     locus_iterator it = m_db.end();
@@ -42,7 +42,9 @@ AlleleAlphabet::index_type     AlleleAlphabet::getSymbol( const locus_t & l, con
     if( offset == bitset_type::npos ) {
         // inactive variant
         //
-        offset = m_free_list.find_first();
+//        offset = m_free_list.find_first();
+        offset = m_next_free;
+
         if( offset == bitset_type::npos ) {
             offset = m_active.size();
             m_active.push_back( it );
@@ -53,7 +55,8 @@ AlleleAlphabet::index_type     AlleleAlphabet::getSymbol( const locus_t & l, con
             assert( offset < m_active.size() );
             m_db.erase( m_active[offset] );
             m_active[offset] = it;
-            m_free_list[ offset ] = false;
+//            m_free_list[ offset ] = false;
+            m_next_free = m_free_list.find_next( m_next_free );
         }
         it->second.second = offset;
     }
@@ -71,6 +74,11 @@ void AlleleAlphabet::updateFreeSymbols( const bitset_type & fs ) {
     m_free_intersect &= b;
     m_free_union |= b;
     m_free_list = m_free_intersect | ~m_free_union;
+}
+
+void AlleleAlphabet::setState() {
+    m_next_free = m_free_list.find_first();
+    m_free_mask = ~m_free_list;
 }
 
 void AlleleAlphabet::resetFreeSymbols() {

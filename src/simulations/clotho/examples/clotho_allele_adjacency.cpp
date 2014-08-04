@@ -217,14 +217,20 @@ public:
             ++m_nRecomb;
             m_nRecombEvents += nRec;
 
-            res = res->clone();
+            gamete_type::bitset_type symm_diff, 
+                                    base_copy( *base_gamete->getBits() ), 
+                                    other_copy( *other_gamete->getBits() );
 
-            (*res) ^= (*other_gamete);
+            if( base_copy.size() >= other_copy.size() ) {
+                other_copy.resize( base_copy.size(), false);
+            } else {
+                base_copy.resize( other_copy.size(), false );
+            }
+            symm_diff = ( base_copy ^ other_copy);
 
             copied = false;
-            gamete_type::bitset_type mask;
-
-            mask.resize( res->set_size(), true );
+            gamete_type::bitset_type mask( symm_diff );
+            mask.flip();
 
             static locus_generator< AlleleAlphabet::locus_t, RandomProcess::rng_pointer> lgen;
             typedef std::vector< AlleleAlphabet::locus_t > recombination_points;
@@ -237,45 +243,31 @@ public:
             rec_points.push_back(1.0);
             std::sort( rec_points.begin(), rec_points.end() );
 
-            gamete_type::adjacency_iterator it = res->begin();
-            gamete_type::adjacency_iterator it_end = res->end();
-
-            unsigned int nDiffs = 0;
-            while( it != it_end ) {
-                ++nDiffs;
-                locus_bitset::index_type offset = it.index();
-
-                recombination_iterator rit = std::lower_bound( rec_points.begin(), rec_points.end(), (*(*it++)).first);
-
+            gamete_type::alphabet_t::pointer alpha = base_gamete->getAlphabet();
+            gamete_type::bitset_type::size_type offset = symm_diff.find_first();
+            while( offset != gamete_type::bitset_type::npos ) {
+                recombination_iterator rit = std::lower_bound( rec_points.begin(), rec_points.end(), (*alpha)[offset]->first );
                 if( (rit - rec_points.begin()) % 2 ) {
-                    if( (*other_gamete)[offset] ) {
-                        res->addVariant(offset);
-                    } else {
-                        res->removeVariant(offset);
-                    }
-                } else if( (*base_gamete)[offset] ) {
-                    res->addVariant(offset);
+                    symm_diff[offset] = other_copy[offset];
                 } else {
-                    res->removeVariant(offset);
+                    symm_diff[offset] = base_copy[offset];
                 }
-                mask[offset] = false;
+                offset = symm_diff.find_next(offset);
             }
-            if( nDiffs > 1 ) {
-                res->masked_join( *base_gamete, mask );
-            } else if( nMut == 0 ) {
-                // Either both of the parents gametes are completely homozygous,
-                // or there is only one heterozygous site
-                // In either case, any form of recombination will result a gamete which is
-                // identical to one of the parent gametes.
-                // Since the base_gamete is chosen at random, it is safe to conclude that it
-                // is the result of the recombination.
-                // There are no new mutations to be added to this gamete in the next generation.
-                // Therefore, the "res" gamete is actually just a copy of the base_gamete.
-                // However, since we cloned it initially, under the assumption that the
-                // recombination sites would result in a new gamete, it is necessary to release
-                // the current result, and copy the base_gamete
-                res->release();
-                return base_gamete->copy();
+
+            symm_diff |= (base_copy & mask );
+
+            if( nMut == 0) {
+                if( symm_diff == base_copy ) {
+                    return base_gamete->copy();
+                } else if( symm_diff == other_copy ) {
+                    return other_gamete->copy();
+                } else {
+                    res = new gamete_type( symm_diff, alpha );
+                    return res;
+                }
+            } else {
+                res = new gamete_type( symm_diff, alpha );
             }
         }
 
@@ -301,6 +293,10 @@ public:
         }
 
         return res;
+    }
+
+    void updateHeterozygous( gamete_type::bitset_type & symm_diff, gamete_type::bitset_type & mask ) {
+
     }
 
     virtual ~ReproduceWithRecombination() {}
@@ -374,7 +370,7 @@ public:
         return (*this)(f, ind->getProperties()->getGamete(0), ind->getProperties()->getGamete(1) );
     }
 
-    double operator()( double f, gamete_pointer g1, gamete_pointer g2 ) {
+/*    double operator()( double f, gamete_pointer g1, gamete_pointer g2 ) {
         double res = f;
         if( g1 == g2 ) return res;
 
@@ -406,8 +402,45 @@ public:
         while( g2_it != g2_e ) {
             //assert( (*(*g2_it)).second.first != AlleleAlphabet::getInstance()->end_allele());
             //assert( (*g2_it) != AlleleAlphabet::getInstance()->end_db());
-            allele_type at( *((*(*g2_it++)).second.first) );
-            m_het_case(res, at);
+            //allele_type at( *((*(*g2_it++)).second.first) );
+            m_het_case(res, *((*(*g2_it++)).second.first));
+        }
+
+        return res;
+    }*/
+
+    double operator()( double f, gamete_pointer g1, gamete_pointer g2 ) {
+        double res = f;
+        if( g1 == g2 ) return res;
+
+        gamete_type::alphabet_t::pointer alpha = g1->getAlphabet();
+        gamete_type::bitset_type g1_copy( *(g1->getBits()) ), g2_copy( *(g2->getBits()));
+        if( g1_copy.size() >= g2_copy.size() ) {
+            g1_copy.resize( g2_copy.size(), false);
+        } else {
+            g2_copy.resize( g1_copy.size(), false);
+        }
+
+        gamete_type::bitset_type tmp = (g1_copy & g2_copy); // homozygous of gamete 1 and 2
+        gamete_type::bitset_type::size_type pos = tmp.find_first();
+
+        while( pos != gamete_type::bitset_type::npos ) {
+            m_hom_case( res, *(*alpha)[pos]->second.first);
+            pos = tmp.find_next(pos);
+        }
+
+        tmp = g1_copy - g2_copy;    // heterozygous of gamete 1
+        pos = tmp.find_first();
+        while( pos != gamete_type::bitset_type::npos ) {
+            m_het_case( res, *(*alpha)[pos]->second.first );
+            pos = tmp.find_next(pos);
+        }
+
+        tmp = g2_copy - g1_copy;    // heterozygous of gamete 2
+        pos = tmp.find_first();
+        while( pos != gamete_type::bitset_type::npos ) {
+            m_het_case( res, *(*alpha)[pos]->second.first );
+            pos = tmp.find_next(pos);
         }
 
         return res;
@@ -504,13 +537,15 @@ int main( int argc, char ** argv ) {
         }
 
         memset( fitness, 0, sizeof(double) * fitness_size );
-        alphabet_type::getInstance()->resetFreeSymbols();
+//        alphabet_type::getInstance()->resetFreeSymbols();
 
 //        std::cout << "Generation: " << i << std::endl;
 
-        for( typename locus_bitset::active_iterator it = locus_bitset::active_begin(); it != locus_bitset::active_end(); it++ ) {
-            (*it)->updateSymbols();
-        }
+//        for( typename locus_bitset::active_iterator it = locus_bitset::active_begin(); it != locus_bitset::active_end(); it++ ) {
+//            (*it)->updateSymbols();
+//        }
+
+        locus_bitset::updateActiveAlphabet();
 
         // measure fitness of parent population
         //
@@ -551,6 +586,7 @@ int main( int argc, char ** argv ) {
         std::swap( parent, child );
     }
 
+    locus_bitset::updateActiveAlphabet();
     stats->stopPhase( "Sim" );
     stats->startPhase( "Final" );
 
@@ -560,7 +596,6 @@ int main( int argc, char ** argv ) {
     double nBlocks = 0;
     unsigned int n = 0;
     for( typename locus_bitset::active_iterator it = locus_bitset::active_begin(); it != locus_bitset::active_end(); it++ ) {
-        (*it)->updateSymbols();
         size_t s = (*it)->size();
         nBlocks += (double)(*it)->block_count();
         nSymbols += (double)s;

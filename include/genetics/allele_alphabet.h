@@ -59,7 +59,9 @@ public:
     index_type  getSymbol( const locus_t & l, const allele_t & a, bool createNew = true );
     void     updateFreeSymbols( const bitset_type & fs );
     void     resetFreeSymbols( );
-    size_t   block_count();
+
+    void    setState();
+    size_t  block_count();
 
     size_t  size();
     size_t  active_size();
@@ -89,6 +91,8 @@ public:
         return m_free_list.count();
     }
 
+    bitset_type * getFreeMask() { return &m_free_mask; }
+
     virtual ~AlleleAlphabet();
 protected:
     alleles_type    m_alleles;
@@ -97,6 +101,8 @@ protected:
     active_database_type    m_active;
 
     bitset_type     m_free_list, m_free_intersect, m_free_union;
+    bitset_type     m_free_mask;
+    bitset_type::size_type  m_next_free;
 };
 
 #undef BOOST_DYNAMIC_BITSET_DONT_USE_FRIENDS

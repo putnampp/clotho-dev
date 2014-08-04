@@ -18,12 +18,43 @@ locus_bitset::active_iterator locus_bitset::active_end() {
     return m_active.end();
 }
 
+void locus_bitset::updateActiveAlphabet() {
+    active_iterator first = active_begin(), last = active_end();
+    if( first != last ) {
+        alphabet_t::pointer alpha = (*first)->getAlphabet();
+        alpha->resetFreeSymbols();
+        while( first != last ) {
+            assert( (*first)->getAlphabet() == alpha );
+            (*first)->updateSymbols();
+            first++;
+        }
+
+        alpha->setState();
+
+        first = active_begin();
+        last = active_end();
+
+        while( first != last ) {
+            (*first++)->clearFree();
+        }
+    }
+}
+
 //void * locus_bitset::operator new( size_t s ) {
 //    return m_pool.malloc();
 //}
 
 locus_bitset::locus_bitset( alphabet_t::pointer a ) :
     m_bits(),
+    m_copies(1),
+    m_alphabet( a ) {
+    if( this != &EMPTY ) {
+        m_active.insert( this );
+    }
+}
+
+locus_bitset::locus_bitset( const bitset_type & bs, alphabet_t::pointer a ) :
+    m_bits(bs),
     m_copies(1),
     m_alphabet( a ) {
     if( this != &EMPTY ) {
@@ -104,6 +135,20 @@ void locus_bitset::updateSymbols() {
     m_alphabet->updateFreeSymbols( m_bits );
 }
 
+void locus_bitset::clearFree() {
+    if( m_bits.size() > m_alphabet->getFreeMask()->size() ) {
+        bitset_type b( *m_alphabet->getFreeMask());
+        b.resize( m_bits.size(), true );
+        m_bits &= b;
+    } else if( m_bits.size() < m_alphabet->getFreeMask()->size() ) {
+        bitset_type b( *m_alphabet->getFreeMask() );
+        b.resize( m_bits.size() );
+        m_bits &= b;
+    } else {
+        m_bits &= *m_alphabet->getFreeMask();
+    }
+}
+
 /*
 locus_bitset::allele_iterator locus_bitset::allele_begin() {
     return allele_iterator( begin(), m_alphabet);
@@ -118,7 +163,6 @@ void locus_bitset::release() {
         m_bits.reset();
         if( this != &EMPTY ) {
             m_active.erase( this );
-//            m_pool.free( this );
             delete this;
         }
     }
@@ -172,17 +216,6 @@ void locus_bitset::masked_join( const locus_bitset & rhs, const bitset_type & ma
         r.resize( mask.size(), false );
         m_bits |= (r & mask);
     }
-}
-
-bool locus_bitset::minMutationCount( const size_t threshold ) const {
-    size_t t = 0;
-    size_t pos = m_bits.find_first();
-    while (pos != bitset_type::npos && t < threshold ) {
-        pos = m_bits.find_next(pos);
-        ++t;
-    }
-
-    return (t >= threshold);
 }
 
 locus_bitset::~locus_bitset() {}
