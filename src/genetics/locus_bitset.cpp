@@ -65,7 +65,8 @@ locus_bitset::locus_bitset( const bitset_type & bs, alphabet_t::pointer a ) :
 locus_bitset::locus_bitset( const locus_bitset & la ) :
     m_bits(la.m_bits),
     m_copies( la.m_copies ),
-    m_alphabet(la.m_alphabet) {
+    m_alphabet(la.m_alphabet) 
+{
     m_active.insert(this);
 }
 

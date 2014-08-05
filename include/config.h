@@ -3,13 +3,13 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * modification, are permitted provided that the following conditions are met: 
  *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer.
+ *    list of conditions and the following disclaimer. 
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
+ *    and/or other materials provided with the distribution. 
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -39,29 +39,29 @@
 /* #undef LOG_LEVEL */
 
 #ifdef LOG_LEVEL  // log_level defined
-#if LOG_LEVEL == LOG_OFF // but it is set to be off
-#ifdef LOG
-#warning "Turning Logging OFF"
-#undef LOG      // make sure logging is off
-#endif
-#else   // LOG_LEVEL
-#ifndef LOG   // debug not turned
-#define LOG   // turn it on
-#endif
+    #if LOG_LEVEL == LOG_OFF // but it is set to be off
+        #ifdef LOG
+            #warning "Turning Logging OFF"
+            #undef LOG      // make sure logging is off
+        #endif 
+    #else   // LOG_LEVEL
+        #ifndef LOG   // debug not turned
+            #define LOG   // turn it on
+        #endif
 
-#if LOG_LEVEL == LOG_CRIT
-#elif LOG_LEVEL == LOG_ERROR
-#elif LOG_LEVEL == LOG_WARN
-#elif LOG_LEVEL == LOG_STATUS
-#elif LOG_LEVEL == LOG_NOTE
-#elif LOG_LEVEL == LOG_DEBUG
-#elif LOG_LEVEL == LOG_ALL
-#else
-#error "UNKNOWN LOG LEVEL DEFINED."
-#endif // LOG_LEVEL
-#endif  // LOG_LEVEL
+        #if LOG_LEVEL == LOG_CRIT
+        #elif LOG_LEVEL == LOG_ERROR
+        #elif LOG_LEVEL == LOG_WARN
+        #elif LOG_LEVEL == LOG_STATUS
+        #elif LOG_LEVEL == LOG_NOTE
+        #elif LOG_LEVEL == LOG_DEBUG
+        #elif LOG_LEVEL == LOG_ALL
+        #else
+            #error "UNKNOWN LOG LEVEL DEFINED."
+        #endif // LOG_LEVEL
+    #endif  // LOG_LEVEL
 #elif defined LOG     // debugging turned on, but debug_level not defined
-#define LOG_LEVEL LOG_DEFAULT
+    #define LOG_LEVEL LOG_DEFAULT
 #endif  // end verifications
 /*
 #ifndef MAX_ALLELES

@@ -35,6 +35,7 @@
 
 #include <vector>
 #include <memory>
+#include <limits>
 
 #include "utility/simulation_stats.h"
 
@@ -50,6 +51,9 @@
 
 //#include "processes.hpp"
 #include "processes/reproduction_models.hpp"
+
+#include "genetics/recombine_bitset.hpp"
+#include "genetics/fitness_bitset.hpp"
 
 #define _PLOIDY 2
 
@@ -210,6 +214,97 @@ public:
             other_gamete = ind->getProperties()->getGamete(0);
         }
 
+        bool copied = true;
+
+        gamete_pointer res = base_gamete;
+
+        if( nRec > 0 ) {
+            ++m_nRecomb;
+            m_nRecombEvents += nRec;
+
+            copied = false;
+            gamete_type::bitset_type symm_diff;
+            gamete_type::alphabet_t::pointer  alpha = base_gamete->getAlphabet();
+
+            static locus_generator< AlleleAlphabet::locus_t, RandomProcess::rng_pointer> lgen;
+            typedef std::vector< AlleleAlphabet::locus_t > recombination_points;
+            typedef typename recombination_points::iterator recombination_iterator;
+
+            recombination_points rec_points;
+            rec_points.reserve( nRec + 2 );
+
+            rec_points.push_back( std::numeric_limits< typename gamete_type::alphabet_t::locus_t >::min() );
+            rec_points.push_back( std::numeric_limits< typename gamete_type::alphabet_t::locus_t >::max() );
+
+            std::generate_n( std::back_inserter( rec_points ), nRec, lgen );
+            std::sort( rec_points.begin(), rec_points.end() );
+            recombination_iterator it = std::unique( rec_points.begin(), rec_points.end() );
+            rec_points.resize((it - rec_points.begin()));
+            
+            recombine_bitset< typename gamete_type::bitset_type::block_type, typename gamete_type::bitset_type::allocator_type, typename gamete_type::alphabet_t > recomb( base_gamete->getBits(), &symm_diff, alpha, &rec_points );
+
+            boost::to_block_range( *other_gamete->getBits(), recomb );
+
+            if( nMut == 0) {
+                if( recomb.isBaseMatch() ) {
+                    return base_gamete->copy();
+                } else if( recomb.isAlternateMatch() ) {
+                    return other_gamete->copy();
+                } else {
+                    res = new gamete_type( symm_diff, alpha );
+                    return res;
+                }
+            } else {
+                res = new gamete_type( symm_diff, alpha );
+            }
+        }
+
+        if( nMut > 0 ) {
+            ++m_nMut;
+            m_nMutEvents += nMut;
+            if( copied ) {
+                res = res->clone();
+            }
+
+            do {
+                typedef symbol_generator< AlleleAlphabet::locus_t, AlleleAlphabet::allele_t, AlleleAlphabet::index_type, AlleleAlphabet > sgen_type;
+                typedef typename sgen_type::symbol_type symbol_type;
+
+                static sgen_type sgen;
+                symbol_type s = sgen( res->getAlphabet(), (infinite_site * ) NULL );
+                //std::cout << "Adding variant: " << s << std::endl;
+                res->addVariant( s );
+            } while( --nMut );
+
+        } else if( copied ) {
+            res = res->copy();
+        }
+
+        return res;
+    }
+
+/*
+    gamete_pointer operator()( individual_pointer ind ) {
+        unsigned int nMut = m_rng->nextPoisson( m_mu );
+        unsigned int nRec = 0;
+        if( ind->getProperties()->getGamete(0) != ind->getProperties()->getGamete(1) ) {
+            nRec = m_rng->nextPoisson( m_rho );
+        } else if( nMut == 0 ) {
+            // both gametes are the same
+            // AND no new mutations will be added
+            // hence just return a copy
+            return ind->getProperties()->getGamete(0)->copy();
+        }
+
+        gamete_pointer base_gamete, other_gamete;
+        if( m_rng->nextBool() ) {
+            base_gamete = ind->getProperties()->getGamete(0);
+            other_gamete = ind->getProperties()->getGamete(1);
+        } else {
+            base_gamete = ind->getProperties()->getGamete(1);
+            other_gamete = ind->getProperties()->getGamete(0);
+        }
+
         gamete_pointer res = base_gamete;
         bool copied = true;
 
@@ -294,10 +389,7 @@ public:
 
         return res;
     }
-
-    void updateHeterozygous( gamete_type::bitset_type & symm_diff, gamete_type::bitset_type & mask ) {
-
-    }
+*/
 
     virtual ~ReproduceWithRecombination() {}
 protected:
@@ -409,6 +501,7 @@ public:
         return res;
     }*/
 
+/*
     double operator()( double f, gamete_pointer g1, gamete_pointer g2 ) {
         double res = f;
         if( g1 == g2 ) return res;
@@ -445,7 +538,19 @@ public:
 
         return res;
     }
+*/
+    
+    double operator()( double f, gamete_pointer g1, gamete_pointer g2 ) {
+        if( g1 == g2 ) return f;
 
+        gamete_type::alphabet_t::pointer alpha = g1->getAlphabet();
+
+        fitness_bitset< typename gamete_type::bitset_type::block_type, typename gamete_type::bitset_type::allocator_type, typename gamete_type::alphabet_t, hom_policy, het_policy, double > fit( g1->getBits(),alpha,m_hom_case, m_het_case, f);
+
+        boost::to_block_range( *g2->getBits(), fit );
+
+        return fit.getResult();
+    }
     virtual ~fitness_multiplicative() {}
 protected:
     het_policy m_het_case;

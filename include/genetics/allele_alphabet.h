@@ -36,6 +36,7 @@ public:
     typedef variant_db_t::iterator                                              locus_iterator;
     typedef variant_db_t::const_iterator                                        clocus_iterator;
     typedef std::vector< locus_iterator >                                       active_database_type;
+    typedef typename active_database_type::iterator                             active_iterator;
 
     typedef unsigned long                       block_type;
     typedef boost::dynamic_bitset< block_type > bitset_type;
@@ -75,6 +76,9 @@ public:
 
     adjacency_iterator begin( edge_set_type * es );
     adjacency_iterator end( edge_set_type * es );
+
+    active_iterator active_begin()  { return m_active.begin(); }
+    active_iterator active_end()    { return m_active.end(); }
 
     alleles_type::iterator end_allele() {
         return m_alleles.end();

@@ -66,13 +66,22 @@ AlleleAlphabet::index_type     AlleleAlphabet::getSymbol( const locus_t & l, con
 void AlleleAlphabet::updateFreeSymbols( const bitset_type & fs ) {
     // boost::dynamic_bitset returns # of bits as size
     assert((m_free_list.size() == m_free_intersect.size()) && (m_free_list.size() == m_free_union.size()));
-    bitset_type b(fs);
-    if( b.size() < m_free_list.size() ) {
+    if( fs.size() < m_free_list.size() ) {
+        bitset_type b(fs);
         b.resize( m_free_list.size(), false );
+        m_free_intersect &= b;
+        m_free_union |= b;
+    } else {
+         if( fs.size() > m_free_list.size() ) {
+            m_free_list.resize( fs.size(), false);
+            m_free_intersect.resize( fs.size(), false);
+            m_free_union.resize( fs.size(), false );
+        }
+
+        m_free_intersect &= fs;
+        m_free_union |= fs;
     }
 
-    m_free_intersect &= b;
-    m_free_union |= b;
     m_free_list = m_free_intersect | ~m_free_union;
 }
 
