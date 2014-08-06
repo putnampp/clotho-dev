@@ -77,8 +77,12 @@ public:
     adjacency_iterator begin( edge_set_type * es );
     adjacency_iterator end( edge_set_type * es );
 
-    active_iterator active_begin()  { return m_active.begin(); }
-    active_iterator active_end()    { return m_active.end(); }
+    active_iterator active_begin()  {
+        return m_active.begin();
+    }
+    active_iterator active_end()    {
+        return m_active.end();
+    }
 
     alleles_type::iterator end_allele() {
         return m_alleles.end();
@@ -95,7 +99,9 @@ public:
         return m_free_list.count();
     }
 
-    bitset_type * getFreeMask() { return &m_free_mask; }
+    bitset_type * getFreeMask() {
+        return &m_free_mask;
+    }
 
     virtual ~AlleleAlphabet();
 protected:

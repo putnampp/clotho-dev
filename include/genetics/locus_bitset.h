@@ -56,7 +56,9 @@ public:
         return m_alphabet;
     }
 
-    bitset_type * getBits() { return &m_bits; }
+    bitset_type * getBits() {
+        return &m_bits;
+    }
 
     adjacency_iterator begin();
     adjacency_iterator end();

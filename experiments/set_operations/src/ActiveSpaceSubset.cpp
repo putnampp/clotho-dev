@@ -119,7 +119,7 @@ ActiveSpaceSubset ActiveSpaceSubset::operator-( const ActiveSpaceSubset & rhs ) 
 
 ActiveSpaceSubset ActiveSpaceSubset::operator^( const ActiveSpaceSubset & rhs ) const {
     ActiveSpaceSubset tmp( *this );
-    return tmp -= rhs;
+    return tmp ^= rhs;
 }
 
 size_t ActiveSpaceSubset::count() const {

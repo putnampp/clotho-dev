@@ -27,6 +27,8 @@
  * either expressed or implied, of the FreeBSD Project.
  ******************************************************************************/
 
+//#define LOGGING 1
+
 #include "clotho.h"
 #include "clotho_commandline.h"
 #include <cstdlib>
@@ -56,6 +58,14 @@
 #include "genetics/fitness_bitset.hpp"
 
 #define _PLOIDY 2
+
+#ifdef LOGGING
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+boost::property_tree::ptree global_log;
+
+#include "utility/lowest_bit.h"
+#endif
 
 using std::shared_ptr;
 
@@ -94,20 +104,6 @@ struct locus_generator< double, RandomProcess::rng_pointer > {
 struct infinite_site {};
 
 //#define SYM_SPEC symbol_generator< PopulationAlphabet::locus_t, PopulationAlphabet::allele_t, PopulationAlphabet::index_type, PopulationAlphabet >
-
-//template <> template <>
-//SYM_SPEC::symbol_type SYM_SPEC::operator()< infinite_site >( PopulationAlphabet * alpha, infinite_site * inf) {
-//    static locus_generator< PopulationAlphabet::locus_t, RandomProcess::rng_pointer> lgen;
-//    static allele_generator< PopulationAlphabet::allele_t, void > agen;
-
-//    PopulationAlphabet::locus_t l = lgen();
-//    while( alpha->isLocus( l ) ) {
-//        l = lgen();
-//    }
-
-//    return alpha->getSymbol( l, agen(), true );
-//    return alpha->getSymbol(lgen(), agen(), true );
-//}
 
 #undef SYM_SPEC
 
@@ -177,7 +173,18 @@ protected:
 
 class ReproduceWithRecombination : public RandomProcess {
 public:
-    ReproduceWithRecombination( double mu, double rho ) : m_mu(mu), m_rho(rho), m_nRecomb(0), m_nRecombEvents(0), m_nMut(0), m_nMutEvents(0) {}
+    typedef std::vector< AlleleAlphabet::locus_t > recombination_points;
+    typedef typename recombination_points::iterator recombination_iterator;
+
+    ReproduceWithRecombination( double mu, double rho ) : 
+        m_mu(mu)
+        , m_rho(rho)
+        , m_nRecomb(0)
+        , m_nRecombEvents(0)
+        , m_nMut(0)
+        , m_nMutEvents(0) 
+//        , m_nCalls(0) 
+    {}
 
     size_t getRecombinationCalls() {
         return m_nRecomb;
@@ -193,206 +200,176 @@ public:
         return m_nMutEvents;
     }
 
-    gamete_pointer operator()( individual_pointer ind ) {
+    gamete_pointer operator()( individual_pointer ind, unsigned int gen = 0 ) {
+        return operator()(ind->getProperties()->getGamete(0), ind->getProperties()->getGamete(1), gen);
+    }
+
+    gamete_pointer operator()( gamete_pointer base_gamete, gamete_pointer other_gamete, unsigned int gen = 0 ) {
+#ifdef LOGGING
+            static unsigned int nCalls = 0;
+            std::ostringstream oss;
+            oss << gen <<  "." << nCalls++;
+            std::string log_key = oss.str();
+#endif
+
         unsigned int nMut = m_rng->nextPoisson( m_mu );
         unsigned int nRec = 0;
-        if( ind->getProperties()->getGamete(0) != ind->getProperties()->getGamete(1) ) {
+        gamete_pointer res = NULL;
+
+        if( base_gamete != other_gamete ) {
             nRec = m_rng->nextPoisson( m_rho );
+
+            if( m_rng->nextBool() ) {
+                res = base_gamete;
+                base_gamete = other_gamete;
+                other_gamete = res;
+                res = NULL;
+            }
         } else if( nMut == 0 ) {
             // both gametes are the same
             // AND no new mutations will be added
             // hence just return a copy
-            return ind->getProperties()->getGamete(0)->copy();
+#ifdef LOGGING
+            global_log.put( log_key + ".result", "Same gamete; Copying base gamete");
+#endif
+            return base_gamete->copy();
+//        } else {
+//            // both gametes are the same
+//            // recombination will result in no new gametes
+//            // therefore skip recombinations.
+//            // there will be mutations, so clone one of the gametes
+//            assert( nMut > 0 );
+//            assert( nRec == 0 );
         }
 
-        gamete_pointer base_gamete, other_gamete;
-        if( m_rng->nextBool() ) {
-            base_gamete = ind->getProperties()->getGamete(0);
-            other_gamete = ind->getProperties()->getGamete(1);
-        } else {
-            base_gamete = ind->getProperties()->getGamete(1);
-            other_gamete = ind->getProperties()->getGamete(0);
-        }
-
-        bool copied = true;
-
-        gamete_pointer res = base_gamete;
+#ifdef LOGGING
+            global_log.put( log_key + ".nRec", nRec );
+            global_log.put( log_key + ".nMut", nMut );
+#endif
 
         if( nRec > 0 ) {
             ++m_nRecomb;
             m_nRecombEvents += nRec;
 
-            copied = false;
             gamete_type::bitset_type symm_diff;
             gamete_type::alphabet_t::pointer  alpha = base_gamete->getAlphabet();
 
-            static locus_generator< AlleleAlphabet::locus_t, RandomProcess::rng_pointer> lgen;
-            typedef std::vector< AlleleAlphabet::locus_t > recombination_points;
-            typedef typename recombination_points::iterator recombination_iterator;
-
             recombination_points rec_points;
-            rec_points.reserve( nRec + 2 );
+            generateRecombination( rec_points, nRec );
 
-            rec_points.push_back( std::numeric_limits< typename gamete_type::alphabet_t::locus_t >::min() );
-            rec_points.push_back( std::numeric_limits< typename gamete_type::alphabet_t::locus_t >::max() );
+#ifdef LOGGING
+            boost::property_tree::ptree p;
+            for( unsigned int i = 0; i < rec_points.size(); ++i ) {
+                boost::property_tree::ptree t;
+                t.put( "", rec_points[i]);
+                p.push_back( std::make_pair( "", t ) );
+            }
 
-            std::generate_n( std::back_inserter( rec_points ), nRec, lgen );
-            std::sort( rec_points.begin(), rec_points.end() );
-            recombination_iterator it = std::unique( rec_points.begin(), rec_points.end() );
-            rec_points.resize((it - rec_points.begin()));
+            global_log.add_child( log_key + ".points", p );
+#endif            
             
-            recombine_bitset< typename gamete_type::bitset_type::block_type, typename gamete_type::bitset_type::allocator_type, typename gamete_type::alphabet_t > recomb( base_gamete->getBits(), &symm_diff, alpha, &rec_points );
+            typedef recombine_bitset< typename gamete_type::bitset_type::block_type, typename gamete_type::bitset_type::allocator_type, typename gamete_type::alphabet_t > recombination_method_type;
+
+#ifdef LOGGING
+            recombination_method_type::result_stats stats(gen);
+#else
+            recombination_method_type::result_stats stats;
+#endif
+
+            recombination_method_type recomb( base_gamete->getBits(), &symm_diff, alpha, &rec_points, &stats );
 
             boost::to_block_range( *other_gamete->getBits(), recomb );
 
             if( nMut == 0) {
-                if( recomb.isBaseMatch() ) {
+                if( stats.is_empty ) {
+#ifdef LOGGING
+                    global_log.put( log_key + ".result" , "EMPTY");
+#endif
+                    return gamete_type::EMPTY.copy();
+                } else if( stats.match_base ) {
+
+#ifdef LOGGING
+                    global_log.put( log_key + ".result" , "Matched Base");
+#endif
                     return base_gamete->copy();
-                } else if( recomb.isAlternateMatch() ) {
+                } else if( stats.match_alt ) {
+#ifdef LOGGING
+                    global_log.put( log_key + ".result" , "Matched Alternate");
+#endif
+
                     return other_gamete->copy();
                 } else {
+#ifdef LOGGING
+                    global_log.put( log_key + ".result" , "New gamete, no new mutations");
+#endif
                     res = new gamete_type( symm_diff, alpha );
                     return res;
                 }
             } else {
+#ifdef LOGGING
+                global_log.put( log_key + ".result", "New gamete, New mutations");
+#endif
                 res = new gamete_type( symm_diff, alpha );
             }
-        }
-
-        if( nMut > 0 ) {
-            ++m_nMut;
-            m_nMutEvents += nMut;
-            if( copied ) {
-                res = res->clone();
-            }
-
-            do {
-                typedef symbol_generator< AlleleAlphabet::locus_t, AlleleAlphabet::allele_t, AlleleAlphabet::index_type, AlleleAlphabet > sgen_type;
-                typedef typename sgen_type::symbol_type symbol_type;
-
-                static sgen_type sgen;
-                symbol_type s = sgen( res->getAlphabet(), (infinite_site * ) NULL );
-                //std::cout << "Adding variant: " << s << std::endl;
-                res->addVariant( s );
-            } while( --nMut );
-
-        } else if( copied ) {
-            res = res->copy();
-        }
-
-        return res;
-    }
-
-/*
-    gamete_pointer operator()( individual_pointer ind ) {
-        unsigned int nMut = m_rng->nextPoisson( m_mu );
-        unsigned int nRec = 0;
-        if( ind->getProperties()->getGamete(0) != ind->getProperties()->getGamete(1) ) {
-            nRec = m_rng->nextPoisson( m_rho );
         } else if( nMut == 0 ) {
-            // both gametes are the same
-            // AND no new mutations will be added
-            // hence just return a copy
-            return ind->getProperties()->getGamete(0)->copy();
-        }
-
-        gamete_pointer base_gamete, other_gamete;
-        if( m_rng->nextBool() ) {
-            base_gamete = ind->getProperties()->getGamete(0);
-            other_gamete = ind->getProperties()->getGamete(1);
+#ifdef LOGGING
+            global_log.put( log_key + ".result", "Different Gametes; No Mutaions; Copy random gamete" );
+#endif
+            return base_gamete->copy();
         } else {
-            base_gamete = ind->getProperties()->getGamete(1);
-            other_gamete = ind->getProperties()->getGamete(0);
+#ifdef LOGGING
+            global_log.put( log_key + ".result", "Different Gamete; Clone random gamete");
+#endif
+            res = base_gamete->clone();
         }
 
-        gamete_pointer res = base_gamete;
-        bool copied = true;
+        assert( res != NULL);
+        assert( nMut > 0 );
 
-        if( nRec > 0 ) {
-            ++m_nRecomb;
-            m_nRecombEvents += nRec;
+         ++m_nMut;
+         m_nMutEvents += nMut;
 
-            gamete_type::bitset_type symm_diff, 
-                                    base_copy( *base_gamete->getBits() ), 
-                                    other_copy( *other_gamete->getBits() );
+#ifdef LOGGING
+        boost::property_tree::ptree m;
+#endif
+         while( nMut-- ) {
+            typedef symbol_generator< AlleleAlphabet::locus_t, AlleleAlphabet::allele_t, AlleleAlphabet::index_type, AlleleAlphabet > sgen_type;
+            typedef typename sgen_type::symbol_type symbol_type;
 
-            if( base_copy.size() >= other_copy.size() ) {
-                other_copy.resize( base_copy.size(), false);
-            } else {
-                base_copy.resize( other_copy.size(), false );
-            }
-            symm_diff = ( base_copy ^ other_copy);
-
-            copied = false;
-            gamete_type::bitset_type mask( symm_diff );
-            mask.flip();
-
-            static locus_generator< AlleleAlphabet::locus_t, RandomProcess::rng_pointer> lgen;
-            typedef std::vector< AlleleAlphabet::locus_t > recombination_points;
-            typedef typename recombination_points::iterator recombination_iterator;
-            recombination_points rec_points(nRec, 0.0);
-            do {
-                rec_points[ --nRec ] = lgen();
-            } while( nRec );
-            rec_points.push_back(0.0);
-            rec_points.push_back(1.0);
-            std::sort( rec_points.begin(), rec_points.end() );
-
-            gamete_type::alphabet_t::pointer alpha = base_gamete->getAlphabet();
-            gamete_type::bitset_type::size_type offset = symm_diff.find_first();
-            while( offset != gamete_type::bitset_type::npos ) {
-                recombination_iterator rit = std::lower_bound( rec_points.begin(), rec_points.end(), (*alpha)[offset]->first );
-                if( (rit - rec_points.begin()) % 2 ) {
-                    symm_diff[offset] = other_copy[offset];
-                } else {
-                    symm_diff[offset] = base_copy[offset];
-                }
-                offset = symm_diff.find_next(offset);
-            }
-
-            symm_diff |= (base_copy & mask );
-
-            if( nMut == 0) {
-                if( symm_diff == base_copy ) {
-                    return base_gamete->copy();
-                } else if( symm_diff == other_copy ) {
-                    return other_gamete->copy();
-                } else {
-                    res = new gamete_type( symm_diff, alpha );
-                    return res;
-                }
-            } else {
-                res = new gamete_type( symm_diff, alpha );
-            }
-        }
-
-        if( nMut > 0 ) {
-            ++m_nMut;
-            m_nMutEvents += nMut;
-            if( copied ) {
-                res = res->clone();
-            }
-
-            do {
-                typedef symbol_generator< AlleleAlphabet::locus_t, AlleleAlphabet::allele_t, AlleleAlphabet::index_type, AlleleAlphabet > sgen_type;
-                typedef typename sgen_type::symbol_type symbol_type;
-
-                static sgen_type sgen;
-                symbol_type s = sgen( res->getAlphabet(), (infinite_site * ) NULL );
+            static sgen_type sgen;
+            symbol_type s = sgen( res->getAlphabet(), (infinite_site * ) NULL );
                 //std::cout << "Adding variant: " << s << std::endl;
-                res->addVariant( s );
-            } while( --nMut );
+#ifdef LOGGING
+            boost::property_tree::ptree _m;
+            _m.put( "", s );
 
-        } else if( copied ) {
-            res = res->copy();
-        }
+            m.push_back( std::make_pair("", _m));
+#endif
+            res->addVariant( s );
+         }
 
+#ifdef LOGGING
+         global_log.add_child( log_key + ".mutations", m);
+#endif
         return res;
     }
-*/
 
     virtual ~ReproduceWithRecombination() {}
 protected:
+    void generateRecombination( recombination_points & rec_points, unsigned int nRec ) {
+        static locus_generator< AlleleAlphabet::locus_t, RandomProcess::rng_pointer> lgen;
+
+        rec_points.reserve( nRec + 2 );
+
+        rec_points.push_back( std::numeric_limits< typename gamete_type::alphabet_t::locus_t >::min() );
+        rec_points.push_back( std::numeric_limits< typename gamete_type::alphabet_t::locus_t >::max() );
+
+        std::generate_n( std::back_inserter( rec_points ), nRec, lgen );
+        std::sort( rec_points.begin(), rec_points.end() );
+        recombination_iterator it = std::unique( rec_points.begin(), rec_points.end() );
+        rec_points.resize((it - rec_points.begin()));
+    }
+
     double m_mu, m_rho;
     size_t m_nRecomb, m_nRecombEvents;
     size_t m_nMut, m_nMutEvents;
@@ -462,84 +439,6 @@ public:
         return (*this)(f, ind->getProperties()->getGamete(0), ind->getProperties()->getGamete(1) );
     }
 
-/*    double operator()( double f, gamete_pointer g1, gamete_pointer g2 ) {
-        double res = f;
-        if( g1 == g2 ) return res;
-
-//        unsigned int s = g1->size() + g2->size();
-//        if( s == 0 ) return res;
-
-//        std::cout << "G1 has " << g1->size() << std::endl;
-//        std::cout << "G2 has " << g2->size() << std::endl;
-
-        adjacency_iterator g1_it = g1->begin(), g1_e = g1->end();
-        adjacency_iterator g2_it = g2->begin(), g2_e = g2->end();
-
-        assert( g1_it.comparable( g2_it ) );
-
-        while( g1_it != g1_e && g2_it != g2_e ) {
-            if( g1_it == g2_it )  {
-                m_hom_case( res, *((*(*g1_it++)).second.first));
-                g2_it++;
-            } else if( g1_it < g2_it ) {
-                m_het_case( res, *((*(*g1_it++)).second.first) );
-            } else {
-                m_het_case( res, *((*(*g2_it++)).second.first) );
-            }
-        }
-        while( g1_it != g1_e ) {
-            m_het_case(res, *((*(*g1_it++)).second.first));
-        }
-
-        while( g2_it != g2_e ) {
-            //assert( (*(*g2_it)).second.first != AlleleAlphabet::getInstance()->end_allele());
-            //assert( (*g2_it) != AlleleAlphabet::getInstance()->end_db());
-            //allele_type at( *((*(*g2_it++)).second.first) );
-            m_het_case(res, *((*(*g2_it++)).second.first));
-        }
-
-        return res;
-    }*/
-
-/*
-    double operator()( double f, gamete_pointer g1, gamete_pointer g2 ) {
-        double res = f;
-        if( g1 == g2 ) return res;
-
-        gamete_type::alphabet_t::pointer alpha = g1->getAlphabet();
-        gamete_type::bitset_type g1_copy( *(g1->getBits()) ), g2_copy( *(g2->getBits()));
-        if( g1_copy.size() >= g2_copy.size() ) {
-            g1_copy.resize( g2_copy.size(), false);
-        } else {
-            g2_copy.resize( g1_copy.size(), false);
-        }
-
-        gamete_type::bitset_type tmp = (g1_copy & g2_copy); // homozygous of gamete 1 and 2
-        gamete_type::bitset_type::size_type pos = tmp.find_first();
-
-        while( pos != gamete_type::bitset_type::npos ) {
-            m_hom_case( res, *(*alpha)[pos]->second.first);
-            pos = tmp.find_next(pos);
-        }
-
-        tmp = g1_copy - g2_copy;    // heterozygous of gamete 1
-        pos = tmp.find_first();
-        while( pos != gamete_type::bitset_type::npos ) {
-            m_het_case( res, *(*alpha)[pos]->second.first );
-            pos = tmp.find_next(pos);
-        }
-
-        tmp = g2_copy - g1_copy;    // heterozygous of gamete 2
-        pos = tmp.find_first();
-        while( pos != gamete_type::bitset_type::npos ) {
-            m_het_case( res, *(*alpha)[pos]->second.first );
-            pos = tmp.find_next(pos);
-        }
-
-        return res;
-    }
-*/
-    
     double operator()( double f, gamete_pointer g1, gamete_pointer g2 ) {
         if( g1 == g2 ) return f;
 
@@ -606,6 +505,27 @@ int main( int argc, char ** argv ) {
 
     stats->startPhase( "PopInit" );
 
+#ifdef LOGGING
+    {
+        lowest_bit_256 lbit;
+        for( unsigned int i = 0; i < 256; ++i ) {
+            const lowest_bit_256::value_type v = lbit[i];
+
+            boost::property_tree::ptree nnode, inode, snode, node;
+            nnode.put("", v.next);
+            inode.put("", v.bit_index);
+            snode.put("", v.bit_shift_next);
+            node.push_back( std::make_pair("", nnode));
+            node.push_back( std::make_pair("", inode));
+            node.push_back( std::make_pair("", snode));
+
+            std::ostringstream oss;
+            oss << "lowest_bit." << i;
+            global_log.add_child( oss.str(), node);
+        }
+    }
+#endif
+
     fitness_multiplicative< het_fitness, hom_fitness > fmult;
 
     for( unsigned int i = 0; i < vm[ FOUNDER_SIZE_K ].as< unsigned int >(); ++i) {
@@ -642,15 +562,27 @@ int main( int argc, char ** argv ) {
         }
 
         memset( fitness, 0, sizeof(double) * fitness_size );
-//        alphabet_type::getInstance()->resetFreeSymbols();
 
 //        std::cout << "Generation: " << i << std::endl;
 
-//        for( typename locus_bitset::active_iterator it = locus_bitset::active_begin(); it != locus_bitset::active_end(); it++ ) {
-//            (*it)->updateSymbols();
-//        }
 
         locus_bitset::updateActiveAlphabet();
+
+#ifdef LOGGING
+        {
+            std::ostringstream oss;
+            oss << i << ".free_list";
+            std::string k = oss.str();
+
+            oss.str("");
+            oss.clear();
+            oss <<  *AlleleAlphabet::getInstance()->getFreeMask();
+            global_log.put( k + ".size", AlleleAlphabet::getInstance()->getFreeMask()->size());
+            global_log.put( k + ".count", AlleleAlphabet::getInstance()->getFreeMask()->count());
+            global_log.put( k + ".sequence", oss.str());
+            global_log.put( k + ".total_mutations", repro.getMutationEvents());
+        }
+#endif
 
         // measure fitness of parent population
         //
@@ -673,11 +605,11 @@ int main( int argc, char ** argv ) {
             std::pair< individual_pointer, individual_pointer > mate_pair = ds( parent );
 
             nSelfing += (( mate_pair.first == mate_pair.second ) ? 1 : 0);
-            gamete_pointer g = repro( mate_pair.first );
+            gamete_pointer g = repro( mate_pair.first, i );
             assert( gamete_type::isGamete( g ) );
             (*child)[child_idx]->getProperties()->inheritFrom(blank_id, g);
 
-            gamete_pointer g1 = repro( mate_pair.second );
+            gamete_pointer g1 = repro( mate_pair.second, i );
             (*child)[child_idx]->getProperties()->inheritFrom(blank_id, g1);
 
             (*child)[child_idx++]->getProperties()->setDOB( i );
@@ -717,6 +649,7 @@ int main( int argc, char ** argv ) {
         n += (*it)->copies();
     }
 
+    n += (gamete_type::EMPTY.copies() - 1);
     std::cout << "Final population has " << nGametes  << " (" << n << ") gametes" << std::endl;
 
     std::cout << "Average number of blocks per Gamete: " << nBlocks/nGametes << std::endl;
@@ -736,6 +669,11 @@ int main( int argc, char ** argv ) {
     std::cout << "Selfing count: " << nSelfing << std::endl;
 
     std::cout << "Lost or Fixed from previous generation: " << alphabet_type::getInstance()->fixed_lost_count() << std::endl;
+
+
+#ifdef LOGGING
+    boost::property_tree::write_json( std::cerr, global_log ); 
+#endif
 
     while( !population.empty() ) {
         individual_type * ind = population.back();

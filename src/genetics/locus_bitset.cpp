@@ -29,6 +29,8 @@ void locus_bitset::updateActiveAlphabet() {
             first++;
         }
 
+        if( EMPTY.copies() > 1 ) { EMPTY.updateSymbols(); }
+
         alpha->setState();
 
         first = active_begin();
@@ -56,7 +58,8 @@ locus_bitset::locus_bitset( alphabet_t::pointer a ) :
 locus_bitset::locus_bitset( const bitset_type & bs, alphabet_t::pointer a ) :
     m_bits(bs),
     m_copies(1),
-    m_alphabet( a ) {
+    m_alphabet( a ) 
+{
     if( this != &EMPTY ) {
         m_active.insert( this );
     }
@@ -82,7 +85,7 @@ locus_bitset::pointer locus_bitset::clone() const {
 
 //    std::pair< active_iterator, bool > res =  m_active.insert( c );
 //    assert( res.second );
-
+//
     return c;
 }
 
