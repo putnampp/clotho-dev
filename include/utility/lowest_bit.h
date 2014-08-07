@@ -13,16 +13,17 @@ public:
     };
 
     typedef _value value_type;
+    typedef unsigned char block_type;
 
     static const unsigned int block_width = 8;
 
     lowest_bit_256();
 
-    const value_type & operator[]( unsigned char val ) const;
+    const value_type & operator[]( block_type val ) const;
 
-    unsigned char next( unsigned char val ) const;
-    unsigned char low_bit_index( unsigned char val ) const;
-    unsigned char next_shift_offset( unsigned char val ) const;
+    unsigned char next( block_type val ) const;
+    unsigned char low_bit_index( block_type val ) const;
+    unsigned char next_shift_offset( block_type val ) const;
 
     const value_type * begin() const;
 

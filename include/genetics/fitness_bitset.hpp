@@ -209,7 +209,7 @@ protected:
     inline void bit_walker( Block _bits, active_iterator base_it , OP * op ) {
         unsigned int res_offset = 0;
         while( _bits ) {
-            unsigned char low_byte = (unsigned char)(_bits);
+            typename lowest_bit_map::block_type low_byte = (typename lowest_bit_map::block_type)(_bits);
             if( low_byte ) {
                 unsigned int _offset = res_offset;
                 const lowest_bit_map::value_type * v = low_bit_map.begin() + low_byte;
