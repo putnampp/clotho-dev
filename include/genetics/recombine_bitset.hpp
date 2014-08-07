@@ -141,6 +141,8 @@ public:
     typedef typename recombination_points::iterator     recombination_iterator;
     typedef typename Alphabet::active_iterator          active_iterator;
 
+    typedef lowest_bit_256                              lowest_bit_map;
+
     struct result_stats {
         bool match_base, match_alt, is_empty;
 #if LOGGING
@@ -444,7 +446,7 @@ protected:
             unsigned char low_byte = (unsigned char)(bits & 0x00000000000000FF);
             unsigned int _offset = res_offset;
             while( low_byte ) {
-                const lowest_bit_256::value_type & v = low_bit_map[low_byte];
+                const lowest_bit_map::value_type & v = low_bit_map[low_byte];
                 unsigned int shift = _offset + v.bit_index;
 
                 (this->*op)( res, (*m_alpha)[ pos_offset + shift]->first, shift );
@@ -461,23 +463,22 @@ protected:
     inline void bit_walker( Block & res, Block bits, active_iterator pos_offset,  unset_op_ptr op ) {
         unsigned int res_offset = 0;
         while( bits ) {
-//            unsigned char low_byte = (unsigned char)(bits & 0x00000000000000FF);
             unsigned char low_byte = (unsigned char)(bits);
             if( low_byte ) {
                 unsigned int _offset = res_offset;
+                const lowest_bit_map::value_type * v = low_bit_map.begin() + low_byte;
                 do {
-                    const lowest_bit_256::value_type & v = low_bit_map[low_byte];
-                    unsigned int shift = _offset + v.bit_index;
+                    unsigned int shift = _offset + v->bit_index;
 
                     (this->*op)( res, (*(pos_offset + shift))->first, shift);
 
-                    low_byte = v.next;
-                    _offset += v.bit_shift_next;
-                } while( low_byte );
+                    _offset += v->bit_shift_next;
+                    v = v->next_ptr;
+                } while( v != NULL );
             }
 
-            bits >>= lowest_bit_256::block_width;
-            res_offset += lowest_bit_256::block_width;
+            bits >>= lowest_bit_map::block_width;
+            res_offset += lowest_bit_map::block_width;
         }
     }
 
@@ -495,9 +496,9 @@ protected:
     recombination_points * rec_points;
     result_type        * m_stats;
 
-    static const lowest_bit_256 low_bit_map;
+    static const lowest_bit_map low_bit_map;
 };
 
 template < class Block, class Allocator, class Alphabet >
-const lowest_bit_256 recombine_bitset< Block, Allocator, Alphabet >::low_bit_map;
+const typename recombine_bitset< Block, Allocator, Alphabet >::lowest_bit_map recombine_bitset< Block, Allocator, Alphabet >::low_bit_map;
 #endif  // RECOMBINE_BITSET_HPP_

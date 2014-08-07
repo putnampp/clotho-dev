@@ -24,13 +24,13 @@ inline void to_block_range( dynamic_bitset< Block, Allocator > & alt, fitness_bi
 template < class Block, class Allocator, class Alphabet, class HomPolicy, class HetPolicy, class ResultType >
 class fitness_bitset {
 public:
-
     typedef fitness_bitset< Block, Allocator, Alphabet, HomPolicy, HetPolicy, ResultType > self_type;
 
     typedef boost::dynamic_bitset< Block, Allocator >   bitset_type;
     typedef ResultType                                  result_type;
 
     typedef typename Alphabet::active_iterator          active_iterator;
+    typedef lowest_bit_256                              lowest_bit_map;
 
     friend void boost::to_block_range< Block, Allocator, Alphabet, HomPolicy, HetPolicy, ResultType >( boost::dynamic_bitset< Block, Allocator > &, fitness_bitset< Block, Allocator, Alphabet, HomPolicy, HetPolicy, ResultType > );
 
@@ -46,7 +46,6 @@ public:
     void operator()( BlockIterator base_first, BlockIterator base_last, BlockIterator alt_first, BlockIterator alt_last ) {
         active_iterator seq_pos = m_alpha->active_begin();
 
-//        unsigned int seq_pos = 0;
         while( true ) {
             if( base_first == base_last ) {
                 while( alt_first != alt_last ) {
@@ -192,7 +191,7 @@ protected:
 //            unsigned int _offset = res_offset;
             unsigned int _offset = pos_offset;
             while( low_byte ) {
-                const lowest_bit_256::value_type & v = low_bit_map[low_byte];
+                const lowest_bit_map::value_type & v = low_bit_map[low_byte];
 
                 (*op)( m_result, *(*m_alpha)[ _offset + v.bit_index ]->second.first );
 
@@ -210,19 +209,20 @@ protected:
     inline void bit_walker( Block _bits, active_iterator base_it , OP * op ) {
         unsigned int res_offset = 0;
         while( _bits ) {
-            unsigned char low_byte = (unsigned char)(_bits & 0x00000000000000FF);
-            unsigned int _offset = res_offset;
-            while( low_byte ) {
-                const lowest_bit_256::value_type & v = low_bit_map[low_byte];
+            unsigned char low_byte = (unsigned char)(_bits);
+            if( low_byte ) {
+                unsigned int _offset = res_offset;
+                const lowest_bit_map::value_type * v = low_bit_map.begin() + low_byte;
+                do {
+                    (*op)( m_result, *(*(base_it + _offset + v->bit_index))->second.first );
 
-                (*op)( m_result, *(*(base_it + _offset + v.bit_index))->second.first );
-
-                low_byte = v.next;
-                _offset += v.bit_shift_next;
+                    _offset += v->bit_shift_next;
+                    v = v->next_ptr;
+                } while( v != NULL );
             }
 
-            _bits >>= 8;
-            res_offset += 8;
+            _bits >>= lowest_bit_map::block_width;
+            res_offset += lowest_bit_map::block_width;
         }
     }
 
@@ -232,11 +232,12 @@ protected:
     HetPolicy * m_het;
     result_type m_result;
 
-    static const lowest_bit_256 low_bit_map;
+    static const lowest_bit_map low_bit_map;
 };
 
 
 template < class Block, class Allocator, class Alphabet, class HomPolicy, class HetPolicy, class ResultType >
-const lowest_bit_256    fitness_bitset< Block, Allocator, Alphabet, HomPolicy, HetPolicy, ResultType >::low_bit_map;
+const typename fitness_bitset< Block, Allocator, Alphabet, HomPolicy, HetPolicy, ResultType >::lowest_bit_map    
+    fitness_bitset< Block, Allocator, Alphabet, HomPolicy, HetPolicy, ResultType >::low_bit_map;
 
 #endif  // FITNESS_BITSET_HPP_
