@@ -226,24 +226,31 @@ public:
         gamete_pointer res = NULL;
 
         if( nRec ) {
-            gamete_type::bitset_type recombined_set;
-            recombination_method_type::result_type status;
-
-            recombine( base_gamete, other_gamete, recombined_set, nRec, status );
-
             if( nMut ) {
-                res = new gamete_type( recombined_set, base_gamete->getAlphabet() );
+                res = new gamete_type( base_gamete->getAlphabet() );
+                recombination_method_type::result_type status;
+
+                recombine( base_gamete, other_gamete, res->getBits(), nRec, status );
                 mutate( res, nMut );
-            } else if( status.is_empty ) {
-                res = gamete_type::EMPTY.copy();
-            } else if( status.match_base ) {
-                res = base_gamete->copy();
-            } else if( status.match_alt ) {
-                res = other_gamete->copy();
             } else {
-                res = new gamete_type( recombined_set, base_gamete->getAlphabet() );
+                // recombination only
+                gamete_type::bitset_type recombined_set;
+                recombination_method_type::result_type status;
+
+                recombine( base_gamete, other_gamete, &recombined_set, nRec, status );
+
+                if( status.is_empty ) {
+                    res = gamete_type::EMPTY.copy();
+                } else if( status.match_base ) {
+                    res = base_gamete->copy();
+                } else if( status.match_alt ) {
+                    res = other_gamete->copy();
+                } else {
+                    res = new gamete_type( recombined_set, base_gamete->getAlphabet() );
+                }
             }
         } else {
+            // mutation only
             res = base_gamete->clone();
             mutate( res, nMut );
         }
@@ -323,7 +330,7 @@ public:
         return res;
     }
 
-    void recombine( gamete_pointer base_gamete, gamete_pointer other_gamete, gamete_type::bitset_type & res, unsigned int nRec, recombination_method_type::result_type & result_status ) {
+    void recombine( gamete_pointer base_gamete, gamete_pointer other_gamete, gamete_type::bitset_type * res, unsigned int nRec, recombination_method_type::result_type & result_status ) {
         ++m_nRecomb;
         m_nRecombEvents += nRec;
 
@@ -332,7 +339,7 @@ public:
         recombination_points rec_points;
         generateRecombination( rec_points, nRec );
 
-        recombination_method_type recomb( base_gamete->getBits(), &res, alpha, &rec_points, &result_status );
+        recombination_method_type recomb( base_gamete->getBits(), res, alpha, &rec_points, &result_status );
 
         boost::to_block_range( *other_gamete->getBits(), recomb );
     }
@@ -345,7 +352,7 @@ public:
 #else
             recombination_method_type::result_type status;
 #endif
-        recombine( base_gamete, other_gamete, symm_diff, nRec, status );
+        recombine( base_gamete, other_gamete, &symm_diff, nRec, status );
 
         gamete_pointer res = new gamete_type( symm_diff, base_gamete->getAlphabet() );
         return res;
