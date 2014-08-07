@@ -205,7 +205,7 @@ public:
     }
 
     gamete_pointer operator()( gamete_pointer base_gamete, gamete_pointer other_gamete, unsigned int gen = 0 ) {
-        return method2( base_gamete, other_gamete, gen );
+        return method3( base_gamete, other_gamete, gen );
     }
 
     gamete_pointer method3( gamete_pointer base_gamete, gamete_pointer other_gamete, unsigned int gen ) {
@@ -226,7 +226,23 @@ public:
         gamete_pointer res = NULL;
 
         if( nRec ) {
-            recombination_method_type::result_type;
+            gamete_type::bitset_type recombined_set;
+            recombination_method_type::result_type status;
+
+            recombine( base_gamete, other_gamete, recombined_set, nRec, status );
+
+            if( nMut ) {
+                res = new gamete_type( recombined_set, base_gamete->getAlphabet() );
+                mutate( res, nMut );
+            } else if( status.is_empty ) {
+                res = gamete_type::EMPTY.copy();
+            } else if( status.match_base ) {
+                res = base_gamete->copy();
+            } else if( status.match_alt ) {
+                res = other_gamete->copy();
+            } else {
+                res = new gamete_type( recombined_set, base_gamete->getAlphabet() );
+            }
         } else {
             res = base_gamete->clone();
             mutate( res, nMut );
@@ -307,26 +323,31 @@ public:
         return res;
     }
 
-    gamete_pointer recombine( gamete_pointer base_gamete, gamete_pointer other_gamete, unsigned int nRec, unsigned int gen = 0 ) {
+    void recombine( gamete_pointer base_gamete, gamete_pointer other_gamete, gamete_type::bitset_type & res, unsigned int nRec, recombination_method_type::result_type & result_status ) {
         ++m_nRecomb;
         m_nRecombEvents += nRec;
 
-        gamete_type::bitset_type symm_diff;
         gamete_type::alphabet_t::pointer  alpha = base_gamete->getAlphabet();
 
         recombination_points rec_points;
         generateRecombination( rec_points, nRec );
 
-#ifdef LOGGING
-            recombination_method_type::result_type stats(gen);
-#else
-            recombination_method_type::result_type stats;
-#endif
-        recombination_method_type recomb( base_gamete->getBits(), &symm_diff, alpha, &rec_points, &stats );
+        recombination_method_type recomb( base_gamete->getBits(), &res, alpha, &rec_points, &result_status );
 
         boost::to_block_range( *other_gamete->getBits(), recomb );
+    }
 
-        gamete_pointer res = new gamete_type( symm_diff, alpha );
+    gamete_pointer recombine( gamete_pointer base_gamete, gamete_pointer other_gamete, unsigned int nRec, unsigned int gen = 0 ) {
+
+        gamete_type::bitset_type symm_diff;
+#ifdef LOGGING
+            recombination_method_type::result_type status(gen);
+#else
+            recombination_method_type::result_type status;
+#endif
+        recombine( base_gamete, other_gamete, symm_diff, nRec, status );
+
+        gamete_pointer res = new gamete_type( symm_diff, base_gamete->getAlphabet() );
         return res;
     }
 
