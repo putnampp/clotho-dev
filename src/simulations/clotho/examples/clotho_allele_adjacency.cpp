@@ -173,7 +173,8 @@ protected:
 
 class ReproduceWithRecombination : public RandomProcess {
 public:
-    typedef std::vector< AlleleAlphabet::locus_t > recombination_points;
+        typedef recombine_bitset< typename gamete_type::bitset_type::block_type, typename gamete_type::bitset_type::allocator_type, typename gamete_type::alphabet_t > recombination_method_type;
+    typedef typename recombination_method_type::recombination_points recombination_points;
     typedef typename recombination_points::iterator recombination_iterator;
 
     ReproduceWithRecombination( double mu, double rho ) : 
@@ -183,7 +184,6 @@ public:
         , m_nRecombEvents(0)
         , m_nMut(0)
         , m_nMutEvents(0) 
-//        , m_nCalls(0) 
     {}
 
     size_t getRecombinationCalls() {
@@ -206,6 +206,34 @@ public:
 
     gamete_pointer operator()( gamete_pointer base_gamete, gamete_pointer other_gamete, unsigned int gen = 0 ) {
         return method2( base_gamete, other_gamete, gen );
+    }
+
+    gamete_pointer method3( gamete_pointer base_gamete, gamete_pointer other_gamete, unsigned int gen ) {
+        unsigned int nMut = m_rng->nextPoisson( m_mu );
+        unsigned int nRec = (( base_gamete == other_gamete) ? 0 : m_rng->nextPoisson(m_rho));
+
+        if( base_gamete != other_gamete && m_rng->nextBool() ) {
+            // have different gametes; therefore should randomly swap them
+            std::swap( base_gamete, other_gamete );
+        }
+
+        if( nMut == 0 && nRec == 0) {
+            // no recombination or mutation
+            // therefore randomly copy one of them
+            return base_gamete->copy();
+        }
+
+        gamete_pointer res = NULL;
+
+        if( nRec ) {
+            recombination_method_type::result_type;
+        } else {
+            res = base_gamete->clone();
+            mutate( res, nMut );
+        }
+
+        assert( res != NULL );
+        return res;
     }
 
     gamete_pointer method2( gamete_pointer base_gamete, gamete_pointer other_gamete, unsigned int gen ) {
@@ -289,12 +317,10 @@ public:
         recombination_points rec_points;
         generateRecombination( rec_points, nRec );
 
-        typedef recombine_bitset< typename gamete_type::bitset_type::block_type, typename gamete_type::bitset_type::allocator_type, typename gamete_type::alphabet_t > recombination_method_type;
-
 #ifdef LOGGING
-            recombination_method_type::result_stats stats(gen);
+            recombination_method_type::result_type stats(gen);
 #else
-            recombination_method_type::result_stats stats;
+            recombination_method_type::result_type stats;
 #endif
         recombination_method_type recomb( base_gamete->getBits(), &symm_diff, alpha, &rec_points, &stats );
 
@@ -395,12 +421,10 @@ public:
             global_log.add_child( log_key + ".points", p );
 #endif            
             
-            typedef recombine_bitset< typename gamete_type::bitset_type::block_type, typename gamete_type::bitset_type::allocator_type, typename gamete_type::alphabet_t > recombination_method_type;
-
 #ifdef LOGGING
-            recombination_method_type::result_stats stats(gen);
+            recombination_method_type::result_type stats(gen);
 #else
-            recombination_method_type::result_stats stats;
+            recombination_method_type::result_type stats;
 #endif
 
             recombination_method_type recomb( base_gamete->getBits(), &symm_diff, alpha, &rec_points, &stats );

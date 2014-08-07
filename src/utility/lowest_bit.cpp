@@ -24,6 +24,7 @@ void lowest_bit_256::initialize() {
                 if( tmp & 1 ) {
                     m_vals[ val ].next = tmp;
                     m_vals[ val ].bit_shift_next = idx;
+                    m_vals[ val ].next_ptr = &m_vals[tmp];
                     break;
                 }
                 tmp >>= 1;
@@ -32,6 +33,7 @@ void lowest_bit_256::initialize() {
         } else {
             m_vals[ val ].next = 0;
             m_vals[ val ].bit_shift_next = idx;
+            m_vals[ val ].next_ptr = NULL;
         }
         --val;
     }
@@ -51,6 +53,10 @@ unsigned char lowest_bit_256::low_bit_index( unsigned char val ) const {
 
 unsigned char lowest_bit_256::next_shift_offset( unsigned char val ) const {
     return m_vals[ val ].bit_shift_next;
+}
+
+const lowest_bit_256::value_type * lowest_bit_256::begin() const {
+    return m_vals;
 }
 
 lowest_bit_256::~lowest_bit_256() {}
