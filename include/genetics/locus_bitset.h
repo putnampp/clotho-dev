@@ -68,7 +68,6 @@ protected:
     void clearFree();
 
 public:
-    //static void * operator new( size_t );
     void    release();
 
     static bool isGamete( locus_bitset * lb );
@@ -90,8 +89,6 @@ protected:
     bitset_type             m_bits;
     mutable size_t          m_copies;
     alphabet_t::pointer     m_alphabet;
-
-//    static pool_type m_pool;
 
     static active_bitsets m_active;
 };

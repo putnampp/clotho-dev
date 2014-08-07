@@ -35,14 +35,11 @@ AlleleAlphabet::index_type     AlleleAlphabet::getSymbol( const locus_t & l, con
         it = m_db.insert( make_pair( l, make_pair( a_it, offset)));
     } else {
         // existing edge
-        //offset = it->second.second;
         return npos;
     }
 
     if( offset == bitset_type::npos ) {
         // inactive variant
-        //
-//        offset = m_free_list.find_first();
         offset = m_next_free;
 
         if( offset == bitset_type::npos ) {
@@ -55,7 +52,6 @@ AlleleAlphabet::index_type     AlleleAlphabet::getSymbol( const locus_t & l, con
             assert( offset < m_active.size() );
             m_db.erase( m_active[offset] );
             m_active[offset] = it;
-//            m_free_list[ offset ] = false;
             m_next_free = m_free_list.find_next( m_next_free );
         }
         it->second.second = offset;
@@ -66,13 +62,34 @@ AlleleAlphabet::index_type     AlleleAlphabet::getSymbol( const locus_t & l, con
 void AlleleAlphabet::updateFreeSymbols( const bitset_type & fs ) {
     // boost::dynamic_bitset returns # of bits as size
     assert((m_free_list.size() == m_free_intersect.size()) && (m_free_list.size() == m_free_union.size()));
-    if( fs.size() < m_free_list.size() ) {
-        bitset_type b(fs);
-        b.resize( m_free_list.size(), false );
-        m_free_intersect &= b;
-        m_free_union |= b;
+
+    typedef std::vector< typename bitset_type::block_type, typename bitset_type::allocator_type > buffer_type;
+
+    typedef typename buffer_type::iterator iterator;
+    typedef typename buffer_type::const_iterator citerator;
+
+    if( fs.size() == 0 ) {
+        m_free_intersect.reset();
+    } else if( fs.size() < m_free_list.size() ) {
+//        bitset_type b(fs);
+//        b.resize( m_free_list.size(), false );
+//        m_free_intersect &= b;
+//        m_free_union |= b;
+//
+        citerator first = fs.m_bits.begin(), last = fs.m_bits.end();
+
+        iterator int_it = m_free_intersect.m_bits.begin(), int_last = m_free_intersect.m_bits.end(),
+            un_it = m_free_union.m_bits.begin();
+        while( first != last ) {
+            (*int_it++) &= (*first);
+            (*un_it++) |= (*first++);
+        }
+        while( int_it != int_last ) {
+            (*int_it++) = 0;
+        }
+
     } else {
-         if( fs.size() > m_free_list.size() ) {
+        if( fs.size() > m_free_list.size() ) {
             m_free_list.resize( fs.size(), false);
             m_free_intersect.resize( fs.size(), false);
             m_free_union.resize( fs.size(), false );
@@ -82,10 +99,11 @@ void AlleleAlphabet::updateFreeSymbols( const bitset_type & fs ) {
         m_free_union |= fs;
     }
 
-    m_free_list = m_free_intersect | ~m_free_union;
+//    m_free_list = m_free_intersect | ~m_free_union;
 }
 
 void AlleleAlphabet::setState() {
+    m_free_list = m_free_intersect | ~m_free_union;
     m_next_free = m_free_list.find_first();
     m_free_mask = ~m_free_list;
 }

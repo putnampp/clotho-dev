@@ -2,7 +2,6 @@
 
 // statics
 //
-//locus_bitset::pool_type locus_bitset::m_pool;
 locus_bitset  locus_bitset::EMPTY;
 typename locus_bitset::active_bitsets locus_bitset::m_active;
 
@@ -42,10 +41,6 @@ void locus_bitset::updateActiveAlphabet() {
     }
 }
 
-//void * locus_bitset::operator new( size_t s ) {
-//    return m_pool.malloc();
-//}
-
 locus_bitset::locus_bitset( alphabet_t::pointer a ) :
     m_bits(),
     m_copies(1),
@@ -60,7 +55,6 @@ locus_bitset::locus_bitset( const bitset_type & bs, alphabet_t::pointer a ) :
     m_copies(1),
     m_alphabet( a ) 
 {
-    assert( m_bits == bs );
     if( this != &EMPTY ) {
         m_active.insert( this );
     }
@@ -71,7 +65,6 @@ locus_bitset::locus_bitset( const locus_bitset & la ) :
     m_copies( la.m_copies ),
     m_alphabet(la.m_alphabet) 
 {
-    assert( m_bits == la.m_bits );
     m_active.insert(this);
 }
 
@@ -142,6 +135,10 @@ void locus_bitset::updateSymbols() {
 }
 
 void locus_bitset::clearFree() {
+    if( m_alphabet->getFreeMask()->size() == 0 ) {
+        return;
+    }
+
     if( m_bits.size() > m_alphabet->getFreeMask()->size() ) {
         bitset_type b( *m_alphabet->getFreeMask());
         b.resize( m_bits.size(), true );

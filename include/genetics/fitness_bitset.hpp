@@ -237,7 +237,7 @@ protected:
 
 
 template < class Block, class Allocator, class Alphabet, class HomPolicy, class HetPolicy, class ResultType >
-const typename fitness_bitset< Block, Allocator, Alphabet, HomPolicy, HetPolicy, ResultType >::lowest_bit_map    
-    fitness_bitset< Block, Allocator, Alphabet, HomPolicy, HetPolicy, ResultType >::low_bit_map;
+const typename fitness_bitset< Block, Allocator, Alphabet, HomPolicy, HetPolicy, ResultType >::lowest_bit_map
+fitness_bitset< Block, Allocator, Alphabet, HomPolicy, HetPolicy, ResultType >::low_bit_map;
 
 #endif  // FITNESS_BITSET_HPP_
