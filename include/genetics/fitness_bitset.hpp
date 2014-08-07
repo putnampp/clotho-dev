@@ -35,7 +35,7 @@ public:
     friend void boost::to_block_range< Block, Allocator, Alphabet, HomPolicy, HetPolicy, ResultType >( boost::dynamic_bitset< Block, Allocator > &, fitness_bitset< Block, Allocator, Alphabet, HomPolicy, HetPolicy, ResultType > );
 
     fitness_bitset( bitset_type * base, typename Alphabet::pointer alpha, HomPolicy & homozygous, HetPolicy & heterozygous, result_type initial ) :
-        m_base( base ), m_alpha( alpha ), m_hom(homozygous), m_het(heterozygous), m_result( initial) {
+        m_base( base ), m_alpha( alpha ), m_hom(&homozygous), m_het(&heterozygous), m_result( initial) {
     }
 
     fitness_bitset( const self_type & other ) :
@@ -50,7 +50,7 @@ public:
         while( true ) {
             if( base_first == base_last ) {
                 while( alt_first != alt_last ) {
-                    bit_walker( (*alt_first++), seq_pos, &m_het);
+                    bit_walker( (*alt_first++), seq_pos, m_het);
                     seq_pos += bitset_type::bits_per_block;
                 }
                 break;
@@ -58,15 +58,15 @@ public:
 
             if( alt_first == alt_last ) {
                 while( base_first != base_last ) {
-                    bit_walker( (*base_first++), seq_pos, &m_het );
+                    bit_walker( (*base_first++), seq_pos, m_het );
                     seq_pos += bitset_type::bits_per_block;
                 }
                 break;
             }
             Block base = (*base_first++), alt = (*alt_first++);
 
-            bit_walker( base & alt, seq_pos, &m_hom );
-            bit_walker( base ^ alt, seq_pos, &m_het );
+            bit_walker( base & alt, seq_pos, m_hom );
+            bit_walker( base ^ alt, seq_pos, m_het );
 
             seq_pos += bitset_type::bits_per_block;
         }
@@ -228,8 +228,8 @@ protected:
 
     bitset_type * m_base;
     typename Alphabet::pointer  m_alpha;
-    HomPolicy m_hom;
-    HetPolicy m_het;
+    HomPolicy * m_hom;
+    HetPolicy * m_het;
     result_type m_result;
 
     static const lowest_bit_256 low_bit_map;

@@ -60,6 +60,7 @@ locus_bitset::locus_bitset( const bitset_type & bs, alphabet_t::pointer a ) :
     m_copies(1),
     m_alphabet( a ) 
 {
+    assert( m_bits == bs );
     if( this != &EMPTY ) {
         m_active.insert( this );
     }
@@ -70,6 +71,7 @@ locus_bitset::locus_bitset( const locus_bitset & la ) :
     m_copies( la.m_copies ),
     m_alphabet(la.m_alphabet) 
 {
+    assert( m_bits == la.m_bits );
     m_active.insert(this);
 }
 

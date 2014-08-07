@@ -18,7 +18,7 @@ public:
     unsigned char next( unsigned char val ) const;
     unsigned char low_bit_index( unsigned char val ) const;
     unsigned char next_shift_offset( unsigned char val ) const;
-    
+
     virtual ~lowest_bit_256();
 protected:
     void initialize();

@@ -31,7 +31,7 @@ inline void to_block_range( const dynamic_bitset< Block, Allocator > & alt, reco
     }
     oss << "recombine_bitset." << nCalls++;
     std::string log_key = oss.str();
-    
+
     global_log.put( log_key + ".alt.size", alt.size() );
     oss.str("");
     oss.clear();
@@ -43,6 +43,15 @@ inline void to_block_range( const dynamic_bitset< Block, Allocator > & alt, reco
     oss.clear();
     oss << *recomb.m_base;
     global_log.put( log_key + ".base.sequence", oss.str() );
+
+    boost::property_tree::ptree pts;
+    for( unsigned int i = 0; i < recomb.rec_points->size(); ++i ) {
+        boost::property_tree::ptree t;
+        t.put( "", recomb.rec_points->at(i));
+        pts.push_back( std::make_pair( "", t ) );
+    }
+
+    global_log.add_child(log_key + ".points", pts );
 #endif
 
     iterator first = recomb.m_base->m_bits.begin(), last = recomb.m_base->m_bits.end(),
@@ -63,6 +72,58 @@ inline void to_block_range( const dynamic_bitset< Block, Allocator > & alt, reco
         global_log.put( log_key + ".match_base", recomb.m_stats->match_base );
         global_log.put( log_key + ".match_alt", recomb.m_stats->match_alt );
         global_log.put( log_key + ".is_empty", recomb.m_stats->is_empty );
+    }
+
+    if(recomb.m_base->count() ) {
+        boost::property_tree::ptree a;
+        for( typename dynamic_bitset< Block, Allocator >::size_type i = recomb.m_base->find_first(); i != dynamic_bitset< Block, Allocator >::npos; i = recomb.m_base->find_next(i)) {
+
+            boost::property_tree::ptree t;
+            t.put("", (*recomb.m_alpha)[i]->first);
+
+            boost::property_tree::ptree r;
+            typename recombine_bitset< Block, Allocator, Alphabet >::recombination_iterator rit = std::upper_bound( recomb.rec_points->begin(), recomb.rec_points->end(), (*recomb.m_alpha)[i]->first);
+            if( (rit - recomb.rec_points->begin()) % 2 ) {
+                r.put("", "base");
+            } else {
+                r.put("", "alt");
+            }
+
+            boost::property_tree::ptree c;
+            c.push_back( std::make_pair( "", t) );
+            c.push_back( std::make_pair( "", r) );
+            oss.str("");
+            oss.clear();
+            oss << i;
+            a.add_child( oss.str(), c);
+        }
+        global_log.add_child( log_key + ".base.alpha", a);
+    }
+
+    if( alt.count() ) {
+        boost::property_tree::ptree a;
+        for( typename dynamic_bitset< Block, Allocator >::size_type i = alt.find_first(); i != dynamic_bitset< Block, Allocator >::npos; i = alt.find_next(i)) {
+
+            boost::property_tree::ptree t;
+            t.put("", (*recomb.m_alpha)[i]->first);
+
+            boost::property_tree::ptree r;
+            typename recombine_bitset< Block, Allocator, Alphabet >::recombination_iterator rit = std::upper_bound( recomb.rec_points->begin(), recomb.rec_points->end(), (*recomb.m_alpha)[i]->first);
+            if( (rit - recomb.rec_points->begin()) % 2 ) {
+                r.put("", "base");
+            } else {
+                r.put("", "alt");
+            }
+
+            boost::property_tree::ptree c;
+            c.push_back( std::make_pair( "", t) );
+            c.push_back( std::make_pair( "", r) );
+            oss.str("");
+            oss.clear();
+            oss << i;
+            a.add_child( oss.str(), c);
+        }
+        global_log.add_child( log_key + ".alt.alpha", a);
     }
 #endif
 
@@ -92,23 +153,23 @@ public:
 
     friend void boost::to_block_range< Block, Allocator, Alphabet >( const boost::dynamic_bitset< Block, Allocator > &, recombine_bitset< Block, Allocator, Alphabet>  );
 
-    recombine_bitset( bitset_type * base, bitset_type * res, 
-        typename Alphabet::pointer alpha,
-        recombination_points * rp, result_stats * stats = NULL ) :
+    recombine_bitset( bitset_type * base, bitset_type * res,
+                      typename Alphabet::pointer alpha,
+                      recombination_points * rp, result_stats * stats = NULL ) :
         m_base( base )
         , m_result( res )
         , m_alpha( alpha )
         , rec_points( rp )
-        , m_stats( stats )
-    {    }
+        , m_stats( stats ) {
+    }
 
     recombine_bitset( const self_type & other ) :
         m_base( other.m_base )
         , m_result( other.m_result )
         , m_alpha( other.m_alpha )
         , rec_points( other.rec_points )
-        , m_stats( other.m_stats )
-    {    }
+        , m_stats( other.m_stats ) {
+    }
 
     template < class BlockIterator >
     void operator()( BlockIterator base_first, BlockIterator base_last, BlockIterator alt_first, BlockIterator alt_last ) {
@@ -116,7 +177,7 @@ public:
 
         active_iterator seq_pos = m_alpha->active_begin();
 //        unsigned int seq_pos = 0;
-
+//
         while( true ) {
             if( base_first == base_last ) {
                 while( alt_first != alt_last ) {
@@ -152,7 +213,7 @@ public:
 
             Block base = (*base_first++), alt = (*alt_first++);
 
-            Block res = (base & ~( base ^ alt));     // homozygous bits
+            Block res = (base | alt);     // homozygous bits
 
             bit_walker( res, (base & ~alt), seq_pos, &self_type::unset_if_alt );
             bit_walker( res, (alt & ~base), seq_pos, &self_type::unset_if_base );
@@ -284,21 +345,92 @@ protected:
     }
 
     void unset_if_alt( Block & res, double loc, unsigned int _offset ) {
-        recombination_iterator rit = std::lower_bound( rec_points->begin(), rec_points->end(), loc);
-        if( (rit - rec_points->begin()) % 2 ) {
+        recombination_iterator rit = std::upper_bound( rec_points->begin(), rec_points->end(), loc);
+        if( (rit - rec_points->begin()) % 2 == 0 ) {
             // bit is supposed to come from alt
             // hence clear the bit in the result
+
+#ifdef LOGGING
+            static unsigned int n = 0;
+            Block before = res;
+#endif
             res &= ~(((Block)1) << (_offset));
+
+#ifdef LOGGING
+            if( n++ % 10 == 0) {
+                std::ostringstream oss;
+                oss << "unset_if_alt." << (n / 10);
+                std::string log_key = oss.str();
+
+                global_log.add( log_key + ".location", loc );
+                global_log.add( log_key + ".upper_bound_offset", (rit - rec_points->begin()));
+                global_log.add( log_key + ".upper_bound", *rit);
+
+                oss.str("");
+                oss.clear();
+                oss << std::hex << (((Block)1) << (_offset));
+                global_log.add( log_key + ".mask", oss.str());
+
+                oss.str("");
+                oss.clear();
+                oss << std::hex << before;
+
+                global_log.add( log_key + ".before", oss.str() );
+
+                oss.str("");
+                oss.clear();
+                oss << std::hex << res;
+
+                global_log.add( log_key + ".after", oss.str() );
+            }
+#endif
+//        } else {
+//            res |= (((Block)1) << (_offset));
         }
     }
 
     void unset_if_base( Block & res, double loc, unsigned int _offset ) {
 //        double loc = (*m_alpha)[ lookup_offset + _offset ]->first;
-        recombination_iterator rit = std::lower_bound( rec_points->begin(), rec_points->end(), loc);
-        if( (rit - rec_points->begin()) % 2 == 0 ) {
+        recombination_iterator rit = std::upper_bound( rec_points->begin(), rec_points->end(), loc);
+        if( (rit - rec_points->begin()) % 2 ) {
             // bit is supposed to come from base
             // hence clear the bit in the result
+#ifdef LOGGING
+            static unsigned int n = 0;
+            Block before = res;
+#endif
             res &= ~(((Block)1) << (_offset));
+#ifdef LOGGING
+            if( n++ % 10 == 0) {
+                std::ostringstream oss;
+                oss << "unset_if_base." << (n / 10);
+                std::string log_key = oss.str();
+
+                global_log.add( log_key + ".location", loc );
+                global_log.add( log_key + ".upper_bound_offset", (rit - rec_points->begin()));
+
+                global_log.add( log_key + ".upper_bound", *rit);
+
+                oss.str("");
+                oss.clear();
+                oss << std::hex << (((Block)1) << (_offset));
+                global_log.add( log_key + ".mask", oss.str());
+
+                oss.str("");
+                oss.clear();
+                oss << std::hex << before;
+
+                global_log.add( log_key + ".before", oss.str() );
+
+                oss.str("");
+                oss.clear();
+                oss << std::hex << res;
+
+                global_log.add( log_key + ".after", oss.str() );
+            }
+#endif
+//        } else {
+//            res |= (((Block)1) << (_offset));
         }
     }
 
