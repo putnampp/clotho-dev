@@ -227,6 +227,47 @@ protected:
         }
     }
 
+    template < class OP >
+    inline void rec_bit_walker( unsigned short bits, active_iterator base_it, OP * op, unsigned int res_offset ) {
+        if( bits == 0 ) return;
+
+        const lowest_bit_map::value_type * v = low_bit_map.begin() + bits;
+        do {
+            (*op)( m_result, *(*(base_it + res_offset + v->bit_index))->second.first );
+
+            res_offset += v->bit_shift_next;
+            v = v->next_ptr;
+        } while( v != NULL );
+    }
+
+    template < class OP >
+    inline void rec_bit_walker( unsigned int bits, active_iterator pos_offset, OP * op, unsigned int res_offset ) {
+        if( bits == 0 ) return;
+
+        static const unsigned char WIDTH = 16;
+
+        unsigned short _bits = (unsigned short) bits;
+        rec_bit_walker( _bits, pos_offset, op, res_offset );
+
+        _bits = (unsigned short)(bits >> WIDTH);
+
+        rec_bit_walker( _bits, pos_offset, op, res_offset + WIDTH );
+    }
+
+    template < class OP >
+    inline void rec_bit_walker( unsigned long bits, active_iterator pos_offset, OP * op, unsigned int res_offset = 0 ) {
+        if( bits == 0 ) return;
+
+        static const unsigned char WIDTH = 32;
+
+        unsigned int _bits = (unsigned int) bits;
+        rec_bit_walker( _bits, pos_offset, op, res_offset );
+
+        _bits = (unsigned int)(bits >> WIDTH);
+    
+        rec_bit_walker( _bits, pos_offset, op, res_offset + WIDTH );
+    }
+
     bitset_type * m_base;
     typename Alphabet::pointer  m_alpha;
     HomPolicy * m_hom;

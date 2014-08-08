@@ -249,6 +249,12 @@ public:
         active_iterator seq_pos = m_alpha->active_begin();
 //        unsigned int seq_pos = 0;
 //
+//
+        unsigned int nBase = (base_last - base_first), nAlt = (alt_last - alt_first);
+        m_result->resize( (nBase > nAlt) ? (bitset_type::bits_per_block * nBase) : (bitset_type::bits_per_block * nAlt), false);
+
+        typename std::vector< Block, Allocator>::iterator res_it = m_result->m_bits.begin();
+
         while( true ) {
             if( base_first == base_last ) {
                 while( alt_first != alt_last ) {
@@ -260,7 +266,9 @@ public:
                     match_base = ((match_base) && (res == 0 ));
                     match_alt = ((match_alt) && (res == alt));
 
-                    m_result->append(res);
+//                    m_result->append(res);
+                    (*res_it) = res;
+                    ++res_it;
                     seq_pos += bitset_type::bits_per_block;
                 }
                 break;
@@ -276,7 +284,9 @@ public:
                     match_base = ((match_base) && ( res == base ));
                     match_alt = ((match_alt) && (res == 0));
 
-                    m_result->append(res);
+//                    m_result->append(res);
+                    (*res_it) = res;
+                    ++res_it;
                     seq_pos += bitset_type::bits_per_block;
                 }
                 break;
@@ -293,7 +303,9 @@ public:
             match_base = ((match_base) && (res == base ));
             match_alt = ((match_alt) && (res == alt ));
 
-            m_result->append( res );
+//            m_result->append( res );
+            (*res_it) = res;
+            ++res_it;
             seq_pos += bitset_type::bits_per_block;
         }
 
@@ -541,6 +553,46 @@ protected:
             res_offset += 8;
         }
     }*/
+
+    inline void rec_bit_walker( Block & res, unsigned short bits, active_iterator pos_offset, unset_op_ptr op, unsigned int res_offset ) {
+        if( bits == 0 ) return;
+
+        const lowest_bit_map::value_type * v = low_bit_map.begin() + bits;
+        do {
+            unsigned int shift = res_offset + v->bit_index;
+
+            (this->*op)( res, (*(pos_offset + shift))->first, shift);
+
+            res_offset += v->bit_shift_next;
+            v = v->next_ptr;
+        } while( v != NULL );
+    }
+
+    inline void rec_bit_walker( Block & res, unsigned int bits, active_iterator pos_offset, unset_op_ptr op, unsigned int res_offset ) {
+        if( bits == 0 ) return;
+
+        static const unsigned char WIDTH = 16;
+
+        unsigned short _bits = (unsigned short) bits;
+        rec_bit_walker( res, _bits, pos_offset, op, res_offset );
+
+        _bits = (unsigned short)(bits >> WIDTH);
+
+        rec_bit_walker( res, _bits, pos_offset, op, (res_offset + WIDTH) );
+    }
+
+    inline void rec_bit_walker( Block & res, unsigned long bits, active_iterator pos_offset, unset_op_ptr op ) {
+        if( bits == 0 ) return;
+
+        static const unsigned char WIDTH = 32;
+
+        unsigned int _bits = (unsigned int) bits;
+        rec_bit_walker( res, _bits, pos_offset, op, 0 );
+
+        _bits = (unsigned int)(bits >> WIDTH);
+    
+        rec_bit_walker( res, _bits, pos_offset, op, WIDTH );
+    }
 
     inline void bit_walker( Block & res, Block bits, active_iterator pos_offset,  unset_op_ptr op ) {
         unsigned int res_offset = 0;
