@@ -784,7 +784,7 @@ int main( int argc, char ** argv ) {
 
             nSelfing += (( mate_pair.first == mate_pair.second ) ? 1 : 0);
             gamete_pointer g = repro( mate_pair.first, i );
-            assert( gamete_type::isGamete( g ) );
+            //assert( gamete_type::isGamete( g ) );
             (*child)[child_idx]->getProperties()->inheritFrom(blank_id, g);
 
             gamete_pointer g1 = repro( mate_pair.second, i );

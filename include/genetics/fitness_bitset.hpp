@@ -30,7 +30,7 @@ public:
     typedef ResultType                                  result_type;
 
     typedef typename Alphabet::active_iterator          active_iterator;
-    typedef lowest_bit_256                              lowest_bit_map;
+    typedef lowest_bit_64K                              lowest_bit_map;
 
     friend void boost::to_block_range< Block, Allocator, Alphabet, HomPolicy, HetPolicy, ResultType >( boost::dynamic_bitset< Block, Allocator > &, fitness_bitset< Block, Allocator, Alphabet, HomPolicy, HetPolicy, ResultType > );
 
@@ -183,6 +183,7 @@ protected:
         bit_walker( base ^ alt, pos_offset, &m_het );
     }
 
+/*
     template < class OP >
     inline void bit_walker( Block _bits, unsigned int pos_offset, OP * op ) {
 //        unsigned int res_offset = 0;
@@ -203,7 +204,7 @@ protected:
             pos_offset += 8;
 //            res_offset += 8;
         }
-    }
+    }*/
 
     template < class OP >
     inline void bit_walker( Block _bits, active_iterator base_it , OP * op ) {

@@ -1,6 +1,8 @@
 #ifndef RECOMBINE_BITSET_HPP_
 #define RECOMBINE_BITSET_HPP_
 
+#define BOOST_DYNAMIC_BITSET_DONT_USE_FRIENDS
+
 #include <boost/dynamic_bitset.hpp>
 #include <vector>
 #include <limits>
@@ -141,7 +143,7 @@ public:
     typedef typename recombination_points::iterator     recombination_iterator;
     typedef typename Alphabet::active_iterator          active_iterator;
 
-    typedef lowest_bit_256                              lowest_bit_map;
+    typedef lowest_bit_64K                              lowest_bit_map;
 
     struct result_stats {
         bool match_base, match_alt, is_empty;
@@ -177,6 +179,71 @@ public:
 
     template < class BlockIterator >
     void operator()( BlockIterator base_first, BlockIterator base_last, BlockIterator alt_first, BlockIterator alt_last ) {
+        method1( base_first, base_last, alt_first, alt_last );
+    }
+
+    template < class BlockIterator >
+    void method2( BlockIterator base_first, BlockIterator base_last, BlockIterator alt_first, BlockIterator alt_last ) {
+        bool match_base = true, match_alt = true, is_empty = true;
+
+        static bitset_type mask;
+        mask.reset();
+        mask.resize(m_alpha->size(), false);
+
+        buildBaseMask( mask );
+
+        BlockIterator mask_it = mask.m_bits.begin();
+
+//        unsigned int nMaskBlocks = mask.num_blocks();
+
+        while( true ) {
+            if( base_first == base_last ) {
+                while(alt_first != alt_last ) {
+//                    assert(nMaskBlocks--);
+                    Block a = (*alt_first++), m = (*mask_it++);
+
+                    Block res = (a & ~m);
+
+                    is_empty = ((is_empty) && (res == 0));
+                    match_base = ((match_base) && (res == 0 ));
+                    match_alt = ((match_alt) && (res == a));
+
+                    m_result->append(res);
+                }
+                break;
+            }
+
+            if( alt_first == alt_last ) {
+                while( base_first != base_last ) {
+//                    assert(nMaskBlocks--);
+                    Block b = (*base_first++), m = (*mask_it++);
+
+                    Block res = (b & m);
+
+                    is_empty = ((is_empty) && (res == 0));
+                    match_base = ((match_base) && (res == b ));
+                    match_alt = ((match_alt) && (res == 0 ));
+
+                    m_result->append(res);
+                }
+                break;
+            }
+
+//            assert( nMaskBlocks-- );
+            Block b = (*base_first++), a = (*alt_first++), m = (*mask_it++);
+
+            Block res = ((b & m) | (a & ~m));
+            
+            is_empty = ((is_empty) && (res == 0));
+            match_base = ((match_base) && (res == b ));
+            match_alt = ((match_alt) && (res == a));
+
+            m_result->append(res);
+        }
+    }
+    
+    template < class BlockIterator >
+    void method1( BlockIterator base_first, BlockIterator base_last, BlockIterator alt_first, BlockIterator alt_last ) {
         bool match_base = true, match_alt = true, is_empty = true;
 
         active_iterator seq_pos = m_alpha->active_begin();
@@ -239,6 +306,21 @@ public:
 
     virtual ~recombine_bitset() {}
 protected:
+
+    void buildBaseMask( bitset_type & mask ) {
+        for( unsigned int i = 1; i < rec_points->size(); i += 2 ) {
+            typename Alphabet::locus_t min = rec_points->at(i - 1);
+            typename Alphabet::locus_t max = rec_points->at(i);
+
+            typename Alphabet::symbol_range res = m_alpha->findAllSymbols( min, max );
+
+            while( res.first != res.second ) {
+                if( res.first->second.second != bitset_type::npos )
+                    mask[ res.first->second.second ] = true;
+                ++res.first;
+            }
+        }
+    }
 
     inline Block walk_block_bits( Block base, Block alt, unsigned int pos_offset ) {
         Block bits = (base ^ alt);      // symmetric difference
@@ -440,7 +522,7 @@ protected:
 
     typedef void (self_type::*unset_op_ptr)( Block & res, double, unsigned int boffset);
 
-    inline void bit_walker( Block & res, Block bits, unsigned int pos_offset,  unset_op_ptr op ) {
+/*    inline void bit_walker( Block & res, Block bits, unsigned int pos_offset,  unset_op_ptr op ) {
         unsigned int res_offset = 0;
         while( bits ) {
             unsigned char low_byte = (unsigned char)(bits & 0x00000000000000FF);
@@ -458,7 +540,7 @@ protected:
             bits >>= 8;
             res_offset += 8;
         }
-    }
+    }*/
 
     inline void bit_walker( Block & res, Block bits, active_iterator pos_offset,  unset_op_ptr op ) {
         unsigned int res_offset = 0;
@@ -501,4 +583,7 @@ protected:
 
 template < class Block, class Allocator, class Alphabet >
 const typename recombine_bitset< Block, Allocator, Alphabet >::lowest_bit_map recombine_bitset< Block, Allocator, Alphabet >::low_bit_map;
+
+#undef BOOST_DYNAMIC_BITSET_DONT_USE_FRIENDS
+
 #endif  // RECOMBINE_BITSET_HPP_

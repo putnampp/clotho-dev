@@ -42,6 +42,8 @@ public:
     typedef boost::dynamic_bitset< block_type > bitset_type;
     typedef bitset_type                         edge_set_type;
 
+    typedef std::pair< vertex_type, vertex_type >   symbol_range;
+
     typedef AdjacencyIterator< active_database_type, edge_set_type > adjacency_iterator;
 
     typedef std::shared_ptr< AlleleAlphabet >   pointer;
@@ -101,6 +103,13 @@ public:
 
     bitset_type * getFreeMask() {
         return &m_free_mask;
+    }
+
+    symbol_range findAllSymbols( locus_t min, locus_t max ) {
+        vertex_type min_it = m_db.lower_bound( min );
+        vertex_type max_it = m_db.upper_bound( max );
+
+        return std::make_pair( min_it, max_it );
     }
 
     virtual ~AlleleAlphabet();
