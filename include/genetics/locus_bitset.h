@@ -3,7 +3,7 @@
 
 //#include "population_alphabet.h"
 
-#define SORTED_ALPHABET 1
+#include "genetics/config.hpp"  // SORTED_ALPHABET
 
 #ifdef SORTED_ALPHABET
 #include "sorted_allele_alphabet.h"
