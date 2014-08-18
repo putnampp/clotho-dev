@@ -29,6 +29,15 @@
 
 //#define LOGGING 1
 
+#ifdef LOGGING
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+typedef boost::property_tree::ptree state_log_type;
+state_log_type global_log;
+
+#include "utility/lowest_bit.h"
+#endif
+
 #include "clotho.h"
 #include "clotho_commandline.h"
 #include <cstdlib>
@@ -58,14 +67,6 @@
 #include "genetics/fitness_bitset.hpp"
 
 #define _PLOIDY 2
-
-#ifdef LOGGING
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
-boost::property_tree::ptree global_log;
-
-#include "utility/lowest_bit.h"
-#endif
 
 using std::shared_ptr;
 
@@ -104,18 +105,22 @@ struct locus_generator< double, RandomProcess::rng_pointer > {
 struct infinite_site {};
 
 //#define SYM_SPEC symbol_generator< PopulationAlphabet::locus_t, PopulationAlphabet::allele_t, PopulationAlphabet::index_type, PopulationAlphabet >
+//#undef SYM_SPEC
 
-#undef SYM_SPEC
+typedef locus_bitset gamete_type;
+typedef typename gamete_type::alphabet_t    alphabet_type;
+typedef typename gamete_type::allele_type   allele_type;
 
-#define SYM_SPEC symbol_generator< AlleleAlphabet::locus_t, AlleleAlphabet::allele_t, AlleleAlphabet::index_type, AlleleAlphabet >
+
+#define SYM_SPEC symbol_generator< alphabet_type::locus_t, alphabet_type::allele_t, alphabet_type::index_type, alphabet_type >
 
 template <> template <>
 SYM_SPEC::symbol_type SYM_SPEC::operator()< infinite_site >( alphabet_pointer alpha, infinite_site * inf) {
-    static locus_generator< AlleleAlphabet::locus_t, RandomProcess::rng_pointer> lgen;
-    static allele_generator< AlleleAlphabet::allele_t, void > agen;
+    static locus_generator< alphabet_type::locus_t, RandomProcess::rng_pointer> lgen;
+    static allele_generator< alphabet_type::allele_t, void > agen;
 
     SYM_SPEC::symbol_type res = alpha->getSymbol(lgen(), agen(), true );
-    while( res == AlleleAlphabet::npos ) {
+    while( res == alphabet_type::npos ) {
         res = alpha->getSymbol(lgen(), agen(), true );
     }
     return res;
@@ -124,14 +129,10 @@ SYM_SPEC::symbol_type SYM_SPEC::operator()< infinite_site >( alphabet_pointer al
 
 #include "locus_bitset_mutate.tcc"
 
-typedef locus_bitset gamete_type;
-typedef typename gamete_type::alphabet_t    alphabet_type;
-typedef typename gamete_type::allele_type   allele_type;
-
 typedef allele_type *   allele_pointer;
 typedef gamete_type *   gamete_pointer;
 
-typedef typename gamete_type::adjacency_iterator       adjacency_iterator;
+//typedef typename gamete_type::adjacency_iterator       adjacency_iterator;
 
 typedef reproduction::models::mutation::mutate_site< allele_type, alphabet_type, gamete_type >   mmodel_type;
 typedef reproduction::models::recombination::no_recomb< _PLOIDY >     rcmodel_type;
@@ -366,17 +367,17 @@ public:
          m_nMutEvents += nMut;
 
 #ifdef LOGGING
-        boost::property_tree::ptree m;
+        state_log_type m;
 #endif
          while( nMut-- ) {
-            typedef symbol_generator< AlleleAlphabet::locus_t, AlleleAlphabet::allele_t, AlleleAlphabet::index_type, AlleleAlphabet > sgen_type;
+            typedef symbol_generator< alphabet_type::locus_t, alphabet_type::allele_t, alphabet_type::index_type, alphabet_type > sgen_type;
             typedef typename sgen_type::symbol_type symbol_type;
 
             static sgen_type sgen;
             symbol_type s = sgen( res->getAlphabet(), (infinite_site * ) NULL );
                 //std::cout << "Adding variant: " << s << std::endl;
 #ifdef LOGGING
-            boost::property_tree::ptree _m;
+            state_log_type _m;
             _m.put( "", s );
 
             m.push_back( std::make_pair("", _m));
@@ -439,9 +440,9 @@ public:
             generateRecombination( rec_points, nRec );
 
 #ifdef LOGGING
-            boost::property_tree::ptree p;
+            state_log_type p;
             for( unsigned int i = 0; i < rec_points.size(); ++i ) {
-                boost::property_tree::ptree t;
+                state_log_type t;
                 t.put( "", rec_points[i]);
                 p.push_back( std::make_pair( "", t ) );
             }
@@ -509,17 +510,17 @@ public:
          m_nMutEvents += nMut;
 
 #ifdef LOGGING
-        boost::property_tree::ptree m;
+        state_log_type m;
 #endif
          while( nMut-- ) {
-            typedef symbol_generator< AlleleAlphabet::locus_t, AlleleAlphabet::allele_t, AlleleAlphabet::index_type, AlleleAlphabet > sgen_type;
+            typedef symbol_generator< alphabet_type::locus_t, alphabet_type::allele_t, alphabet_type::index_type, alphabet_type > sgen_type;
             typedef typename sgen_type::symbol_type symbol_type;
 
             static sgen_type sgen;
             symbol_type s = sgen( res->getAlphabet(), (infinite_site * ) NULL );
                 //std::cout << "Adding variant: " << s << std::endl;
 #ifdef LOGGING
-            boost::property_tree::ptree _m;
+            state_log_type _m;
             _m.put( "", s );
 
             m.push_back( std::make_pair("", _m));
@@ -536,12 +537,12 @@ public:
     virtual ~ReproduceWithRecombination() {}
 protected:
     void generateRecombination( recombination_points & rec_points, unsigned int nRec ) {
-        static locus_generator< AlleleAlphabet::locus_t, RandomProcess::rng_pointer> lgen;
+        static locus_generator< alphabet_type::locus_t, RandomProcess::rng_pointer> lgen;
 
         rec_points.reserve( nRec + 2 );
 
-        rec_points.push_back( std::numeric_limits< typename gamete_type::alphabet_t::locus_t >::min() );
-        rec_points.push_back( std::numeric_limits< typename gamete_type::alphabet_t::locus_t >::max() );
+        rec_points.push_back( std::numeric_limits< typename alphabet_type::locus_t >::min() );
+        rec_points.push_back( std::numeric_limits< typename alphabet_type::locus_t >::max() );
 
         std::generate_n( std::back_inserter( rec_points ), nRec, lgen );
         std::sort( rec_points.begin(), rec_points.end() );
@@ -690,11 +691,9 @@ int main( int argc, char ** argv ) {
         for( unsigned int i = 0; i < 256; ++i ) {
             const lowest_bit_256::value_type v = lbit[i];
 
-            boost::property_tree::ptree nnode, inode, snode, node;
-            nnode.put("", v.next);
+            state_log_type nnode, inode, snode, node;
             inode.put("", v.bit_index);
             snode.put("", v.bit_shift_next);
-            node.push_back( std::make_pair("", nnode));
             node.push_back( std::make_pair("", inode));
             node.push_back( std::make_pair("", snode));
 
@@ -749,16 +748,23 @@ int main( int argc, char ** argv ) {
 #ifdef LOGGING
         {
             std::ostringstream oss;
-            oss << i << ".free_list";
+//            oss << i << ".free_list";
+            oss << i;
             std::string k = oss.str();
 
-            oss.str("");
-            oss.clear();
-            oss <<  *AlleleAlphabet::getInstance()->getFreeMask();
-            global_log.put( k + ".size", AlleleAlphabet::getInstance()->getFreeMask()->size());
-            global_log.put( k + ".count", AlleleAlphabet::getInstance()->getFreeMask()->count());
-            global_log.put( k + ".sequence", oss.str());
-            global_log.put( k + ".total_mutations", repro.getMutationEvents());
+//            oss.str("");
+//            oss.clear();
+            //oss <<  *AlleleAlphabet::getInstance()->getFreeMask();
+//            oss << *alphabet_type::getInstance()->getFreeMask();
+//            global_log.put( k + ".size", AlleleAlphabet::getInstance()->getFreeMask()->size());
+//            global_log.put( k + ".count", AlleleAlphabet::getInstance()->getFreeMask()->count());
+//            global_log.put( k + ".sequence", oss.str());
+//            global_log.put( k + ".total_mutations", repro.getMutationEvents());
+
+            state_log_type tmp;
+            alphabet_type::getInstance()->logState( tmp );
+
+            global_log.add_child( oss.str(), tmp );
         }
 #endif
 

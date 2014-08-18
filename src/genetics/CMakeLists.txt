@@ -36,5 +36,6 @@ LIST( APPEND GENETICS_SRCS basic_gamete.cpp)
 LIST( APPEND GENETICS_SRCS locus_bitset.cpp)
 LIST( APPEND GENETICS_SRCS population_alphabet.cpp)
 LIST( APPEND GENETICS_SRCS allele_alphabet.cpp)
+LIST( APPEND GENETICS_SRCS sorted_allele_alphabet.cpp)
 
 ADD_LIBRARY(${PROJECT_NAME}_genetics SHARED ${GENETICS_SRCS})

@@ -15,6 +15,8 @@ extern boost::property_tree::ptree global_log;
 
 #include "utility/lowest_bit.h"
 
+#include "accessor.hpp"
+
 template < class Block, class Allocator, class Alphabet >
 class recombine_bitset;
 
@@ -233,7 +235,7 @@ public:
             Block b = (*base_first++), a = (*alt_first++), m = (*mask_it++);
 
             Block res = ((b & m) | (a & ~m));
-            
+
             is_empty = ((is_empty) && (res == 0));
             match_base = ((match_base) && (res == b ));
             match_alt = ((match_alt) && (res == a));
@@ -241,7 +243,7 @@ public:
             m_result->append(res);
         }
     }
-    
+
     template < class BlockIterator >
     void method1( BlockIterator base_first, BlockIterator base_last, BlockIterator alt_first, BlockIterator alt_last ) {
         bool match_base = true, match_alt = true, is_empty = true;
@@ -534,25 +536,25 @@ protected:
 
     typedef void (self_type::*unset_op_ptr)( Block & res, double, unsigned int boffset);
 
-/*    inline void bit_walker( Block & res, Block bits, unsigned int pos_offset,  unset_op_ptr op ) {
-        unsigned int res_offset = 0;
-        while( bits ) {
-            unsigned char low_byte = (unsigned char)(bits & 0x00000000000000FF);
-            unsigned int _offset = res_offset;
-            while( low_byte ) {
-                const lowest_bit_map::value_type & v = low_bit_map[low_byte];
-                unsigned int shift = _offset + v.bit_index;
+    /*    inline void bit_walker( Block & res, Block bits, unsigned int pos_offset,  unset_op_ptr op ) {
+            unsigned int res_offset = 0;
+            while( bits ) {
+                unsigned char low_byte = (unsigned char)(bits & 0x00000000000000FF);
+                unsigned int _offset = res_offset;
+                while( low_byte ) {
+                    const lowest_bit_map::value_type & v = low_bit_map[low_byte];
+                    unsigned int shift = _offset + v.bit_index;
 
-                (this->*op)( res, (*m_alpha)[ pos_offset + shift]->first, shift );
+                    (this->*op)( res, (*m_alpha)[ pos_offset + shift]->first, shift );
 
-                low_byte = v.next;
-                _offset += v.bit_shift_next;
+                    low_byte = v.next;
+                    _offset += v.bit_shift_next;
+                }
+
+                bits >>= 8;
+                res_offset += 8;
             }
-
-            bits >>= 8;
-            res_offset += 8;
-        }
-    }*/
+        }*/
 
     inline void rec_bit_walker( Block & res, unsigned short bits, active_iterator pos_offset, unset_op_ptr op, unsigned int res_offset ) {
         if( bits == 0 ) return;
@@ -561,7 +563,8 @@ protected:
         do {
             unsigned int shift = res_offset + v->bit_index;
 
-            (this->*op)( res, (*(pos_offset + shift))->first, shift);
+//            (this->*op)( res, (*(pos_offset + shift))->first, shift);
+            (this->*op)( res, accessor::get< typename Alphabet::active_iterator, typename Alphabet::locus_t >(pos_offset + shift), shift);
 
             res_offset += v->bit_shift_next;
             v = v->next_ptr;
@@ -590,7 +593,7 @@ protected:
         rec_bit_walker( res, _bits, pos_offset, op, 0 );
 
         _bits = (unsigned int)(bits >> WIDTH);
-    
+
         rec_bit_walker( res, _bits, pos_offset, op, WIDTH );
     }
 
@@ -604,7 +607,8 @@ protected:
                 do {
                     unsigned int shift = _offset + v->bit_index;
 
-                    (this->*op)( res, (*(pos_offset + shift))->first, shift);
+                    //(this->*op)( res, (*(pos_offset + shift))->first, shift);
+                    (this->*op)( res, accessor::get< typename Alphabet::active_iterator, typename Alphabet::locus_t >( pos_offset + shift ), shift );
 
                     _offset += v->bit_shift_next;
                     v = v->next_ptr;

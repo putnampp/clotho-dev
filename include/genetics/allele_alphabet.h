@@ -14,7 +14,7 @@
 
 #include <memory>
 
-#include "adjacency_iterator.hpp"
+//#include "adjacency_iterator.hpp"
 #include "symbol_generator.hpp"
 
 class AlleleAlphabet {
@@ -44,7 +44,10 @@ public:
 
     typedef std::pair< vertex_type, vertex_type >   symbol_range;
 
-    typedef AdjacencyIterator< active_database_type, edge_set_type > adjacency_iterator;
+    template < class RecordIterator, class Result >
+    static Result get( RecordIterator it );
+
+//    typedef AdjacencyIterator< active_database_type, edge_set_type > adjacency_iterator;
 
     typedef std::shared_ptr< AlleleAlphabet >   pointer;
 
@@ -76,8 +79,8 @@ public:
         return sym->second.second;
     }
 
-    adjacency_iterator begin( edge_set_type * es );
-    adjacency_iterator end( edge_set_type * es );
+//    adjacency_iterator begin( edge_set_type * es );
+//    adjacency_iterator end( edge_set_type * es );
 
     active_iterator active_begin()  {
         return m_active.begin();
@@ -123,6 +126,32 @@ protected:
     bitset_type     m_free_mask;
     bitset_type::size_type  m_next_free;
 };
+
+#include "accessor.hpp"
+
+namespace accessor {
+
+template <>
+typename AlleleAlphabet::allele_t get< typename AlleleAlphabet::locus_iterator, typename AlleleAlphabet::allele_t>( AlleleAlphabet::locus_iterator it ) {
+    return *(it->second.first);
+}
+
+template <>
+typename AlleleAlphabet::allele_t get< typename AlleleAlphabet::active_iterator, typename AlleleAlphabet::allele_t>( AlleleAlphabet::active_iterator it ) {
+    return *((*it)->second.first);
+}
+
+template <>
+typename AlleleAlphabet::locus_t get< typename AlleleAlphabet::active_iterator, typename AlleleAlphabet::locus_t>( AlleleAlphabet::active_iterator it ) {
+    return (*it)->first;
+}
+
+template <>
+typename AlleleAlphabet::locus_t get< typename AlleleAlphabet::locus_iterator, typename AlleleAlphabet::locus_t>( AlleleAlphabet::locus_iterator it ) {
+    return it->first;
+}
+
+}   // namespace accessor
 
 #undef BOOST_DYNAMIC_BITSET_DONT_USE_FRIENDS
 

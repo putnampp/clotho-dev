@@ -3,6 +3,8 @@
 
 #include <boost/dynamic_bitset.hpp>
 
+#include "accessor.hpp"
+
 template < class Block, class Allocator, class Alphabet, class HomPolicy, class HetPolicy, class ResultType >
 class fitness_bitset;
 
@@ -183,28 +185,28 @@ protected:
         bit_walker( base ^ alt, pos_offset, &m_het );
     }
 
-/*
-    template < class OP >
-    inline void bit_walker( Block _bits, unsigned int pos_offset, OP * op ) {
-//        unsigned int res_offset = 0;
-        while( _bits ) {
-            unsigned char low_byte = (unsigned char)(_bits & 0x00000000000000FF);
-//            unsigned int _offset = res_offset;
-            unsigned int _offset = pos_offset;
-            while( low_byte ) {
-                const lowest_bit_map::value_type & v = low_bit_map[low_byte];
+    /*
+        template < class OP >
+        inline void bit_walker( Block _bits, unsigned int pos_offset, OP * op ) {
+    //        unsigned int res_offset = 0;
+            while( _bits ) {
+                unsigned char low_byte = (unsigned char)(_bits & 0x00000000000000FF);
+    //            unsigned int _offset = res_offset;
+                unsigned int _offset = pos_offset;
+                while( low_byte ) {
+                    const lowest_bit_map::value_type & v = low_bit_map[low_byte];
 
-                (*op)( m_result, *(*m_alpha)[ _offset + v.bit_index ]->second.first );
+                    (*op)( m_result, *(*m_alpha)[ _offset + v.bit_index ]->second.first );
 
-                low_byte = v.next;
-                _offset += v.bit_shift_next;
+                    low_byte = v.next;
+                    _offset += v.bit_shift_next;
+                }
+
+                _bits >>= 8;
+                pos_offset += 8;
+    //            res_offset += 8;
             }
-
-            _bits >>= 8;
-            pos_offset += 8;
-//            res_offset += 8;
-        }
-    }*/
+        }*/
 
     template < class OP >
     inline void bit_walker( Block _bits, active_iterator base_it , OP * op ) {
@@ -215,7 +217,8 @@ protected:
                 unsigned int _offset = res_offset;
                 const lowest_bit_map::value_type * v = low_bit_map.begin() + low_byte;
                 do {
-                    (*op)( m_result, *(*(base_it + _offset + v->bit_index))->second.first );
+                    //(*op)( m_result, *(*(base_it + _offset + v->bit_index))->second.first );
+                    (*op)( m_result, accessor::get< typename Alphabet::active_iterator, typename Alphabet::allele_t >(base_it + _offset + v->bit_index));
 
                     _offset += v->bit_shift_next;
                     v = v->next_ptr;
@@ -264,7 +267,7 @@ protected:
         rec_bit_walker( _bits, pos_offset, op, res_offset );
 
         _bits = (unsigned int)(bits >> WIDTH);
-    
+
         rec_bit_walker( _bits, pos_offset, op, res_offset + WIDTH );
     }
 

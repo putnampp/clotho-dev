@@ -61,7 +61,7 @@ AlleleAlphabet::index_type     AlleleAlphabet::getSymbol( const locus_t & l, con
 
 void AlleleAlphabet::updateFreeSymbols( const bitset_type & fs ) {
     // boost::dynamic_bitset returns # of bits as size
-    assert((m_free_list.size() == m_free_intersect.size()) && (m_free_list.size() == m_free_union.size()));
+    assert(m_free_intersect.size() == m_free_union.size());
 
     typedef std::vector< typename bitset_type::block_type, typename bitset_type::allocator_type > buffer_type;
 
@@ -70,7 +70,7 @@ void AlleleAlphabet::updateFreeSymbols( const bitset_type & fs ) {
 
     if( fs.size() == 0 ) {
         m_free_intersect.reset();
-    } else if( fs.size() < m_free_list.size() ) {
+    } else if( fs.size() < m_free_intersect.size() ) {
 //        bitset_type b(fs);
 //        b.resize( m_free_list.size(), false );
 //        m_free_intersect &= b;
@@ -89,8 +89,7 @@ void AlleleAlphabet::updateFreeSymbols( const bitset_type & fs ) {
         }
 
     } else {
-        if( fs.size() > m_free_list.size() ) {
-            m_free_list.resize( fs.size(), false);
+        if( fs.size() > m_free_intersect.size() ) {
             m_free_intersect.resize( fs.size(), false);
             m_free_union.resize( fs.size(), false );
         }
@@ -98,8 +97,6 @@ void AlleleAlphabet::updateFreeSymbols( const bitset_type & fs ) {
         m_free_intersect &= fs;
         m_free_union |= fs;
     }
-
-//    m_free_list = m_free_intersect | ~m_free_union;
 }
 
 void AlleleAlphabet::setState() {
@@ -137,12 +134,12 @@ bool AlleleAlphabet::isLocus( locus_t & l ) const {
     return res != m_db.end();
 }
 
-AlleleAlphabet::adjacency_iterator AlleleAlphabet::begin( edge_set_type * es ) {
-    return adjacency_iterator( &m_active, es, 0 );
-}
+//AlleleAlphabet::adjacency_iterator AlleleAlphabet::begin( edge_set_type * es ) {
+//    return adjacency_iterator( &m_active, es, 0 );
+//}
 
-AlleleAlphabet::adjacency_iterator AlleleAlphabet::end( edge_set_type * es ) {
-    return adjacency_iterator( &m_active, es );
-}
+//AlleleAlphabet::adjacency_iterator AlleleAlphabet::end( edge_set_type * es ) {
+//    return adjacency_iterator( &m_active, es );
+//}
 
 AlleleAlphabet::~AlleleAlphabet() {}

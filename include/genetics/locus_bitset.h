@@ -2,7 +2,15 @@
 #define LOCUS_BITSET_H_
 
 //#include "population_alphabet.h"
+
+#define SORTED_ALPHABET 1
+
+#ifdef SORTED_ALPHABET
+#include "sorted_allele_alphabet.h"
+#else
 #include "allele_alphabet.h"
+#endif
+
 //#include "adjacency_iterator.hpp"
 
 #include <type_traits>
@@ -13,7 +21,13 @@
 class locus_bitset {
 public:
 //    typedef PopulationAlphabet      alphabet_t;
+
+#ifdef SORTED_ALPHABET
+    typedef SortedAlleleAlphabet    alphabet_t;
+#else
     typedef AlleleAlphabet          alphabet_t;
+#endif
+
     typedef alphabet_t::locus_t     locus_type;
     typedef alphabet_t::allele_t    allele_type;
     typedef alphabet_t::bitset_type bitset_type;
@@ -24,7 +38,7 @@ public:
 
     typedef boost::object_pool< locus_bitset >      pool_type;
 
-    typedef alphabet_t::adjacency_iterator adjacency_iterator;
+//    typedef alphabet_t::adjacency_iterator adjacency_iterator;
 
     typedef std::set< locus_bitset * > active_bitsets;
     typedef typename active_bitsets::iterator active_iterator;
@@ -60,8 +74,8 @@ public:
         return &m_bits;
     }
 
-    adjacency_iterator begin();
-    adjacency_iterator end();
+//    adjacency_iterator begin();
+//    adjacency_iterator end();
 
 protected:
     void updateSymbols();

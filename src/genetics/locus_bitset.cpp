@@ -1,4 +1,5 @@
 #include "genetics/locus_bitset.h"
+#include <iostream>
 
 // statics
 //
@@ -36,7 +37,8 @@ void locus_bitset::updateActiveAlphabet() {
         last = active_end();
 
         while( first != last ) {
-            (*first++)->clearFree();
+            (*first)->clearFree();
+            ++first;
         }
     }
 }
@@ -89,6 +91,10 @@ void locus_bitset::addVariant( index_type idx ) {
 
     if( m_bits.size() <= idx) {
         m_bits.resize( idx + 1, false );
+        if( m_bits.size() > m_alphabet->size() ) {
+            std::cerr << "Unexpected size: " << m_bits.size() << " [" << m_alphabet->size() << "]" << std::endl;
+        }
+        assert( m_bits.size() <= m_alphabet->size());
     }
 
     m_bits[idx] = true;
@@ -118,13 +124,13 @@ size_t locus_bitset::set_size() {
     return m_bits.size();
 }
 
-locus_bitset::adjacency_iterator locus_bitset::begin() {
-    return m_alphabet->begin( &m_bits );
-}
-
-locus_bitset::adjacency_iterator locus_bitset::end() {
-    return m_alphabet->end( &m_bits );
-}
+//locus_bitset::adjacency_iterator locus_bitset::begin() {
+//    return m_alphabet->begin( &m_bits );
+//}
+//
+//locus_bitset::adjacency_iterator locus_bitset::end() {
+//    return m_alphabet->end( &m_bits );
+//}
 
 bool locus_bitset::operator[]( index_type idx ) {
     return ((idx < m_bits.size()) ? m_bits[idx] : false);
@@ -139,13 +145,9 @@ void locus_bitset::clearFree() {
         return;
     }
 
-    if( m_bits.size() > m_alphabet->getFreeMask()->size() ) {
+    if( m_bits.size() != m_alphabet->getFreeMask()->size() ) {
         bitset_type b( *m_alphabet->getFreeMask());
         b.resize( m_bits.size(), true );
-        m_bits &= b;
-    } else if( m_bits.size() < m_alphabet->getFreeMask()->size() ) {
-        bitset_type b( *m_alphabet->getFreeMask() );
-        b.resize( m_bits.size() );
         m_bits &= b;
     } else {
         m_bits &= *m_alphabet->getFreeMask();
