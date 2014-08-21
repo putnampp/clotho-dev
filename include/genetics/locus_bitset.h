@@ -6,7 +6,8 @@
 #include "genetics/config.hpp"  // SORTED_ALPHABET
 
 #ifdef SORTED_ALPHABET
-#include "sorted_allele_alphabet.h"
+//#include "sorted_allele_alphabet.h"
+#include "sorted_allele_alphabet2.h"
 #else
 #include "allele_alphabet.h"
 #endif
@@ -23,7 +24,7 @@ public:
 //    typedef PopulationAlphabet      alphabet_t;
 
 #ifdef SORTED_ALPHABET
-    typedef SortedAlleleAlphabet    alphabet_t;
+    typedef SortedAlleleAlphabet2    alphabet_t;
 #else
     typedef AlleleAlphabet          alphabet_t;
 #endif

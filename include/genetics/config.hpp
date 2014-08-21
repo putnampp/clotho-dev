@@ -3,6 +3,6 @@
 
 #include "config.h"
 
-//#define SORTED_ALPHABET 1
+#define SORTED_ALPHABET 1
 
 #endif  // GENETICS_CONFIG_HPP_

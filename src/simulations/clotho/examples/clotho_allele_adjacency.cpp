@@ -741,7 +741,7 @@ int main( int argc, char ** argv ) {
 
         memset( fitness, 0, sizeof(double) * fitness_size );
 
-//        std::cout << "Generation: " << i << std::endl;
+//        std::cerr << "Generation: " << i << std::endl;
 
         locus_bitset::updateActiveAlphabet();
 
