@@ -51,7 +51,7 @@ public:
         while( true ) {
             if( base_first == base_last ) {
                 while( alt_first != alt_last ) {
-                    bit_walker( (*alt_first++), seq_pos, m_het);
+                    bit_walker_unrolled( (*alt_first++), seq_pos, m_het);
                     seq_pos += bitset_type::bits_per_block;
                 }
                 break;
@@ -59,15 +59,15 @@ public:
 
             if( alt_first == alt_last ) {
                 while( base_first != base_last ) {
-                    bit_walker( (*base_first++), seq_pos, m_het );
+                    bit_walker_unrolled( (*base_first++), seq_pos, m_het );
                     seq_pos += bitset_type::bits_per_block;
                 }
                 break;
             }
             Block base = (*base_first++), alt = (*alt_first++);
 
-            bit_walker( base & alt, seq_pos, m_hom );
-            bit_walker( base ^ alt, seq_pos, m_het );
+            bit_walker_unrolled( base & alt, seq_pos, m_hom );
+            bit_walker_unrolled( base ^ alt, seq_pos, m_het );
 
             seq_pos += bitset_type::bits_per_block;
         }
@@ -207,6 +207,57 @@ protected:
     //            res_offset += 8;
             }
         }*/
+
+    template < class OP >
+    inline void bit_walk( typename lowest_bit_map::block_type low_byte, active_iterator base_it, OP * op, unsigned int _offset ) {
+        const lowest_bit_map::value_type * v = low_bit_map.begin() + low_byte;
+        do {
+                (*op)( m_result, accessor::get< typename Alphabet::active_iterator, typename Alphabet::allele_t >(base_it + _offset + v->bit_index));
+
+                _offset += v->bit_shift_next;
+                v = v->next_ptr;
+            } while( v != NULL );
+    }
+
+    template < class OP >
+    inline void block_walker( unsigned long _bits, active_iterator base_it, OP * op, unsigned short t ) {
+        typename lowest_bit_map::block_type low_byte = (typename lowest_bit_map::block_type)(_bits);
+
+        if( low_byte ) {    // block 0
+            bit_walk( low_byte, base_it, op, 0 );
+        }
+        _bits /= lowest_bit_map::max_values;
+
+        if( !_bits ) return;
+
+        low_byte = (typename lowest_bit_map::block_type)(_bits);
+
+        if( low_byte ) {    // block 1
+            bit_walk( low_byte, base_it, op, lowest_bit_map::block_width );
+        }
+        _bits /= lowest_bit_map::max_values;
+
+        if( !_bits ) return;
+        low_byte = (typename lowest_bit_map::block_type)(_bits);
+
+        if( low_byte ) {    // block 2
+            bit_walk( low_byte, base_it, op, 2 * lowest_bit_map::block_width );
+        }
+        _bits /= lowest_bit_map::max_values;
+
+        low_byte = (typename lowest_bit_map::block_type)(_bits);
+
+        if( low_byte ) {    // block 3
+            bit_walk( low_byte, base_it, op, 3 * lowest_bit_map::block_width );
+        }
+    }
+
+    template < class OP >
+    inline void bit_walker_unrolled( Block _bits, active_iterator base_it, OP * op ) {
+        if( !_bits ) return;
+
+        block_walker( _bits, base_it, op, (typename lowest_bit_map::block_type) 0 );
+    }
 
     template < class OP >
     inline void bit_walker( Block _bits, active_iterator base_it , OP * op ) {

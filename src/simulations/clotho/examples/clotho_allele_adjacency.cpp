@@ -210,12 +210,18 @@ public:
     }
 
     gamete_pointer method3( gamete_pointer base_gamete, gamete_pointer other_gamete, unsigned int gen ) {
-        unsigned int nMut = m_rng->nextPoisson( m_mu );
-        unsigned int nRec = (( base_gamete == other_gamete) ? 0 : m_rng->nextPoisson(m_rho));
+        unsigned int nMut = m_rng->nextPoisson(m_mu);
+        //unsigned int nRec = m_rng->nextPoisson(m_rho);
 
-        if( base_gamete != other_gamete && m_rng->nextBool() ) {
-            // have different gametes; therefore should randomly swap them
-            std::swap( base_gamete, other_gamete );
+        //if( m_rng->nextBool() ) {
+        //    // have different gametes; therefore should randomly swap them
+        //    std::swap( base_gamete, other_gamete );
+        //}
+
+        unsigned int nRec = 0;
+        if( base_gamete != other_gamete ) {
+            nRec = m_rng->nextPoisson( m_rho );
+            if( m_rng->nextBool() ) std::swap( base_gamete, other_gamete);
         }
 
         if( nMut == 0 && nRec == 0) {

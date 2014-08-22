@@ -5,11 +5,15 @@
 
 #include "genetics/config.hpp"  // SORTED_ALPHABET
 
-#ifdef SORTED_ALPHABET
-//#include "sorted_allele_alphabet.h"
+#if SORTED_ALPHABET == 1
+#include "sorted_allele_alphabet.h"
+typedef SortedAlleleAlphabet alpha_type;
+#elif SORTED_ALPHABET == 2
 #include "sorted_allele_alphabet2.h"
+typedef SortedAlleleAlphabet2 alpha_type;
 #else
 #include "allele_alphabet.h"
+typedef AlleleAlphabet alpha_type;
 #endif
 
 //#include "adjacency_iterator.hpp"
@@ -23,11 +27,13 @@ class locus_bitset {
 public:
 //    typedef PopulationAlphabet      alphabet_t;
 
-#ifdef SORTED_ALPHABET
-    typedef SortedAlleleAlphabet2    alphabet_t;
-#else
-    typedef AlleleAlphabet          alphabet_t;
-#endif
+//#ifdef SORTED_ALPHABET
+//    typedef SortedAlleleAlphabet2    alphabet_t;
+//#else
+//    typedef AlleleAlphabet          alphabet_t;
+//#endif
+
+    typedef alpha_type     alphabet_t;
 
     typedef alphabet_t::locus_t     locus_type;
     typedef alphabet_t::allele_t    allele_type;

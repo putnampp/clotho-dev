@@ -94,8 +94,9 @@ void SortedAlleleAlphabet2::updateFreeSymbols( const bitset_type & fs ) {
         iterator int_it = m_free_intersect.m_bits.begin(), int_last = m_free_intersect.m_bits.end(),
             un_it = m_free_union.m_bits.begin();
         while( first != last ) {
-            (*int_it++) &= (*first);
-            (*un_it++) |= (*first++);
+            block_type t = (*first++);
+            (*int_it++) &= t;
+            (*un_it++) |= t;
         }
         while( int_it != int_last ) {
             (*int_it++) = 0;
