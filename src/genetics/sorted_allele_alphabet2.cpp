@@ -59,7 +59,7 @@ SortedAlleleAlphabet2::index_type     SortedAlleleAlphabet2::getSymbol( const lo
         idx = findFreeRangeContaining( l );
     } else {
 //        std::cerr << "Locus already exists in database: " << l << " at " << idx << std::endl;
-         if( !m_free_list[ idx ] ) {
+        if( !m_free_list[ idx ] ) {
             // locus exists, AND is still active (not at a free position)
             //a
 //            std::cerr << "Locus is still active" << std::endl;
@@ -92,7 +92,7 @@ void SortedAlleleAlphabet2::updateFreeSymbols( const bitset_type & fs ) {
         citerator first = fs.m_bits.begin(), last = fs.m_bits.end();
 
         iterator int_it = m_free_intersect.m_bits.begin(), int_last = m_free_intersect.m_bits.end(),
-            un_it = m_free_union.m_bits.begin();
+                 un_it = m_free_union.m_bits.begin();
         while( first != last ) {
             block_type t = (*first++);
             (*int_it++) &= t;
@@ -169,7 +169,7 @@ typename SortedAlleleAlphabet2::index_type SortedAlleleAlphabet2::appendSymbol( 
     }
 
     m_db[ idx ] = std::make_pair(l,a);
-    
+
     assert( m_free_list.size() + bits_per_range == m_db.size() );
 
     m_free_list.resize( m_db.size(), true );
@@ -217,10 +217,10 @@ void SortedAlleleAlphabet2::updateFreeIndex( index_type idx, bool isFree ) {
     m_free_list.m_bits[ range_idx ] &= offset_mask;
     m_free_list.m_bits[ range_idx ] |= offset_set;
 
-    
+
 //    std::cerr << "Setting c0 to " << range_idx << " (free list)" << std::endl;
     block_type c0 = m_free_list.m_bits[ range_idx ],
-    c1 = 0 ;
+               c1 = 0 ;
 
     range_idx += ((range_idx & 1)? -1 : 1);
     if( range_idx < m_free_list.num_blocks() ) {
@@ -238,7 +238,7 @@ void SortedAlleleAlphabet2::updateFreeIndex( index_type idx, bool isFree ) {
 
         path >>= 1;
 
-//        std::cerr << "Updating free range idx: " << p << std::endl;       
+//        std::cerr << "Updating free range idx: " << p << std::endl;
         m_free_ranges.m_bits[ p ] = ( c0 | c1 );
 
         if( !p ) break;
@@ -307,7 +307,7 @@ void SortedAlleleAlphabet2::buildFreeRanges(  ) {
 
     if( m_db.size() == 0 ) return;
 
-    
+
     if( m_free_list.num_blocks() == 0 ) {
         return;
     }
@@ -317,7 +317,9 @@ void SortedAlleleAlphabet2::buildFreeRanges(  ) {
     size_t inode_count = 1;
     size_t bcount = (m_db.size() / bits_per_range) + 1;
 
-    while( inode_count < bcount ) { inode_count <<= 1;}
+    while( inode_count < bcount ) {
+        inode_count <<= 1;
+    }
 
     m_free_ranges.resize( inode_count * bits_per_range, false );
 
@@ -383,17 +385,19 @@ typename SortedAlleleAlphabet2::index_type SortedAlleleAlphabet2::find( const lo
 
 typename SortedAlleleAlphabet2::index_type SortedAlleleAlphabet2::find( const locus_t & l ) {
     locus_lookup_map::iterator it = m_lookup_locus.find(l);
-    
+
     return ((it == m_lookup_locus.end() ) ? npos : it->second);
 }
 
 void SortedAlleleAlphabet2::logState( boost::property_tree::ptree & log ) {
-    std::string key = "alphabet";
-    log.put( key + ".max_size", m_db.size() );
-    log.put( key + ".size", m_db.size() - m_free_list.count());
+    std::string key = "symbol_database";
+    log.put( key + ".count", m_db.size() );
+    log.put( key + ".active_count", m_db.size() - m_free_list.count());
+    log.put( key + ".symbol_per_block", bitset_type::bits_per_block );
+    log.put( key + ".max_block_per_region", (m_db.size() / bitset_type::bits_per_block) + 1 );
 
     std::ostringstream oss;
-    
+
     for( unsigned int i = 0; i < m_db.size(); ++i ) {
         if( !m_free_list[i] ) {
             oss.str("");
@@ -405,43 +409,36 @@ void SortedAlleleAlphabet2::logState( boost::property_tree::ptree & log ) {
 
     variant_db_t::iterator first = m_db.begin();
 
-    bool isSorted = true;
-    while( isSorted && first != m_db.end() ) {
-        isSorted = std::is_sorted( first, first + bits_per_range, comp_first() );
-        first += bits_per_range;
-    }
-    log.put( key + ".is_sorted", isSorted );
+    /*
+        free_ranges::iterator it = m_free_ranges.begin();
+        boost::property_tree::ptree fr;
+        while( it != m_free_ranges.end() ) {
+            boost::property_tree::ptree p, q, r, s, t;
+            p.put("", it->first.lower() );
+            q.put("", it->first.upper() );
+            r.push_back( std::make_pair("", p));
+            r.push_back( std::make_pair("", q));
 
-/*
-    free_ranges::iterator it = m_free_ranges.begin();
-    boost::property_tree::ptree fr;
-    while( it != m_free_ranges.end() ) {
-        boost::property_tree::ptree p, q, r, s, t;
-        p.put("", it->first.lower() );
-        q.put("", it->first.upper() );
-        r.push_back( std::make_pair("", p));
-        r.push_back( std::make_pair("", q));
+            index_interval_type::iterator idx_it = it->second.begin();
+            while( idx_it != it->second.end() ) {
+                boost::property_tree::ptree _p, _q, _s;
+                _p.put("", idx_it->lower() );
+                _q.put("", idx_it->upper() );
 
-        index_interval_type::iterator idx_it = it->second.begin();
-        while( idx_it != it->second.end() ) {
-            boost::property_tree::ptree _p, _q, _s;
-            _p.put("", idx_it->lower() );
-            _q.put("", idx_it->upper() );
+                _s.push_back( std::make_pair( "", _p ) );
+                _s.push_back( std::make_pair( "", _q ) );
+                s.push_back( std::make_pair("", _s));
+                ++idx_it;
+            }
 
-            _s.push_back( std::make_pair( "", _p ) );
-            _s.push_back( std::make_pair( "", _q ) );
-            s.push_back( std::make_pair("", _s));
-            ++idx_it;
+            t.push_back( std::make_pair( "", r ) );
+            t.push_back( std::make_pair( "", s ) );
+            fr.push_back( std::make_pair( "", t ));
+            ++it;
         }
 
-        t.push_back( std::make_pair( "", r ) );
-        t.push_back( std::make_pair( "", s ) );
-        fr.push_back( std::make_pair( "", t ));
-        ++it;
-    }
-
-    log.add_child( key + ".free_ranges", fr );
-*/
+        log.add_child( key + ".free_ranges", fr );
+    */
 }
 
 SortedAlleleAlphabet2::~SortedAlleleAlphabet2() {}

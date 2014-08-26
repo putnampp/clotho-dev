@@ -29,7 +29,9 @@ void locus_bitset::updateActiveAlphabet() {
             first++;
         }
 
-        if( EMPTY.copies() > 1 ) { EMPTY.updateSymbols(); }
+        if( EMPTY.copies() > 1 ) {
+            EMPTY.updateSymbols();
+        }
 
         alpha->setState();
 
@@ -55,8 +57,7 @@ locus_bitset::locus_bitset( alphabet_t::pointer a ) :
 locus_bitset::locus_bitset( const bitset_type & bs, alphabet_t::pointer a ) :
     m_bits(bs),
     m_copies(1),
-    m_alphabet( a ) 
-{
+    m_alphabet( a ) {
     if( this != &EMPTY ) {
         m_active.insert( this );
     }
@@ -65,8 +66,7 @@ locus_bitset::locus_bitset( const bitset_type & bs, alphabet_t::pointer a ) :
 locus_bitset::locus_bitset( const locus_bitset & la ) :
     m_bits(la.m_bits),
     m_copies( la.m_copies ),
-    m_alphabet(la.m_alphabet) 
-{
+    m_alphabet(la.m_alphabet) {
     m_active.insert(this);
 }
 
@@ -223,4 +223,43 @@ void locus_bitset::masked_join( const locus_bitset & rhs, const bitset_type & ma
     }
 }
 
+void locus_bitset::updateFrequencies( std::vector< size_t > & freqs ) const {
+    assert( freqs.size() >= m_bits.size() );
+
+    index_type idx = m_bits.find_first();
+    while( idx != bitset_type::npos ) {
+        freqs[idx] += m_copies;
+        idx = m_bits.find_next(idx);
+    }
+}
+
 locus_bitset::~locus_bitset() {}
+
+bool operator==( const locus_bitset & lhs, const locus_bitset & rhs ) {
+    typedef std::vector< locus_bitset::bitset_type::block_type, locus_bitset::bitset_type::allocator_type > buffer_type;
+    typedef buffer_type::const_iterator citerator;
+
+    citerator l_it = lhs.m_bits.m_bits.begin(), r_it = rhs.m_bits.m_bits.begin(),
+              l_end = lhs.m_bits.m_bits.end(), r_end = rhs.m_bits.m_bits.end();
+
+    bool isSame = true;
+
+    while( isSame ) {
+        if( l_it == l_end ) {
+            while( isSame && r_it != r_end ) {
+                isSame = ((*r_it++) == 0);
+            }
+        }
+
+        if( r_it == r_end ) {
+            while( isSame && l_it != l_end ) {
+                isSame = ((*l_it++) == 0);
+            }
+            break;
+        }
+
+        isSame = ((*r_it++) == (*l_it++));
+    }
+
+    return isSame;
+}

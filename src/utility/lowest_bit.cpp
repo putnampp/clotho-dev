@@ -13,7 +13,7 @@ void lowest_bit_256::initialize() {
                 m_vals[ val ].bit_index = idx++;
                 tmp >>= 1;
                 break;
-            } 
+            }
 
             tmp >>= 1;
             ++idx;
@@ -68,7 +68,7 @@ void lowest_bit_64K::initialize() {
                 m_vals[ val ].bit_index = idx++;
                 tmp >>= 1;
                 break;
-            } 
+            }
 
             tmp >>= 1;
             ++idx;

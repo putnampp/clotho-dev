@@ -93,11 +93,8 @@ public:
     active_iterator active_begin()  {
         return m_db.begin();
     }
-    active_iterator active_end()    {
-        return m_db.end();
-    }
 
-    locus_iterator          end_db() {
+    active_iterator active_end()    {
         return m_db.end();
     }
 
@@ -106,6 +103,14 @@ public:
     }
     size_t  fixed_lost_count() const {
         return m_free_list.count();
+    }
+
+    size_t database_size() const {
+        return m_db.size();
+    }
+
+    bool checkFreeStatus( index_type idx ) {
+        return !m_free_list[idx];
     }
 
     bitset_type * getFreeMask() {

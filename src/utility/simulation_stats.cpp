@@ -1,6 +1,9 @@
 #include "simulation_stats.h"
 #include <cassert>
 
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+
 SimulationStats::SimulationStats() :
     m_nProcessedEvents(0),
     m_nPendingEvents(0) {

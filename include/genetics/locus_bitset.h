@@ -1,7 +1,7 @@
 #ifndef LOCUS_BITSET_H_
 #define LOCUS_BITSET_H_
 
-//#include "population_alphabet.h"
+#define BOOST_DYNAMIC_BITSET_DONT_USE_FRIENDS
 
 #include "genetics/config.hpp"  // SORTED_ALPHABET
 
@@ -16,8 +16,6 @@ typedef SortedAlleleAlphabet2 alpha_type;
 typedef AlleleAlphabet alpha_type;
 #endif
 
-//#include "adjacency_iterator.hpp"
-
 #include <type_traits>
 #include <boost/pool/object_pool.hpp>
 
@@ -25,14 +23,6 @@ typedef AlleleAlphabet alpha_type;
 
 class locus_bitset {
 public:
-//    typedef PopulationAlphabet      alphabet_t;
-
-//#ifdef SORTED_ALPHABET
-//    typedef SortedAlleleAlphabet2    alphabet_t;
-//#else
-//    typedef AlleleAlphabet          alphabet_t;
-//#endif
-
     typedef alpha_type     alphabet_t;
 
     typedef alphabet_t::locus_t     locus_type;
@@ -81,6 +71,9 @@ public:
         return &m_bits;
     }
 
+
+    friend bool operator==( const locus_bitset & lhs, const locus_bitset & rhs );
+
 //    adjacency_iterator begin();
 //    adjacency_iterator end();
 
@@ -95,8 +88,11 @@ public:
     static active_iterator active_begin();
     static active_iterator active_end();
     static void updateActiveAlphabet();
+    static size_t activeCount() {
+        return m_active.size();
+    }
 
-    size_t  copies() {
+    size_t  copies() const {
         return m_copies;
     }
 
@@ -104,6 +100,8 @@ public:
     locus_bitset & operator|=( const locus_bitset & rhs );
 
     void masked_join( const locus_bitset & rhs, const bitset_type & mask );
+
+    void updateFrequencies( std::vector< size_t > & freqs ) const;
 
     virtual ~locus_bitset();
 protected:
@@ -113,5 +111,9 @@ protected:
 
     static active_bitsets m_active;
 };
+
+bool operator==( const locus_bitset & lhs, const locus_bitset & rhs );
+
+#undef BOOST_DYNAMIC_BITSET_DONT_USE_FRIENDS
 
 #endif  // LOCUS_BITSET_H_

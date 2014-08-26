@@ -212,11 +212,11 @@ protected:
     inline void bit_walk( typename lowest_bit_map::block_type low_byte, active_iterator base_it, OP * op, unsigned int _offset ) {
         const lowest_bit_map::value_type * v = low_bit_map.begin() + low_byte;
         do {
-                (*op)( m_result, accessor::get< typename Alphabet::active_iterator, typename Alphabet::allele_t >(base_it + _offset + v->bit_index));
+            (*op)( m_result, accessor::get< typename Alphabet::active_iterator, typename Alphabet::allele_t >(base_it + _offset + v->bit_index));
 
-                _offset += v->bit_shift_next;
-                v = v->next_ptr;
-            } while( v != NULL );
+            _offset += v->bit_shift_next;
+            v = v->next_ptr;
+        } while( v != NULL );
     }
 
     template < class OP >

@@ -29,10 +29,10 @@
 
 //#define LOGGING 1
 
-#ifdef LOGGING
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 typedef boost::property_tree::ptree state_log_type;
+#ifdef LOGGING
 state_log_type global_log;
 
 #include "utility/lowest_bit.h"
@@ -47,6 +47,7 @@ state_log_type global_log;
 #include <vector>
 #include <memory>
 #include <limits>
+#include <cmath>
 
 #include "utility/simulation_stats.h"
 
@@ -56,11 +57,8 @@ state_log_type global_log;
 #include "genetics/locus_bitset.h"
 
 #include "rng/rng.hpp"
-//#include "models/default_life_cycle.hpp"
 #include "models/selection_models.hpp"
-//#include "models/reproduction_models.hpp"
 
-//#include "processes.hpp"
 #include "processes/reproduction_models.hpp"
 
 #include "genetics/recombine_bitset.hpp"
@@ -174,18 +172,18 @@ protected:
 
 class ReproduceWithRecombination : public RandomProcess {
 public:
-        typedef recombine_bitset< typename gamete_type::bitset_type::block_type, typename gamete_type::bitset_type::allocator_type, typename gamete_type::alphabet_t > recombination_method_type;
+    typedef recombine_bitset< typename gamete_type::bitset_type::block_type, typename gamete_type::bitset_type::allocator_type, typename gamete_type::alphabet_t > recombination_method_type;
     typedef typename recombination_method_type::recombination_points recombination_points;
     typedef typename recombination_points::iterator recombination_iterator;
 
-    ReproduceWithRecombination( double mu, double rho ) : 
+    ReproduceWithRecombination( double mu, double rho ) :
         m_mu(mu)
         , m_rho(rho)
         , m_nRecomb(0)
         , m_nRecombEvents(0)
         , m_nMut(0)
-        , m_nMutEvents(0) 
-    {}
+        , m_nMutEvents(0) {
+    }
 
     size_t getRecombinationCalls() {
         return m_nRecomb;
@@ -297,7 +295,7 @@ public:
 
             if( nMut ) {
 #ifdef LOGGING
-            global_log.put( log_key + ".mutate", true);
+                global_log.put( log_key + ".mutate", true);
 #endif
                 mutate(res, nMut);
             }
@@ -316,21 +314,21 @@ public:
         global_log.put( log_key + ".new_gamete.sequence", oss.str());
         global_log.put( log_key + ".new_gamete.size", res->getBits()->size() );
         global_log.put( log_key + ".new_gamete.count", res->getBits()->count() );
-        
-        if( base_gamete->getBits()->count() > 0 && other_gamete->getBits()->count() > 0) {
-        oss.str("");
-        oss.clear();
-        oss << *base_gamete->getBits();
-        global_log.put( log_key + ".base_gamete.sequence", oss.str());
-        global_log.put( log_key + ".base_gamete.size", base_gamete->getBits()->size() );
-        global_log.put( log_key + ".base_gamete.count", base_gamete->getBits()->count() );
 
-        oss.str("");
-        oss.clear();
-        oss << *other_gamete->getBits();
-        global_log.put( log_key + ".other_gamete.sequence", oss.str());
-        global_log.put( log_key + ".other_gamete.size", other_gamete->getBits()->size() );
-        global_log.put( log_key + ".other_gamete.count", other_gamete->getBits()->count() );
+        if( base_gamete->getBits()->count() > 0 && other_gamete->getBits()->count() > 0) {
+            oss.str("");
+            oss.clear();
+            oss << *base_gamete->getBits();
+            global_log.put( log_key + ".base_gamete.sequence", oss.str());
+            global_log.put( log_key + ".base_gamete.size", base_gamete->getBits()->size() );
+            global_log.put( log_key + ".base_gamete.count", base_gamete->getBits()->count() );
+
+            oss.str("");
+            oss.clear();
+            oss << *other_gamete->getBits();
+            global_log.put( log_key + ".other_gamete.sequence", oss.str());
+            global_log.put( log_key + ".other_gamete.size", other_gamete->getBits()->size() );
+            global_log.put( log_key + ".other_gamete.count", other_gamete->getBits()->count() );
         }
 #endif
 
@@ -355,9 +353,9 @@ public:
 
         gamete_type::bitset_type symm_diff;
 #ifdef LOGGING
-            recombination_method_type::result_type status(gen);
+        recombination_method_type::result_type status(gen);
 #else
-            recombination_method_type::result_type status;
+        recombination_method_type::result_type status;
 #endif
         recombine( base_gamete, other_gamete, &symm_diff, nRec, status );
 
@@ -369,19 +367,19 @@ public:
         assert( res->copies() == 1 );
         assert( nMut );
 
-         ++m_nMut;
-         m_nMutEvents += nMut;
+        ++m_nMut;
+        m_nMutEvents += nMut;
 
 #ifdef LOGGING
         state_log_type m;
 #endif
-         while( nMut-- ) {
+        while( nMut-- ) {
             typedef symbol_generator< alphabet_type::locus_t, alphabet_type::allele_t, alphabet_type::index_type, alphabet_type > sgen_type;
             typedef typename sgen_type::symbol_type symbol_type;
 
             static sgen_type sgen;
             symbol_type s = sgen( res->getAlphabet(), (infinite_site * ) NULL );
-                //std::cout << "Adding variant: " << s << std::endl;
+            //std::cout << "Adding variant: " << s << std::endl;
 #ifdef LOGGING
             state_log_type _m;
             _m.put( "", s );
@@ -389,15 +387,15 @@ public:
             m.push_back( std::make_pair("", _m));
 #endif
             res->addVariant( s );
-         }
+        }
     }
 
     gamete_pointer method1( gamete_pointer base_gamete, gamete_pointer other_gamete, unsigned int gen ) {
 #ifdef LOGGING
-            static unsigned int nCalls = 0;
-            std::ostringstream oss;
-            oss << gen <<  "." << nCalls++;
-            std::string log_key = oss.str();
+        static unsigned int nCalls = 0;
+        std::ostringstream oss;
+        oss << gen <<  "." << nCalls++;
+        std::string log_key = oss.str();
 #endif
 
         unsigned int nMut = m_rng->nextPoisson( m_mu );
@@ -431,8 +429,8 @@ public:
         }
 
 #ifdef LOGGING
-            global_log.put( log_key + ".nRec", nRec );
-            global_log.put( log_key + ".nMut", nMut );
+        global_log.put( log_key + ".nRec", nRec );
+        global_log.put( log_key + ".nMut", nMut );
 #endif
 
         if( nRec > 0 ) {
@@ -454,8 +452,8 @@ public:
             }
 
             global_log.add_child( log_key + ".points", p );
-#endif            
-            
+#endif
+
 #ifdef LOGGING
             recombination_method_type::result_type stats(gen);
 #else
@@ -512,19 +510,19 @@ public:
         assert( res != NULL);
         assert( nMut > 0 );
 
-         ++m_nMut;
-         m_nMutEvents += nMut;
+        ++m_nMut;
+        m_nMutEvents += nMut;
 
 #ifdef LOGGING
         state_log_type m;
 #endif
-         while( nMut-- ) {
+        while( nMut-- ) {
             typedef symbol_generator< alphabet_type::locus_t, alphabet_type::allele_t, alphabet_type::index_type, alphabet_type > sgen_type;
             typedef typename sgen_type::symbol_type symbol_type;
 
             static sgen_type sgen;
             symbol_type s = sgen( res->getAlphabet(), (infinite_site * ) NULL );
-                //std::cout << "Adding variant: " << s << std::endl;
+            //std::cout << "Adding variant: " << s << std::endl;
 #ifdef LOGGING
             state_log_type _m;
             _m.put( "", s );
@@ -532,10 +530,10 @@ public:
             m.push_back( std::make_pair("", _m));
 #endif
             res->addVariant( s );
-         }
+        }
 
 #ifdef LOGGING
-         global_log.add_child( log_key + ".mutations", m);
+        global_log.add_child( log_key + ".mutations", m);
 #endif
         return res;
     }
@@ -643,6 +641,99 @@ protected:
 
 };
 
+void logMutationFrequencies( boost::property_tree::ptree & p, std::vector< size_t > & frequencies, std::map< size_t, size_t > & freq_dist ) {
+    boost::property_tree::ptree v, _v0, _v1;
+    _v0.put("", "Allele");
+    _v1.put("", "Frequency");
+    v.push_back( std::make_pair("", _v0));
+    v.push_back( std::make_pair("", _v1));
+    p.add_child("frequency.y.smps", v);
+
+    boost::property_tree::ptree x, _x0, _x1;
+    _x0.put("", "Region relative position of Allele" );
+    _x1.put("", "Frequency of allele in population" );
+    x.push_back( std::make_pair("", _x0 ) );
+    x.push_back( std::make_pair("", _x1 ) );
+    p.add_child( "frequency.x", x);
+
+    boost::property_tree::ptree d,s;
+
+    alphabet_type::active_iterator alpha_it = alphabet_type::getInstance()->active_begin();
+    for( std::vector< size_t >::iterator it = frequencies.begin(); it != frequencies.end(); ++it ) {
+        if( *it > 0 ) {
+            assert( alphabet_type::getInstance()->checkFreeStatus( it - frequencies.begin()) );
+            boost::property_tree::ptree x,y,z, _s;
+            x.put( "", alpha_it->first);
+            y.put( "", (*it));
+
+            z.push_back( std::make_pair("", x ));
+            z.push_back( std::make_pair("", y ));
+
+            std::ostringstream oss;
+            oss << (it - frequencies.begin() );
+
+            _s.put("", oss.str());
+            s.push_back( std::make_pair("", _s));
+            d.push_back( std::make_pair("", z ));
+
+            std::map< size_t, size_t >::iterator it2 = freq_dist.find((*it));
+            if( it2 == freq_dist.end() ) {
+                freq_dist.insert( std::make_pair( (*it), 1 ) );
+            } else {
+                ++it2->second;
+            }
+        }
+        ++alpha_it;
+    }
+
+    p.add_child( "frequency.y.vars", s );
+    p.add_child( "frequency.y.data", d );
+}
+
+void logMutationDistribution( boost::property_tree::ptree & p, std::map< size_t, size_t > & freq_dist ) {
+    boost::property_tree::ptree v, _v0, _v1;
+    _v0.put("", "Frequency");
+    _v1.put("", "Count");
+    v.push_back( std::make_pair("", _v0));
+    v.push_back( std::make_pair("", _v1));
+    p.add_child("distribution.y.smps", v);
+
+    boost::property_tree::ptree x, _x0, _x1;
+    _x0.put("", "Region relative position of Allele" );
+    _x1.put("", "Frequency of allele in population" );
+    x.push_back( std::make_pair("", _x0 ) );
+    x.push_back( std::make_pair("", _x1 ) );
+    p.add_child( "distribution.x", x);
+    boost::property_tree::ptree d,s;
+
+    unsigned int i = 0;
+    for( std::map< size_t, size_t >::iterator it = freq_dist.begin(); it != freq_dist.end(); ++it ) {
+        boost::property_tree::ptree x,y,z, _s;
+        x.put( "", it->first);
+        y.put( "", it->second);
+
+        z.push_back( std::make_pair("", x ) );
+        z.push_back( std::make_pair("", y ) );
+
+        std::ostringstream oss;
+        oss << i++;
+
+        _s.put("", oss.str());
+        s.push_back( std::make_pair("", _s));
+        d.push_back( std::make_pair("", z ));
+    }
+
+    p.add_child( "distribution.y.vars", s );
+    p.add_child( "distribution.y.data", d );
+}
+
+void logMutationStats( boost::property_tree::ptree & p, std::vector< size_t > & frequencies ) {
+    std::map< size_t, size_t > freq_dist;
+    logMutationFrequencies( p, frequencies, freq_dist );
+
+    logMutationDistribution( p, freq_dist );
+}
+
 int main( int argc, char ** argv ) {
 
     po::variables_map vm;
@@ -650,8 +741,7 @@ int main( int argc, char ** argv ) {
         return 0;
     }
 
-    string engine_config( "" );
-    string clotho_config( "" );
+    state_log_type  log;
 
     SystemClock::vtime_t tUntil = vm[ SIM_UNTIL_K ].as< SystemClock::vtime_t >();
     unsigned int nGen = vm[ GENERATIONS_K ].as< unsigned int >();
@@ -659,8 +749,6 @@ int main( int argc, char ** argv ) {
     if( nGen != (unsigned int) -1 ) {
         tUntil =  nGen;
     }
-
-    cout << "Simulate until: " << tUntil << endl;
 
     gsl_rng_env_setup();
     const gsl_rng_type * T = gsl_rng_default;
@@ -671,44 +759,37 @@ int main( int argc, char ** argv ) {
     gsl_rng_set( my_rng, m_seed );
 
     shared_ptr< iRNG > rng( new GSL_RNG( my_rng, m_type, m_seed ));
-    cout << "RNG: " <<  rng->getType() << "; seed: " << rng->getSeed() << endl;
-
     RandomProcess::initialize( rng );
 
     double mu = vm[ MUTATION_RATE_K ].as<double>();
     double rho = vm[ RECOMBINATION_RATE_K ].as< double >();
 
+    log.put( "configuration.random_number.generator", rng->getType() );
+    log.put( "configuration.random_number.seed", rng->getSeed() );
+
+    log.put( "configuration.generations", tUntil );
+    log.put( "configuration.population.size", vm[ FOUNDER_SIZE_K ].as< unsigned int >() );
+    log.put( "configuration.mutation.model", "infinite site");
+    log.put( "configuration.mutation.rate_per_region", mu );
+
+    log.put( "configuration.recombination.model", "uniform random" );
+    log.put( "configuration.recombination.rate_per_region", rho );
+
+    log.put( "configuration.region.mutation_rate_per_base", pow( 10.0, -8.0) );
+    log.put( "configuration.region.base_per_region", mu / pow( 10.0, -8.0) );
+    log.put( "configuration.region.regions_per_individual",  _PLOIDY );
+
     mmodel_type::initialize( mu, false);
 
-    shared_ptr< SimulationStats > stats( new SimulationStats() );
-
-    stats->startPhase( RUNTIME_K );
+//    shared_ptr< SimulationStats > stats( new SimulationStats() );
+//    stats->startPhase( RUNTIME_K );
 
     environment_type population;
     environment_type buffer;
 
     system_id blank_id;
 
-    stats->startPhase( "PopInit" );
-
-#ifdef LOGGING
-    {
-        lowest_bit_256 lbit;
-        for( unsigned int i = 0; i < 256; ++i ) {
-            const lowest_bit_256::value_type v = lbit[i];
-
-            state_log_type nnode, inode, snode, node;
-            inode.put("", v.bit_index);
-            snode.put("", v.bit_shift_next);
-            node.push_back( std::make_pair("", inode));
-            node.push_back( std::make_pair("", snode));
-
-            std::ostringstream oss;
-            oss << "lowest_bit." << i;
-            global_log.add_child( oss.str(), node);
-        }
-    }
-#endif
+//    stats->startPhase( "PopInit" );
 
     fitness_multiplicative< het_fitness, hom_fitness > fmult;
 
@@ -721,10 +802,10 @@ int main( int argc, char ** argv ) {
         buffer.push_back( new individual_type() );
     }
 
-    std::cout << gamete_type::EMPTY.copies() << std::endl;
+    std::cerr << gamete_type::EMPTY.copies() << std::endl;
     assert( gamete_type::EMPTY.copies() - 1 == 2 * vm[ FOUNDER_SIZE_K ].as<unsigned int>() );
 
-    stats->stopPhase( "PopInit" );
+//   stats->stopPhase( "PopInit" );
 
     environment_type * parent = &population, * child = &buffer;
 
@@ -734,7 +815,7 @@ int main( int argc, char ** argv ) {
     ReproduceWithRecombination repro( mu, rho );
 
     size_t nSelfing = 0;
-    stats->startPhase( "Sim" );
+//    stats->startPhase( "Sim" );
     for( SystemClock::vtime_t i = 0; i < tUntil; ++i ) {
         assert( parent != child );
         if( fitness_size < parent->size() ) {
@@ -754,18 +835,8 @@ int main( int argc, char ** argv ) {
 #ifdef LOGGING
         {
             std::ostringstream oss;
-//            oss << i << ".free_list";
             oss << i;
             std::string k = oss.str();
-
-//            oss.str("");
-//            oss.clear();
-            //oss <<  *AlleleAlphabet::getInstance()->getFreeMask();
-//            oss << *alphabet_type::getInstance()->getFreeMask();
-//            global_log.put( k + ".size", AlleleAlphabet::getInstance()->getFreeMask()->size());
-//            global_log.put( k + ".count", AlleleAlphabet::getInstance()->getFreeMask()->count());
-//            global_log.put( k + ".sequence", oss.str());
-//            global_log.put( k + ".total_mutations", repro.getMutationEvents());
 
             state_log_type tmp;
             alphabet_type::getInstance()->logState( tmp );
@@ -814,16 +885,16 @@ int main( int argc, char ** argv ) {
     }
 
     locus_bitset::updateActiveAlphabet();
-    stats->stopPhase( "Sim" );
-    stats->startPhase( "Final" );
-
+//    stats->stopPhase( "Sim" );
+//    stats->startPhase( "Final" );
+//
     unsigned int nUniqueInd = 0;
     for( unsigned int i = 1; i < parent->size(); ++i ) {
         bool no_dup = true;
         for( unsigned int j = 0; no_dup && j < i; ++j ) {
             no_dup = !((*parent)[i]->getProperties()->getGamete(0) == (*parent)[j]->getProperties()->getGamete(0) && (*parent)[i]->getProperties()->getGamete(1) == (*parent)[j]->getProperties()->getGamete(1))
-                    && !((*parent)[i]->getProperties()->getGamete(0) == (*parent)[j]->getProperties()->getGamete(1) && (*parent)[i]->getProperties()->getGamete(1) == (*parent)[j]->getProperties()->getGamete(0));
- 
+                     && !((*parent)[i]->getProperties()->getGamete(0) == (*parent)[j]->getProperties()->getGamete(1) && (*parent)[i]->getProperties()->getGamete(1) == (*parent)[j]->getProperties()->getGamete(0));
+
         }
         if( no_dup ) {
             ++nUniqueInd;
@@ -831,15 +902,20 @@ int main( int argc, char ** argv ) {
     }
 
     double nSymbols = 0;
-    double nGametes = 0;
     size_t nMaxSymbols = 0, nMinSymbols = -1;
     double nBlocks = 0;
     unsigned int n = 0;
+
+    typedef std::vector< std::pair< locus_bitset::active_iterator, size_t > > count_vector_type;
+    count_vector_type g_counts;
+
+    std::vector< size_t > frequencies( alphabet_type::getInstance()->database_size(), 0);
+
     for( typename locus_bitset::active_iterator it = locus_bitset::active_begin(); it != locus_bitset::active_end(); it++ ) {
+        (*it)->updateFrequencies( frequencies );
         size_t s = (*it)->size();
         nBlocks += (double)(*it)->block_count();
         nSymbols += (double)s;
-        nGametes += 1.0;
 
         if( nMaxSymbols < s ) {
             nMaxSymbols = s;
@@ -850,56 +926,59 @@ int main( int argc, char ** argv ) {
         }
 
         n += (*it)->copies();
-    }
 
-    n += (gamete_type::EMPTY.copies() - 1);
-    std::cout << "Final population has " << nGametes  << " (" << n << ") gametes" << std::endl;
-    std::cout << "Final population has " << nUniqueInd << " unique individuals" << std::endl;
-
-    std::cout << "Average number of blocks per Gamete: " << nBlocks/nGametes << std::endl;
-
-    std::cout << "Max Mutations single Gamete: " << nMaxSymbols << std::endl;
-    std::cout << "Min Mutations single Gamete: " << nMinSymbols << std::endl;
-    std::cout << "Average Mutations per Gamete: " << nSymbols/nGametes << std::endl;
-
-    std::cout << "Population Mutation count: " << alphabet_type::getInstance()->active_count() << " (" << mmodel_type::getVariantMap()->size() << ")" << std::endl;
-
-    std::cout << "Simulation Recombinations: " << repro.getRecombinationCalls() << std::endl;
-    std::cout << "Simulation Recombination Events: " << repro.getRecombinationEvents() << std::endl;
-
-    std::cout << "Simulation Mutation Calls: " << repro.getMutationCalls() << std::endl;
-    std::cout << "Simulation Mutation Events: " << repro.getMutationEvents() << std::endl;
-
-    std::cout << "Selfing count: " << nSelfing << std::endl;
-
-    std::cout << "Lost or Fixed from previous generation: " << alphabet_type::getInstance()->fixed_lost_count() << std::endl;
-
-#ifdef LOGGING
-
-    // testing whether reproduction works
-    typename locus_bitset::active_iterator it = locus_bitset::active_begin();
-    unsigned int e = 10;
-    while( it != locus_bitset::active_end() ) {
-        if( e-- == 0 ) { break; }
-        gamete_pointer p0 = NULL, p1 = NULL;
-        for( ; it != locus_bitset::active_end(); it++ ) {
-            if( (*it)->getBits()->count() >= 1 ) {
-                if( p0 == NULL ) {
-                    p0 = *it;
-                } else {
-                    p1 = *it++;
-                    break;
-                }
+        bool isUnique = true;
+        for( count_vector_type::iterator it2 = g_counts.begin(); it2 != g_counts.end(); it2++ ) {
+            if( (*it) == *(it2->first) ) {
+                it2->second += (*it)->copies();
+                isUnique = false;
+                break;
             }
         }
 
-        if( p0 != NULL && p1 != NULL ) {
-            std::cout << "Test reproduction" << std::endl;
-            gamete_pointer res = repro.recombine(p0, p1, 1, tUntil + 1);
+        if( isUnique ) {
+            g_counts.push_back(std::make_pair( it, (*it)->copies() ));
         }
     }
 
-    boost::property_tree::write_json( std::cerr, global_log ); 
+    double nGametes = (double)g_counts.size();
+
+    boost::property_tree::ptree mut_stats;
+    logMutationStats( mut_stats, frequencies );
+
+    n += (gamete_type::EMPTY.copies() - 1);
+    alphabet_type::getInstance()->logState( log );
+
+    log.put( "population.regions.count", n );
+    log.put( "population.regions.unique", nGametes );
+    log.put( "population.regions.active", locus_bitset::activeCount() );
+    log.put( "population.regions.reference", gamete_type::EMPTY.copies() - 1);
+
+    log.put( "population.individual.count", parent->size() );
+    log.put( "population.individual.unique", nUniqueInd );
+    log.put( "population.individual.selfing", nSelfing );
+
+    log.put( "population.mutations.count", alphabet_type::getInstance()->active_count());
+    log.put( "population.mutations.lost_or_fixed", alphabet_type::getInstance()->fixed_lost_count());
+    log.put( "population.mutations.single_region.max", nMaxSymbols );
+    log.put( "population.mutations.single_region.min", nMinSymbols );
+    log.put( "population.mutations.single_region.average", nSymbols/nGametes );
+
+    log.add_child( "population.mutations", mut_stats );
+
+    log.put( "simulation.events.recombination", repro.getRecombinationEvents() );
+    log.put( "simulation.events.mutation", repro.getMutationEvents() );
+
+    log.put( "symbol_database.count", alphabet_type::getInstance()->database_size() );
+    log.put( "symbol_database.symbol_size", sizeof( alphabet_type::symbol_type));
+    log.put( "symbol_database.symbol_per_block", locus_bitset::bitset_type::bits_per_block );
+    log.put( "symbol_database.max_block_per_region", (alphabet_type::getInstance()->database_size() / locus_bitset::bitset_type::bits_per_block) + 1 );
+    log.put( "simulation.profile.memory_usage.total_blocks", nBlocks );
+    log.put( "simulation.profile.memory_usage.blocks_per_region", nBlocks/nGametes );
+
+
+#ifdef LOGGING
+    boost::property_tree::write_json( std::cerr, global_log );
 #endif
 
     while( !population.empty() ) {
@@ -914,12 +993,11 @@ int main( int argc, char ** argv ) {
         buffer.pop_back();
         delete ind;
     }
-    stats->stopPhase( "Final" );
+//    stats->stopPhase( "Final" );
+//    stats->stopPhase( RUNTIME_K );
+//    cout << *stats;
 
-    stats->stopPhase( RUNTIME_K );
-
-    cout << *stats;
-
+    boost::property_tree::write_json( std::cout, log );
     delete [] fitness;
 
     return 0;

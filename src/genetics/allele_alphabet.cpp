@@ -79,7 +79,7 @@ void AlleleAlphabet::updateFreeSymbols( const bitset_type & fs ) {
         citerator first = fs.m_bits.begin(), last = fs.m_bits.end();
 
         iterator int_it = m_free_intersect.m_bits.begin(), int_last = m_free_intersect.m_bits.end(),
-            un_it = m_free_union.m_bits.begin();
+                 un_it = m_free_union.m_bits.begin();
         while( first != last ) {
             (*int_it++) &= (*first);
             (*un_it++) |= (*first++);
