@@ -16,8 +16,8 @@ typedef SortedAlleleAlphabet2 alpha_type;
 typedef AlleleAlphabet alpha_type;
 #endif
 
-#include <type_traits>
-#include <boost/pool/object_pool.hpp>
+//#include <type_traits>
+//#include <boost/pool/object_pool.hpp>
 
 #include <set>
 
@@ -33,8 +33,7 @@ public:
 
     typedef locus_bitset *  pointer;
 
-    typedef boost::object_pool< locus_bitset >      pool_type;
-
+//    typedef boost::object_pool< locus_bitset >      pool_type;
 //    typedef alphabet_t::adjacency_iterator adjacency_iterator;
 
     typedef std::set< locus_bitset * > active_bitsets;

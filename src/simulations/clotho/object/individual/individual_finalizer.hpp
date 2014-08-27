@@ -2,7 +2,7 @@
 #define INDIVIDUAL_FINALIZER_HPP_
 
 //#include "../finalizer.hpp"
-#include "config.hpp"
+#include "object/individual/config.hpp"
 
 namespace finalizer {
 

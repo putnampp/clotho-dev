@@ -2,7 +2,7 @@
 #define INDIVIDUAL_INITIALIZER_HPP_
 
 //#include "../initializer.hpp"
-#include "config.hpp"
+#include "object/individual/config.hpp"
 
 namespace initializer {
 

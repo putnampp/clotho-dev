@@ -2,6 +2,7 @@
 #define FITNESS_BITSET_HPP_
 
 #include <boost/dynamic_bitset.hpp>
+#include "utility/lowest_bit.h"
 
 #include "accessor.hpp"
 
