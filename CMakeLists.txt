@@ -81,7 +81,7 @@ ELSE (NOT ${PROJECT_NAME}_EXTERNALLY_CONFIGURED )
 ENDIF (NOT ${PROJECT_NAME}_EXTERNALLY_CONFIGURED )
 
 ################################################################################
-FIND_PACKAGE( Boost COMPONENTS program_options filesystem system thread unit_test_framework REQUIRED )
+FIND_PACKAGE( Boost COMPONENTS program_options filesystem system thread unit_test_framework chrono REQUIRED )
 IF( Boost_FOUND )
     INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
     MESSAGE (STATUS "Boost Include: " ${Boost_INCLUDE_DIR} )

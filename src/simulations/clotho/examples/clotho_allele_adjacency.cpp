@@ -49,6 +49,8 @@ state_log_type global_log;
 #include <limits>
 #include <cmath>
 
+#include "timing.hpp"
+
 #include "utility/simulation_stats.h"
 
 #include "object/individual.hpp"
@@ -209,13 +211,6 @@ public:
 
     gamete_pointer method3( gamete_pointer base_gamete, gamete_pointer other_gamete, unsigned int gen ) {
         unsigned int nMut = m_rng->nextPoisson(m_mu);
-        //unsigned int nRec = m_rng->nextPoisson(m_rho);
-
-        //if( m_rng->nextBool() ) {
-        //    // have different gametes; therefore should randomly swap them
-        //    std::swap( base_gamete, other_gamete );
-        //}
-
         unsigned int nRec = 0;
         if( base_gamete != other_gamete ) {
             nRec = m_rng->nextPoisson( m_rho );
@@ -251,6 +246,16 @@ public:
                 } else if( status.match_alt ) {
                     res = other_gamete->copy();
                 } else {
+                    // this does not guarantee that the gamete will be unique in the population
+                    // there is a rare(?) scenario under which this new gamete will be identical
+                    // to another gamete in the population.
+                    //
+                    // Under the infinite site model, two identical child gametes can be produced
+                    // when a pair of parents produce multiple children, but recombination events
+                    // occur such at locations which result in the same output sequence.  This is
+                    // rare because a) both parents must use the same "base" gamete for each
+                    // child (.5^C), and b) all of the randomly generated recombination events 
+                    // need to occur in the same regions relative to the parent's mutations.
                     res = new gamete_type( recombined_set, base_gamete->getAlphabet() );
                 }
             }
@@ -870,6 +875,7 @@ int main( int argc, char ** argv ) {
         return 0;
     }
 
+    timer runtime_timer;
     state_log_type  log;
 
     SystemClock::vtime_t tUntil = vm[ SIM_UNTIL_K ].as< SystemClock::vtime_t >();
@@ -910,18 +916,15 @@ int main( int argc, char ** argv ) {
 
     mmodel_type::initialize( mu, false);
 
-//    shared_ptr< SimulationStats > stats( new SimulationStats() );
-//    stats->startPhase( RUNTIME_K );
 
     environment_type population;
     environment_type buffer;
 
     system_id blank_id;
 
-//    stats->startPhase( "PopInit" );
-
     fitness_multiplicative< het_fitness, hom_fitness > fmult;
 
+    timer init_time;
     for( unsigned int i = 0; i < vm[ FOUNDER_SIZE_K ].as< unsigned int >(); ++i) {
         population.push_back( new individual_type() );
 
@@ -934,7 +937,7 @@ int main( int argc, char ** argv ) {
     std::cerr << gamete_type::EMPTY.copies() << std::endl;
     assert( gamete_type::EMPTY.copies() - 1 == 2 * vm[ FOUNDER_SIZE_K ].as<unsigned int>() );
 
-//   stats->stopPhase( "PopInit" );
+    init_time.stop();
 
     environment_type * parent = &population, * child = &buffer;
 
@@ -944,7 +947,7 @@ int main( int argc, char ** argv ) {
     ReproduceWithRecombination repro( mu, rho );
 
     size_t nSelfing = 0;
-//    stats->startPhase( "Sim" );
+    timer sim_time;
     for( SystemClock::vtime_t i = 0; i < tUntil; ++i ) {
         assert( parent != child );
         if( fitness_size < parent->size() ) {
@@ -996,7 +999,6 @@ int main( int argc, char ** argv ) {
 
             nSelfing += (( mate_pair.first == mate_pair.second ) ? 1 : 0);
             gamete_pointer g = repro( mate_pair.first, i );
-            //assert( gamete_type::isGamete( g ) );
             (*child)[child_idx]->getProperties()->inheritFrom(blank_id, g);
 
             gamete_pointer g1 = repro( mate_pair.second, i );
@@ -1014,9 +1016,9 @@ int main( int argc, char ** argv ) {
     }
 
     locus_bitset::updateActiveAlphabet();
-//    stats->stopPhase( "Sim" );
-//    stats->startPhase( "Final" );
-//
+    sim_time.stop();
+
+    timer finalize_timer;
     unsigned int nUniqueInd = 0;
     for( unsigned int i = 1; i < parent->size(); ++i ) {
         bool no_dup = true;
@@ -1122,10 +1124,15 @@ int main( int argc, char ** argv ) {
         buffer.pop_back();
         delete ind;
     }
-//    stats->stopPhase( "Final" );
-//    stats->stopPhase( RUNTIME_K );
-//    cout << *stats;
 
+    finalize_timer.stop();
+    runtime_timer.stop();
+
+    log.put( "simulation.performance.initialize.nanosecond", init_time.elapsed().count() );
+    log.put( "simulation.performance.simulate.nanoseconds", sim_time.elapsed().count() );
+    log.put( "simulation.performance.finalize.nanoseconds", finalize_timer.elapsed().count() );
+    log.put( "simulation.performance.runtime.nanoseconds", runtime_timer.elapsed().count() );
+    
     boost::property_tree::write_json( std::cout, log );
     delete [] fitness;
 
