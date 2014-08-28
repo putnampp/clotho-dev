@@ -78,7 +78,7 @@ public:
 
 protected:
     void updateSymbols();
-    void clearFree();
+    size_t clearFree();
 
 public:
     void    release();
@@ -86,7 +86,7 @@ public:
     static bool isGamete( locus_bitset * lb );
     static active_iterator active_begin();
     static active_iterator active_end();
-    static void updateActiveAlphabet();
+    static size_t updateActiveAlphabet();
     static size_t activeCount() {
         return m_active.size();
     }

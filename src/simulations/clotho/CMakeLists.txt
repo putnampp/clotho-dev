@@ -83,6 +83,9 @@ ADD_EXECUTABLE(clotho_no_sim examples/clotho_no_sim.cpp ${SRCS} )
 ADD_EXECUTABLE(clotho_allele_adjacency examples/clotho_allele_adjacency.cpp ${SRCS} )
 #ADD_EXECUTABLE(clotho_env_only clotho_env_only.cpp ${SRCS} )
 
+ADD_EXECUTABLE(performance_combiner examples/performance_combiner.cpp)
+TARGET_LINK_LIBRARIES(performance_combiner ${COMMON_LIBRARIES} )
+
 #TARGET_LINK_LIBRARIES( clotho ${COMMON_LIBRARIES} ${PROJECT_NAME}_genetics engine object timer ${PROJECT_NAME}_utility)
 
 #TARGET_LINK_LIBRARIES( clotho_fixed ${COMMON_LIBRARIES} genetics engine object timer )
@@ -90,3 +93,4 @@ TARGET_LINK_LIBRARIES( clotho_no_sim ${COMMON_LIBRARIES} ${PROJECT_NAME}_genetic
 #TARGET_LINK_LIBRARIES( clotho_adjacency ${COMMON_LIBRARIES} ${PROJECT_NAME}_genetics engine object timer ${PROJECT_NAME}_utility)
 TARGET_LINK_LIBRARIES( clotho_allele_adjacency ${COMMON_LIBRARIES} ${PROJECT_NAME}_genetics engine object timer ${PROJECT_NAME}_utility)
 #TARGET_LINK_LIBRARIES( clotho_env_only ${COMMON_LIBRARIES} genetics engine object timer )
+

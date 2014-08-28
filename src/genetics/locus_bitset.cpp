@@ -18,7 +18,8 @@ locus_bitset::active_iterator locus_bitset::active_end() {
     return m_active.end();
 }
 
-void locus_bitset::updateActiveAlphabet() {
+size_t locus_bitset::updateActiveAlphabet() {
+    size_t nBlocks = 0;
     active_iterator first = active_begin(), last = active_end();
     if( first != last ) {
         alphabet_t::pointer alpha = (*first)->getAlphabet();
@@ -39,10 +40,11 @@ void locus_bitset::updateActiveAlphabet() {
         last = active_end();
 
         while( first != last ) {
-            (*first)->clearFree();
+            nBlocks += (*first)->clearFree();
             ++first;
         }
     }
+    return nBlocks;
 }
 
 locus_bitset::locus_bitset( alphabet_t::pointer a ) :
@@ -140,9 +142,9 @@ void locus_bitset::updateSymbols() {
     m_alphabet->updateFreeSymbols( m_bits );
 }
 
-void locus_bitset::clearFree() {
+size_t locus_bitset::clearFree() {
     if( m_alphabet->getFreeMask()->size() == 0 ) {
-        return;
+        return m_bits.num_blocks();
     }
 
     if( m_bits.size() != m_alphabet->getFreeMask()->size() ) {
@@ -152,6 +154,8 @@ void locus_bitset::clearFree() {
     } else {
         m_bits &= *m_alphabet->getFreeMask();
     }
+
+    return m_bits.num_blocks();
 }
 
 /*

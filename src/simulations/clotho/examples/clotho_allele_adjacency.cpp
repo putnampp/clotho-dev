@@ -84,6 +84,48 @@ typedef TIndividual< gamete_type, _PLOIDY, system_id, individual_props< gamete_t
 typedef individual_type  *                  individual_pointer;
 typedef std::vector< individual_pointer >   environment_type;
 
+struct simulation_configuration {
+    state_log_type log;
+
+    unsigned int                nGen, nPop;
+
+    double                      mu, rho;
+    
+    SystemClock::vtime_t        tUntil;
+
+    gsl_rng *                   my_rng;
+
+    std::shared_ptr< iRNG >     rng;
+
+    simulation_configuration( ) :
+        nGen(0), nPop(0), mu( 0.0 ), rho(0.0), tUntil(0), my_rng( NULL )
+    {
+        init_rng();
+    }
+
+    simulation_configuration( unsigned int gen, unsigned int pop, double m, double r ) :
+        nGen( gen ), nPop(pop), mu(m), rho(r)
+    {
+        if( nGen != (unsigned int) -1 ) {
+            tUntil = nGen;
+        }
+
+        init_rng();
+    }
+
+    void init_rng( unsigned int seed = 0 ) {
+        gsl_rng_env_setup();
+        const gsl_rng_type * T = gsl_rng_default;
+        string m_type = T->name;
+        unsigned int m_seed = gsl_rng_default_seed;
+
+        my_rng = gsl_rng_alloc( T );
+        gsl_rng_set( my_rng, m_seed );
+
+        rng.reset( new GSL_RNG( my_rng, m_type, m_seed ));
+    }
+};
+
 int main( int argc, char ** argv ) {
 
     po::variables_map vm;
@@ -161,9 +203,19 @@ int main( int argc, char ** argv ) {
 
     ReproduceWithRecombination<gamete_type, alphabet_type, individual_pointer> repro( mu, rho );
 
+    state_log_type gen_log;
+    state_log_type gen_run_log;
+    state_log_type gen_size_log;
+    state_log_type gen_alpha_log;
+    state_log_type gen_seq_log;
+
     size_t nSelfing = 0;
     timer sim_time;
+
+    std::ostringstream oss;
+
     for( SystemClock::vtime_t i = 0; i < tUntil; ++i ) {
+        timer gen_timer;
         assert( parent != child );
         if( fitness_size < parent->size() ) {
             if( fitness != NULL ) {
@@ -175,14 +227,11 @@ int main( int argc, char ** argv ) {
 
         memset( fitness, 0, sizeof(double) * fitness_size );
 
-//        std::cerr << "Generation: " << i << std::endl;
-
-        locus_bitset::updateActiveAlphabet();
-
+        size_t table_size = locus_bitset::updateActiveAlphabet() + 1;
+        size_t parent_pop_seq_count = locus_bitset::activeCount();
+        size_t parent_pop_mut_count = alphabet_type::getInstance()->active_count();
 #ifdef LOGGING
         {
-            std::ostringstream oss;
-            oss << i;
             std::string k = oss.str();
 
             state_log_type tmp;
@@ -228,9 +277,27 @@ int main( int argc, char ** argv ) {
         }
 
         std::swap( parent, child );
+
+        gen_timer.stop();
+        
+        state_log_type a, g, r, s, t;
+        a.put("", parent_pop_mut_count );
+        gen_alpha_log.push_back( std::make_pair("", a ) );
+
+        g.put("", i );
+        gen_log.push_back( std::make_pair("", g ) );
+
+        r.put("", gen_timer.elapsed().count() );
+        gen_run_log.push_back( std::make_pair("", r ) );
+
+        s.put("", parent_pop_seq_count );
+        gen_seq_log.push_back( std::make_pair("", s ) );
+
+        t.put("", table_size );
+        gen_size_log.push_back( std::make_pair("", t ) );
     }
 
-    locus_bitset::updateActiveAlphabet();
+    double nBlocks = (double) locus_bitset::updateActiveAlphabet();
     sim_time.stop();
 
     timer finalize_timer;
@@ -249,7 +316,6 @@ int main( int argc, char ** argv ) {
 
     double nSymbols = 0;
     size_t nMaxSymbols = 0, nMinSymbols = -1;
-    double nBlocks = 0;
     unsigned int n = 0;
 
     typedef std::vector< std::pair< locus_bitset::active_iterator, size_t > > count_vector_type;
@@ -260,7 +326,6 @@ int main( int argc, char ** argv ) {
     for( typename locus_bitset::active_iterator it = locus_bitset::active_begin(); it != locus_bitset::active_end(); it++ ) {
         (*it)->updateFrequencies( frequencies );
         size_t s = (*it)->size();
-        nBlocks += (double)(*it)->block_count();
         nSymbols += (double)s;
 
         if( nMaxSymbols < s ) {
@@ -347,6 +412,11 @@ int main( int argc, char ** argv ) {
     log.put( "simulation.performance.simulate.nanoseconds", sim_time.elapsed().count() );
     log.put( "simulation.performance.finalize.nanoseconds", finalize_timer.elapsed().count() );
     log.put( "simulation.performance.runtime.nanoseconds", runtime_timer.elapsed().count() );
+    log.add_child( "simulation.performance.data.generations", gen_log );
+    log.add_child( "simulation.performance.data.runtimes", gen_run_log );
+    log.add_child( "simulation.performance.data.table_size", gen_size_log );
+    log.add_child( "simulation.performance.data.alphabet_size", gen_alpha_log );
+    log.add_child( "simulation.performance.data.sequence_count", gen_seq_log );
     
     boost::property_tree::write_json( std::cout, log );
     delete [] fitness;
