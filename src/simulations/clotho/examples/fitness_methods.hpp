@@ -1,7 +1,8 @@
 #ifndef FITNESS_METHODS_HPP_
 #define FITNESS_METHODS_HPP_
 
-#include "genetics/fitness_bitset.hpp"
+//#include "genetics/fitness_bitset.hpp"
+#include "genetics/fitness_bitset2.hpp"
 
 template < class Allele >
 struct het_fitness {
@@ -56,12 +57,16 @@ public:
 
         typename gamete_type::alphabet_t::pointer alpha = g1->getAlphabet();
 
-        fitness_bitset< typename gamete_type::bitset_type::block_type, typename gamete_type::bitset_type::allocator_type, typename gamete_type::alphabet_t, hom_policy, het_policy, double > fit( g1->getBits(),alpha,m_hom_case, m_het_case, f);
+        //fitness_bitset< typename gamete_type::bitset_type::block_type, typename gamete_type::bitset_type::allocator_type, typename gamete_type::alphabet_t, hom_policy, het_policy, double > fit( g1->getBits(), alpha, m_hom_case, m_het_case, f);
+//        boost::to_block_range( *g2->getBits(), fit );
+        fitness_bitset2< typename gamete_type::alphabet_t, hom_policy, het_policy, double > fit( alpha, m_hom_case, m_het_case, f);
 
-        boost::to_block_range( *g2->getBits(), fit );
+        fit( *g1, *g2, f);
 
-        return fit.getResult();
+        //return fit.getResult();
+        return f;
     }
+
     virtual ~fitness_multiplicative() {}
 protected:
     het_policy m_het_case;

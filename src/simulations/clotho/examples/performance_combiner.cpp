@@ -101,7 +101,7 @@ void join_performance_data( const std::vector< string > & files, boost::property
         ++file_idx;
     }
 
-    boost::property_tree::write_json( std::cerr, p );
+//    boost::property_tree::write_json( std::cerr, p );
 }
 
 void to_canvasxpress_graph( const boost::property_tree::ptree & p ) {
@@ -301,16 +301,18 @@ void to_canvasxpress_graph3( const boost::property_tree::ptree & p ) {
 
 void combine_sample_data( boost::property_tree::ptree::const_iterator first, boost::property_tree::ptree::const_iterator last, string child_key, boost::property_tree::ptree & res ) {
 
-    boost::property_tree::ptree vars, smps, data;
+    boost::property_tree::ptree vars, smps, data, files;
 
     bool gen_found = false;
     while( first != last ) {
         if( first->second.get_child_optional( child_key ) != boost::none ) {
             double mut_rate = first->second.get<double>("mutation_rate");
-            boost::property_tree::ptree m_node;
+            boost::property_tree::ptree m_node, z_node;
             m_node.put("", mut_rate);
+            z_node.put("", first->second.get<std::string>("filename") );
 
             vars.push_back( std::make_pair( "", m_node ) );
+            files.push_back( std::make_pair( "", z_node) );
             if( !gen_found ) {
                 smps = first->second.get_child( "generations" );
                 gen_found = true;
@@ -333,11 +335,13 @@ void combine_sample_data( boost::property_tree::ptree::const_iterator first, boo
         ++first;
     }
 
-    boost::property_tree::ptree y;
+    boost::property_tree::ptree y, z;
 
     y.add_child( "smps", smps );
     y.add_child( "data", data );
     y.add_child( "vars", vars );
+
+    z.add_child( "filenames", files );
 
     boost::property_tree::ptree graph_opts;
 
@@ -346,7 +350,9 @@ void combine_sample_data( boost::property_tree::ptree::const_iterator first, boo
     graph_opts.put( "title", child_key );
     graph_opts.put( "xAxisTitle", child_key );
     graph_opts.put( "yAxisTitle", "Generations" );
+    graph_opts.put( "colorBy", "filenames" );
     
     res.add_child( "y", y );
+    res.add_child( "z", z );
     res.add_child( "graph_opts", graph_opts );
 }
