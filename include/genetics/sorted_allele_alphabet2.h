@@ -136,6 +136,7 @@ protected:
     bitset_type     m_free_mask;
     bitset_type     m_free_ranges;
 
+public:
     static const  block_type  low_order_bit_masks[ bits_per_range ];
     static const  block_type  bit_position_masks[ bits_per_range ];
 };
