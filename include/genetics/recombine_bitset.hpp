@@ -169,6 +169,8 @@ public:
         , m_alpha( alpha )
         , rec_points( rp )
         , m_stats( stats ) {
+        rec_points->insert(rec_points->begin(), std::numeric_limits< typename Alphabet::locus_t >::min() );
+        rec_points->push_back(std::numeric_limits< typename Alphabet::locus_t >::max());
     }
 
     recombine_bitset( const self_type & other ) :
@@ -177,6 +179,8 @@ public:
         , m_alpha( other.m_alpha )
         , rec_points( other.rec_points )
         , m_stats( other.m_stats ) {
+        rec_points->insert(rec_points->begin(), std::numeric_limits< typename Alphabet::locus_t >::min() );
+        rec_points->push_back(std::numeric_limits< typename Alphabet::locus_t >::max());
     }
 
     template < class BlockIterator >
