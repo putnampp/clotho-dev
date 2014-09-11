@@ -208,14 +208,17 @@ int main( int argc, char ** argv ) {
     state_log_type gen_size_log;
     state_log_type gen_alpha_log;
     state_log_type gen_seq_log;
+    state_log_type gen_fit_log, gen_repro_log, gen_reset_log;
 
     size_t nSelfing = 0;
     timer sim_time;
 
     std::ostringstream oss;
+    size_t nBlocks = 0;
 
     for( SystemClock::vtime_t i = 0; i < tUntil; ++i ) {
         timer gen_timer;
+        timer fit_timer;
         assert( parent != child );
         if( fitness_size < parent->size() ) {
             if( fitness != NULL ) {
@@ -227,9 +230,6 @@ int main( int argc, char ** argv ) {
 
         memset( fitness, 0, sizeof(double) * fitness_size );
 
-        size_t table_size = locus_bitset::updateActiveAlphabet() + 1;
-        size_t parent_pop_seq_count = locus_bitset::activeCount();
-        size_t parent_pop_mut_count = alphabet_type::getInstance()->active_count();
 #ifdef LOGGING
         {
             std::string k = oss.str();
@@ -252,7 +252,9 @@ int main( int argc, char ** argv ) {
             ++tmp;
         }
         //e_fitness /= (double)parent->size();
+        fit_timer.stop();
 
+        timer repro_timer;
         //
         // mate
         //
@@ -271,6 +273,9 @@ int main( int argc, char ** argv ) {
             (*child)[child_idx++]->getProperties()->setDOB( i );
         }
 
+        repro_timer.stop();
+
+        timer reset_timer;
         assert( parent->size() == vm[ FOUNDER_SIZE_K ].as< unsigned int > () );
         for( environment_type::iterator it = parent->begin(); it != parent->end(); it++ ) {
             (*it)->reset();
@@ -278,9 +283,15 @@ int main( int argc, char ** argv ) {
 
         std::swap( parent, child );
 
+        nBlocks = locus_bitset::updateActiveAlphabet();
+        reset_timer.stop();
+
         gen_timer.stop();
+
+        size_t parent_pop_seq_count = locus_bitset::activeCount();
+        size_t parent_pop_mut_count = alphabet_type::getInstance()->active_count(); // performs dynamic_bitset::count(); linear computation of bitset Hamming Weight
         
-        state_log_type a, g, r, s, t;
+        state_log_type a, g, r, s, t, f, m, c;
         a.put("", parent_pop_mut_count );
         gen_alpha_log.push_back( std::make_pair("", a ) );
 
@@ -293,11 +304,19 @@ int main( int argc, char ** argv ) {
         s.put("", parent_pop_seq_count );
         gen_seq_log.push_back( std::make_pair("", s ) );
 
-        t.put("", table_size );
+        t.put("", nBlocks );
         gen_size_log.push_back( std::make_pair("", t ) );
+
+        f.put("", fit_timer.elapsed().count());
+        gen_fit_log.push_back( std::make_pair("", f ) );
+
+        m.put("", repro_timer.elapsed().count());
+        gen_repro_log.push_back( std::make_pair("", m ));
+
+        c.put("", reset_timer.elapsed().count());
+        gen_reset_log.push_back( std::make_pair("", c));
     }
 
-    double nBlocks = (double) locus_bitset::updateActiveAlphabet();
     sim_time.stop();
 
     timer finalize_timer;
@@ -415,8 +434,11 @@ int main( int argc, char ** argv ) {
     log.add_child( "simulation.performance.data.generations", gen_log );
     log.add_child( "simulation.performance.data.runtimes", gen_run_log );
     log.add_child( "simulation.performance.data.table_size", gen_size_log );
-    log.add_child( "simulation.performance.data.alphabet_size", gen_alpha_log );
+    log.add_child( "simulation.performance.data.segregation_sites", gen_alpha_log );
     log.add_child( "simulation.performance.data.sequence_count", gen_seq_log );
+    log.add_child( "simulation.performance.data.fitness", gen_fit_log);
+    log.add_child( "simulation.performance.data.reproduction", gen_repro_log);
+    log.add_child( "simulation.performance.data.reset", gen_reset_log);
     
     boost::property_tree::write_json( std::cout, log );
     delete [] fitness;
