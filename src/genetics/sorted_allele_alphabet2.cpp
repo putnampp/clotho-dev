@@ -8,7 +8,10 @@
 
 #include "utility/bitset_ops.hpp"
 
+// OFFSET_BIT_MASK => bit_[n] = 1
 #define OFFSET_BIT_MASK( n ) (1UL << n)
+
+// LOW_BIT_MASK => bits_{[0, n]} = 1
 #define LOW_BIT_MASK( n ) ((1UL << (n + 1) ) - 1)
 
 const typename SortedAlleleAlphabet2::block_type  SortedAlleleAlphabet2::low_order_bit_masks[ bits_per_range ] = {
