@@ -3,9 +3,11 @@
 #include <map>
 #include <set>
 #include <cassert>
+#include <fstream>
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
+#include <boost/foreach.hpp>
 
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string/predicate.hpp>
@@ -19,14 +21,33 @@ typedef boost::property_tree::ptree json_tree_type;
 const string HELP_K = "help";
 const string INPUT_K = "input";
 
+const string CANVAS_K = "canvas";
+const string GNUPLOT_K = "gnuplot";
+
+const string PREFIX_K = "prefix";
+
+const string GRAPHING_K = "graph";
+
 void join_performance_data( const std::vector< string > & files, boost::property_tree::ptree & p );
 void to_canvasxpress_graph( const boost::property_tree::ptree & p );
 void to_canvasxpress_graph2( const boost::property_tree::ptree & p );
-void to_canvasxpress_graph3( const boost::property_tree::ptree & p );
+void to_canvasxpress_graph3( const boost::property_tree::ptree & p, const std::string & prefix );
+
+void to_gnuplot_graph( boost::property_tree::ptree & p, const std::string & prefix, const std::vector< std::string > & keys );
+
+void gnuplot_data( std::ostream * out, boost::property_tree::ptree::iterator first, boost::property_tree::ptree::iterator last, const std::vector< std::string > & keys );
 
 void combine_sample_data( boost::property_tree::ptree::const_iterator first, boost::property_tree::ptree::const_iterator last, string child_key, boost::property_tree::ptree & res );
 
 int parse_commandline( int argc, char ** argv, po::variables_map & vm );
+
+template < class Iterator >
+inline void write_list( std::ostream * out, Iterator f, Iterator l, const std::string delim ) {
+    (*out) << (*f++);
+    while( f != l ) {
+        (*out) << delim << (*f++);
+    }
+}
 
 int main( int argc, char ** argv ) {
     po::variables_map vm;
@@ -37,12 +58,31 @@ int main( int argc, char ** argv ) {
     }
 
     std::vector< string > inp = vm[ INPUT_K ].as< std::vector<string> >();
+
+    std::string prefix = vm[PREFIX_K].as< string >();
   
     json_tree_type raw_data, graph;
 
     join_performance_data( inp, raw_data );
 
-    to_canvasxpress_graph3( raw_data );
+    std::vector< string > g_keys;
+    g_keys.push_back( "generations" );
+    g_keys.push_back( "runtimes" );
+    g_keys.push_back( "table_size" );
+    g_keys.push_back( "segregation_sites" );
+    g_keys.push_back( "sequence_count" );
+    g_keys.push_back( "reset" );
+    g_keys.push_back( "fitness" );
+    g_keys.push_back( "reproduction" );
+
+    if( vm.count(CANVAS_K) ) {
+        to_canvasxpress_graph3( raw_data, prefix );
+    }
+
+    if( vm.count(GNUPLOT_K) ) {
+        to_gnuplot_graph( raw_data, prefix, g_keys );
+    }
+
     return 0;
 }
 
@@ -55,6 +95,10 @@ int parse_commandline( int argc, char ** argv, po::variables_map & vm ) {
     po::options_description parameters("Parameters");
     parameters.add_options()
         ( (INPUT_K + ",i").c_str(), po::value< std::vector< string > >()->composing(), "JSON files")
+        ( (CANVAS_K).c_str(), "CanvasXpress graphs and data")
+        ( (GNUPLOT_K).c_str(), "GNUPlot graphs and data")
+        ( (PREFIX_K + ",p").c_str(), po::value< string >()->default_value(""), "Output file prefix")
+        ( (GRAPHING_K + ",g").c_str(), po::value< std::vector< string > >()->composing(), "Graph data keys")
     ;
 
     po::positional_options_description pos;
@@ -279,7 +323,7 @@ void to_canvasxpress_graph2( const boost::property_tree::ptree & p ) {
     boost::property_tree::write_json( std::cout, graph );
 }
 
-void to_canvasxpress_graph3( const boost::property_tree::ptree & p ) {
+void to_canvasxpress_graph3( const boost::property_tree::ptree & p, const std::string & prefix ) {
     typedef boost::property_tree::ptree tree_type;
     typedef tree_type::iterator tree_iterator;
     typedef tree_type::const_iterator tree_citerator;
@@ -288,15 +332,22 @@ void to_canvasxpress_graph3( const boost::property_tree::ptree & p ) {
     std::vector< string > g_keys;
     g_keys.push_back( "runtimes" );
     g_keys.push_back( "table_size" );
-    g_keys.push_back( "alphabet_size" );
+    g_keys.push_back( "segregation_sites" );
     g_keys.push_back( "sequence_count" );
+    g_keys.push_back( "reset" );
+    g_keys.push_back( "fitness" );
+    g_keys.push_back( "reproduction" );
     for( std::vector< string >::iterator it = g_keys.begin(); it != g_keys.end(); ++it) {
         tree_type tmp;
         combine_sample_data( p.begin(), p.end(), (*it), tmp );
         graphs.add_child( "graphs." + (*it), tmp );
     }
 
-    boost::property_tree::write_json( std::cout, graphs );
+    if( prefix.empty() ) { 
+        boost::property_tree::write_json( std::cout, graphs );
+    } else {
+        boost::property_tree::write_json( prefix + "_canvasxpress.json", graphs);
+    }
 }
 
 void combine_sample_data( boost::property_tree::ptree::const_iterator first, boost::property_tree::ptree::const_iterator last, string child_key, boost::property_tree::ptree & res ) {
@@ -356,3 +407,53 @@ void combine_sample_data( boost::property_tree::ptree::const_iterator first, boo
     res.add_child( "z", z );
     res.add_child( "graph_opts", graph_opts );
 }
+
+void to_gnuplot_graph( boost::property_tree::ptree & p, const std::string & prefix, const std::vector< std::string > & keys ) {
+    if( prefix.empty() ) {
+        gnuplot_data( &std::cout, p.begin(), p.end(), keys );
+    } else {
+        std::ofstream out( (prefix + "_gnuplot.data").c_str());
+        gnuplot_data( &out, p.begin(), p.end(), keys );
+    }
+}
+
+void gnuplot_data( std::ostream * out, boost::property_tree::ptree::iterator first, boost::property_tree::ptree::iterator last, const std::vector< std::string > & keys ) {
+    while( first != last ) {
+        std::vector< std::string > final_keys;
+
+        std::vector< std::vector< std::string > > transposed;
+        // transpose data sets
+        for( std::vector< std::string >::const_iterator k_it = keys.begin(); k_it != keys.end(); ++k_it ) {
+            if( first->second.get_child_optional( *k_it ) != boost::none ) {
+                final_keys.push_back( *k_it );
+                unsigned int i = 0;
+                std::ostringstream oss;
+                BOOST_FOREACH( boost::property_tree::ptree::value_type & v, first->second.get_child(*k_it)) {
+                    if( transposed.size() == i ) {
+                        transposed.push_back( std::vector< std::string >() );
+                    }
+                    oss.str("");
+                    oss.clear();
+                    oss << v.second.data();
+
+                    transposed[ i++ ].push_back( oss.str() );
+                }
+            }
+        }
+
+
+        (*out) << "#" << first->second.get<std::string>("filename") << "\n";
+        write_list( out, final_keys.begin(), final_keys.end(), "," );
+        (*out) << "\n";
+
+        for( std::vector< std::vector< std::string > >::iterator  it = transposed.begin(); it != transposed.end(); ++it ) {
+            write_list( out, it->begin(), it->end(), ",");
+            (*out) << "\n";
+        }
+
+        (*out) << "\n";
+
+        ++first;
+    }
+}
+
