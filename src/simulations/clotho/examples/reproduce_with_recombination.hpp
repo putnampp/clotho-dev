@@ -2,7 +2,8 @@
 #define REPRODUCE_WITH_RECOMBINATION_HPP_
 
 #include "rng/random_process.hpp"
-#include "genetics/recombine_bitset.hpp"
+//#include "genetics/recombine_bitset.hpp"
+#include "genetics/recombine_methods.hpp"
 
 #include "locus_generator.tcc"
 #include "infinite_site_generator.tcc"
@@ -387,6 +388,7 @@ public:
 
     virtual ~ReproduceWithRecombination() {}
 protected:
+/*
     void generateRecombination( recombination_points & rec_points, unsigned int nRec ) {
         static locus_generator< typename alphabet_type::locus_t, RandomProcess::rng_pointer> lgen;
 
@@ -399,6 +401,23 @@ protected:
         std::sort( rec_points.begin(), rec_points.end() );
         recombination_iterator it = std::unique( rec_points.begin(), rec_points.end() );
         rec_points.resize((it - rec_points.begin()));
+    }
+*/
+
+    inline void generateRecombination( recombination_points & rec_points, unsigned int nRec, bool bSkipUnique = true ) {
+        static locus_generator< typename alphabet_type::locus_t, RandomProcess::rng_pointer > lgen;
+
+        while( nRec ) {
+            std::generate_n( std::back_inserter( rec_points ), nRec, lgen );
+
+            std::sort( rec_points.begin(), rec_points.end() );
+
+            if( bSkipUnique ) break;
+            recombination_iterator it = std::unique( rec_points.begin(), rec_points.end() );
+            rec_points.resize(( it - rec_points.begin()));
+
+            nRec -= rec_points.size();
+        }
     }
 
     double m_mu, m_rho;
