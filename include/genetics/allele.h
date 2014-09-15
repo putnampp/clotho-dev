@@ -6,6 +6,8 @@ struct allele {
     allele( double d = 1.0, double s = 0.0 ) : dominance(d), selection(s) {}
     allele( const allele & a ) : dominance(a.dominance), selection(a.selection) {}
 
+    bool isNeutral() const { return selection == 0.0; }
+
     virtual ~allele() {}
 };
 
