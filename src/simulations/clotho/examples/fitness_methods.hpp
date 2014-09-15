@@ -57,6 +57,8 @@ public:
 
         typename gamete_type::alphabet_t::pointer alpha = g1->getAlphabet();
 
+        if( !alpha->hasSelectedMutations() ) return f;
+
         fitness_bitset< typename gamete_type::bitset_type::block_type, typename gamete_type::bitset_type::allocator_type, typename gamete_type::alphabet_t, hom_policy, het_policy, double > fit( g1->getBits(), alpha, m_hom_case, m_het_case, f);
         boost::to_block_range( *g2->getBits(), fit );
         return fit.getResult();
