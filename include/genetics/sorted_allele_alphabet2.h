@@ -117,6 +117,8 @@ public:
         return &m_free_mask;
     }
 
+    bool hasSelectedMutations() const { return m_has_selected; }
+
     virtual ~SortedAlleleAlphabet2();
 protected:
     index_type      find( const locus_t & l );
@@ -135,6 +137,9 @@ protected:
     bitset_type     m_free_list, m_free_intersect, m_free_union;
     bitset_type     m_free_mask;
     bitset_type     m_free_ranges;
+    bitset_type     m_non_neutral;
+
+    bool            m_has_selected;
 
 public:
     static const  block_type  low_order_bit_masks[ bits_per_range ];

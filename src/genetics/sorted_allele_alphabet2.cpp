@@ -52,7 +52,7 @@ const typename SortedAlleleAlphabet2::block_type  SortedAlleleAlphabet2::bit_pos
     OFFSET_BIT_MASK( 60 ), OFFSET_BIT_MASK( 61 ), OFFSET_BIT_MASK( 62 ), OFFSET_BIT_MASK( 63 )
 };
 
-SortedAlleleAlphabet2::SortedAlleleAlphabet2()  {}
+SortedAlleleAlphabet2::SortedAlleleAlphabet2() : m_has_selected(false) {}
 
 SortedAlleleAlphabet2::index_type     SortedAlleleAlphabet2::getSymbol( const locus_t & l, const allele_t & a, bool allowDuplicates ) {
     index_type idx = find( l );
@@ -121,6 +121,11 @@ void SortedAlleleAlphabet2::setState() {
     m_free_mask = ~m_free_list;
 
     buildFreeRanges();
+
+    if( m_has_selected ) {
+        m_non_neutral &= m_free_mask;
+        m_has_selected = m_non_neutral.any();
+    }
 }
 
 void SortedAlleleAlphabet2::resetFreeSymbols() {
@@ -204,6 +209,12 @@ void SortedAlleleAlphabet2::updateSymbolAt( index_type & idx, const locus_t & l,
     }
 
     updateFreeIndex( idx, false );
+
+    if( !a.isNeutral() ) {
+        m_non_neutral.resize( m_db.size(), false );
+        m_non_neutral[idx] = true;
+        m_has_selected = true;
+    }
 }
 
 void SortedAlleleAlphabet2::updateFreeIndex( index_type idx, bool isFree ) {
